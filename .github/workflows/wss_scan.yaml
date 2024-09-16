@@ -1,0 +1,53 @@
+name: Whitesource scan
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: [self-hosted, solinas]
+    container: golang:1
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.head_ref }}
+      cancel-in-progress: true
+    env:
+      WS_APIKEY: ${{ secrets.WS_APIKEY }}
+      WS_USERKEY: ${{ secrets.WS_USERKEY }}
+      WS_WSS_URL: ${{ vars.WS_URL }}
+      WS_PRODUCTNAME: ${{ vars.WS_PRODUCTNAME }}
+      WS_PROJECTNAME: ${{ vars.WS_PROJECTNAME_PREFIX }}-${{ github.event.repository.name }}-${{ github.head_ref || github.ref_name }} 
+    steps:
+      - name: Update Ubuntu
+        run: |
+          uname -a
+          apt update
+      - name: Install Ubuntu dependencies
+        run: |
+          apt install -y \
+            git \
+            default-libmysqlclient-dev \
+            libcurl4-openssl-dev \
+            libssl-dev \
+            libffi-dev \
+            pkg-config \
+            apache2 \
+            apache2-dev \
+            default-jre
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          token: ${{ secrets.GH_ACTION_REPO_READ }}
+      - name: Setup env
+        run: |
+          echo "machine github.tools.sap\n  login ${{ secrets.GO_GITHUB_USER_ACCESS_TOKEN }}" > ~/.netrc
+          export GOPRIVATE=github.tools.sap/kms/*
+          go mod vendor
+      - name: Run Whitesource Scan
+        run: |
+          curl -LJO https://github.com/whitesource/unified-agent-distribution/releases/latest/download/wss-unified-agent.jar
+          export GOFLAGS='--buildvcs=false'
+          java -jar ./wss-unified-agent.jar -c ${PWD}/whitesource-fs-agent.config -d .
