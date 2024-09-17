@@ -44,7 +44,7 @@ jobs:
         timeout-minutes: 30
         uses: checkmarx/ast-github-action@main
         with:
-          project_name: KMS20-${{ github.event.repository.name }}
+          project_name: ${{ github.event.repository.name }}
           base_uri: https://checkmarx.tools.sap
           cx_client_id: ${{ secrets.CX_CLIENT_ID }} 
           cx_client_secret: ${{ secrets.CX_CLIENT_SECRET }} 

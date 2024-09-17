@@ -9,7 +9,7 @@ on:
 jobs:
   scan:
     runs-on: [self-hosted, solinas]
-    container: golang:1
+    container: python:3.9.16-slim
     concurrency:
       group: ${{ github.workflow }}-${{ github.head_ref }}
       cancel-in-progress: true
@@ -22,7 +22,6 @@ jobs:
     steps:
       - name: Update Ubuntu
         run: |
-          uname -a
           apt update
       - name: Install Ubuntu dependencies
         run: |
@@ -35,19 +34,20 @@ jobs:
             pkg-config \
             apache2 \
             apache2-dev \
-            default-jre
+            npm \
+            nodejs \
+            openjdk-11-jdk
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           submodules: recursive
           token: ${{ secrets.GH_ACTION_REPO_READ }}
-      - name: Setup env
+      - name: Setup Npm
         run: |
-          echo "machine github.tools.sap\n  login ${{ secrets.GO_GITHUB_USER_ACCESS_TOKEN }}" > ~/.netrc
-          export GOPRIVATE=github.tools.sap/kms/*
-          go mod vendor
+          npm install -g grunt-cli
+          npm install
+          grunt --force
       - name: Run Whitesource Scan
         run: |
           curl -LJO https://github.com/whitesource/unified-agent-distribution/releases/latest/download/wss-unified-agent.jar
-          export GOFLAGS='--buildvcs=false'
-          java -jar ./wss-unified-agent.jar -c ${PWD}/whitesource-fs-agent.config -d .
+          java -jar ./wss-unified-agent.jar -c ${PWD}/.github/config/whitesource-fs-agent.config -d .
