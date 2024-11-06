@@ -1,0 +1,33 @@
+{
+  "name": "kms",
+  "private": true,
+  "version": "1.0.0",
+  "author": "SAP SE",
+  "description": "KMS UI",
+  "dependencies": {
+    "@openui5/types": "^1.129.0",
+    "@types/axios": "^0.14.4",
+    "@types/qunit": "^2.19.11",
+    "@ui5/cli": "^4",
+    "@ui5/linter": "^1.0.2",
+    "@ui5/middleware-code-coverage": "^2.0.1",
+    "axios": "^1.7.7",
+    "chance": "^1.1.12",
+    "cors": "^2.8.5",
+    "eslint": "^9.12.0",
+    "express": "^4.21.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.8.1",
+    "ui5-middleware-livereload": "^3.1.0",
+    "ui5-tooling-modules": "^3.17.0",
+    "ui5-tooling-transpile": "^3.5.0"
+  },
+  "scripts": {
+    "start": "ui5 serve -o index.html",
+    "build": "ui5 build --all",
+    "lint-no-fix": "eslint --quiet \"./webapp/**/*.ts\"",
+    "lint": "eslint --fix \"./webapp/**/*.ts\"",
+    "serve": "node mock.mjs"
+  }
+}
