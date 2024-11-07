@@ -1,0 +1,131 @@
+{
+    "_version": "1.21.0",
+    "sap.app": {
+        "id": "kms",
+        "type": "application",
+        "i18n": {
+            "bundleUrl": "i18n/i18n.properties",
+            "fallbackLocale": "en",
+            "supportedLocales": [
+                "en",
+                "de"
+            ]
+        },
+        "title": "{{appTitle}}",
+        "description": "KMS UI",
+        "applicationVersion": {
+            "version": "1.0.0"
+        }
+    },
+    "sap.ui": {
+        "technology": "UI5",
+        "deviceTypes": {
+            "desktop": true,
+            "tablet": false,
+            "phone": false
+        }
+    },
+    "sap.ui5": {
+        "contentDensities": {
+            "compact": true,
+            "cozy": true
+        },
+        "rootView": {
+            "viewName": "kms.view.App",
+            "type": "XML",
+            "id": "kmsApp",
+            "async": true
+        },
+        "resources": {
+            "css": [
+                {
+                    "uri": "css/style.css"
+                }
+            ]
+        },
+        "dependencies": {
+            "minUI5Version": "1.77.0",
+            "libs": {
+                "sap.m": {},
+                "sap.tnt": {},
+                "sap.ui.core": {},
+                "sap.ui.layout": {},
+                "sap.uxap": {}
+            }
+        },
+        "models": {
+            "i18n": {
+                "type": "sap.ui.model.resource.ResourceModel",
+                "uri": "i18n/i18n.properties"
+            }
+        },
+        "routing": {
+            "config": {
+                "routerClass": "sap.m.routing.Router",
+                "controlId": "mainContents",
+                "viewType": "XML",
+                "controlAggregation": "pages",
+                "viewPath": "kms.view",
+                "async": true
+            },
+            "routes": [
+                {
+                    "pattern": "home",
+                    "name": "home",
+                    "target": "home"
+                },
+                {
+                    "pattern": "keyConfigs",
+                    "name": "keyConfigs",
+                    "target": "keyConfigs"
+                },
+                {
+                    "pattern": "systems",
+                    "name": "systems",
+                    "target": "systems"
+                },
+                {
+                    "pattern": "tasks",
+                    "name": "tasks",
+                    "target": "tasks"
+                },
+                {
+                    "pattern": "users",
+                    "name": "users",
+                    "target": "users"
+                },
+                {
+                    "pattern": "settings",
+                    "name": "settings",
+                    "target": "settings"
+                }
+            ],
+            "targets": {
+                "home": {
+                    "viewId": "home",
+                    "viewName": "Home"
+                },
+                "keyConfigs": {
+                    "viewId": "keyConfigs",
+                    "viewName": "keyConfigs.KeyConfigs"
+                },
+                "systems": {
+                    "viewId": "systems",
+                    "viewName": "systems.Systems"
+                },
+                "tasks": {
+                    "viewId": "tasks",
+                    "viewName": "tasks.Tasks"
+                },
+                "users": {
+                    "viewId": "users",
+                    "viewName": "users.Users"
+                },
+                "settings": {
+                    "viewId": "settings",
+                    "viewName": "Settings"
+                }
+            }
+        }
+    }
+}

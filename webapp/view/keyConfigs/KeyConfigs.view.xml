@@ -1,0 +1,124 @@
+<mvc:View
+    controllerName="kms.controller.keyConfigs.KeyConfigs"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:card="sap.f.cards"
+    xmlns:core="sap.ui.core"
+    xmlns:mdc="sap.ui.mdc"
+    xmlns:mvc="sap.ui.core.mvc"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    <f:DynamicPage>
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:breadcrumbs>
+                    <Breadcrumbs currentLocationText="{i18n>sideContentKeyConfiguration}">
+                        <Link text="{i18n>sideContentHome}"
+                            href="#/home" />
+                    </Breadcrumbs>
+                </f:breadcrumbs>
+                <f:heading>
+                    <Title
+                        text="{parts: ['i18n>keyConfigurationWithCount', 'oneWay>/configsCount'], formatter: 'formatMessage'}" />
+                </f:heading>
+                <f:snappedTitleOnMobile>
+                    <Title text="{i18n>sideContentKeyConfiguration}" />
+                </f:snappedTitleOnMobile>
+                <f:actions>
+                    <Button
+                        icon="sap-icon://refresh"
+                        type="Transparent"
+                        press="setKeyConfigs" />
+                    <Button
+                        icon="sap-icon://filter"
+                        type="Transparent" />
+                    <Button
+                        icon="sap-icon://sort"
+                        class="sapUiSmallMarginEnd"
+                        type="Transparent" />
+                    <Button
+                        icon="sap-icon://add"
+                        type="Emphasized"
+                        text="{i18n>createConfiguration}"
+                        press="onCreateConfigPress" />
+                </f:actions>
+            </f:DynamicPageTitle>
+        </f:title>
+        <f:content>
+            <VBox height="100%">
+                <f:GridContainer class="sapUiSmallMargin" items="{oneWay>/configs}"
+                    visible="{= ${oneWay>/configs}.length !== 0 }">
+                    <f:layout>
+                        <f:GridContainerSettings rowSize="84px" columnSize="84px" gap="8px" />
+                    </f:layout>
+                    <f:GridListItem press="onConfigPress"
+                        type="{= ${oneWay>keys}.length > 0 ? 'Active' : 'Inactive'}">
+                        <f:layoutData>
+                            <f:GridContainerItemLayoutData columns="4" />
+                        </f:layoutData>
+                        <VBox
+                            width="100%"
+                            class="sapUiContentPadding"
+                            justifyContent="SpaceBetween">
+                            <VBox justifyContent="SpaceBetween"
+                                class="sapUiSmallMarginBegin sapUiSmallMarginTop sapUiSmallMarginEnd"
+                                width="100%">
+                                <Title text="{oneWay>name}" />
+                                <Label text="{oneWay>id}" />
+                            </VBox>
+                            <HBox justifyContent="SpaceBetween"
+                                class="sapUiSmallMarginBegin sapUiSmallMarginTop sapUiSmallMarginEnd"
+                                width="100%">
+                                <VBox width="50%">
+                                    <Label text="{i18n>keys}:" />
+                                    <Text text="{= ${oneWay>keys}.length}" />
+                                </VBox>
+                                <VBox width="50%">
+                                    <Label text="Systems:" />
+                                    <Text text="{= ${oneWay>systems}.length}" />
+                                </VBox>
+                            </HBox>
+                            <VBox justifyContent="SpaceBetween"
+                                backgroundDesign="Solid"
+                                height="90px"
+                                visible="{= ${oneWay>keys}.length !== 0}"
+                                class="gray-background-color rounded-box sapUiSmallMargin">
+                                <Label design="Bold" text="ap-southeast-test-something"
+                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop" />
+                                <Label text="AWS - eu-central-1"
+                                    class="sapUiTinyMarginBegin" />
+                                <ObjectStatus
+                                    visible="{= ${oneWay>keys}.length !== 3}"
+                                    icon="sap-icon://sys-enter-2"
+                                    text="{i18n>active}"
+                                    class="sapUiTinyMargin"
+                                    inverted="true"
+                                    state="Indication14" />
+                                <ObjectStatus
+                                    visible="{= ${oneWay>keys}.length === 3}"
+                                    icon="sap-icon://warning"
+                                    text="{i18n>disabled}"
+                                    class="sapUiTinyMargin"
+                                    inverted="true"
+                                    state="Indication13" />
+                            </VBox>
+                            <HBox justifyContent="Center" alignItems="Center"
+                                backgroundDesign="Solid"
+                                visible="{= ${oneWay>keys}.length === 0}"
+                                height="90px"
+                                class="outlined-dotted-box-rounded-corners sapUiSmallMargin">
+                                <Button text="{i18n>createKey}" icon="sap-icon://add" />
+                            </HBox>
+                        </VBox>
+                    </f:GridListItem>
+                </f:GridContainer>
+                <IllustratedMessage enableVerticalResponsiveness="false"
+                    title="{i18n>noKeyConfigurations}"
+                    description="{i18n>createKeyConfigurationHint}"
+                    visible="{= ${oneWay>/configs}.length === 0 }"
+                    illustrationType="tnt-NoApplications"
+                    illustrationSize="Scene">
+                </IllustratedMessage>
+            </VBox>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

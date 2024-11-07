@@ -1,0 +1,10 @@
+/dist/
+/node_modules
+/node_modules/*
+.DS_Store
+/playwright/.auth
+/playwright-report/*
+/test-results/*
+/coverage/*
+/coverage
+/.ui5-tooling-modules

@@ -1,0 +1,60 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:tnt="sap.tnt"
+    xmlns:core="sap.ui.core">
+    <ResponsivePopover
+        id="userInfoPopover"
+        showHeader="false"
+        contentWidth="300px"
+        placement="Bottom">
+        <content>
+            <VBox width="100%" height="100%">
+                <HBox alignContent="Center" justifyContent="Center"
+                    class="sapUiSmallMarginTop">
+                    <Avatar
+                        initials="KM"
+                        displaySize="L"
+                        showBorder="true"
+                        press="onPress" />
+                </HBox>
+                <HBox justifyContent="Center" alignContent="Center"
+                    class="sapUiTinyMarginTop">
+                    <Title text="First Last" level="H3" />
+                </HBox>
+                <HBox justifyContent="Center" alignContent="Center">
+                    <Label text="first.last@sap.com" />
+                </HBox>
+                <tnt:NavigationList id="userInfoNavList" class="sapUiTinyMarginTop"
+                    itemSelect="onUserInfoListSelect">
+                    <tnt:NavigationListItem
+                        text="{i18n>userAccount}"
+                        icon="sap-icon://customer"
+                        key="account">
+                    </tnt:NavigationListItem>
+                    <tnt:NavigationListItem
+                        text="{i18n>settings}"
+                        icon="sap-icon://settings"
+                        key="settings">
+                    </tnt:NavigationListItem>
+                    <tnt:NavigationListItem
+                        text="{i18n>tenants}"
+                        icon="sap-icon://detail-more"
+                        key="tenants">
+                    </tnt:NavigationListItem>
+                    <tnt:NavigationListItem
+                        text="{i18n>sideContentLegal}"
+                        icon="sap-icon://official-service"
+                        key="legal">
+                    </tnt:NavigationListItem>
+                </tnt:NavigationList>
+                <HBox justifyContent="End" class="sapUiSmallMarginEnd">
+                    <Button
+                        text="{i18n>signOut}"
+                        type="Transparent"
+                        icon="sap-icon://log"
+                        press="onSignOutPress" />
+                </HBox>
+            </VBox>
+        </content>
+    </ResponsivePopover>
+</core:FragmentDefinition>

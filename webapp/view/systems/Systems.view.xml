@@ -1,0 +1,26 @@
+<mvc:View
+    controllerName="kms.controller.systems.Systems"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:mvc="sap.ui.core.mvc">
+    <f:DynamicPage>
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:breadcrumbs>
+                    <Breadcrumbs currentLocationText="{i18n>sideContentSystems}">
+                        <Link text="{i18n>sideContentHome}"
+                            href="#/home" />
+                    </Breadcrumbs>
+                </f:breadcrumbs>
+                <f:heading>
+                    <Title text="{i18n>sideContentSystems}" />
+                </f:heading>
+                <f:snappedTitleOnMobile>
+                    <Title text="{i18n>sideContentSystems}" />
+                </f:snappedTitleOnMobile>
+            </f:DynamicPageTitle>
+        </f:title>
+        <f:content>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>
