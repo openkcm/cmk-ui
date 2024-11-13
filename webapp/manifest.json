@@ -80,6 +80,11 @@
                     "target": "keyConfigs"
                 },
                 {
+                    "pattern": "keyConfigs/{keyConfigId}",
+                    "name": "keyConfigDetail",
+                    "target": "keyConfigDetail"
+                },
+                {
                     "pattern": "systems",
                     "name": "systems",
                     "target": "systems"
@@ -108,6 +113,10 @@
                 "keyConfigs": {
                     "viewId": "keyConfigs",
                     "viewName": "keyConfigs.KeyConfigs"
+                },
+                "keyConfigDetail": {
+                    "viewId": "keyConfigDetail",
+                    "viewName": "keyConfigs.detail.Detail"
                 },
                 "systems": {
                     "viewId": "systems",
