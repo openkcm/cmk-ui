@@ -1,0 +1,93 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:tnt="sap.tnt"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    <Table
+        noDataText=" "
+        items="{
+                    path: 'oneWay>/keyConfig/keys',
+                    sorter: {
+                        path: 'Name'
+                    }
+                }">
+        <headerToolbar>
+            <OverflowToolbar>
+                <Title
+                    text="{parts: ['i18n>keysWithCount', 'oneWay>/keysCount'], formatter: 'formatMessage'}"
+                    level="H2" />
+                <ToolbarSpacer />
+                <Button
+                    text="{i18n>create}" type="Ghost"
+                    class="sapUiSizeCompact"
+                    icon="sap-icon://add" />
+                <Button
+                    icon="sap-icon://filter"
+                    press="onKeysTableFilterPress"
+                    type="Transparent" />
+                <Button
+                    icon="sap-icon://sort"
+                    press="onKeysTableSortPress"
+                    class="sapUiSmallMarginEnd"
+                    type="Transparent" />
+            </OverflowToolbar>
+        </headerToolbar>
+        <columns>
+            <Column width="70%"
+                visible="{= ${oneWay>/keyConfig/keys}.length > 0 }">
+                <Text text="{i18n>name}" />
+            </Column>
+            <Column width="auto"
+                visible="{= ${oneWay>/keyConfig/keys}.length > 0 }">
+                <Text text="{i18n>createdOn}" wrapping="false" />
+            </Column>
+            <Column width="auto"
+                visible="{= ${oneWay>/keyConfig/keys}.length > 0 }">
+                <Text text="{i18n>state}" wrapping="false" />
+            </Column>
+            <Column width="7%"
+                visible="{= ${oneWay>/keyConfig/keys}.length > 0 }">
+                <Text text="{i18n>actions}" wrapping="false" />
+            </Column>
+            <Column width="7%"
+                visible="{= ${oneWay>/keyConfig/keys}.length === 0 }">
+                <Text text="" wrapping="false" />
+            </Column>
+        </columns>
+        <items>
+            <ColumnListItem vAlign="Middle" type="Navigation">
+                <cells>
+                    <VBox justifyContent="Center" alignContent="Center">
+                        <HBox alignItems="End" justifyContent="Start">
+                            <Text text="{oneWay>name}" wrapping="false" />
+                            <tnt:InfoLabel
+                                visible="{= !!${oneWay>primary}}"
+                                class="sapUiTinyMarginBegin"
+                                text="{i18n>primaryKey}"
+                                displayOnly="true"
+                                colorScheme="5" />
+                        </HBox>
+                        <Label text="{oneWay>provider} - {oneWay>region}" />
+                    </VBox>
+                    <Text
+                        text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, pattern: 'MMM dd yyyy', source:{pattern: 'yyyy-MM-ddTHH:mm:ss.SSSSSSZ'}}}"
+                        wrapping="false" />
+                    <VBox justifyContent="Center">
+                        <tnt:InfoLabel
+                            visible="{= !!${oneWay>enabled}}"
+                            text="{i18n>enabled}"
+                            colorScheme="8" />
+                        <tnt:InfoLabel
+                            visible="{= !${oneWay>enabled}}"
+                            text="{i18n>disabled}"
+                            colorScheme="2" />
+                    </VBox>
+                    <VBox alignContent="Center" alignItems="Center"
+                        justifyContent="Center">
+                        <Button icon="sap-icon://overflow" type="Ghost"
+                            class="sapUiSmallMarginEnd" />
+                    </VBox>
+                </cells>
+            </ColumnListItem>
+        </items>
+    </Table>
+</core:FragmentDefinition>

@@ -1,0 +1,70 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:layout="sap.ui.layout">
+    <f:GridContainer class="sapUiSmallMargin" items="{oneWay>/configs}">
+        <f:layout>
+            <f:GridContainerSettings rowSize="84px" columnSize="84px" gap="8px" />
+        </f:layout>
+        <f:GridListItem press="onConfigPress"
+            type="{= ${oneWay>keys}.length > 0 ? 'Active' : 'Inactive'}">
+            <f:layoutData>
+                <f:GridContainerItemLayoutData columns="4" />
+            </f:layoutData>
+            <VBox
+                width="100%"
+                class="sapUiContentPadding"
+                justifyContent="SpaceBetween">
+                <VBox justifyContent="SpaceBetween"
+                    class="sapUiSmallMarginBegin sapUiSmallMarginTop sapUiSmallMarginEnd"
+                    width="100%">
+                    <Title text="{oneWay>name}" />
+                    <Label text="{oneWay>id}" />
+                </VBox>
+                <HBox justifyContent="SpaceBetween"
+                    class="sapUiSmallMarginBegin sapUiSmallMarginTop sapUiSmallMarginEnd"
+                    width="100%">
+                    <VBox width="50%">
+                        <Label text="{i18n>keys}:" />
+                        <Text text="{= ${oneWay>keys}.length}" />
+                    </VBox>
+                    <VBox width="50%">
+                        <Label text="Systems:" />
+                        <Text text="{= ${oneWay>systems}.length}" />
+                    </VBox>
+                </HBox>
+                <VBox justifyContent="SpaceBetween"
+                    backgroundDesign="Solid"
+                    height="90px"
+                    visible="{= ${oneWay>keys}.length !== 0}"
+                    class="gray-background-color rounded-box sapUiSmallMargin">
+                    <Label design="Bold" text="ap-southeast-test-something"
+                        class="sapUiTinyMarginBegin sapUiTinyMarginTop" />
+                    <Label text="AWS - eu-central-1"
+                        class="sapUiTinyMarginBegin" />
+                    <ObjectStatus
+                        visible="{= ${oneWay>keys}.length !== 3}"
+                        icon="sap-icon://sys-enter-2"
+                        text="{i18n>active}"
+                        class="sapUiTinyMargin"
+                        inverted="true"
+                        state="Indication14" />
+                    <ObjectStatus
+                        visible="{= ${oneWay>keys}.length === 3}"
+                        icon="sap-icon://warning"
+                        text="{i18n>disabled}"
+                        class="sapUiTinyMargin"
+                        inverted="true"
+                        state="Indication13" />
+                </VBox>
+                <HBox justifyContent="Center" alignItems="Center"
+                    backgroundDesign="Solid"
+                    visible="{= ${oneWay>keys}.length === 0}"
+                    height="90px"
+                    class="outlined-dotted-box-rounded-corners sapUiSmallMargin">
+                    <Button text="{i18n>createKey}" icon="sap-icon://add" />
+                </HBox>
+            </VBox>
+        </f:GridListItem>
+    </f:GridContainer>
+</core:FragmentDefinition>

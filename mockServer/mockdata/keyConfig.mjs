@@ -40,10 +40,10 @@ export default () => {
         const response = Array.from({ length: count }, () => ({
             name: chance.state({ full: true }),
             id: chance.guid(),
-            keys: generateKeys(chance.integer({ min: 0, max: 4 })),
-            systems: generateSystems(chance.integer({ min: 1, max: 3 })),
-            createdBy: chance.name(),
-            created: chance.date()
+            keys: generateKeys(chance.integer({ min: 0, max: 3 })),
+            systems: generateSystems(chance.integer({ min: 0, max: 3 })),
+            createdBy: chance.email(),
+            createdOn: chance.date()
         }));
         return {
             data: response,

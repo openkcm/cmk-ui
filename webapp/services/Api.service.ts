@@ -61,6 +61,22 @@ export default class Api {
         }
     }
 
+    public async patch<T, R>(endpoint: string, data: T): Promise<R> {
+        try {
+            const response: AxiosResponse<R> = await this.axiosInstance.patch(endpoint, data);
+            return response.data;
+        } catch (error) {
+            const axiosError = error as AxiosError;
+            const apiError = axiosError.response;
+
+            throw new Error(JSON.stringify({
+                error: apiError,
+                status: apiError.status,
+                message: apiError.statusText,
+            }));
+        }
+    }
+
     public async delete<T>(endpoint: string): Promise<T> {
         try {
             const response: AxiosResponse<T> = await this.axiosInstance.delete(endpoint);

@@ -1,0 +1,65 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout"
+    xmlns:forms="sap.ui.layout.form">
+    <forms:Form width="100%" editable="true">
+        <forms:layout>
+            <forms:ColumnLayout
+                columnsM="2"
+                columnsL="3"
+                columnsXL="3" />
+        </forms:layout>
+        <forms:toolbar>
+            <OverflowToolbar>
+                <Title text="{i18n>details}" />
+                <ToolbarSpacer />
+                <Button icon="sap-icon://save" text="{i18n>save}"
+                    type="Emphasized"
+                    press="onSaveKeyConfigPress" />
+                <Button icon="sap-icon://decline" text="{i18n>cancel}"
+                    type="Ghost"
+                    press="onCancelEditPress" />
+            </OverflowToolbar>
+        </forms:toolbar>
+        <forms:formContainers>
+            <forms:FormContainer>
+                <forms:formElements>
+                    <forms:FormElement label="{i18n>name}">
+                        <forms:fields>
+                            <Input value="{twoWay>/keyConfig/name}" />
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>uuid}">
+                        <forms:fields>
+                            <Input editable="false"
+                                value="{oneWay>/keyConfig/id}" />
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>keyAdministrators}">
+                        <forms:fields>
+                            <Input editable="false" value="" />
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>tags}">
+                        <forms:fields>
+                            <Input editable="false" value="" />
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>createdBy}">
+                        <forms:fields>
+                            <Input editable="false"
+                                value="{oneWay>/keyConfig/createdBy}" />
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>createdOn}">
+                        <forms:fields>
+                            <Input
+                                editable="false"
+                                value="{path:'oneWay>/keyConfig/createdOn', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ss.SSSSSSZ'}}} UTC" />
+                        </forms:fields>
+                    </forms:FormElement>
+                </forms:formElements>
+            </forms:FormContainer>
+        </forms:formContainers>
+    </forms:Form>
+</core:FragmentDefinition>
