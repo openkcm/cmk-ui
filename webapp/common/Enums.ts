@@ -14,4 +14,10 @@ export enum KeyVersionStates {
     INACTIVE = 'INACTIVE',
 }
 
-export default { KeyConfigStatuses, KeyTypes, KeyVersionStates };
+export enum CloudProviders {
+    AWS = 'AWS',
+    AZURE = 'AZURE',
+    GCP = 'GCP'
+}
+
+export default { KeyConfigStatuses, KeyTypes, KeyVersionStates, CloudProviders };

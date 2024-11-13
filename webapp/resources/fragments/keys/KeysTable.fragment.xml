@@ -16,10 +16,14 @@
                     text="{parts: ['i18n>keysWithCount', 'oneWay>/keysCount'], formatter: 'formatMessage'}"
                     level="H2" />
                 <ToolbarSpacer />
-                <Button
-                    text="{i18n>create}" type="Ghost"
-                    class="sapUiSizeCompact"
-                    icon="sap-icon://add" />
+                <MenuButton text="{i18n>create}" icon="sap-icon://add" type="Ghost">
+                    <menu>
+                        <Menu>
+                            <MenuItem text="{i18n>sapManaged}"
+                                press="handleCreateKeyRoute" />
+                        </Menu>
+                    </menu>
+                </MenuButton>
                 <Button
                     icon="sap-icon://filter"
                     press="onKeysTableFilterPress"
@@ -62,7 +66,7 @@
                             <tnt:InfoLabel
                                 visible="{= !!${oneWay>primary}}"
                                 class="sapUiTinyMarginBegin"
-                                text="{i18n>primaryKey}"
+                                text="{i18n>primary}"
                                 displayOnly="true"
                                 colorScheme="5" />
                         </HBox>

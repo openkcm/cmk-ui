@@ -80,7 +80,7 @@
                     "target": "keyConfigs"
                 },
                 {
-                    "pattern": "keyConfigs/{keyConfigId}",
+                    "pattern": "keyConfigs/{keyConfigId}:?query:",
                     "name": "keyConfigDetail",
                     "target": "keyConfigDetail"
                 },

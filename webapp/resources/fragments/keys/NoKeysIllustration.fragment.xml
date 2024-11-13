@@ -16,10 +16,14 @@
                     text="{parts: ['i18n>keysWithCount', 'oneWay>/keysCount'], formatter: 'formatMessage'}"
                     level="H2" />
                 <ToolbarSpacer />
-                <Button
-                    text="{i18n>create}" type="Ghost"
-                    class="sapUiSizeCompact"
-                    icon="sap-icon://add" />
+                <MenuButton text="{i18n>create}" icon="sap-icon://add" type="Ghost">
+                    <menu>
+                        <Menu>
+                            <MenuItem text="{i18n>sapManaged}"
+                                press="handleCreateKeyRoute" />
+                        </Menu>
+                    </menu>
+                </MenuButton>
             </OverflowToolbar>
         </forms:toolbar>
     </forms:Form>

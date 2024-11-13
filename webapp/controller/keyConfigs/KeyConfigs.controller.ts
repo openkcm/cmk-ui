@@ -3,6 +3,7 @@ import JSONModel from 'sap/ui/model/json/JSONModel';
 import BindingMode from 'sap/ui/model/BindingMode';
 import Api from 'kms/services/Api.service';
 import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
+import { Button$PressEvent } from 'sap/m/Button';
 import { KeyConfig } from 'kms/common/Types';
 import MessageBox from 'sap/m/MessageBox';
 import Fragment from 'sap/ui/core/Fragment';
@@ -18,7 +19,7 @@ export default class Keys extends BaseController {
         sortValue: 'createdOn' as string,
         sortDesc: true as boolean
     });
-    private filterPopover: ViewSettingsDialog | undefined;
+    private sortPopover: ViewSettingsDialog | undefined;
 
     public onInit(): void {
         super.onInit();
@@ -83,23 +84,31 @@ export default class Keys extends BaseController {
         ];
         this.viewSettingModel.setProperty('/sortColumns', columns);
         this.viewSettingModel.setProperty('/currentTable', 'keys');
-        if (!this.filterPopover) {
+        if (!this.sortPopover) {
             await Fragment.load({
                 id: view.getId(),
                 name: 'kms.resources.fragments.common.TableSorter',
                 controller: this
             }).then((dialog) => {
-                this.filterPopover = dialog as ViewSettingsDialog;
-                this.filterPopover.addStyleClass('sapUiSizeCompact');
-                this.filterPopover.setModel(component.getModel('i18n'), 'i18n');
-                this.filterPopover.setModel(this.viewSettingModel, 'viewSettingModel');
-                this.filterPopover.open();
+                this.sortPopover = dialog as ViewSettingsDialog;
+                this.sortPopover.addStyleClass('sapUiSizeCompact');
+                this.sortPopover.setModel(component.getModel('i18n'), 'i18n');
+                this.sortPopover.setModel(this.viewSettingModel, 'viewSettingModel');
+                this.sortPopover.open();
             });
         } else {
-            this.filterPopover.open();
+            this.sortPopover.open();
         }
     };
-
+    public onKeyConfigDashboardCreateSAPKeyPress(event: Button$PressEvent): void {
+        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const selectedConfig = this.oneWayModel.getProperty(path) as KeyConfig;
+        const keyConfigId: string = selectedConfig.id;
+        this.getRouter().navTo('keyConfigDetail', {
+            query: { createKey: true },
+            keyConfigId: keyConfigId
+        });
+    }
     public onTableSortApplyPress(): void {
         //@TODO Implement sorting for key config dashboard when API is ready
     };
