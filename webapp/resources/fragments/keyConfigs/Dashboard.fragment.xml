@@ -7,7 +7,7 @@
             <f:GridContainerSettings rowSize="84px" columnSize="84px" gap="8px" />
         </f:layout>
         <f:GridListItem press="onConfigPress"
-            type="{= ${oneWay>keys}.length > 0 ? 'Active' : 'Inactive'}">
+            type="Active">
             <f:layoutData>
                 <f:GridContainerItemLayoutData columns="4" />
             </f:layoutData>
@@ -35,11 +35,13 @@
                 </HBox>
                 <VBox justifyContent="SpaceBetween"
                     backgroundDesign="Solid"
-                    height="90px"
+                    height="110px"
                     visible="{= ${oneWay>keys}.length !== 0}"
                     class="gray-background-color rounded-box sapUiSmallMargin">
-                    <Label design="Bold" text="ap-southeast-test-something"
+                    <Title text="{i18n>primaryKey}:" titleStyle="H6"
                         class="sapUiTinyMarginBegin sapUiTinyMarginTop" />
+                    <Label design="Bold" text="ap-southeast-test-something"
+                        class="sapUiTinyMarginBegin" />
                     <Label text="AWS - eu-central-1"
                         class="sapUiTinyMarginBegin" />
                     <ObjectStatus
@@ -60,9 +62,16 @@
                 <HBox justifyContent="Center" alignItems="Center"
                     backgroundDesign="Solid"
                     visible="{= ${oneWay>keys}.length === 0}"
-                    height="90px"
+                    height="110px"
                     class="outlined-dotted-box-rounded-corners sapUiSmallMargin">
-                    <Button text="{i18n>createKey}" icon="sap-icon://add" />
+                    <MenuButton text="{i18n>createKey}" icon="sap-icon://add">
+                        <menu>
+                            <Menu>
+                                <MenuItem text="{i18n>sapManaged}"
+                                    press="onKeyConfigDashboardCreateSAPKeyPress" />
+                            </Menu>
+                        </menu>
+                    </MenuButton>
                 </HBox>
             </VBox>
         </f:GridListItem>

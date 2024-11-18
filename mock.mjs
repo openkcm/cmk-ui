@@ -10,6 +10,16 @@ app.get("/api/v1/keyConfig", (req, res) => {
     res.json(keyConfig());
 });
 
+app.patch("/api/v1/keyConfig", (req, res) => {
+    const newConfig = req.body;
+    res.status(200).json(newConfig);
+});
+
+app.post("/api/v1/keys", (req, res) => {
+    const newKey = req.body;
+    res.status(201).json(newKey);
+});
+
 app.get("/api/v1/systems", (req, res) => {
     res.json(systems());
 });

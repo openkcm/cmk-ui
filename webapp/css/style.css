@@ -1,5 +1,11 @@
 .gray-background-color {
-    background-color: #f5f6f7 !important;
+    @media (prefers-color-scheme: light) {
+        background-color: #f5f6f7 !important;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        background-color: #12171c !important;
+    }
 }
 
 .outlined-dotted-box-rounded-corners {
