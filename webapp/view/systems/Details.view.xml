@@ -1,0 +1,24 @@
+<mvc:View controllerName="kms.controller.systems.Detail"
+          xmlns:m="sap.m" xmlns="sap.uxap" xmlns:mvc="sap.ui.core.mvc">
+    <ObjectPageLayout showTitleInHeaderContent="true" upperCaseAnchorBar="false">
+        <headerTitle>
+            <ObjectPageDynamicHeaderTitle>
+                <expandedHeading>
+                    <m:Title text="{oneWay>/name}" wrapping="true"/>
+                </expandedHeading>
+                <expandedContent>
+                    <m:Label text="eu-central-1" />
+                </expandedContent>
+                <actions>
+                    <ObjectPageHeaderActionButton text="{i18n>switchKeyConfiguration}"
+                                                    hideText="false"/>
+                    <ObjectPageHeaderActionButton text="{i18n>disconnect}" hideText="false"/>
+                </actions>
+                <navigationActions>
+                    <m:OverflowToolbarButton type="Transparent" icon="sap-icon://decline"
+                                           press="onCancel" tooltip="Close"/>
+                </navigationActions>
+            </ObjectPageDynamicHeaderTitle>
+        </headerTitle>
+    </ObjectPageLayout>
+</mvc:View>
