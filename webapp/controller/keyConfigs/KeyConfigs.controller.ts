@@ -8,6 +8,12 @@ import { KeyConfig } from 'kms/common/Types';
 import MessageBox from 'sap/m/MessageBox';
 import Fragment from 'sap/ui/core/Fragment';
 import ViewSettingsDialog from 'sap/m/ViewSettingsDialog';
+import Dialog from 'sap/m/Dialog';
+import MessageToast from 'sap/m/MessageToast';
+interface KeyConfigsResponse {
+    data: KeyConfig[];
+    count: number;
+}
 export default class Keys extends BaseController {
     private readonly api: Api = new Api();
     private readonly oneWayModel = new JSONModel({
@@ -20,6 +26,8 @@ export default class Keys extends BaseController {
         sortDesc: true as boolean
     });
     private sortPopover: ViewSettingsDialog | undefined;
+    private readonly createConfigModel = new JSONModel({});
+    private configCreatePopover: Dialog | undefined;
 
     public onInit(): void {
         super.onInit();
@@ -40,14 +48,10 @@ export default class Keys extends BaseController {
             if (!keyConfigs) {
                 return;
             };
-            interface KeyConfigsResponse {
-                data: KeyConfig[];
-                count: number;
-            }
-            const keyConfigsResponse = keyConfigs as unknown as KeyConfigsResponse;
-            const keyConfigsData = keyConfigsResponse.data;
+
+            const keyConfigsData = keyConfigs.data;
             this.oneWayModel.setProperty('/configs', keyConfigsData);
-            this.oneWayModel.setProperty('/configsCount', keyConfigsResponse.count || 0);
+            this.oneWayModel.setProperty('/configsCount', keyConfigs.count || 0);
         }).catch((error) => {
             console.error('Error parsing key configs', error);
         }).finally(() => {
@@ -55,9 +59,9 @@ export default class Keys extends BaseController {
         });
     };
 
-    private async fetchKeyConfigs() {
+    private async fetchKeyConfigs(): Promise<KeyConfigsResponse> {
         try {
-            const keyConfigs = await this.api.get<KeyConfig[]>('keyConfig', {});
+            const keyConfigs = await this.api.get<KeyConfigsResponse>('keyConfig', {});
             return keyConfigs;
         } catch (error) {
             console.error(error);
@@ -111,5 +115,149 @@ export default class Keys extends BaseController {
     }
     public onTableSortApplyPress(): void {
         //@TODO Implement sorting for key config dashboard when API is ready
+    };
+
+    public async onCreateConfigPress(): Promise<void> {
+        const view = this.getView();
+        const component = this.getOwnerComponent();
+        if (!this.configCreatePopover) {
+            await Fragment.load({
+                id: view.getId(),
+                name: 'kms.resources.fragments.KeyConfigs.CreateConfig',
+                controller: this
+            }).then((dialog) => {
+                this.configCreatePopover = dialog as Dialog;
+                this.configCreatePopover.addStyleClass('sapUiSizeCompact');
+                this.configCreatePopover.setModel(component.getModel('i18n'), 'i18n');
+                this.configCreatePopover.setModel(this.createConfigModel, 'model');
+                this.resetCreateConfigModel();
+                this.configCreatePopover.open();
+            });
+        } else {
+            this.configCreatePopover.open();
+        }
+    };
+
+    public async onConfigCreationCreatePress(): Promise<void> {
+        interface KeyConfigPostPayload {
+            name: string;
+            description: string;
+            adminGroup: string;
+        }
+
+        const name = this.createConfigModel.getProperty('/name') as string;
+        const description = this.createConfigModel.getProperty('/description') as string;
+        const adminGroup = this.createConfigModel.getProperty('/adminGroup') as string;
+        const newConfig = {
+            name: name,
+            description: description,
+            adminGroup: adminGroup
+        } as KeyConfigPostPayload;
+
+        this.getView().setBusy(true);
+        try {
+            const keyConfig = await this.api.post<KeyConfigPostPayload, KeyConfig>('keyConfig', newConfig);
+            MessageToast.show(this.getText('keyConfigCreated'));
+            this.configCreatePopover?.close();
+            this.configCreatePopover?.destroy();
+            this.configCreatePopover = undefined;
+            this.resetCreateConfigModel();
+            this.getRouter().navTo('keyConfigDetail', {
+                keyConfigId: keyConfig?.id
+            });
+            MessageToast.show(this.getText('keyConfigCreated'));
+        } catch (error) {
+            console.error(error);
+            MessageBox.error(this.getText('errorCreatingKeyConfig'));
+        } finally {
+            this.getView().setBusy(false);
+        }
+    };
+
+    public onConfigCreationNameChange(): void {
+        const name = this.createConfigModel.getProperty('/name') as string;
+        const adminGroup = this.createConfigModel.getProperty('/adminGroup') as string;
+        if (!this._isNameValid(name)) {
+            this.createConfigModel.setProperty('/nameValueState', 'Error');
+            this.createConfigModel.setProperty('/nameValueStateText', this.getText('nameRequired'));
+            this.createConfigModel.setProperty('/createButtonEnabled', false);
+        } else {
+            this.createConfigModel.setProperty('/nameValueState', 'None');
+            this.createConfigModel.setProperty('/nameValueStateText', '');
+            this.createConfigModel.setProperty('/createButtonEnabled', this._isAdminGroupValid(adminGroup));
+        }
+    };
+
+    public _isNameValid(name: string): boolean {
+        const nameRegex = /^.{3,}$/;
+        if (!name || !nameRegex.test(name)) {
+            return false;
+        }
+        return true;
+    };
+
+    public _isAdminGroupValid(adminGroup: string): boolean {
+        const adminGroupRegex = /^[a-zA-Z0-9-_]+$/;
+        if (!adminGroup || !adminGroupRegex.test(adminGroup)) {
+            return false;
+        }
+        return true;
+    };
+
+    public onConfigCreationAdminGroupChange(): void {
+        const adminGroup = this.createConfigModel.getProperty('/adminGroup') as string;
+        const name = this.createConfigModel.getProperty('/name') as string;
+        if (!this._isAdminGroupValid(adminGroup)) {
+            this.createConfigModel.setProperty('/adminGroupValueState', 'Error');
+            this.createConfigModel.setProperty('/adminGroupValueStateText', this.getText('adminGroupRequired'));
+            this.createConfigModel.setProperty('/createButtonEnabled', false);
+        } else {
+            this.createConfigModel.setProperty('/adminGroupValueState', 'None');
+            this.createConfigModel.setProperty('/adminGroupValueStateText', '');
+            this.createConfigModel.setProperty('/createButtonEnabled', this._isNameValid(name));
+        }
+    };
+
+    public resetCreateConfigModel(): void {
+        this.createConfigModel.setData({
+            name: '' as string,
+            description: '' as string,
+            adminGroup: '' as string,
+            adminGroupList: [
+                {
+                    key: '',
+                    text: this.getText('selectAdminGroup')
+                },
+                {
+                    key: 'adminGroup1',
+                    text: 'Admin Group 1'
+                },
+                {
+                    key: 'adminGroup2',
+                    text: 'Admin Group 2'
+                }
+            ] as object[],
+            createButtonEnabled: false as boolean,
+            nameValueState: 'None' as string,
+            nameValueStateText: '' as string,
+            adminGroupValueState: 'None' as string,
+            adminGroupValueStateText: '' as string
+        }, true);
+    };
+
+    public onConfigCreationCancelPress(): void {
+        MessageBox.warning(this.getText('confirmCancelConfigCreation'), {
+            styleClass: 'sapUiSizeCompact',
+            emphasizedAction: MessageBox.Action.NO,
+            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            onClose: (action: unknown) => {
+                if (action === MessageBox.Action.YES) {
+                    this.configCreatePopover?.close();
+                    this.configCreatePopover?.destroy();
+                    this.configCreatePopover = undefined;
+                    this.resetCreateConfigModel();
+                }
+            }
+        });
     };
 }

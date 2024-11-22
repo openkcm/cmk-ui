@@ -1,0 +1,47 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:u="sap.ui.unified"
+    xmlns:layout="sap.ui.layout">
+    <Dialog
+        escapeHandler=".onConfigCreationCancelPress"
+        id="configCreateDialog"
+        title="{i18n>createConfiguration}"
+        verticalScrolling="false"
+        class="sapUiContentPadding"
+        contentHeight="auto"
+        contentWidth="40%">
+        <content>
+            <VBox>
+                <Label text="{i18n>name}:" required="true" />
+                <Input value="{model>/name}" valueState="{model>/nameValueState}"
+                    valueLiveUpdate="true" liveChange="onConfigCreationNameChange"
+                    valueStateText="{model>/nameValueStateText}" />
+                <Label text="{i18n>description}:"
+                    class="sapUiTinyMarginTop" />
+                <TextArea value="{model>/description}" rows="4"
+                    width="100%" />
+                <Label text="{i18n>adminGroup}" required="true" class="sapUiTinyMarginTop" />
+                <Select
+                    width="100%"
+                    change="onConfigCreationAdminGroupChange"
+                    valueState="{model>/adminGroupValueState}"
+                    valueStateText="{model>/adminGroupValueStateText}"
+                    forceSelection="true"
+                    selectedKey="{model>/adminGroup}"
+                    items="{model>/adminGroupList}">
+                    <core:Item key="{model>key}" text="{model>text}" />
+                </Select>
+            </VBox>
+        </content>
+        <beginButton>
+            <Button text="{i18n>create}" press="onConfigCreationCreatePress" type="Emphasized"
+                enabled="{model>/createButtonEnabled}" />
+        </beginButton>
+        <endButton>
+            <Button text="{i18n>cancel}" press="onConfigCreationCancelPress" type="Transparent" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>
