@@ -49,6 +49,7 @@
                 "sap.m": {},
                 "sap.tnt": {},
                 "sap.ui.core": {},
+                "sap.ui.comp": {},
                 "sap.ui.layout": {},
                 "sap.uxap": {}
             }
@@ -103,6 +104,21 @@
                     "pattern": "settings",
                     "name": "settings",
                     "target": "settings"
+                },
+                {
+                    "pattern": "systems",
+                    "name": "systems",
+                    "target": [
+                        "systems"
+                    ]
+                },
+                {
+                    "pattern": "systems/{systemID}",
+                    "name": "systemsDetail",
+                    "target": [
+                        "systems",
+                        "systemsDetail"
+                    ] 
                 }
             ],
             "targets": {
@@ -118,10 +134,6 @@
                     "viewId": "keyConfigDetail",
                     "viewName": "keyConfigs.detail.Detail"
                 },
-                "systems": {
-                    "viewId": "systems",
-                    "viewName": "systems.Systems"
-                },
                 "tasks": {
                     "viewId": "tasks",
                     "viewName": "tasks.Tasks"
@@ -133,6 +145,24 @@
                 "settings": {
                     "viewId": "settings",
                     "viewName": "Settings"
+                },
+                "systemsLayout": {
+                    "viewId": "systemsLayout",
+                    "viewName": "systems.Layout"
+                },
+                "systems": {
+                    "parent": "systemsLayout",
+                    "controlId": "systemsLayout",
+                    "viewName": "systems.Systems",
+                    "clearControlAggregation": true,
+                    "controlAggregation": "beginColumnPages"
+                },
+                "systemsDetail": {
+                    "parent": "systemsLayout",
+                    "controlId": "systemsLayout",
+                    "viewName": "systems.Details",
+                    "clearControlAggregation": true,
+                    "controlAggregation": "midColumnPages"
                 }
             }
         }

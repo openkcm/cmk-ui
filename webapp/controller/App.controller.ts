@@ -33,6 +33,7 @@ export default class App extends BaseController {
                 this.oneWayModel.setProperty('/selectedKey', 'keyConfigs');
                 break;
             case 'systems':
+            case 'systemsDetail':
                 this.oneWayModel.setProperty('/selectedKey', 'systems');
                 break;
             case 'tasks':

@@ -78,7 +78,9 @@
                 title="{i18n>connectedSystems}" showTitle="false">
                 <subSections>
                     <ObjectPageSubSection>
-                        <!-- @TODO Will be replaced by the proper systems table once that's done -->
+                        <core:Fragment
+                            fragmentName="kms.resources.fragments.SystemsTable"
+                            type="XML" />
                     </ObjectPageSubSection>
                 </subSections>
             </ObjectPageSection>

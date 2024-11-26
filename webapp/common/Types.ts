@@ -3,6 +3,8 @@ import { KeyConfigStatuses, KeyTypes, KeyVersionStates } from "kms/common/Enums"
 export interface System {
     id: string;
     keyConfiguration: KeyConfig;
+    name: string;
+    key: string;
 };
 export interface KeyConfig {
     name: string;
