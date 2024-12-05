@@ -18,7 +18,7 @@
                 <ToolbarSpacer />
                 <MenuButton text="{i18n>create}" icon="sap-icon://add" type="Ghost">
                     <menu>
-                        <Menu>
+                        <Menu class="sapUiSizeCompact">
                             <MenuItem text="{i18n>sapManaged}"
                                 press="handleCreateKeyRoute" />
                         </Menu>

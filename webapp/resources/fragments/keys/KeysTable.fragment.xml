@@ -5,11 +5,14 @@
     <Table
         noDataText=" "
         items="{
-                    path: 'oneWay>/keyConfig/keys',
+                    path: 'oneWay>/keys',
                     sorter: {
-                        path: 'Name'
+                        path: 'enabled',
+                        descending: true
                     }
-                }">
+                }"
+        contextualWidth="Auto"
+        popinLayout="GridSmall">
         <headerToolbar>
             <OverflowToolbar>
                 <Title
@@ -18,7 +21,7 @@
                 <ToolbarSpacer />
                 <MenuButton text="{i18n>create}" icon="sap-icon://add" type="Ghost">
                     <menu>
-                        <Menu>
+                        <Menu class="sapUiSizeCompact">
                             <MenuItem text="{i18n>sapManaged}"
                                 press="handleCreateKeyRoute" />
                         </Menu>
@@ -36,41 +39,55 @@
             </OverflowToolbar>
         </headerToolbar>
         <columns>
-            <Column width="70%"
-                visible="{= ${oneWay>/keyConfig/keys}.length > 0 }">
+            <Column
+                vAlign="Middle"
+                hAlign="Begin"
+                width="15rem"
+                minScreenWidth="Large"
+                demandPopin="false"
+                visible="{= ${oneWay>/keys}.length > 0 }">
                 <Text text="{i18n>name}" />
             </Column>
-            <Column width="auto"
-                visible="{= ${oneWay>/keyConfig/keys}.length > 0 }">
+            <Column
+                vAlign="Middle"
+                hAlign="End"
+                minScreenWidth="Large"
+                demandPopin="true"
+                visible="{= ${oneWay>/keys}.length > 0 }">
                 <Text text="{i18n>createdOn}" wrapping="false" />
             </Column>
-            <Column width="auto"
-                visible="{= ${oneWay>/keyConfig/keys}.length > 0 }">
+            <Column
+                hAlign="End"
+                vAlign="Middle"
+                minScreenWidth="Large"
+                demandPopin="true"
+                visible="{= ${oneWay>/keys}.length > 0 }">
                 <Text text="{i18n>state}" wrapping="false" />
             </Column>
-            <Column width="7%"
-                visible="{= ${oneWay>/keyConfig/keys}.length > 0 }">
+            <Column
+                hAlign="End"
+                vAlign="Middle"
+                minScreenWidth="Large"
+                demandPopin="true"
+                visible="{= ${oneWay>/keys}.length > 0 }">
                 <Text text="{i18n>actions}" wrapping="false" />
-            </Column>
-            <Column width="7%"
-                visible="{= ${oneWay>/keyConfig/keys}.length === 0 }">
-                <Text text="" wrapping="false" />
             </Column>
         </columns>
         <items>
-            <ColumnListItem vAlign="Middle" type="Navigation">
+            <ColumnListItem vAlign="Middle" type="Navigation" press="onKeyTableRowPress">
                 <cells>
                     <VBox justifyContent="Center" alignContent="Center">
                         <HBox alignItems="End" justifyContent="Start">
-                            <Text text="{oneWay>name}" wrapping="false" />
                             <tnt:InfoLabel
+                                icon="sap-icon://favorite"
                                 visible="{= !!${oneWay>primary}}"
-                                class="sapUiTinyMarginBegin"
+                                class="sapUiTinyMarginEnd"
                                 text="{i18n>primary}"
                                 displayOnly="true"
                                 colorScheme="5" />
+                            <Text text="{oneWay>name}" wrapping="false" />
                         </HBox>
-                        <Label text="{oneWay>provider} - {oneWay>region}" />
+                        <Label text="{oneWay>provider} • {oneWay>region}" />
                     </VBox>
                     <Text
                         text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, pattern: 'MMM dd yyyy', source:{pattern: 'yyyy-MM-ddTHH:mm:ss.SSSSSSZ'}}}"
@@ -85,10 +102,21 @@
                             text="{i18n>disabled}"
                             colorScheme="2" />
                     </VBox>
-                    <VBox alignContent="Center" alignItems="Center"
-                        justifyContent="Center">
-                        <Button icon="sap-icon://overflow" type="Ghost"
-                            class="sapUiSmallMarginEnd" />
+                    <VBox alignContent="End" alignItems="End"
+                        justifyContent="End">
+                        <MenuButton icon="sap-icon://action-settings" type="Transparent"
+                            enabled="{= !${oneWay>enabled}}">
+                            <menu>
+                                <Menu class="sapUiSizeCompact">
+                                    <MenuItem press="onKeyTableMakePrimaryPress"
+                                        text="{i18n>makePrimary}"
+                                        visible="{= !${oneWay>enabled}}"
+                                        icon="sap-icon://favorite" />
+                                    <MenuItem press="onKeyTableDeletePress" text="{i18n>delete}"
+                                        icon="sap-icon://delete" />
+                                </Menu>
+                            </menu>
+                        </MenuButton>
                     </VBox>
                 </cells>
             </ColumnListItem>

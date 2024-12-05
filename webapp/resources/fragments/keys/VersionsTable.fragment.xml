@@ -1,0 +1,74 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:tnt="sap.tnt"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    <Table
+        noDataText=" "
+        items="{
+                    path: 'oneWay>/keyVersions',
+                    sorter: {
+                        path: 'version',
+                        descending: true
+                    }
+                }"
+        contextualWidth="Auto"
+        popinLayout="GridSmall">
+        <headerToolbar>
+            <OverflowToolbar>
+                <Title
+                    text="{parts: ['i18n>versionsWithCount', 'oneWay>/keyVersionsCount'], formatter: 'formatMessage'}"
+                    level="H2" />
+                <ToolbarSpacer />
+                <Button
+                    text="{i18n>confgureRotation}"
+                    type="Ghost"
+                    icon="sap-icon://action-settings"
+                    press="onConfigureRotationPress" />
+            </OverflowToolbar>
+        </headerToolbar>
+        <columns>
+            <Column
+                vAlign="Middle"
+                hAlign="Begin"
+                minScreenWidth="XSmall"
+                demandPopin="false">
+                <Text text="{i18n>version}" />
+            </Column>
+            <Column
+                vAlign="Middle"
+                hAlign="Begin"
+                minScreenWidth="XSmall"
+                demandPopin="true">
+                <Text text="{i18n>age}" wrapping="false" />
+            </Column>
+            <Column
+                hAlign="Begin"
+                vAlign="Middle"
+                minScreenWidth="XSmall"
+                demandPopin="true">
+                <Text text="{i18n>state}" wrapping="false" />
+            </Column>
+        </columns>
+        <items>
+            <ColumnListItem vAlign="Middle" type="Inactive">
+                <cells>
+                    <Text text="{oneWay>version}" />
+                    <Text
+                        text="{path: 'oneWay>metadata/createdAt', formatter: '.formatter.timeElapsedSince'}"
+                        tooltip="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, pattern: 'MMM dd yyyy HH:mm:ss UTC', source:{pattern: 'yyyy-MM-ddTHH:mm:ss.SSSSSSZ'}}}"
+                        wrapping="false" />
+                    <VBox justifyContent="Center">
+                        <tnt:InfoLabel
+                            visible="{= ${oneWay>status} === 'ENABLED'}"
+                            text="{i18n>enabled}"
+                            colorScheme="8" />
+                        <tnt:InfoLabel
+                            visible="{= ${oneWay>status} === 'DISABLED'}"
+                            text="{i18n>disabled}"
+                            colorScheme="2" />
+                    </VBox>
+                </cells>
+            </ColumnListItem>
+        </items>
+    </Table>
+</core:FragmentDefinition>

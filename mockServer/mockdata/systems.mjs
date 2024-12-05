@@ -1,31 +1,40 @@
-export default () => {
-    return [
-        {
-            name: "SuccessFactors_aws",
-            region: "eu-central-1",
-            sid: "P12",
-            applicationRole: "SuccessFactors Learning",
-            systemRole: "HEC_HANA",
-            status: "connected",
-            keyConfig: "Systems Europe"
-        },
-        {
-            name: "SAC_aws",
-            region: "eu-central-1",
-            sid: "P25",
-            applicationRole: "SAP Analytics Cloud",
-            systemRole: "HEC_HANA",
-            status: "Connecting",
-            keyConfig: ""
-        },
-        {
-            name: "Ariba_azure",
-            region: "eu-central-1",
-            sid: "P29",
-            applicationRole: "SAP Ariba",
-            systemRole: "HEC_HANA",
-            status: "Disconnecting",
-            keyConfig: ""
+import Chance from "chance";
+const chance = new Chance();
+export default (systemID, keyConfigurationID) => {
+    const generateSystems = (count, keyConfigurationID) => {
+        const response = Array.from({ length: count }, () => (
+            {
+                id: chance.guid(),
+                sid: chance.string({ length: 3, pool: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' }),
+                keyConfigurationID: keyConfigurationID ? keyConfigurationID : chance.guid(),
+                keyConfigurationName: "Key Config XYZ",
+                name: `System ${chance.animal()}`,
+                region: chance.pickone(['eu-central-1', 'us-east-1', 'us-west-2']),
+                systemRole: chance.pickone(["SAP Analytics Cloud", "SuccessFactors Learning", "SAP Ariba", "SAP Fieldglass", "SAP Concur"]),
+                status: chance.pickone(['CONNECTED, DISCONNECTED']),
+                applicationRole: "HEC_HANA"
+            }
+        ));
+        return {
+            data: response,
+            count: response.length
+        };
+    };
+    if (!systemID && keyConfigurationID) {
+        return generateSystems(chance.integer({ min: 1, max: 5 }), keyConfigurationID);
+    } else if (systemID && !keyConfigurationID) {
+        return {
+            id: systemID,
+            sid: chance.string({ length: 3, pool: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' }),
+            keyConfigurationID: chance.guid(),
+            keyConfigurationName: `Key Config ${chance.state({ full: true })}`,
+            name: `System ${chance.animal()}`,
+            region: chance.pickone(['eu-central-1', 'us-east-1', 'us-west-2']),
+            systemRole: chance.pickone(["SAP Analytics Cloud", "SuccessFactors Learning", "SAP Ariba", "SAP Fieldglass", "SAP Concur"]),
+            status: chance.pickone(['CONNECTED, DISCONNECTED']),
+            applicationRole: "HEC_HANA"
         }
-    ];
+    } else {
+        return generateSystems(chance.integer({ min: 1, max: 5 }));
+    }
 }

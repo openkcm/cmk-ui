@@ -1,24 +1,29 @@
 import Chance from "chance";
 const chance = new Chance();
-export default () => {
-    const generateSystems = (count) => {
-        return Array.from({ length: count }, () => (
-            {
+const now = new Date();
+const old = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+export default (configID) => {
+    const generateConfigs = (count) => {
+        const response = Array.from({ length: count }, () => ({
+            name: `Key Config ${chance.state({ full: true })}`,
+            id: chance.guid(),
+            description: chance.sentence(),
+            adminGroupID: chance.guid(),
+            metadata: {
+                creatorID: chance.guid(),
+                creatorName: chance.name(),
+                createdAt: chance.date({ min: old, max: now }),
+                updatedAt: chance.date({ min: old, max: now }),
+                totalKeys: chance.integer({ min: 1, max: 10 }),
+                totalSystems: chance.integer({ min: 1, max: 10 })
+            },
+            primaryKey: {
                 id: chance.guid(),
-                keyConfig: chance.pickone(['Systems Europe', 'Systems US']),
-            }
-        ));
-    };
-    const generateKeys = (count) => {
-        const states = ['ENABLED', 'DISABLED', 'PENDING_DELETION', 'PENDING_IMPORT', 'DELETED', 'UNKNOWN'];
-        return Array.from({ length: count }, () => (
-            {
-                name: chance.animal(),
+                name: `Key ${chance.animal()}`,
                 description: chance.sentence(),
                 enabled: chance.bool(),
-                id: chance.guid(),
-                primary: chance.bool(),
-                state: chance.pickone(states),
+                primary: true,
+                state: chance.pickone(['ENABLED', 'DISABLED']),
                 customerHeld: chance.bool(),
                 nativeId: chance.guid(),
                 algorithm: chance.pickone(['AES256', 'RSA3072', 'RSA4096']),
@@ -26,29 +31,64 @@ export default () => {
                 region: chance.pickone(['eu-central-1', 'us-east-1', 'us-west-2']),
                 metadata: {
                     createdBy: chance.name(),
-                    createdAt: chance.date(),
+                    createdAt: chance.date({ min: old, max: now }),
                     updatedBy: chance.name(),
-                    updatedAt: chance.date(),
+                    updatedAt: chance.date({ min: old, max: now }),
                     imported: chance.bool(),
                     totalVersions: chance.integer({ min: 1, max: 10 }),
                     primaryVersion: chance.integer({ min: 1, max: 10 }),
                 }
             }
-        ));
-    };
-    const generateConfigs = (count) => {
-        const response = Array.from({ length: count }, () => ({
-            name: chance.state({ full: true }),
-            id: chance.guid(),
-            keys: generateKeys(chance.integer({ min: 0, max: 3 })),
-            systems: generateSystems(chance.integer({ min: 0, max: 3 })),
-            createdBy: chance.email(),
-            createdOn: chance.date()
         }));
+        response.forEach(item => {
+            if (chance.bool()) {
+                item.metadata.totalKeys = 0;
+                delete item.primaryKey;
+            }
+        });
         return {
             data: response,
             count: response.length
         };
     };
-    return generateConfigs(chance.integer({ min: 0, max: 20 }));
+    if (configID) {
+        return {
+            name: `Key Config ${chance.state({ full: true })}`,
+            id: configID,
+            description: chance.sentence(),
+            adminGroupID: chance.guid(),
+            metadata: {
+                creatorID: chance.guid(),
+                creatorName: chance.name(),
+                createdAt: chance.date({ min: old, max: now }),
+                updatedAt: chance.date({ min: old, max: now }),
+                totalKeys: chance.integer({ min: 1, max: 10 }),
+                totalSystems: chance.integer({ min: 1, max: 10 })
+            },
+            primaryKey: {
+                id: chance.guid(),
+                name: `Key ${chance.animal()}`,
+                description: chance.sentence(),
+                enabled: chance.bool(),
+                primary: true,
+                state: chance.pickone(['ENABLED', 'DISABLED']),
+                customerHeld: chance.bool(),
+                nativeId: chance.guid(),
+                algorithm: chance.pickone(['AES256', 'RSA3072', 'RSA4096']),
+                provider: chance.pickone(['AWS', 'SAP']),
+                region: chance.pickone(['eu-central-1', 'us-east-1', 'us-west-2']),
+                metadata: {
+                    createdBy: chance.name(),
+                    createdAt: chance.date({ min: old, max: now }),
+                    updatedBy: chance.name(),
+                    updatedAt: chance.date({ min: old, max: now }),
+                    imported: chance.bool(),
+                    totalVersions: chance.integer({ min: 1, max: 10 }),
+                    primaryVersion: chance.integer({ min: 1, max: 10 }),
+                }
+            }
+        }
+    } else {
+        return generateConfigs(chance.integer({ min: 1, max: 20 }));
+    }
 }

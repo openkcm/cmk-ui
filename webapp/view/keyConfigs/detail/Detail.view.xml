@@ -60,12 +60,12 @@
                 <subSections>
                     <ObjectPageSubSection>
                         <m:VBox>
-                            <m:VBox visible="{= ${oneWay>/keyConfig/keys}.length > 0 }">
+                            <m:VBox visible="{= ${oneWay>/keyConfig/metadata/totalKeys} > 0 }">
                                 <core:Fragment
                                     fragmentName="kms.resources.fragments.keys.KeysTable"
                                     type="XML" />
                             </m:VBox>
-                            <m:VBox visible="{= ${oneWay>/keyConfig/keys}.length === 0 }">
+                            <m:VBox visible="{= ${oneWay>/keyConfig/metadata/totalKeys} === 0 }">
                                 <core:Fragment
                                     fragmentName="kms.resources.fragments.keys.NoKeysIllustration"
                                     type="XML" />

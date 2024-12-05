@@ -37,7 +37,7 @@
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>keyAdministrators}">
                         <forms:fields>
-                            <Input editable="false" value="" />
+                            <Input editable="false" value="{oneWay>/keyConfig/adminGroupID}" />
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>tags}">
@@ -48,14 +48,14 @@
                     <forms:FormElement label="{i18n>createdBy}">
                         <forms:fields>
                             <Input editable="false"
-                                value="{oneWay>/keyConfig/createdBy}" />
+                                value="{oneWay>/keyConfig/metadata/creatorName}" />
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>createdOn}">
                         <forms:fields>
                             <Input
                                 editable="false"
-                                value="{path:'oneWay>/keyConfig/createdOn', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ss.SSSSSSZ'}}} UTC" />
+                                value="{path:'oneWay>/keyConfig/metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ss.SSSSSSZ'}}} UTC" />
                         </forms:fields>
                     </forms:FormElement>
                 </forms:formElements>

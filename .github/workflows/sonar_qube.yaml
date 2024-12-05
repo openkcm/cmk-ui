@@ -23,9 +23,7 @@ jobs:
           apt update
       - name: Install Ubuntu dependencies
         run: |
-          apt install -y \
-            curl \
-            jq unzip zip
+          apt install -y curl jq zip unzip
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.GH_ACTION_REPO_READ }}
@@ -34,6 +32,7 @@ jobs:
         with:
           args: >
             -Dsonar.coverage.skip=${{ vars.SONAR_QUBE_COVERAGE_SKIP }}
+            -Dsonar.exclusions=${{ vars.SONAR_QUBE_EXCLUSIONS }}
             -Dsonar.verbose=${{ vars.SONAR_QUBE_VERBOSE_LOGGING }}
             -Dsonar.projectKey=${{ vars.SONAR_QUBE_PROJECT_KEY_PREFIX }}-${{ github.event.repository.name }}
         #${{ steps.repo-name.outputs.repository-name }}

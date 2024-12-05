@@ -5,7 +5,10 @@ import Api from "kms/services/Api.service";
 import { System } from "kms/common/Types";
 import MessageBox from "sap/m/MessageBox";
 import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
-
+interface SystemsResponse {
+    data: Systems[];
+    count: number;
+}
 export default class Systems extends BaseController {
     private readonly api: Api = new Api();
 
@@ -21,28 +24,26 @@ export default class Systems extends BaseController {
         this.setModel(this.oneWayModel, 'oneWay');
     };
     public onRouteMatched(): void {
-        this.setSystems();
+        this.getSystems().catch((error) => {
+            console.error(error);
+        });
     };
 
-    private setSystems(): void {
+    private async getSystems(): Promise<void> {
         this.getView().setBusy(true);
-        this.fetchSystems().then((systems) => {
+        try {
+            const systems = await this.api.get<SystemsResponse>('systems', {});
             if (!systems) {
                 return;
             };
-            
-            interface SystemsResponse {
-                data: Systems[];
-                count: number;
-            }
-            const systemsResponse = systems as unknown as SystemsResponse;            
-            this.oneWayModel.setProperty('/systems', systemsResponse);
-            this.oneWayModel.setProperty('/systemsCount', systemsResponse?.count || 0);
-        }).catch((error) => {
-            console.error('Error parsing systems', error);
-        }).finally(() => {
+            this.oneWayModel.setProperty('/systems', systems.data);
+            this.oneWayModel.setProperty('/systemsCount', systems.count || 0);
+        } catch (error) {
+            console.error('Error fetching systems', error);
+            MessageBox.error(this.getText('errorFetchingSystems'));
+        } finally {
             this.getView().setBusy(false);
-        });
+        }
     };
 
     public onSystemPress(event: ListItemBase$PressEvent): void {
@@ -53,16 +54,4 @@ export default class Systems extends BaseController {
             systemID: systemName
         });
     };
-
-    private async fetchSystems() {
-        try {
-            const systems = await this.api.get<Systems[]>('systems', {});
-            return systems;
-        } catch (error) {
-            console.error(error);
-            MessageBox.error(this.getText('errorFetchingSystems'));
-        }
-    };
-
-
 }

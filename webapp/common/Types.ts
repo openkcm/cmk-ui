@@ -1,4 +1,4 @@
-import { KeyConfigStatuses, KeyTypes, KeyVersionStates } from "kms/common/Enums";
+import { KeyVersionStates } from "kms/common/Enums";
 
 export interface System {
     id: string;
@@ -19,22 +19,48 @@ export interface User {
 export interface KeyConfig {
     name: string;
     id: string;
-    keys: Key[];
-    systems: System[];
-    createdBy: string;
-    createdOn: string;
+    description: string;
+    adminGroupID: string;
+    metadata: {
+        creatorID: string,
+        creatorName: string,
+        createdAt: string,
+        updatedAt: string,
+        totalKeys: number,
+        totalSystems: number
+    },
+    primaryKey?: Key;
 }
 export interface Key {
-    id: string;
-    primary: boolean;
-    state: KeyConfigStatuses;
-    type: KeyTypes;
-    versions: Version[];
-    labels: Label[];
+    id: string,
+    name: string,
+    description: string,
+    enabled: boolean,
+    primary: boolean,
+    state: string,
+    customerHeld: boolean,
+    nativeId: string,
+    algorithm: string,
+    provider: string,
+    region: string,
+    metadata: {
+        createdBy: string,
+        createdAt: string,
+        updatedBy: string,
+        updatedAt: string,
+        imported: boolean,
+        totalVersions: number,
+        primaryVersion: number,
+    }
 };
-export interface Version {
+export interface KeyVersion {
     id: string;
-    state: KeyVersionStates;
+    status: KeyVersionStates;
+    isPrimary: boolean;
+    metadata: {
+        createdAt: string;
+        updatedAt: string;
+    }
 };
 export interface Label {
     id: string;

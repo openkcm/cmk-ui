@@ -14,22 +14,30 @@ export default class App extends BaseController {
             selectedKey: ''
         }
     );
+    private toolPage: ToolPage | undefined;
 
     public onInit(): void {
         super.onInit();
         this.setModel(this.oneWayModel, 'oneWay');
         this.oneWayModel.setProperty('/selectedKey', 'home');
+        this.toolPage = this.byId('kmsApp') as ToolPage;
         this.getRouter().attachRouteMatched(this.onRouteChange.bind(this));
     }
 
     public onRouteChange(event: Router$RouteMatchedEvent): void {
         const routeName = event.getParameter('name');
+        if (routeName === 'home') {
+            this.toolPage.setSideExpanded(true);
+        } else {
+            this.toolPage.setSideExpanded(false);
+        }
         switch (routeName) {
             case 'home':
                 this.oneWayModel.setProperty('/selectedKey', 'home');
                 break;
             case 'keyConfigs':
             case 'keyConfigDetail':
+            case 'keyConfigKeyDetail':
                 this.oneWayModel.setProperty('/selectedKey', 'keyConfigs');
                 break;
             case 'systems':
@@ -61,15 +69,14 @@ export default class App extends BaseController {
         const view = this.getView();
 
         if (!this.userPopover) {
-            await Fragment.load({
+            const userFragment = await Fragment.load({
                 id: view.getId(),
                 name: 'kms.resources.fragments.UserInfoPopover',
                 controller: this
-            }).then((popover) => {
-                this.userPopover = popover as ResponsivePopover;
-                view.addDependent(this.userPopover);
-                this.userPopover.openBy(button);
             });
+            this.userPopover = userFragment as ResponsivePopover;
+            view.addDependent(this.userPopover);
+            this.userPopover.openBy(button);
         } else {
             this.userPopover.openBy(button);
         }

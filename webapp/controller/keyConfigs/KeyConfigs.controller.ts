@@ -39,33 +39,23 @@ export default class Keys extends BaseController {
     };
 
     public onRouteMatched(): void {
-        this.setKeyConfigs();
-    };
-
-    private setKeyConfigs(): void {
-        this.getView().setBusy(true);
-        this.fetchKeyConfigs().then((keyConfigs) => {
-            if (!keyConfigs) {
-                return;
-            };
-
-            const keyConfigsData = keyConfigs.data;
-            this.oneWayModel.setProperty('/configs', keyConfigsData);
-            this.oneWayModel.setProperty('/configsCount', keyConfigs.count || 0);
-        }).catch((error) => {
-            console.error('Error parsing key configs', error);
-        }).finally(() => {
-            this.getView().setBusy(false);
+        this.setKeyConfigs().catch((error) => {
+            console.error(error);
         });
     };
 
-    private async fetchKeyConfigs(): Promise<KeyConfigsResponse> {
+    private async setKeyConfigs(): Promise<void> {
+        this.getView().setBusy(true);
         try {
             const keyConfigs = await this.api.get<KeyConfigsResponse>('keyConfig', {});
-            return keyConfigs;
+            const keyConfigsData = keyConfigs.data;
+            this.oneWayModel.setProperty('/configs', keyConfigsData);
+            this.oneWayModel.setProperty('/configsCount', keyConfigs.count || 0);
         } catch (error) {
             console.error(error);
             MessageBox.error(this.getText('errorFetchingKeyConfigs'));
+        } finally {
+            this.getView().setBusy(false);
         }
     };
 
@@ -89,17 +79,15 @@ export default class Keys extends BaseController {
         this.viewSettingModel.setProperty('/sortColumns', columns);
         this.viewSettingModel.setProperty('/currentTable', 'keys');
         if (!this.sortPopover) {
-            await Fragment.load({
+            this.sortPopover = await Fragment.load({
                 id: view.getId(),
                 name: 'kms.resources.fragments.common.TableSorter',
                 controller: this
-            }).then((dialog) => {
-                this.sortPopover = dialog as ViewSettingsDialog;
-                this.sortPopover.addStyleClass('sapUiSizeCompact');
-                this.sortPopover.setModel(component.getModel('i18n'), 'i18n');
-                this.sortPopover.setModel(this.viewSettingModel, 'viewSettingModel');
-                this.sortPopover.open();
-            });
+            }) as ViewSettingsDialog;
+            this.sortPopover.addStyleClass('sapUiSizeCompact');
+            this.sortPopover.setModel(component.getModel('i18n'), 'i18n');
+            this.sortPopover.setModel(this.viewSettingModel, 'viewSettingModel');
+            this.sortPopover.open();
         } else {
             this.sortPopover.open();
         }
@@ -121,18 +109,16 @@ export default class Keys extends BaseController {
         const view = this.getView();
         const component = this.getOwnerComponent();
         if (!this.configCreatePopover) {
-            await Fragment.load({
+            this.configCreatePopover = await Fragment.load({
                 id: view.getId(),
                 name: 'kms.resources.fragments.KeyConfigs.CreateConfig',
                 controller: this
-            }).then((dialog) => {
-                this.configCreatePopover = dialog as Dialog;
-                this.configCreatePopover.addStyleClass('sapUiSizeCompact');
-                this.configCreatePopover.setModel(component.getModel('i18n'), 'i18n');
-                this.configCreatePopover.setModel(this.createConfigModel, 'model');
-                this.resetCreateConfigModel();
-                this.configCreatePopover.open();
-            });
+            }) as Dialog;
+            this.configCreatePopover.addStyleClass('sapUiSizeCompact');
+            this.configCreatePopover.setModel(component.getModel('i18n'), 'i18n');
+            this.configCreatePopover.setModel(this.createConfigModel, 'model');
+            this.resetCreateConfigModel();
+            this.configCreatePopover.open();
         } else {
             this.configCreatePopover.open();
         }

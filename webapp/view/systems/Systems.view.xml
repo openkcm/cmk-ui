@@ -28,19 +28,18 @@
         <f:header>
             <f:DynamicPageHeader>
                 <f:content>
-                    <fb:FilterBar id="filterbar" persistencyKey="myPersKey" useToolbar="false"
-                        search=".onSearch" filterChange=".onFilterChange"
-                        afterVariantLoad=".onAfterVariantLoad">
+                    <fb:FilterBar useToolbar="false"
+                        search="getSystems" filterChange=".onFilterChange">
                         <fb:filterGroupItems>
-                            <fb:FilterGroupItem name="Region" label="{i18n>region}" groupName="Group1"
+                            <fb:FilterGroupItem name="Region" label="{i18n>region}"
+                                groupName="Group1"
                                 visibleInFilterBar="true">
                                 <fb:control>
                                     <MultiComboBox
                                         name="{i18n>region}"
                                         selectionChange=".onSelectionChange"
                                         placeholder="{i18n>all}"
-                                        items="{oneWay>/systems}"
-                                    >
+                                        items="{oneWay>/systems}">
                                         <core:Item key="{oneWay>region}" text="{oneWay>region}" />
                                     </MultiComboBox>
                                 </fb:control>
@@ -51,8 +50,7 @@
                                     <MultiComboBox
                                         placeholder="{i18n>all}"
                                         name="{i18n>sid}"
-                                        items="{oneWay>/systems}"
-                                    >
+                                        items="{oneWay>/systems}">
                                         <core:Item key="{oneWay>sid}" text="{oneWay>sid}" />
                                     </MultiComboBox>
                                 </fb:control>
@@ -64,36 +62,35 @@
                                         placeholder="{i18n>all}"
                                         name="{i18n>systemsRole}"
                                         selectionChange=".onSelectionChange"
-                                        items="{oneWay>/systems}"
-                                    >
+                                        items="{oneWay>/systems}">
                                         <core:Item key="{oneWay>systemRole}"
                                             text="{oneWay>systemRole}" />
                                     </MultiComboBox>
                                 </fb:control>
                             </fb:FilterGroupItem>
-                            <fb:FilterGroupItem name="Application Role" label="{i18n>applicationRole}"
+                            <fb:FilterGroupItem name="Application Role"
+                                label="{i18n>applicationRole}"
                                 groupName="Group1" visibleInFilterBar="true">
                                 <fb:control>
                                     <MultiComboBox
                                         placeholder="{i18n>all}"
                                         name="{i18n>applicationRole}"
                                         selectionChange=".onSelectionChange"
-                                        items="{oneWay>/systems}"
-                                    >
+                                        items="{oneWay>/systems}">
                                         <core:Item key="{oneWay>applicationRole}"
                                             text="{oneWay>applicationRole}" />
                                     </MultiComboBox>
                                 </fb:control>
                             </fb:FilterGroupItem>
-                            <fb:FilterGroupItem name="Key Configuration" label="{i18n>keyConfiguration}"
+                            <fb:FilterGroupItem name="Key Configuration"
+                                label="{i18n>keyConfiguration}"
                                 groupName="Group1" visibleInFilterBar="true">
                                 <fb:control>
                                     <MultiComboBox
                                         placeholder="{i18n>all}"
                                         name="{i18n>keyConfiguration}"
                                         selectionChange=".onSelectionChange"
-                                        items="{oneWay>/systems}"
-                                    >
+                                        items="{oneWay>/systems}">
                                         <core:Item key="{oneWay>keyConfig}"
                                             text="{oneWay>keyConfig}" />
                                     </MultiComboBox>
@@ -105,9 +102,11 @@
             </f:DynamicPageHeader>
         </f:header>
         <f:content>
-            <core:Fragment
-                fragmentName="kms.resources.fragments.SystemsTable"
-                type="XML" />
+            <Panel>
+                <core:Fragment
+                    fragmentName="kms.resources.fragments.SystemsTable"
+                    type="XML" />
+            </Panel>
         </f:content>
     </f:DynamicPage>
 </mvc:View>

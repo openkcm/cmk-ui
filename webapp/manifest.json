@@ -83,7 +83,17 @@
                 {
                     "pattern": "keyConfigs/{keyConfigId}:?query:",
                     "name": "keyConfigDetail",
-                    "target": "keyConfigDetail"
+                    "target": [
+                        "keyConfigDetail"
+                    ]
+                },
+                {
+                    "pattern": "keyConfigs/{keyConfigId}/{keyId}:?query:",
+                    "name": "keyConfigKeyDetail",
+                    "target": [
+                        "keyConfigDetail",
+                        "keyConfigKeyDetail"
+                    ]
                 },
                 {
                     "pattern": "systems",
@@ -138,9 +148,23 @@
                     "viewId": "keyConfigs",
                     "viewName": "keyConfigs.KeyConfigs"
                 },
+                "keyConfigDetailLayout": {
+                    "viewId": "keyConfigDetailLayout",
+                    "viewName": "keyConfigs.detail.Layout"
+                },
                 "keyConfigDetail": {
-                    "viewId": "keyConfigDetail",
-                    "viewName": "keyConfigs.detail.Detail"
+                    "parent": "keyConfigDetailLayout",
+                    "controlId": "keyConfigDetailLayout",
+                    "viewName": "keyConfigs.detail.Detail",
+                    "controlAggregation": "beginColumnPages",
+                    "clearControlAggregation": true
+                },
+                "keyConfigKeyDetail": {
+                    "parent": "keyConfigDetailLayout",
+                    "controlId": "keyConfigDetailLayout",
+                    "viewName": "keyConfigs.detail.KeyDetail",
+                    "controlAggregation": "midColumnPages",
+                    "clearControlAggregation": true
                 },
                 "tasks": {
                     "viewId": "tasks",

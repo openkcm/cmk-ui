@@ -26,7 +26,7 @@
                 <tnt:InfoLabel id="il1" text="TEST" renderMode="Narrow" colorScheme="1" />
                 <MenuButton text="Tenant 123456" class="sapUiMediumMarginEnd">
                     <menu>
-                        <Menu>
+                        <Menu class="sapUiSizeCompact">
                             <MenuItem text="Tenant 235235" press="onPress" />
                             <MenuItem text="Tenant 344477" press="onPress" />
                             <MenuItem text="Tenant 473497" press="onPress" />
@@ -75,7 +75,7 @@
         </tnt:header>
         <tnt:sideContent>
             <tnt:SideNavigation
-                expanded="true"
+                expanded="{= ${oneWay>/selectedKey} === 'home'}"
                 selectedKey="{oneWay>/selectedKey}">
                 <tnt:NavigationList>
                     <tnt:NavigationListItem

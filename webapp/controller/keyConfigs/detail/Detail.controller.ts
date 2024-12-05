@@ -1,7 +1,7 @@
 import BaseController from 'kms/controller/BaseController';
 import JSONModel from 'sap/ui/model/json/JSONModel';
 import BindingMode from 'sap/ui/model/BindingMode';
-import { KeyConfig } from 'kms/common/Types';
+import { KeyConfig, Key, System } from 'kms/common/Types';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import Api from 'kms/services/Api.service';
 import MessageBox from 'sap/m/MessageBox';
@@ -12,8 +12,21 @@ import NavContainer from 'sap/m/NavContainer';
 import Wizard from 'sap/m/Wizard';
 import Page from 'sap/m/Page';
 import MessageToast from 'sap/m/MessageToast';
+import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
+import { isUUIDValid } from 'kms/common/Helpers';
+import EventBus from 'sap/ui/core/EventBus';
+import { Button$PressEvent } from 'sap/m/Button';
 interface KeyConfigPatchPayload {
     name: string;
+}
+interface KeyResponse {
+    data: Key[] | undefined;
+    count: number | undefined;
+}
+
+interface SystemsResponse {
+    data: System[] | undefined;
+    count: number | undefined;
 }
 export default class KeyConfigDetail extends BaseController {
     private readonly api: Api = new Api();
@@ -22,7 +35,9 @@ export default class KeyConfigDetail extends BaseController {
         keyConfig: {} as KeyConfig,
         keysCount: 0 as number,
         systemsCount: 0 as number,
-        edit: false as boolean
+        edit: false as boolean,
+        keys: [] as Key[],
+        systems: [] as System[],
     });
     private readonly viewSettingModel = new JSONModel({
         sortColumns: [] as object[],
@@ -40,9 +55,11 @@ export default class KeyConfigDetail extends BaseController {
     private keyCreationWizard: Wizard | undefined;
     private keyCreationWizardPage: Page | undefined;
     private keyCreationReviewPage: Page | undefined;
+    private eventBus = EventBus.getInstance();
 
     public onInit(): void {
         super.onInit();
+        this.eventBus.subscribe('keys', 'loadKeyConfigDetails', (channelId, eventId, data) => this.onKeyDetailRouteEventTriggered(channelId, eventId, data as { keyConfigId: string }), this);
         this.getRouter().getRoute('keyConfigDetail').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.twoWayModel.setDefaultBindingMode(BindingMode.TwoWay);
@@ -53,9 +70,13 @@ export default class KeyConfigDetail extends BaseController {
         this.setModel(this.viewSettingModel, 'viewSettingModel');
         this.setModel(this.keyCreationModel, 'keyCreationModel');
     };
-    private isUUIDValid(uuid: string): boolean {
-        const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
-        return uuidRegex.test(uuid);
+    public onKeyDetailRouteEventTriggered(channelId: string, eventId: string, data: { keyConfigId: string }): void {
+        if (channelId === 'keys' && eventId === 'loadKeyConfigDetails') {
+            this.keyConfigId = data.keyConfigId;
+            this.getKeyConfigData().catch((error) => {
+                console.error(error);
+            });
+        }
     }
     public onRouteMatched(event: Route$PatternMatchedEvent): void {
         this.getView().setBusy(true);
@@ -63,20 +84,19 @@ export default class KeyConfigDetail extends BaseController {
         const queryParams = routeArgs['?query'] as { createKey?: string };
         this.keyConfigId = routeArgs.keyConfigId;
 
-        if (!this.isUUIDValid(this.keyConfigId)) {
+        if (!isUUIDValid(this.keyConfigId)) {
             console.error('Key config id invalid');
             this.getRouter().navTo('keyConfigs');
             return;
         }
-        this.setKeyConfigData();
+        this.getKeyConfigData().catch((error) => {
+            console.error(error);
+        });
 
         if (queryParams?.createKey === 'true') {
             this.getView().setBusy(true);
-            this.handleCreateKeyRoute().then(() => {
-            }).catch((error) => {
-                console.error('Error handling create key route', error);
-            }).finally(() => {
-                this.getView().setBusy(false);
+            this.handleCreateKeyRoute().catch((error) => {
+                console.error(error);
             });
         }
     }
@@ -85,23 +105,21 @@ export default class KeyConfigDetail extends BaseController {
         const component = this.getOwnerComponent();
 
         if (!this.keyCreatePopover) {
-            await Fragment.load({
+            this.keyCreatePopover = await Fragment.load({
                 id: view.getId(),
                 name: 'kms.resources.fragments.common.KeyCreationWizard',
                 controller: this
-            }).then((popover) => {
-                this.keyCreatePopover = popover as Dialog;
-                this.keyCreatePopover.addStyleClass('sapUiSizeCompact');
-                this.keyCreatePopover.setModel(component.getModel('i18n'), 'i18n');
-                this.keyCreatePopover.setModel(this.keyCreationModel, 'model');
-                this.keyCreatePopover.open();
-                this.resetKeyCreationModel()
-                this.keyCreationWizard = this.byId('keyCreationWizard') as Wizard;
-                this.keyCreationNavContainer = this.byId('keyCreationNavContainer') as NavContainer;
-                this.keyCreationReviewPage = this.byId('keyCreationReviewPage') as Page;
-                this.keyCreationWizardPage = this.byId('keyCreationWizardPage') as Page;
-                this.keyCreationNavContainer?.to(this.keyCreationWizardPage);
-            });
+            }) as Dialog;
+            this.keyCreatePopover.addStyleClass('sapUiSizeCompact');
+            this.keyCreatePopover.setModel(component.getModel('i18n'), 'i18n');
+            this.keyCreatePopover.setModel(this.keyCreationModel, 'model');
+            this.keyCreatePopover.open();
+            this.resetKeyCreationModel()
+            this.keyCreationWizard = this.byId('keyCreationWizard') as Wizard;
+            this.keyCreationNavContainer = this.byId('keyCreationNavContainer') as NavContainer;
+            this.keyCreationReviewPage = this.byId('keyCreationReviewPage') as Page;
+            this.keyCreationWizardPage = this.byId('keyCreationWizardPage') as Page;
+            this.keyCreationNavContainer?.to(this.keyCreationWizardPage);
         } else {
             this.keyCreatePopover.open();
             this.resetKeyCreationModel()
@@ -142,7 +160,9 @@ export default class KeyConfigDetail extends BaseController {
             this.keyCreatePopover?.destroy();
             this.keyCreatePopover = undefined;
             this.resetKeyCreationModel();
-            this.setKeyConfigData()
+            this.getKeyConfigData().catch((error) => {
+                console.error(error);
+            });
         } catch (error) {
             MessageBox.error(this.getText('errorCreatingKey'));
             console.error('Error creating key', error);
@@ -194,34 +214,43 @@ export default class KeyConfigDetail extends BaseController {
         this.keyCreationNavContainer.attachAfterNavigate(fnAfterNavigate);
         this.keyCreationNavContainer.backToPage(this.keyCreationWizardPage.getId());
     }
-    private setKeyConfigData() {
-        this.getKeyConfigData().then((keyConfigs) => {
-            if (!keyConfigs) {
+    private async getKeyConfigData(): Promise<void> {
+        try {
+            const keyConfig = await this.api.get<KeyConfig>(`keyConfig/${this.keyConfigId}`);
+            if (!keyConfig) {
                 return;
             }
-            interface KeyConfigsResponse {
-                data: KeyConfig[];
-                count: number;
-            }
-            const keyConfigsResponse = keyConfigs as unknown as KeyConfigsResponse;
-            const keyConfigsData = keyConfigsResponse.data;
-            this.oneWayModel.setProperty('/keyConfig', keyConfigsData[0]);
-            this.oneWayModel.setProperty('/keysCount', keyConfigsData[0]?.keys?.length);
-            this.oneWayModel.setProperty('/systemsCount', keyConfigsData[0]?.systems?.length);
-            this.twoWayModel.setProperty('/keyConfig', keyConfigsData[0]);
-        }).catch((error) => {
-            console.error('Error parsing key config', error);
-        }).finally(() => {
-            this.getView().setBusy(false);
-        });
-    }
-    private async getKeyConfigData() {
-        try {
-            const keyConfigs = await this.api.get<KeyConfig[]>('keyConfig', { id: this.keyConfigId });
-            return keyConfigs;
+            this.oneWayModel.setProperty('/keyConfig', keyConfig);
+            this.twoWayModel.setProperty('/keyConfig', keyConfig);
+            const keys = await this.getKeys();
+            const systems = await this.getSystems();
+            this.oneWayModel.setProperty('/keys', keys?.data);
+            this.oneWayModel.setProperty('/systems', systems?.data);
+            this.oneWayModel.setProperty('/keysCount', keys?.count);
+            this.oneWayModel.setProperty('/systemsCount', systems?.count);
         } catch (error) {
             console.error(error);
             MessageBox.error(this.getText('errorFetchingKeyConfigDetails'));
+        } finally {
+            this.getView().setBusy(false);
+        }
+    }
+    private async getKeys() {
+        try {
+            const keys = await this.api.get<KeyResponse>(`keys`, { keyConfigurationID: this.keyConfigId });
+            return keys;
+        } catch (error) {
+            console.error(error);
+            MessageBox.error(this.getText('errorFetchingKeyDetails'));
+        }
+    }
+    private async getSystems() {
+        try {
+            const systems = await this.api.get<SystemsResponse>(`systems`, { keyConfigurationID: this.keyConfigId });
+            return systems;
+        } catch (error) {
+            console.error(error);
+            MessageBox.error(this.getText('errorFetchingSystems'));
         }
     }
     private async patchKeyConfigData(keyConfig: KeyConfigPatchPayload) {
@@ -239,7 +268,7 @@ export default class KeyConfigDetail extends BaseController {
     public onCancelEditPress(): void {
         this.oneWayModel.setProperty('/edit', false);
     }
-    public onSaveKeyConfigPress(): void {
+    public async onSaveKeyConfigPress(): Promise<void> {
         this.getView().setBusy(true);
         const keyConfig = this.twoWayModel.getProperty('/keyConfig') as KeyConfig;
         const payload = {
@@ -247,14 +276,16 @@ export default class KeyConfigDetail extends BaseController {
             name: keyConfig.name
         } as KeyConfigPatchPayload;
 
-        this.patchKeyConfigData(payload).then(() => {
-            this.setKeyConfigData();
+        try {
+            await this.patchKeyConfigData(payload);
+            await this.getKeyConfigData();
             this.onCancelEditPress();
-        }).catch((error) => {
+        } catch (error) {
             console.error('Error patching key config', error);
-        }).finally(() => {
+            MessageBox.error(this.getText('errorPatchingKeyConfigDetails'));
+        } finally {
             this.getView().setBusy(false);
-        });
+        }
     }
     public onTableSortApplyPress(): void {
         const currentTable = this.viewSettingModel.getProperty('/currentTable') as string;
@@ -286,19 +317,81 @@ export default class KeyConfigDetail extends BaseController {
         this.viewSettingModel.setProperty('/sortColumns', columns);
         this.viewSettingModel.setProperty('/currentTable', 'keys');
         if (!this.filterPopover) {
-            await Fragment.load({
+            this.filterPopover = await Fragment.load({
                 id: view.getId(),
                 name: 'kms.resources.fragments.common.TableSorter',
                 controller: this
-            }).then((dialog) => {
-                this.filterPopover = dialog as ViewSettingsDialog;
-                this.filterPopover.addStyleClass('sapUiSizeCompact');
-                this.filterPopover.setModel(component.getModel('i18n'), 'i18n');
-                this.filterPopover.setModel(this.viewSettingModel, 'viewSettingModel');
-                this.filterPopover.open();
-            });
+            }) as ViewSettingsDialog;
+            this.filterPopover.addStyleClass('sapUiSizeCompact');
+            this.filterPopover.setModel(component.getModel('i18n'), 'i18n');
+            this.filterPopover.setModel(this.viewSettingModel, 'viewSettingModel');
+            this.filterPopover.open();
         } else {
             this.filterPopover.open();
+        }
+    }
+    public onKeyTableRowPress(event: ListItemBase$PressEvent): void {
+        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const selectedKey = this.oneWayModel.getProperty(path) as Key;
+        const keyId: string = selectedKey.id;
+        this.getRouter().navTo('keyConfigKeyDetail', {
+            keyConfigId: this.keyConfigId,
+            keyId: keyId
+        });
+    }
+    // eslint-disable-next-line @typescript-eslint/require-await
+    public async onKeyTableMakePrimaryPress(event: Button$PressEvent): Promise<void> {
+        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const selectedKey = this.oneWayModel.getProperty(path) as Key;
+        MessageBox.confirm(this.getText('confirmMakePrimaryConfirmation'), {
+            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            onClose: async (action: unknown) => {
+                if (action === MessageBox.Action.YES) {
+                    await this.makeKeyPrimary(selectedKey.id);
+                }
+            }
+        });
+    }
+    // eslint-disable-next-line @typescript-eslint/require-await
+    public async onKeyTableDeletePress(event: Button$PressEvent): Promise<void> {
+        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const selectedKey = this.oneWayModel.getProperty(path) as Key;
+        MessageBox.confirm(this.getText('confirmKeyDeletion'), {
+            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            onClose: async (action: unknown) => {
+                if (action === MessageBox.Action.YES) {
+                    await this.deleteKey(selectedKey.id);
+                }
+            }
+        });
+    }
+    private async deleteKey(keyId: string): Promise<void> {
+        this.getView().setBusy(true);
+        try {
+            await this.api.delete(`keys/${keyId}`);
+            MessageToast.show(this.getText('keyDeletedSuccessfully'));
+            await this.getKeyConfigData();
+        } catch (error) {
+            console.error(error);
+            MessageBox.error(this.getText('errorDeletingKey'));
+        } finally {
+            this.getView().setBusy(false);
+        }
+    }
+    private async makeKeyPrimary(keyId: string): Promise<void> {
+        this.getView().setBusy(true);
+        const payload = {
+            keyID: keyId
+        }
+        try {
+            await this.api.put(`keyConfig/${this.keyConfigId}/primaryKey`, payload);
+            MessageToast.show(this.getText('keyMadePrimarySuccessfully'));
+            await this.getKeyConfigData();
+        } catch (error) {
+            console.error(error);
+            MessageBox.error(this.getText('errorMakingKeyPrimary'));
+        } finally {
+            this.getView().setBusy(false);
         }
     }
     private resetKeyCreationModel() {

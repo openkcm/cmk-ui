@@ -1,0 +1,92 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout"
+    xmlns:forms="sap.ui.layout.form">
+    <forms:Form width="100%">
+        <forms:layout>
+            <forms:ColumnLayout
+                columnsM="1"
+                columnsL="1"
+                columnsXL="1" />
+        </forms:layout>
+        <forms:toolbar>
+            <OverflowToolbar>
+                <Title text="{i18n>details}" />
+                <ToolbarSpacer />
+                <Button icon="sap-icon://edit" text="{i18n>edit}" type="Ghost"
+                    press="onEditDetailsPress" />
+            </OverflowToolbar>
+        </forms:toolbar>
+        <forms:formContainers>
+            <forms:FormContainer>
+                <forms:formElements>
+                    <forms:FormElement label="{i18n>uuid}">
+                        <forms:fields>
+                            <Text text="{oneWay>/selectedKey/id}" />
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>name}">
+                        <forms:fields>
+                            <Text text="{oneWay>/selectedKey/name}" />
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>description}">
+                        <forms:fields>
+                            <Text text="{oneWay>/selectedKey/description}" wrapping="true" />
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>enabled}">
+                        <forms:fields>
+                            <Text
+                                text="{= !!${oneWay>/selectedKey/enabled} ? ${i18n>yes} : ${i18n>no}}" />
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>keystore}">
+                        <forms:fields>
+                            <Text text="{oneWay>/selectedKey/provider}" />
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>region}">
+                        <forms:fields>
+                            <Text text="{oneWay>/selectedKey/region}" />
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>algorithm}">
+                        <forms:fields>
+                            <Text text="{oneWay>/selectedKey/algorithm}" />
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>nativeId}"
+                        visible="{= !!${oneWay>/customerHeld}}">
+                        <forms:fields>
+                            <Text text="{oneWay>/selectedKey/nativeID}" />
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>customerHeld}">
+                        <forms:fields>
+                            <Text
+                                text="{= !!${oneWay>/selectedKey/customerHeld} ? ${i18n>yes} : ${i18n>no}}" />
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>createdBy}">
+                        <forms:fields>
+                            <Text text="{oneWay>/selectedKey/metadata/createdBy}" />
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>createdOn}">
+                        <forms:fields>
+                            <Text
+                                text="{path:'oneWay>/selectedKey/metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ss.SSSSSSZ'}}} UTC" />
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>updatedOn}">
+                        <forms:fields>
+                            <Text
+                                text="{path:'oneWay>/selectedKey/metadata/updatedAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ss.SSSSSSZ'}}} UTC" />
+                        </forms:fields>
+                    </forms:FormElement>
+                </forms:formElements>
+            </forms:FormContainer>
+        </forms:formContainers>
+    </forms:Form>
+</core:FragmentDefinition>

@@ -4,13 +4,20 @@ import keyConfig from "./mockServer/mockdata/keyConfig.mjs";
 import systems from "./mockServer/mockdata/systems.mjs";
 import groups from "./mockServer/mockdata/groups.mjs";
 import user from "./mockServer/mockdata/user.mjs";
+import keys from "./mockServer/mockdata/keys.mjs";
+import keyVersions from "./mockServer/mockdata/keyVersions.mjs";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get("/api/v1/keyConfig", (req, res) => {
-    res.json(keyConfig());
+app.get("/api/v1/keyConfig/:id?", (req, res) => {
+    const { id } = req.params;
+    res.json(keyConfig(id));
+});
+
+app.put("/api/v1/keyConfig/:id/primaryKey", (req, res) => {
+    res.status(204).json(keys());
 });
 
 app.patch("/api/v1/keyConfig", (req, res) => {
@@ -23,13 +30,28 @@ app.post("/api/v1/keys", (req, res) => {
     res.status(201).json(newKey);
 });
 
-app.post("/api/v1/keyConfig", (req, res) => {
-    req.body.id = "b40218e3-be88-5eed-9f59-b2066938e2fa";
-    res.status(201).json(req.body);
+app.get("/api/v1/keys/:id?", (req, res) => {
+    const { id } = req.params;
+    res.json(keys(id));
 });
 
-app.get("/api/v1/systems", (req, res) => {
-    res.json(systems());
+app.delete("/api/v1/keys/:id", (req, res) => {
+    res.status(204).json({});
+});
+
+app.patch("/api/v1/keys/:id", (req, res) => {
+    const { id } = req.params;
+    res.status(200).json(keys(id));
+});
+
+app.get("/api/v1/keys/:id/versions", (req, res) => {
+    const { keyID } = req.params;
+    res.json(keyVersions(keyID));
+});
+
+app.get("/api/v1/systems/:systemID?/:keyConfigurationID?", (req, res) => {
+    const { systemID, keyConfigurationID } = req.query;
+    res.json(systems(systemID, keyConfigurationID));
 });
 
 app.get("/api/v1/groups", (req, res) => {

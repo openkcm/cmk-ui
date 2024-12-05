@@ -26,33 +26,33 @@
                     width="100%">
                     <VBox width="50%">
                         <Label text="{i18n>keys}:" />
-                        <Text text="{= ${oneWay>keys}.length}" />
+                        <Text text="{oneWay>metadata/totalKeys}" />
                     </VBox>
                     <VBox width="50%">
                         <Label text="Systems:" />
-                        <Text text="{= ${oneWay>systems}.length}" />
+                        <Text text="{oneWay>metadata/totalSystems}" />
                     </VBox>
                 </HBox>
                 <VBox justifyContent="SpaceBetween"
                     backgroundDesign="Solid"
                     height="110px"
-                    visible="{= ${oneWay>keys}.length !== 0}"
+                    visible="{= !!${oneWay>primaryKey}}"
                     class="gray-background-color rounded-box sapUiSmallMargin">
                     <Title text="{i18n>primaryKey}:" titleStyle="H6"
                         class="sapUiTinyMarginBegin sapUiTinyMarginTop" />
-                    <Label design="Bold" text="ap-southeast-test-something"
+                    <Label design="Bold" text="{oneWay>primaryKey/name}"
                         class="sapUiTinyMarginBegin" />
-                    <Label text="AWS - eu-central-1"
+                    <Label text="{oneWay>primaryKey/provider} • {oneWay>primaryKey/region}"
                         class="sapUiTinyMarginBegin" />
                     <ObjectStatus
-                        visible="{= ${oneWay>keys}.length !== 3}"
+                        visible="{= ${oneWay>primaryKey/state} === 'ENABLED'}"
                         icon="sap-icon://sys-enter-2"
                         text="{i18n>active}"
                         class="sapUiTinyMargin"
                         inverted="true"
                         state="Indication14" />
                     <ObjectStatus
-                        visible="{= ${oneWay>keys}.length === 3}"
+                        visible="{= ${oneWay>primaryKey/state} === 'DISABLED'}"
                         icon="sap-icon://warning"
                         text="{i18n>disabled}"
                         class="sapUiTinyMargin"
@@ -61,12 +61,12 @@
                 </VBox>
                 <HBox justifyContent="Center" alignItems="Center"
                     backgroundDesign="Solid"
-                    visible="{= ${oneWay>keys}.length === 0}"
+                    visible="{= !${oneWay>primaryKey}}"
                     height="110px"
                     class="outlined-dotted-box-rounded-corners sapUiSmallMargin">
                     <MenuButton text="{i18n>createKey}" icon="sap-icon://add">
                         <menu>
-                            <Menu>
+                            <Menu class="sapUiSizeCompact">
                                 <MenuItem text="{i18n>sapManaged}"
                                     press="onKeyConfigDashboardCreateSAPKeyPress" />
                             </Menu>

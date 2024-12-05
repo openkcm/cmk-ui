@@ -2,57 +2,55 @@
     xmlns:core="sap.ui.core"
     xmlns:tnt="sap.tnt"
     core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
-    <Panel>
-        <Table
-            id="table"
-            inset="false"
-            items="{oneWay>/systems}">
-            <headerToolbar>
-                <OverflowToolbar>
-                    <Title id="title"
-                        text="{parts: ['i18n>systemsCount', 'oneWay>/systemsCount'], formatter: 'formatMessage'}"
-                        level="H2" />
-                </OverflowToolbar>
-            </headerToolbar>
-            <columns>
-                <Column minScreenWidth="Tablet" demandPopin="true">
-                    <Text text="{i18n>name}" />
-                </Column>
-                <Column minScreenWidth="Tablet" demandPopin="true">
-                    <Text text="{i18n>sid}" />
-                </Column>
-                <Column minScreenWidth="Tablet" demandPopin="true">
-                    <Text text="{i18n>systemsRole}" />
-                </Column>
-                <Column minScreenWidth="Tablet" demandPopin="true">
-                    <Text text="{i18n>applicationRole}" />
-                </Column>
-                <Column minScreenWidth="Tablet" demandPopin="true">
-                    <Text text="{i18n>keyConfiguration}" />
-                </Column>
-            </columns>
+    <Table
+        id="table"
+        inset="false"
+        items="{oneWay>/systems}">
+        <headerToolbar>
+            <OverflowToolbar>
+                <Title id="title"
+                    text="{parts: ['i18n>systemsCount', 'oneWay>/systemsCount'], formatter: 'formatMessage'}"
+                    level="H2" />
+            </OverflowToolbar>
+        </headerToolbar>
+        <columns>
+            <Column minScreenWidth="Tablet" demandPopin="true">
+                <Text text="{i18n>name}" />
+            </Column>
+            <Column minScreenWidth="Tablet" demandPopin="true">
+                <Text text="{i18n>sid}" />
+            </Column>
+            <Column minScreenWidth="Tablet" demandPopin="true">
+                <Text text="{i18n>systemsRole}" />
+            </Column>
+            <Column minScreenWidth="Tablet" demandPopin="true">
+                <Text text="{i18n>applicationRole}" />
+            </Column>
+            <Column minScreenWidth="Tablet" demandPopin="true">
+                <Text text="{i18n>keyConfiguration}" />
+            </Column>
+        </columns>
 
-            <items>
-                <ColumnListItem vAlign="Middle" type="Inactive">
-                    <cells>
-                        <ObjectIdentifier title="{oneWay>name}" text="{oneWay>region}" />
-                        <Text text="{oneWay>sid}" />
-                        <Text text="{oneWay>systemRole}" />
-                        <Text text="{oneWay>applicationRole}" />
-                        <VBox>
-                            <ObjectStatus
-                                icon="sap-icon://sys-enter-2"
-                                text="{oneWay>keyConfig}"
-                                visible="{= ${oneWay>keyConfig} !== ''}"
-                                inverted="true"
-                                state="Indication14" />
-                            <Button text="Connect"
-                                visible="{= ${oneWay>keyConfig} === ''}"
-                                icon="sap-icon://add" />
-                        </VBox>
-                    </cells>
-                </ColumnListItem>
-            </items>
-        </Table>
-    </Panel>
+        <items>
+            <ColumnListItem vAlign="Middle" type="Inactive">
+                <cells>
+                    <ObjectIdentifier title="{oneWay>name}" text="{oneWay>region}" />
+                    <Text text="{oneWay>sid}" />
+                    <Text text="{oneWay>systemRole}" />
+                    <Text text="{oneWay>applicationRole}" />
+                    <VBox>
+                        <ObjectStatus
+                            icon="sap-icon://sys-enter-2"
+                            text="{oneWay>keyConfigurationName}"
+                            visible="{= ${oneWay>keyConfigurationName} !== ''}"
+                            inverted="true"
+                            state="Indication14" />
+                        <Button text="Connect"
+                            visible="{= ${oneWay>keyConfigurationName} === ''}"
+                            icon="sap-icon://add" />
+                    </VBox>
+                </cells>
+            </ColumnListItem>
+        </items>
+    </Table>
 </core:FragmentDefinition>
