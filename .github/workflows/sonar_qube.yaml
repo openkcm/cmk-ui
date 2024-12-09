@@ -25,7 +25,7 @@ jobs:
         run: |
           apt install -y \
             curl \
-            jq
+            jq unzip zip
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.GH_ACTION_REPO_READ }}

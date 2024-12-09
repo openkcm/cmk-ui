@@ -101,6 +101,14 @@
                     "target": "users"
                 },
                 {
+                    "pattern": "users/{userID}",
+                    "name": "usersDetail",
+                    "target": [
+                        "users",
+                        "usersDetail"
+                    ] 
+                },
+                {
                     "pattern": "settings",
                     "name": "settings",
                     "target": "settings"
@@ -138,9 +146,23 @@
                     "viewId": "tasks",
                     "viewName": "tasks.Tasks"
                 },
+                "usersLayout": {
+                    "viewId": "usersLayout",
+                    "viewName": "users.Layout"
+                },
                 "users": {
-                    "viewId": "users",
-                    "viewName": "users.Users"
+                    "parent": "usersLayout",
+                    "controlId": "usersLayout",
+                    "viewName": "users.Users",
+                    "clearControlAggregation": true,
+                    "controlAggregation": "beginColumnPages"
+                },
+                "usersDetail": {
+                    "parent": "usersLayout",
+                    "controlId": "usersLayout",
+                    "viewName": "users.UsersDetail",
+                    "clearControlAggregation": true,
+                    "controlAggregation": "midColumnPages"
                 },
                 "settings": {
                     "viewId": "settings",

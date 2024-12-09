@@ -2,7 +2,9 @@
     controllerName="kms.controller.users.Users"
     xmlns="sap.m"
     xmlns:f="sap.f"
-    xmlns:mvc="sap.ui.core.mvc">
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
     <f:DynamicPage>
         <f:title>
             <f:DynamicPageTitle>
@@ -18,9 +20,45 @@
                 <f:snappedTitleOnMobile>
                     <Title text="{i18n>sideContentUserManagement}" />
                 </f:snappedTitleOnMobile>
+                <f:actions>
+                    <Button
+                        icon="sap-icon://refresh"
+                        type="Transparent"
+                        press="setGroups" />
+                </f:actions>
             </f:DynamicPageTitle>
         </f:title>
         <f:content>
+            <Panel>
+                <Table
+                    id="table"
+                    inset="false"
+                    items="{oneWay>/groupsData}">
+                    <headerToolbar>
+                        <OverflowToolbar>
+                            <Title id="title"
+                                text="{parts: ['i18n>groupsWithCount', 'oneWay>/groupsCount'], formatter: 'formatMessage'}"
+                                level="H2" />
+                        </OverflowToolbar>
+                    </headerToolbar>
+                    <columns>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="{i18n>name}" />
+                        </Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="{i18n>sideContentUserManagement}" />
+                        </Column>
+                    </columns>       
+                    <items>
+                        <ColumnListItem vAlign="Middle" type="Navigation" press="onUserPress">
+                            <cells>
+                                <ObjectIdentifier title="{oneWay>name}" text="{oneWay>name}" />
+                                <Text text="{path:'oneWay>userCount'}" />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </Panel>
         </f:content>
     </f:DynamicPage>
 </mvc:View>

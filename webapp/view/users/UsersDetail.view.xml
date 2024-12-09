@@ -1,0 +1,60 @@
+<mvc:View controllerName="kms.controller.users.Detail" xmlns:f="sap.f"
+          xmlns:m="sap.m" xmlns="sap.uxap" xmlns:core="sap.ui.core"
+          core:require="{ formatMessage: 'sap/base/strings/formatMessage' }"
+          xmlns:mvc="sap.ui.core.mvc">
+    <ObjectPageLayout showTitleInHeaderContent="true" upperCaseAnchorBar="false">
+        <headerTitle>
+            <ObjectPageDynamicHeaderTitle>
+                <expandedHeading>
+                    <m:Title text="{oneWay>/groupName}" wrapping="true"/>
+                </expandedHeading>
+                <navigationActions>
+                    <m:OverflowToolbarButton type="Transparent" icon="sap-icon://decline"
+                                           press="onCancel" tooltip="Close"/>
+                </navigationActions>
+            </ObjectPageDynamicHeaderTitle>
+        </headerTitle>
+
+        <sections>
+            <ObjectPageSection titleUppercase="false"
+                title="{i18n>details}" showTitle="false">
+                <subSections>
+                    <ObjectPageSubSection>
+                        <m:VBox>
+                            <m:Panel>
+                                <m:Table
+                                    id="table"
+                                    inset="false"
+                                    items="{oneWay>/user}">
+                                    <m:headerToolbar>
+                                        <m:OverflowToolbar>
+                                            <m:Title id="title"
+                                                    text="{parts: ['i18n>usersCount', 'oneWay>/userCount'], formatter: 'formatMessage'}"
+                                                    level="H2" />
+                                        </m:OverflowToolbar>
+                                    </m:headerToolbar>
+                                    <m:columns>
+                                        <m:Column minScreenWidth="Tablet" demandPopin="true">
+                                            <m:Text text="{i18n>name}" />
+                                        </m:Column>
+                                        <m:Column minScreenWidth="Tablet" demandPopin="true">
+                                            <m:Text text="{i18n>email}" />
+                                        </m:Column>
+                                    </m:columns>       
+                                    <m:items>
+                                        <m:ColumnListItem vAlign="Middle" type="Inactive">
+                                            <m:cells>
+                                                <m:Text text="{oneWay>name}" />
+                                                <m:Text text="{oneWay>email}" />
+                                            </m:cells>
+                                        </m:ColumnListItem>
+                                    </m:items>
+                                </m:Table>
+                            </m:Panel>
+                        </m:VBox>
+                    </ObjectPageSubSection>
+                </subSections>
+            </ObjectPageSection>
+            </sections>        
+    </ObjectPageLayout>
+</mvc:View>

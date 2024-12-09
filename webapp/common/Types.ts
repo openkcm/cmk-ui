@@ -6,6 +6,16 @@ export interface System {
     name: string;
     key: string;
 };
+export interface Groups {
+    id: string;
+    groups: Groups[];
+    name: string;
+};
+export interface User {
+    id: string;
+    name: string;
+    email: string;
+};
 export interface KeyConfig {
     name: string;
     id: string;

@@ -40,6 +40,7 @@ export default class App extends BaseController {
                 this.oneWayModel.setProperty('/selectedKey', 'tasks');
                 break;
             case 'users':
+            case 'usersDetail':
                 this.oneWayModel.setProperty('/selectedKey', 'users');
                 break;
             case 'settings':
