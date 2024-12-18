@@ -2,8 +2,8 @@ import axios, { AxiosInstance, AxiosError, AxiosResponse } from 'axios';
 export default class Api {
     private readonly axiosInstance: AxiosInstance;
 
-    // Base URL for the API, 'http://localhost:3000/api/v1/' for the mock api
-    private readonly baseURL: string = 'http://localhost:3000/api/v1/';
+    // Configured using UI5 middleware, see webapp/ui5.yaml and /env
+    private readonly baseURL: string = 'UI5_MIDDLEWARE_ENV_API_BASE_URL';
     constructor() {
         this.axiosInstance = axios.create({
             baseURL: this.baseURL,

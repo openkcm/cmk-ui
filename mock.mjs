@@ -11,7 +11,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get("/api/v1/keyConfig/:id?", (req, res) => {
+app.get("/api/v1/keyConfigurations/:id?", (req, res) => {
     const { id } = req.params;
     res.json(keyConfig(id));
 });
@@ -20,7 +20,7 @@ app.put("/api/v1/keyConfig/:id/primaryKey", (req, res) => {
     res.status(204).json(keys());
 });
 
-app.patch("/api/v1/keyConfig", (req, res) => {
+app.patch("/api/v1/keyConfigurations", (req, res) => {
     const newConfig = req.body;
     res.status(200).json(newConfig);
 });

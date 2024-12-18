@@ -32,7 +32,7 @@
                     <m:Button
                         icon="sap-icon://refresh"
                         type="Transparent"
-                        press="setKeyConfigData" />
+                        press="getKeyConfigData" />
                 </actions>
             </ObjectPageDynamicHeaderTitle>
         </headerTitle>

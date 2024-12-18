@@ -11,7 +11,7 @@ import ViewSettingsDialog from 'sap/m/ViewSettingsDialog';
 import Dialog from 'sap/m/Dialog';
 import MessageToast from 'sap/m/MessageToast';
 interface KeyConfigsResponse {
-    data: KeyConfig[];
+    value: KeyConfig[];
     count: number;
 }
 export default class Keys extends BaseController {
@@ -47,8 +47,8 @@ export default class Keys extends BaseController {
     private async setKeyConfigs(): Promise<void> {
         this.getView().setBusy(true);
         try {
-            const keyConfigs = await this.api.get<KeyConfigsResponse>('keyConfig', {});
-            const keyConfigsData = keyConfigs.data;
+            const keyConfigs = await this.api.get<KeyConfigsResponse>('keyConfigurations', {});
+            const keyConfigsData = keyConfigs.value;
             this.oneWayModel.setProperty('/configs', keyConfigsData);
             this.oneWayModel.setProperty('/configsCount', keyConfigs.count || 0);
         } catch (error) {
@@ -128,21 +128,22 @@ export default class Keys extends BaseController {
         interface KeyConfigPostPayload {
             name: string;
             description: string;
-            adminGroup: string;
+            adminGroupID: string;
         }
 
         const name = this.createConfigModel.getProperty('/name') as string;
         const description = this.createConfigModel.getProperty('/description') as string;
-        const adminGroup = this.createConfigModel.getProperty('/adminGroup') as string;
+        // @TODO Temporary until backend implements user management
+        // const adminGroup = this.createConfigModel.getProperty('/adminGroup') as string;
         const newConfig = {
             name: name,
             description: description,
-            adminGroup: adminGroup
+            adminGroupID: '9e04db3d-059d-49bf-9356-b9bc36453f99'
         } as KeyConfigPostPayload;
 
         this.getView().setBusy(true);
         try {
-            const keyConfig = await this.api.post<KeyConfigPostPayload, KeyConfig>('keyConfig', newConfig);
+            const keyConfig = await this.api.post<KeyConfigPostPayload, KeyConfig>('keyConfigurations', newConfig);
             MessageToast.show(this.getText('keyConfigCreated'));
             this.configCreatePopover?.close();
             this.configCreatePopover?.destroy();

@@ -21,7 +21,7 @@ export default () => {
             id: chance.guid(),
         }));
         return {
-            data: response,
+            value: response,
             count: response.length
         };
     };

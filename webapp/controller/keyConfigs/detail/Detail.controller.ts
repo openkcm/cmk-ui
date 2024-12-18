@@ -20,12 +20,12 @@ interface KeyConfigPatchPayload {
     name: string;
 }
 interface KeyResponse {
-    data: Key[] | undefined;
+    value: Key[] | undefined;
     count: number | undefined;
 }
 
 interface SystemsResponse {
-    data: System[] | undefined;
+    value: System[] | undefined;
     count: number | undefined;
 }
 export default class KeyConfigDetail extends BaseController {
@@ -216,7 +216,7 @@ export default class KeyConfigDetail extends BaseController {
     }
     private async getKeyConfigData(): Promise<void> {
         try {
-            const keyConfig = await this.api.get<KeyConfig>(`keyConfig/${this.keyConfigId}`);
+            const keyConfig = await this.api.get<KeyConfig>(`keyConfigurations/${this.keyConfigId}`);
             if (!keyConfig) {
                 return;
             }
@@ -224,8 +224,8 @@ export default class KeyConfigDetail extends BaseController {
             this.twoWayModel.setProperty('/keyConfig', keyConfig);
             const keys = await this.getKeys();
             const systems = await this.getSystems();
-            this.oneWayModel.setProperty('/keys', keys?.data);
-            this.oneWayModel.setProperty('/systems', systems?.data);
+            this.oneWayModel.setProperty('/keys', keys?.value);
+            this.oneWayModel.setProperty('/systems', systems?.value);
             this.oneWayModel.setProperty('/keysCount', keys?.count);
             this.oneWayModel.setProperty('/systemsCount', systems?.count);
         } catch (error) {
@@ -246,7 +246,7 @@ export default class KeyConfigDetail extends BaseController {
     }
     private async getSystems() {
         try {
-            const systems = await this.api.get<SystemsResponse>(`systems`, { keyConfigurationID: this.keyConfigId });
+            const systems = await this.api.get<SystemsResponse>(`systems`);
             return systems;
         } catch (error) {
             console.error(error);
@@ -255,7 +255,7 @@ export default class KeyConfigDetail extends BaseController {
     }
     private async patchKeyConfigData(keyConfig: KeyConfigPatchPayload) {
         try {
-            const keyConfigs = await this.api.patch<KeyConfigPatchPayload, KeyConfig>('keyConfig', keyConfig);
+            const keyConfigs = await this.api.patch<KeyConfigPatchPayload, KeyConfig>('keyConfigurations', keyConfig);
             return keyConfigs;
         } catch (error) {
             console.error(error);
@@ -384,7 +384,7 @@ export default class KeyConfigDetail extends BaseController {
             keyID: keyId
         }
         try {
-            await this.api.put(`keyConfig/${this.keyConfigId}/primaryKey`, payload);
+            await this.api.put(`keyConfigurations/${this.keyConfigId}/primaryKey`, payload);
             MessageToast.show(this.getText('keyMadePrimarySuccessfully'));
             await this.getKeyConfigData();
         } catch (error) {

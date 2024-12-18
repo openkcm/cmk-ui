@@ -5,8 +5,8 @@ import Api from 'kms/services/Api.service';
 import { Groups } from 'kms/common/Types';
 import MessageBox from 'sap/m/MessageBox';
 import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
-interface groupsResponse {
-    data: Groups[];
+interface GroupsResponse {
+    value: Groups[];
     count: number;
 }
 export default class Users extends BaseController {
@@ -31,8 +31,8 @@ export default class Users extends BaseController {
     private async setGroups(): Promise<void> {
         this.getView().setBusy(true);
         try {
-            const groups = await this.api.get<groupsResponse>('groups', {});
-            const groupsData = groups.data;
+            const groups = await this.api.get<GroupsResponse>('groups', {});
+            const groupsData = groups.value;
             this.oneWayModel.setProperty('/groupsData', groupsData);
             this.oneWayModel.setProperty('/groupsCount', groups.count || 0);
 

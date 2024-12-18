@@ -17,7 +17,7 @@ interface KeyPatchPayload {
 }
 
 interface KeyVersionResponse {
-    data: KeyVersion[];
+    value: KeyVersion[];
     count: number;
 }
 
@@ -69,7 +69,7 @@ export default class KeyDetail extends BaseController {
             if (selectedKey) {
                 this.oneWayModel.setProperty('/selectedKey', selectedKey);
                 this.twoWayModel.setProperty('/selectedKey', selectedKey);
-                this.oneWayModel.setProperty('/keyVersions', keyVersions.data);
+                this.oneWayModel.setProperty('/keyVersions', keyVersions.value);
                 this.oneWayModel.setProperty('/keyVersionsCount', keyVersions.count);
             } else {
                 console.error('Key not found');

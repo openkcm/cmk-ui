@@ -6,7 +6,7 @@ import { System } from "kms/common/Types";
 import MessageBox from "sap/m/MessageBox";
 import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
 interface SystemsResponse {
-    data: Systems[];
+    value: Systems[];
     count: number;
 }
 export default class Systems extends BaseController {
@@ -36,7 +36,7 @@ export default class Systems extends BaseController {
             if (!systems) {
                 return;
             };
-            this.oneWayModel.setProperty('/systems', systems.data);
+            this.oneWayModel.setProperty('/systems', systems.value);
             this.oneWayModel.setProperty('/systemsCount', systems.count || 0);
         } catch (error) {
             console.error('Error fetching systems', error);

@@ -16,7 +16,7 @@ export default (systemID, keyConfigurationID) => {
             }
         ));
         return {
-            data: response,
+            value: response,
             count: response.length
         };
     };

@@ -21,11 +21,18 @@
     "typescript-eslint": "^8.15.0",
     "ui5-middleware-livereload": "^3.1.0",
     "ui5-tooling-modules": "^3.17.0",
-    "ui5-tooling-transpile": "^3.5.0"
+    "ui5-tooling-transpile": "^3.5.0",
+    "ui5-tooling-stringreplace": "^3.3.0"
   },
   "scripts": {
-    "start": "ui5 serve -o index.html",
-    "build": "ui5 build --all",
+    "start:mock": "UI5_ENV=mock ui5 serve -o index.html",
+    "start:dev": "UI5_ENV=dev ui5 serve -o index.html",
+    "start:staging": "UI5_ENV=staging ui5 serve -o index.html",
+    "start:prod": "UI5_ENV=prod ui5 serve -o index.html",
+    "build:mock": "UI5_ENV=mock ui5 build --all",
+    "build:dev": "UI5_ENV=dev ui5 build --all",
+    "build:staging": "UI5_ENV=staging ui5 build --all",
+    "build:prod": "UI5_ENV=prod ui5 build --all",
     "lint-no-fix": "npx eslint --quiet \"./webapp/**/*.ts\"",
     "lint": "npx eslint --fix \"./webapp/**/*.ts\"",
     "serve": "node mock.mjs"

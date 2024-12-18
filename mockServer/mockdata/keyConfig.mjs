@@ -47,7 +47,7 @@ export default (configID) => {
             }
         });
         return {
-            data: response,
+            value: response,
             count: response.length
         };
     };

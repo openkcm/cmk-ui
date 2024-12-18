@@ -16,7 +16,7 @@ export default (keyID) => {
             }
         ));
         return {
-            data: response,
+            value: response,
             count: response.length
         };
     };
