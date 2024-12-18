@@ -8,3 +8,4 @@
 /coverage/*
 /coverage
 /.ui5-tooling-modules
+/env/*
