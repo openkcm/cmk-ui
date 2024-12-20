@@ -1,0 +1,11 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:tnt="sap.tnt"
+    xmlns:forms="sap.ui.layout.form"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    <IllustratedMessage
+        enableVerticalResponsiveness="false"
+        title="{i18n>noSystemsAvailable}"
+        illustrationType="tnt-NoApplications"
+        illustrationSize="Dialog" />
+</core:FragmentDefinition>

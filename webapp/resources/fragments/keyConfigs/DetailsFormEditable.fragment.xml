@@ -55,7 +55,7 @@
                         <forms:fields>
                             <Input
                                 editable="false"
-                                value="{path:'oneWay>/keyConfig/metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ss.SSSSSSZ'}}} UTC" />
+                                value="{path:'oneWay>/keyConfig/metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC" />
                         </forms:fields>
                     </forms:FormElement>
                 </forms:formElements>

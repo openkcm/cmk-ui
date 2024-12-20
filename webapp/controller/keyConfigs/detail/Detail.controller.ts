@@ -13,9 +13,14 @@ import Wizard from 'sap/m/Wizard';
 import Page from 'sap/m/Page';
 import MessageToast from 'sap/m/MessageToast';
 import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
-import { isUUIDValid } from 'kms/common/Helpers';
+import { isUUIDValid, copyToClipboard } from 'kms/common/Helpers';
 import EventBus from 'sap/ui/core/EventBus';
 import { Button$PressEvent } from 'sap/m/Button';
+import Filter from 'sap/ui/model/Filter';
+import FilterOperator from 'sap/ui/model/FilterOperator';
+import { SelectDialog$ConfirmEvent, SelectDialog$LiveChangeEvent } from 'sap/m/SelectDialog';
+import ListBinding from 'sap/ui/model/ListBinding';
+import Context from 'sap/ui/model/Context';
 interface KeyConfigPatchPayload {
     name: string;
 }
@@ -27,6 +32,11 @@ interface KeyResponse {
 interface SystemsResponse {
     value: System[] | undefined;
     count: number | undefined;
+}
+interface KeyPatchPayload {
+    name: string;
+    description: string;
+    enabled: boolean;
 }
 export default class KeyConfigDetail extends BaseController {
     private readonly api: Api = new Api();
@@ -50,7 +60,9 @@ export default class KeyConfigDetail extends BaseController {
     });
     private keyConfigId: string;
     private readonly keyCreationModel = new JSONModel({});
+    private readonly connectSystemModel = new JSONModel({});
     private keyCreatePopover: Dialog | undefined;
+    private connectSystemPopover: Dialog | undefined;
     private keyCreationNavContainer: NavContainer | undefined;
     private keyCreationWizard: Wizard | undefined;
     private keyCreationWizardPage: Page | undefined;
@@ -100,6 +112,26 @@ export default class KeyConfigDetail extends BaseController {
             });
         }
     }
+    public async onConnectSystemPress(): Promise<void> {
+        const view = this.getView();
+        const component = this.getOwnerComponent();
+
+        if (!this.connectSystemPopover) {
+            this.connectSystemPopover = await Fragment.load({
+                id: view.getId(),
+                name: 'kms.resources.fragments.common.ConnectSystems',
+                controller: this
+            }) as Dialog;
+            this.connectSystemPopover.addStyleClass('sapUiSizeCompact');
+            this.connectSystemPopover.setModel(component.getModel('i18n'), 'i18n');
+            this.connectSystemPopover.setModel(this.connectSystemModel, 'model');
+            this.connectSystemPopover.open();
+            this.resetConnectSystemModel()
+        } else {
+            this.connectSystemPopover.open();
+            this.resetConnectSystemModel()
+        }
+    }
     private async handleCreateKeyRoute(): Promise<void> {
         const view = this.getView();
         const component = this.getOwnerComponent();
@@ -128,6 +160,47 @@ export default class KeyConfigDetail extends BaseController {
             this.keyCreationWizardPage = this.byId('keyCreationWizardPage') as Page;
             this.keyCreationNavContainer?.to(this.keyCreationWizardPage);
         }
+    }
+    public onConnectSystemsCancelPress(): void {
+        this.connectSystemPopover?.close();
+        this.connectSystemPopover?.destroy();
+        this.connectSystemPopover = undefined;
+        this.resetConnectSystemModel();
+    }
+    public async onConnectSystemsConfirmPress(event: SelectDialog$ConfirmEvent): Promise<void> {
+        const systems = event.getParameter("selectedContexts") as Context[];
+        const selectedSystemIds = systems.map(system => (system.getObject() as System).id);
+        if (selectedSystemIds.length === 0) {
+            MessageToast.show(this.getText('noChangesWereMade'));
+            return;
+        }
+        const patchPromises: Promise<void>[] = [];
+        selectedSystemIds.forEach((systemId) => {
+            patchPromises.push(this.api.patch(`systems/${systemId}/link`, { keyConfigurationID: this.keyConfigId }));
+        })
+        this.getView().setBusy(true);
+        try {
+            await Promise.all(patchPromises);
+            MessageToast.show(this.getText('systemsConnectedSuccessfully'));
+        } catch (error) {
+            console.error(error);
+            MessageBox.error(this.getText('errorConnectingSystems'));
+        } finally {
+            this.getView().setBusy(false);
+            const binding = event.getSource().getBinding('items') as ListBinding;
+            binding.filter([]);
+            this.connectSystemPopover?.close();
+            this.connectSystemPopover?.destroy();
+            this.connectSystemPopover = undefined;
+            this.resetConnectSystemModel();
+            await this.getKeyConfigData();
+        }
+    }
+    public onSearchConnectSystems(event: SelectDialog$LiveChangeEvent): void {
+        const value = event.getParameter('value');
+        const filter = new Filter('name', FilterOperator.Contains, value);
+        const binding = event.getParameter('itemsBinding') as ListBinding;
+        binding.filter([filter]);
     }
     public onKeyCreationWizardCancelPress(): void {
         MessageBox.warning(this.getText('confirmCancelKeyCreation'), {
@@ -365,12 +438,69 @@ export default class KeyConfigDetail extends BaseController {
             }
         });
     }
+    // eslint-disable-next-line @typescript-eslint/require-await
+    public async onKeyTableDisablePress(event: Button$PressEvent): Promise<void> {
+        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const selectedKey = this.oneWayModel.getProperty(path) as Key;
+        MessageBox.confirm(this.getText('confirmKeyDisable'), {
+            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            onClose: async (action: unknown) => {
+                if (action === MessageBox.Action.YES) {
+                    await this.disableKey(selectedKey.id);
+                }
+            }
+        });
+    }
+    // eslint-disable-next-line @typescript-eslint/require-await
+    public async onKeyTableEnablePress(event: Button$PressEvent): Promise<void> {
+        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const selectedKey = this.oneWayModel.getProperty(path) as Key;
+        MessageBox.confirm(this.getText('confirmKeyEnable'), {
+            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            onClose: async (action: unknown) => {
+                if (action === MessageBox.Action.YES) {
+                    await this.enableKey(selectedKey.id);
+                }
+            }
+        });
+    }
+    private async disableKey(keyId: string): Promise<void> {
+        this.getView().setBusy(true);
+        const payload = {
+            enabled: false
+        } as KeyPatchPayload;
+        try {
+            await this.api.patch<KeyPatchPayload, Key>(`keys/${keyId}`, payload);
+            MessageToast.show(this.getText('keyDisabledSuccessfully'));
+            await this.getKeyConfigData();
+        } catch (error) {
+            console.error(error);
+            MessageBox.error(this.getText('errorDisablingKey'));
+        } finally {
+            this.getView().setBusy(false);
+        }
+    }
+    private async enableKey(keyId: string): Promise<void> {
+        this.getView().setBusy(true);
+        try {
+            await this.api.delete(`keys/${keyId}`);
+            MessageToast.show(this.getText('keyEnabledSuccessfully'));
+            await this.getKeyConfigData();
+        } catch (error) {
+            console.error(error);
+            MessageBox.error(this.getText('errorEnablingKey'));
+        } finally {
+            this.getView().setBusy(false);
+        }
+    }
     private async deleteKey(keyId: string): Promise<void> {
         this.getView().setBusy(true);
         try {
             await this.api.delete(`keys/${keyId}`);
             MessageToast.show(this.getText('keyDeletedSuccessfully'));
-            await this.getKeyConfigData();
+            this.getRouter().navTo('keyConfigDetail', {
+                keyConfigId: this.keyConfigId
+            });
         } catch (error) {
             console.error(error);
             MessageBox.error(this.getText('errorDeletingKey'));
@@ -394,6 +524,28 @@ export default class KeyConfigDetail extends BaseController {
             this.getView().setBusy(false);
         }
     }
+    // eslint-disable-next-line @typescript-eslint/require-await
+    public async deleteKeyConfig(): Promise<void> {
+        MessageBox.confirm(this.getText('confirmKeyConfigDelete'), {
+            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            onClose: async (action: unknown) => {
+                if (action === MessageBox.Action.YES) {
+                    this.getView().setBusy(true);
+                    try {
+                        await this.api.delete(`keyConfigurations/${this.keyConfigId}`);
+                        MessageToast.show(this.getText('keyConfigDeletedSuccessfully'));
+                        this.getRouter().navTo('keyConfigs');
+                    } catch (error) {
+                        console.error(error);
+                        MessageBox.error(this.getText('errorDeletingKeyConfig'));
+                    } finally {
+                        this.getView().setBusy(false);
+                    }
+                }
+            }
+        });
+
+    }
     private resetKeyCreationModel() {
         this.keyCreationModel.setData({
             name: '' as string,
@@ -416,5 +568,13 @@ export default class KeyConfigDetail extends BaseController {
             keyNameValueStateText: '' as string,
             createKeyEnabled: false as boolean
         }, true);
+    }
+    private resetConnectSystemModel() {
+        this.connectSystemModel.setData({
+            systemsList: this.oneWayModel.getProperty('/systems') as System[]
+        }, true);
+    }
+    public async onCopyToClipboardPress(event: Button$PressEvent): Promise<void> {
+        await copyToClipboard(event);
     }
 }

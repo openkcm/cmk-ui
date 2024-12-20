@@ -3,12 +3,12 @@
     xmlns:tnt="sap.tnt"
     core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
     <Table
-        id="table"
+        id="systemsTable"
         inset="false"
         items="{oneWay>/systems}">
         <headerToolbar>
             <OverflowToolbar>
-                <Title id="title"
+                <Title
                     text="{parts: ['i18n>systemsCount', 'oneWay>/systemsCount'], formatter: 'formatMessage'}"
                     level="H2" />
             </OverflowToolbar>

@@ -81,13 +81,13 @@
                     <forms:FormElement label="{i18n>createdOn}">
                         <forms:fields>
                             <Text
-                                text="{path:'oneWay>/selectedKey/metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ss.SSSSSSZ'}}} UTC" />
+                                text="{path:'oneWay>/selectedKey/metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC" />
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>updatedOn}">
                         <forms:fields>
                             <Text
-                                text="{path:'oneWay>/selectedKey/metadata/updatedAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ss.SSSSSSZ'}}} UTC" />
+                                text="{path:'oneWay>/selectedKey/metadata/updatedAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC" />
                         </forms:fields>
                     </forms:FormElement>
                 </forms:formElements>

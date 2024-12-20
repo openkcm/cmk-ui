@@ -7,6 +7,7 @@
     xmlns:forms="sap.ui.layout.form"
     xmlns:core="sap.ui.core"
     xmlns:mvc="sap.ui.core.mvc"
+    xmlns:dataHelp="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
     core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
     <ObjectPageLayout>
         <headerTitle>
@@ -26,9 +27,20 @@
                     <m:Title text="{oneWay>/keyConfig/name}" />
                 </snappedHeading>
                 <expandedContent>
-                    <m:Label text="{oneWay>/keyConfig/id}" />
+                    <m:HBox justifyContent="Start" alignContent="Center" alignItems="Center">
+                        <m:Label text="{oneWay>/keyConfig/id}" />
+                        <m:Button icon="sap-icon://copy" type="Transparent"
+                            class="sapUiTinyMarginBegin sapUiTinyMarginBottom"
+                            dataHelp:textToCopy="{oneWay>/keyConfig/id}"
+                            press="onCopyToClipboardPress" />
+                    </m:HBox>
                 </expandedContent>
                 <actions>
+                    <m:Button
+                        text="{i18n>delete}"
+                        icon="sap-icon://delete"
+                        type="Reject"
+                        press="deleteKeyConfig" />
                     <m:Button
                         icon="sap-icon://refresh"
                         type="Transparent"
@@ -60,12 +72,12 @@
                 <subSections>
                     <ObjectPageSubSection>
                         <m:VBox>
-                            <m:VBox visible="{= ${oneWay>/keyConfig/metadata/totalKeys} > 0 }">
+                            <m:VBox visible="{= ${oneWay>/keysCount} > 0 }">
                                 <core:Fragment
                                     fragmentName="kms.resources.fragments.keys.KeysTable"
                                     type="XML" />
                             </m:VBox>
-                            <m:VBox visible="{= ${oneWay>/keyConfig/metadata/totalKeys} === 0 }">
+                            <m:VBox visible="{= ${oneWay>/keysCount} === 0 }">
                                 <core:Fragment
                                     fragmentName="kms.resources.fragments.keys.NoKeysIllustration"
                                     type="XML" />
@@ -78,9 +90,18 @@
                 title="{i18n>connectedSystems}" showTitle="false">
                 <subSections>
                     <ObjectPageSubSection>
-                        <core:Fragment
-                            fragmentName="kms.resources.fragments.SystemsTable"
-                            type="XML" />
+                        <m:VBox>
+                            <m:VBox visible="{= ${oneWay>/systemsCount} > 0 }">
+                                <core:Fragment
+                                    fragmentName="kms.resources.fragments.SystemsTable"
+                                    type="XML" />
+                            </m:VBox>
+                            <m:VBox visible="{= ${oneWay>/systemsCount} === 0 }">
+                                <core:Fragment
+                                    fragmentName="kms.resources.fragments.systems.NoSystemsIllustration"
+                                    type="XML" />
+                            </m:VBox>
+                        </m:VBox>
                     </ObjectPageSubSection>
                 </subSections>
             </ObjectPageSection>

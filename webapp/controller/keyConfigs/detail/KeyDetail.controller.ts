@@ -9,16 +9,12 @@ import { isUUIDValid, copyToClipboard } from 'kms/common/Helpers';
 import MessageBox from 'sap/m/MessageBox';
 import { Button$PressEvent } from 'sap/m/Button';
 import Formatter from 'kms/common/Formatters';
+import MessageToast from 'sap/m/MessageToast';
 
 interface KeyPatchPayload {
     name: string;
     description: string;
     enabled: boolean;
-}
-
-interface KeyVersionResponse {
-    value: KeyVersion[];
-    count: number;
 }
 
 export default class KeyDetail extends BaseController {
@@ -65,12 +61,12 @@ export default class KeyDetail extends BaseController {
     private async getKeyDetails(): Promise<void> {
         try {
             const selectedKey = await this.api.get<Key>(`keys/${this.keyId}`);
-            const keyVersions = await this.api.get<KeyVersionResponse>(`keys/${this.keyId}/versions`);
+            const keyVersions = await this.api.get<[]>(`keys/${this.keyId}/versions`);
             if (selectedKey) {
                 this.oneWayModel.setProperty('/selectedKey', selectedKey);
                 this.twoWayModel.setProperty('/selectedKey', selectedKey);
-                this.oneWayModel.setProperty('/keyVersions', keyVersions.value);
-                this.oneWayModel.setProperty('/keyVersionsCount', keyVersions.count);
+                this.oneWayModel.setProperty('/keyVersions', keyVersions);
+                this.oneWayModel.setProperty('/keyVersionsCount', keyVersions?.length);
             } else {
                 console.error('Key not found');
                 this.getRouter().navTo('keyConfigDetail', {
@@ -89,6 +85,21 @@ export default class KeyDetail extends BaseController {
     }
     public onCancelEditPress(): void {
         this.oneWayModel.setProperty('/edit', false);
+    }
+    public async onRotateNowPress(): Promise<void> {
+        this.getView().setBusy(true);
+        try {
+            await this.api.post<null, Key>(`keys/${this.keyId}/versions`, null);
+            MessageToast.show(this.getText('keyRotatedSuccessfully'));
+            this.getKeyDetails().catch((error) => {
+                console.error(error);
+            });
+        } catch (error) {
+            console.error('Error rotating key', error);
+            MessageBox.error(this.getText('errorRotatingKey'));
+        } finally {
+            this.getView().setBusy(false);
+        }
     }
     public async onSaveKeyDetailsPress(): Promise<void> {
         this.getView().setBusy(true);

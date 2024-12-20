@@ -19,11 +19,16 @@
                     text="{parts: ['i18n>versionsWithCount', 'oneWay>/keyVersionsCount'], formatter: 'formatMessage'}"
                     level="H2" />
                 <ToolbarSpacer />
-                <Button
-                    text="{i18n>confgureRotation}"
-                    type="Ghost"
-                    icon="sap-icon://action-settings"
-                    press="onConfigureRotationPress" />
+                <MenuButton text="{i18n>rotate}" icon="sap-icon://synchronize" type="Ghost">
+                    <menu>
+                        <Menu class="sapUiSizeCompact">
+                            <MenuItem text="{i18n>rotateNow}"
+                                press="onRotateNowPress" />
+                            <MenuItem text="{i18n>confgureRotation}" enabled="false"
+                                press="onConfigureRotationPress" />
+                        </Menu>
+                    </menu>
+                </MenuButton>
             </OverflowToolbar>
         </headerToolbar>
         <columns>
@@ -39,7 +44,7 @@
                 hAlign="Begin"
                 minScreenWidth="XSmall"
                 demandPopin="true">
-                <Text text="{i18n>age}" wrapping="false" />
+                <Text text="{i18n>createdOn}" wrapping="false" />
             </Column>
             <Column
                 hAlign="Begin"
@@ -54,8 +59,7 @@
                 <cells>
                     <Text text="{oneWay>version}" />
                     <Text
-                        text="{path: 'oneWay>metadata/createdAt', formatter: '.formatter.timeElapsedSince'}"
-                        tooltip="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, pattern: 'MMM dd yyyy HH:mm:ss UTC', source:{pattern: 'yyyy-MM-ddTHH:mm:ss.SSSSSSZ'}}}"
+                        text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC"
                         wrapping="false" />
                     <VBox justifyContent="Center">
                         <tnt:InfoLabel

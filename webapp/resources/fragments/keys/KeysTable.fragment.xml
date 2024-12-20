@@ -90,7 +90,7 @@
                         <Label text="{oneWay>provider} • {oneWay>region}" />
                     </VBox>
                     <Text
-                        text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, pattern: 'MMM dd yyyy', source:{pattern: 'yyyy-MM-ddTHH:mm:ss.SSSSSSZ'}}}"
+                        text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC"
                         wrapping="false" />
                     <VBox justifyContent="Center">
                         <tnt:InfoLabel
@@ -104,14 +104,21 @@
                     </VBox>
                     <VBox alignContent="End" alignItems="End"
                         justifyContent="End">
-                        <MenuButton icon="sap-icon://action-settings" type="Transparent"
-                            enabled="{= !${oneWay>enabled}}">
+                        <MenuButton icon="sap-icon://action-settings" type="Transparent">
                             <menu>
                                 <Menu class="sapUiSizeCompact">
                                     <MenuItem press="onKeyTableMakePrimaryPress"
                                         text="{i18n>makePrimary}"
-                                        visible="{= !${oneWay>enabled}}"
+                                        visible="{= !${oneWay>primary}}"
                                         icon="sap-icon://favorite" />
+                                    <MenuItem press="onKeyTableEnablePress"
+                                        text="{i18n>enable}"
+                                        visible="{= !${oneWay>enabled}}"
+                                        icon="sap-icon://log" />
+                                    <MenuItem press="onKeyTableDisablePress"
+                                        text="{i18n>disable}"
+                                        visible="{= !!${oneWay>enabled}}"
+                                        icon="sap-icon://log" />
                                     <MenuItem press="onKeyTableDeletePress" text="{i18n>delete}"
                                         icon="sap-icon://delete" />
                                 </Menu>

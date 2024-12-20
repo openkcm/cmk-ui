@@ -103,9 +103,18 @@
         </f:header>
         <f:content>
             <Panel>
-                <core:Fragment
-                    fragmentName="kms.resources.fragments.SystemsTable"
-                    type="XML" />
+                <m:VBox>
+                    <m:VBox visible="{= ${oneWay>/systems}.length > 0 }">
+                        <core:Fragment
+                            fragmentName="kms.resources.fragments.SystemsTable"
+                            type="XML" />
+                    </m:VBox>
+                    <m:VBox visible="{= ${oneWay>/systems}.length === 0 }">
+                        <core:Fragment
+                            fragmentName="kms.resources.fragments.systems.NoSystemsTableIllustration"
+                            type="XML" />
+                    </m:VBox>
+                </m:VBox>
             </Panel>
         </f:content>
     </f:DynamicPage>
