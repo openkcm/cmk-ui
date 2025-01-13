@@ -42,7 +42,6 @@
             <Column
                 vAlign="Middle"
                 hAlign="Begin"
-                width="15rem"
                 minScreenWidth="Large"
                 demandPopin="false"
                 visible="{= ${oneWay>/keys}.length > 0 }">
@@ -50,15 +49,15 @@
             </Column>
             <Column
                 vAlign="Middle"
-                hAlign="End"
+                hAlign="Begin"
                 minScreenWidth="Large"
                 demandPopin="true"
                 visible="{= ${oneWay>/keys}.length > 0 }">
                 <Text text="{i18n>createdOn}" wrapping="false" />
             </Column>
             <Column
-                hAlign="End"
-                vAlign="Middle"
+                hAlign="Middle"
+                vAlign="Begin"
                 minScreenWidth="Large"
                 demandPopin="true"
                 visible="{= ${oneWay>/keys}.length > 0 }">
@@ -102,8 +101,8 @@
                             text="{i18n>disabled}"
                             colorScheme="2" />
                     </VBox>
-                    <VBox alignContent="End" alignItems="End"
-                        justifyContent="End">
+                    <VBox alignContent="Center"
+                        justifyContent="Start">
                         <MenuButton icon="sap-icon://action-settings" type="Transparent">
                             <menu>
                                 <Menu class="sapUiSizeCompact">

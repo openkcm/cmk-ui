@@ -89,7 +89,7 @@ export default class KeyDetail extends BaseController {
     public async onRotateNowPress(): Promise<void> {
         this.getView().setBusy(true);
         try {
-            await this.api.post<null, Key>(`keys/${this.keyId}/versions`, null);
+            await this.api.post<null, Key>(`keys/${this.keyId}/versions`);
             MessageToast.show(this.getText('keyRotatedSuccessfully'));
             this.getKeyDetails().catch((error) => {
                 console.error(error);

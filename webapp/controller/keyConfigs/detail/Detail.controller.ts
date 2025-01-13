@@ -328,7 +328,8 @@ export default class KeyConfigDetail extends BaseController {
     }
     private async patchKeyConfigData(keyConfig: KeyConfigPatchPayload) {
         try {
-            const keyConfigs = await this.api.patch<KeyConfigPatchPayload, KeyConfig>('keyConfigurations', keyConfig);
+            const keyConfigs = await this.api.patch<KeyConfigPatchPayload, KeyConfig>(`keyConfigurations/${this.keyConfigId}`, keyConfig);
+            MessageToast.show(this.getText('keyConfigSaved'));
             return keyConfigs;
         } catch (error) {
             console.error(error);
@@ -345,7 +346,6 @@ export default class KeyConfigDetail extends BaseController {
         this.getView().setBusy(true);
         const keyConfig = this.twoWayModel.getProperty('/keyConfig') as KeyConfig;
         const payload = {
-            id: keyConfig.id,
             name: keyConfig.name
         } as KeyConfigPatchPayload;
 
