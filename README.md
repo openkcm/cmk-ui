@@ -93,7 +93,25 @@ TODO: add unit and automation test description
 ### Commit messages
 - Commit messages must follow the pattern - `<JIRA TICKET NUMBER>-<COMMIT DESCRIPTION>`
 - Commit description must give a brief explanation of what is being achieved by the commit
- 
+
+## Docker
+
+There is one `Dockerfile` available in a repository - `Dockerfile.dev`.
+
+### Running UI image in a Docker container
+
+1. Build Docker image from UI repository:
+
+```bash
+  make docker-dev-build
+```
+
+2. Run Docker container:
+
+```bash
+  make docker-dev-run
+```
+
 ### Branch names
 The following branch naming conventions apply:
 - `main` - latest development code. New features and bug fixes are merged here.
