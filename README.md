@@ -137,3 +137,41 @@ UI development team
 ## License
 
 This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
+
+## Executing program with k3d
+### Deploying with Helm charts: `make k3d-apply-ui-helm-chart`
+#### Prerequisites - install docker and helm
+
+Before you begin, ensure you have the following installed on your system:
+
+- [Docker](https://docs.docker.com/get-docker/)
+- [Helm](https://helm.sh/docs/intro/install/) (required for managing Kubernetes charts)
+
+#### Prerequisites - create k3d cluster
+Pull cmk project
+- [https://github.tools.sap/kms/cmk.git](https://github.tools.sap/kms/cmk.git)
+
+Follow instructions from README.md, to install cmk cluster
+run 
+```bash
+make start-cmk
+```
+or 
+```bash
+make strat-cmk-colima
+```
+
+After setting up cmk cluster:
+
+#### Run
+```bash
+make start-ui
+```
+
+To access UI, run the command displayed in console. For example:
+```bash
+export POD_NAME=$(kubectl get pods --namespace cmk -l "app.kubernetes.io/name=ui-app,app.kubernetes.io/instance=ui" -o jsonpath="{.items[0].metadata.name}")
+export CONTAINER_PORT=$(kubectl get pod --namespace cmk $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+echo "Visit http://127.0.0.1:8086 to use your application"
+kubectl --namespace cmk port-forward $POD_NAME 8086:$CONTAINER_PORT
+```
