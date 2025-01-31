@@ -9,8 +9,46 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  build:
-    name: Build
+  unit-tests:
+    name: Run unit tests
+    runs-on: [self-hosted, solinas]
+    container: public.int.repositories.cloud.sap/ubuntu:22.04
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.head_ref }}
+      cancel-in-progress: true
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Install chrome and curl
+      run: |
+        apt update
+        apt install -y curl net-tools
+        apt install -y wget
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        apt install -y ./google-chrome-stable_current_amd64.deb
+    - name: Start webserver
+      run: |
+        npm install
+        npm run start:test&
+        coproc read -t 10 && wait "$\!" || true
+        npm run test
+    - uses: actions/upload-artifact@v3
+      with:
+        name: test-coverage-report
+        path: coverage/lcov.info
+
+  sonarqube-scan:
+    needs: unit-tests
+    name: Run SonarQube scan
     runs-on: [self-hosted, solinas]
     container: python:3.9.16-slim
     concurrency:
@@ -28,9 +66,14 @@ jobs:
         with:
           token: ${{ secrets.GH_ACTION_REPO_READ }}
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - uses: actions/download-artifact@v3
+        with:
+          name: test-coverage-report
+          path: webapp/coverage
       - uses: sonarsource/sonarqube-scan-action@master
         with:
           args: >
+            -Dsonar.javascript.lcov.reportPaths=webapp/coverage/*/lcov.info
             -Dsonar.coverage.skip=${{ vars.SONAR_QUBE_COVERAGE_SKIP }}
             -Dsonar.exclusions=${{ vars.SONAR_QUBE_EXCLUSIONS }}
             -Dsonar.verbose=${{ vars.SONAR_QUBE_VERBOSE_LOGGING }}

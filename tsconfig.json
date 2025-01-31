@@ -17,12 +17,15 @@
 		"paths": {
 			"kms/*": [
 				"./webapp/*"
-			]
+			],
+			"unit/*": [
+				"./webapp/test/unit/*"
+			],
 		}
 	},
 	"exclude": [
-		"./webapp/test/*",
-		"./mockServer/**/*"
+		"./mockServer/**/*",
+		"./webapp/coverage/**/*"
 	],
 	"include": [
 		"./webapp/**/*"

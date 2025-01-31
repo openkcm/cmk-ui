@@ -39,6 +39,20 @@ server:
       afterMiddleware: compression
     - name: ui5-tooling-transpile-middleware
       afterMiddleware: compression
+      configuration:
+        debug: true
+        babelConfig:
+          sourceMaps: true
+          ignore:
+          - "**/*.d.ts"
+          presets:
+          - - "@babel/preset-env"
+            - targets: defaults
+          - - transform-ui5
+            - overridesToOverride: true
+          - "@babel/preset-typescript"
+          plugins:
+          - istanbul
     - name: ui5-middleware-livereload
       afterMiddleware: compression
     - name: ui5-tooling-stringreplace-middleware
@@ -51,24 +65,3 @@ server:
         files:
           - "**/*.js"
           - "**/*.xml"
-    - name: "@ui5/middleware-code-coverage"
-      afterMiddleware: compression
-      configuration:
-        report:
-          reporter: ["html"]
-          "report-dir": "./coverage/coverage-reports"
-          watermarks: {
-            statements: [50, 80],
-            functions: [50, 80],
-            branches: [50, 80],
-            lines: [50, 80]
-          }
-        instrument:
-          produceSourceMap: true
-          coverageGlobalScope: "window.top"
-          coverageGlobalScopeFunc: false
-        cwd: "./"
-        excludePatterns:
-        - "/webapp/test/**"
-        - "/webapp/view/**"
-        - "/node_modules/**"

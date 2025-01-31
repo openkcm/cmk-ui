@@ -111,7 +111,7 @@ export default class Keys extends BaseController {
         if (!this.configCreatePopover) {
             this.configCreatePopover = await Fragment.load({
                 id: view.getId(),
-                name: 'kms.resources.fragments.KeyConfigs.CreateConfig',
+                name: 'kms.resources.fragments.keyConfigs.CreateConfig',
                 controller: this
             }) as Dialog;
             this.configCreatePopover.addStyleClass('sapUiSizeCompact');

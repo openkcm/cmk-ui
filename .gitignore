@@ -10,3 +10,5 @@
 /.ui5-tooling-modules
 /env/*
 .idea/
+/report/*
+.nyc_output/*
