@@ -19,7 +19,7 @@ export default class Systems extends BaseController {
 
     public onInit(): void {
         super.onInit();
-        this.getRouter().attachRouteMatched(this.onRouteMatched.bind(this));
+        this.getRouter().getRoute('systems').attachPatternMatched({}, () => this.onRouteMatched(), this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.setModel(this.oneWayModel, 'oneWay');
     };

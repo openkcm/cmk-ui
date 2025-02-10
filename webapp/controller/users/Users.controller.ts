@@ -17,7 +17,7 @@ export default class Users extends BaseController {
 
     public onInit(): void {
         super.onInit();
-        this.getRouter().attachRouteMatched(this.onRouteMatched.bind(this));
+        this.getRouter().getRoute('users').attachPatternMatched({}, () => this.onRouteMatched(), this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.setModel(this.oneWayModel, 'oneWay');
     };
