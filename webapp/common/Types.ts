@@ -15,6 +15,7 @@ export interface User {
     id: string;
     name: string;
     email: string;
+    groupName: string;
 };
 export interface KeyConfig {
     name: string;

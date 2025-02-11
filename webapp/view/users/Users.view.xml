@@ -29,36 +29,20 @@
             </f:DynamicPageTitle>
         </f:title>
         <f:content>
-            <Panel>
-                <Table
-                    id="table"
-                    inset="false"
-                    items="{oneWay>/groupsData}">
-                    <headerToolbar>
-                        <OverflowToolbar>
-                            <Title id="title"
-                                text="{parts: ['i18n>groupsWithCount', 'oneWay>/groupsCount'], formatter: 'formatMessage'}"
-                                level="H2" />
-                        </OverflowToolbar>
-                    </headerToolbar>
-                    <columns>
-                        <Column minScreenWidth="Tablet" demandPopin="true">
-                            <Text text="{i18n>name}" />
-                        </Column>
-                        <Column minScreenWidth="Tablet" demandPopin="true">
-                            <Text text="{i18n>sideContentUserManagement}" />
-                        </Column>
-                    </columns>       
-                    <items>
-                        <ColumnListItem vAlign="Middle" type="Navigation" press="onUserPress">
-                            <cells>
-                                <ObjectIdentifier title="{oneWay>name}" text="{oneWay>name}" />
-                                <Text text="{path:'oneWay>userCount'}" />
-                            </cells>
-                        </ColumnListItem>
-                    </items>
-                </Table>
-            </Panel>
+            <VBox>
+                <Panel visible="{= ${oneWay>/groupsCount} > 0 }">
+                    <VBox>
+                        <core:Fragment
+                            fragmentName="kms.resources.fragments.users.UserGroupsTable"
+                            type="XML" />
+                    </VBox>
+                </Panel>
+                <VBox visible="{= ${oneWay>/groupsCount} === 0 }">
+                    <core:Fragment
+                        fragmentName="kms.resources.fragments.users.NoUserGroupsIllustration"
+                        type="XML" />
+                </VBox>
+            </VBox>
         </f:content>
     </f:DynamicPage>
 </mvc:View>

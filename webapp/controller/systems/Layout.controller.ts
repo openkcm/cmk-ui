@@ -2,7 +2,7 @@ import BaseController from "kms/controller/BaseController";
 import BindingMode from "sap/ui/model/BindingMode";
 import JSONModel from "sap/ui/model/json/JSONModel";
 import Api from "kms/services/Api.service";
-import Event from "sap/ui/base/Event";
+import { Router$RouteMatchedEvent } from 'sap/ui/core/routing/Router';
 
 export default class Systems extends BaseController {
     private readonly api: Api = new Api();
@@ -17,7 +17,7 @@ export default class Systems extends BaseController {
         this.setModel(this.oneWayModel, 'oneWay');
     }
 
-    public onRouteMatched(event: Event): void {
+    public onRouteMatched(event: Router$RouteMatchedEvent): void {
         const routeName = event.getParameter('name');
         if (routeName && typeof routeName === 'string') {
             if (routeName === 'systems') {

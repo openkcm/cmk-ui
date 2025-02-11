@@ -93,7 +93,7 @@
                         <m:VBox>
                             <m:VBox visible="{= ${oneWay>/systemsCount} > 0 }">
                                 <core:Fragment
-                                    fragmentName="kms.resources.fragments.SystemsTable"
+                                    fragmentName="kms.resources.fragments.systems.SystemsTable"
                                     type="XML" />
                             </m:VBox>
                             <m:VBox visible="{= ${oneWay>/systemsCount} === 0 }">

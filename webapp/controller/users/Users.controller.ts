@@ -38,6 +38,7 @@ export default class Users extends BaseController {
 
         } catch (error) {
             console.error(error);
+            this.oneWayModel.setProperty('/groupsCount', 0);
             MessageBox.error(this.getText('errorFetchingGroups'));
         } finally {
             this.getView().setBusy(false);

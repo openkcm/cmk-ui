@@ -102,20 +102,20 @@
             </f:DynamicPageHeader>
         </f:header>
         <f:content>
-            <Panel>
-                <m:VBox>
-                    <m:VBox visible="{= ${oneWay>/systems}.length > 0 }">
+            <m:VBox>
+                <Panel visible="{= ${oneWay>/systems}.length > 0 }">
+                    <m:VBox>
                         <core:Fragment
-                            fragmentName="kms.resources.fragments.SystemsTable"
+                            fragmentName="kms.resources.fragments.systems.SystemsTable"
                             type="XML" />
                     </m:VBox>
-                    <m:VBox visible="{= ${oneWay>/systems}.length === 0 }">
-                        <core:Fragment
-                            fragmentName="kms.resources.fragments.systems.NoSystemsTableIllustration"
-                            type="XML" />
-                    </m:VBox>
+                </Panel>
+                <m:VBox visible="{= ${oneWay>/systems}.length === 0 }">
+                    <core:Fragment
+                        fragmentName="kms.resources.fragments.systems.NoSystemsTableIllustration"
+                        type="XML" />
                 </m:VBox>
-            </Panel>
+            </m:VBox>
         </f:content>
     </f:DynamicPage>
 </mvc:View>
