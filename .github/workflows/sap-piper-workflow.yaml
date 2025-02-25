@@ -1,0 +1,12 @@
+name: Piper workflow
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  piper:
+    uses: kms/gitops-pipeline-generic/.github/workflows/piper-workflow.yaml@main
+    secrets: inherit
+    with:
+      build-type: 'UI'

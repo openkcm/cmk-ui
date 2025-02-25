@@ -11,11 +11,22 @@ general:
   vaultPath: piper/PIPELINE-GROUP-7718
   vaultPipelineName: PIPELINE-43716
   vaultServerUrl: https://vault.tools.sap
+  version: main
 stages: null
 steps:
   artifactPrepareVersion:
     gitHttpsCredentialVaultSecretName: GROUP-SECRETS/github-kms20-serviceuser
+    versioningType: cloud_noTag
+  sapCallStagingService:
+    profile: group-7718-default
+    url: https://staging.repositories.cloud.sap/stage/api
   whitesourceExecuteScan:
-    scanType: ua
     productName: SHC - KMS20
     projectName: KMS20-ui
+    SkipProjectsWithEmptyTokens: true
+    failOnSevereVulnerabilities: false
+    cvssSeverityLimit: -1
+    disableNpmSubmodulesAggregation: true
+  npmExecuteScripts:
+    publish: false
+    createBOM: false
