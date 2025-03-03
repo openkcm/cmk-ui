@@ -44,10 +44,10 @@
                 hAlign="Begin"
                 minScreenWidth="XSmall"
                 demandPopin="true">
-                <Text text="{i18n>createdOn}" wrapping="false" />
+                <Text text="{i18n>createdOn}" wrapping="true" />
             </Column>
             <Column
-                hAlign="Begin"
+                hAlign="End"
                 vAlign="Middle"
                 minScreenWidth="XSmall"
                 demandPopin="true">
@@ -57,10 +57,19 @@
         <items>
             <ColumnListItem vAlign="Middle" type="Inactive">
                 <cells>
-                    <Text text="{oneWay>version}" />
+                    <HBox alignItems="End" justifyContent="Start">
+                        <tnt:InfoLabel
+                            icon="sap-icon://favorite"
+                            visible="{= !!${oneWay>isPrimary}}"
+                            class="sapUiTinyMarginEnd"
+                            text="{oneWay>version} • {i18n>primary}"
+                            displayOnly="true"
+                            colorScheme="5" />
+                        <Text text="{oneWay>version}" visible="{= !${oneWay>isPrimary}}" />
+                    </HBox>
                     <Text
                         text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC"
-                        wrapping="false" />
+                        wrapping="true" />
                     <VBox justifyContent="Center">
                         <tnt:InfoLabel
                             visible="{= ${oneWay>status} === 'ENABLED'}"

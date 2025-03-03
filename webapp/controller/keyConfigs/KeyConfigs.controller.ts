@@ -92,12 +92,12 @@ export default class Keys extends BaseController {
             this.sortPopover.open();
         }
     };
-    public onKeyConfigDashboardCreateSAPKeyPress(event: Button$PressEvent): void {
+    public onKeyConfigDashboardCreateSAPKeyPress(event: Button$PressEvent, keyType: string): void {
         const path = event.getSource().getBindingContext('oneWay').getPath();
         const selectedConfig = this.oneWayModel.getProperty(path) as KeyConfig;
         const keyConfigId: string = selectedConfig.id;
         this.getRouter().navTo('keyConfigDetail', {
-            query: { createKey: true },
+            query: { createKey: true, keyType: keyType },
             keyConfigId: keyConfigId
         });
     }

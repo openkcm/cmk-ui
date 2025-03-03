@@ -9,4 +9,9 @@ export enum CloudProviders {
     GCP = 'GCP'
 }
 
-export default { KeyVersionStates, CloudProviders };
+export enum KeyCreationTypes {
+    SYSTEM_MANAGED = 'SYSTEM_MANAGED',
+    HYOK = 'HYOK',
+    BYOK = 'BYOK'
+}
+export default { KeyVersionStates, CloudProviders, KeyCreationTypes };

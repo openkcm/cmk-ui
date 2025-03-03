@@ -4,11 +4,14 @@ const now = new Date();
 const old = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
 export default (keyID) => {
     const states = ['ENABLED', 'DISABLED', 'PENDING_DELETION', 'PENDING_IMPORT', 'DELETED', 'UNKNOWN'];
-
+    const keyTypes = ['SYSTEM_MANAGED', 'HYOK'];
+    const date1 = chance.date({ min: old, max: now }).toISOString();
+    const date2 = chance.date({ min: old, max: now }).toISOString();
     const generateKeys = (count) => {
         const response = Array.from({ length: count }, () => (
             {
                 name: `Key ${chance.animal()}`,
+                type: chance.pickone(keyTypes),
                 description: chance.sentence(),
                 enabled: false,
                 id: chance.guid(),
@@ -21,9 +24,9 @@ export default (keyID) => {
                 region: chance.pickone(['eu-central-1', 'us-east-1', 'us-west-2']),
                 metadata: {
                     createdBy: chance.name(),
-                    createdAt: chance.date({ min: old, max: now }),
+                    createdAt: date1.replace(/\.\d{3}Z$/, '').replace('Z', ''),
                     updatedBy: chance.name(),
-                    updatedAt: chance.date({ min: old, max: now }),
+                    updatedAt: date2.replace(/\.\d{3}Z$/, '').replace('Z', ''),
                     imported: chance.bool(),
                     totalVersions: chance.integer({ min: 1, max: 10 }),
                     primaryVersion: chance.integer({ min: 1, max: 10 }),
@@ -38,6 +41,7 @@ export default (keyID) => {
     if (keyID) {
         return {
             name: `Key ${chance.animal()}`,
+            type: chance.pickone(keyTypes),
             description: chance.sentence(),
             enabled: chance.bool(),
             id: keyID,
@@ -50,9 +54,9 @@ export default (keyID) => {
             region: chance.pickone(['eu-central-1', 'us-east-1', 'us-west-2']),
             metadata: {
                 createdBy: chance.name(),
-                createdAt: chance.date({ min: old, max: now }),
+                createdAt: date1.replace(/\.\d{3}Z$/, '').replace('Z', ''),
                 updatedBy: chance.name(),
-                updatedAt: chance.date({ min: old, max: now }),
+                updatedAt: date2.replace(/\.\d{3}Z$/, '').replace('Z', ''),
                 imported: chance.bool(),
                 totalVersions: chance.integer({ min: 1, max: 10 }),
                 primaryVersion: chance.integer({ min: 1, max: 10 }),

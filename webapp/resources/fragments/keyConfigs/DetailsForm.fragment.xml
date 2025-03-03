@@ -2,7 +2,7 @@
     xmlns:core="sap.ui.core"
     xmlns:layout="sap.ui.layout"
     xmlns:forms="sap.ui.layout.form">
-    <forms:Form width="100%">
+    <forms:Form width="100%" editable="true">
         <forms:layout>
             <forms:ColumnLayout
                 columnsM="2"
@@ -37,8 +37,12 @@
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>tags}">
                         <forms:fields>
-                            <Text
-                                text="" />
+                            <MultiInput tokens="{oneWay>/tags}" editable="false"
+                                visible="{= !!${oneWay>/tags} &amp;&amp; ${oneWay>/tags}.length > 0 }">
+                                <tokens>
+                                    <Token key="{oneWay>}" text="{oneWay>}" />
+                                </tokens>
+                            </MultiInput>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>createdBy}">

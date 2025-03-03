@@ -42,7 +42,13 @@
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>tags}">
                         <forms:fields>
-                            <Input editable="false" value="" />
+                            <MultiInput id="tagsMultiInput" tokens="{oneWay>/tags}" editable="true"
+                                showSuggestion="false" showValueHelp="false"
+                                tokenUpdate="onTagsUpdate">
+                                <tokens>
+                                    <Token key="{oneWay>}" text="{oneWay>}" />
+                                </tokens>
+                            </MultiInput>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>createdBy}">

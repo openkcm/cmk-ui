@@ -21,6 +21,8 @@ import FilterOperator from 'sap/ui/model/FilterOperator';
 import { SelectDialog$ConfirmEvent, SelectDialog$LiveChangeEvent } from 'sap/m/SelectDialog';
 import ListBinding from 'sap/ui/model/ListBinding';
 import Context from 'sap/ui/model/Context';
+import MultiInput, { MultiInput$TokenUpdateEvent } from 'sap/m/MultiInput';
+import Token from 'sap/m/Token';
 interface KeyConfigPatchPayload {
     name: string;
 }
@@ -31,6 +33,10 @@ interface KeyResponse {
 
 interface SystemsResponse {
     value: System[] | undefined;
+    count: number | undefined;
+}
+interface TagsResponse {
+    value: string[] | undefined;
     count: number | undefined;
 }
 interface KeyPatchPayload {
@@ -64,9 +70,13 @@ export default class KeyConfigDetail extends BaseController {
     private keyCreatePopover: Dialog | undefined;
     private connectSystemPopover: Dialog | undefined;
     private keyCreationNavContainer: NavContainer | undefined;
+    private HYOKKeyCreationNavContainer: NavContainer | undefined;
     private keyCreationWizard: Wizard | undefined;
+    private HYOKKeyCreationWizard: Wizard | undefined;
     private keyCreationWizardPage: Page | undefined;
+    private HYOKKeyCreationWizardPage: Page | undefined;
     private keyCreationReviewPage: Page | undefined;
+    private HYOKKeyCreationReviewPage: Page | undefined;
     private eventBus = EventBus.getInstance();
 
     public onInit(): void {
@@ -93,7 +103,7 @@ export default class KeyConfigDetail extends BaseController {
     public onRouteMatched(event: Route$PatternMatchedEvent): void {
         this.getView().setBusy(true);
         const routeArgs = event.getParameter('arguments') as { keyConfigId?: string, '?query': { createKey?: string } };
-        const queryParams = routeArgs['?query'] as { createKey?: string };
+        const queryParams = routeArgs['?query'] as { createKey?: string, keyType?: string };
         this.keyConfigId = routeArgs.keyConfigId;
 
         if (!isUUIDValid(this.keyConfigId)) {
@@ -106,8 +116,9 @@ export default class KeyConfigDetail extends BaseController {
         });
 
         if (queryParams?.createKey === 'true') {
+            const type = queryParams?.keyType || this.Enums.KeyCreationTypes.SYSTEM_MANAGED;
             this.getView().setBusy(true);
-            this.handleCreateKeyRoute().catch((error) => {
+            this.handleCreateKeyRoute(type).catch((error) => {
                 console.error(error);
             });
         }
@@ -132,33 +143,43 @@ export default class KeyConfigDetail extends BaseController {
             this.resetConnectSystemModel()
         }
     }
-    private async handleCreateKeyRoute(): Promise<void> {
+    private async handleCreateKeyRoute(type: string): Promise<void> {
         const view = this.getView();
         const component = this.getOwnerComponent();
+        const wizardView = type === this.Enums.KeyCreationTypes.SYSTEM_MANAGED as string ? 'kms.resources.fragments.common.KeyCreationWizard' : 'kms.resources.fragments.common.HYOKKeyCreationWizard';
 
         if (!this.keyCreatePopover) {
             this.keyCreatePopover = await Fragment.load({
                 id: view.getId(),
-                name: 'kms.resources.fragments.common.KeyCreationWizard',
+                name: wizardView,
                 controller: this
             }) as Dialog;
             this.keyCreatePopover.addStyleClass('sapUiSizeCompact');
             this.keyCreatePopover.setModel(component.getModel('i18n'), 'i18n');
             this.keyCreatePopover.setModel(this.keyCreationModel, 'model');
             this.keyCreatePopover.open();
-            this.resetKeyCreationModel()
+            this.resetKeyCreationModel(type)
             this.keyCreationWizard = this.byId('keyCreationWizard') as Wizard;
+            this.HYOKKeyCreationWizard = this.byId('HYOKKeyCreationWizard') as Wizard;
             this.keyCreationNavContainer = this.byId('keyCreationNavContainer') as NavContainer;
+            this.HYOKKeyCreationNavContainer = this.byId('HYOKKeyCreationNavContainer') as NavContainer;
             this.keyCreationReviewPage = this.byId('keyCreationReviewPage') as Page;
+            this.HYOKKeyCreationReviewPage = this.byId('HYOKKeyCreationReviewPage') as Page;
             this.keyCreationWizardPage = this.byId('keyCreationWizardPage') as Page;
+            this.HYOKKeyCreationWizardPage = this.byId('HYOKKeyCreationWizardPage') as Page;
             this.keyCreationNavContainer?.to(this.keyCreationWizardPage);
+            this.HYOKKeyCreationNavContainer?.to(this.HYOKKeyCreationWizardPage);
         } else {
             this.keyCreatePopover.open();
-            this.resetKeyCreationModel()
+            this.resetKeyCreationModel(type)
             this.keyCreationNavContainer = this.byId('keyCreationNavContainer') as NavContainer;
+            this.HYOKKeyCreationNavContainer = this.byId('HYOKKeyCreationNavContainer') as NavContainer;
             this.keyCreationReviewPage = this.byId('keyCreationReviewPage') as Page;
+            this.HYOKKeyCreationReviewPage = this.byId('HYOKKeyCreationReviewPage') as Page;
             this.keyCreationWizardPage = this.byId('keyCreationWizardPage') as Page;
+            this.HYOKKeyCreationWizardPage = this.byId('HYOKKeyCreationWizardPage') as Page;
             this.keyCreationNavContainer?.to(this.keyCreationWizardPage);
+            this.HYOKKeyCreationNavContainer?.to(this.HYOKKeyCreationWizardPage);
         }
     }
     public onConnectSystemsCancelPress(): void {
@@ -218,13 +239,27 @@ export default class KeyConfigDetail extends BaseController {
         });
     }
     public async onKeyCreationWizardSubmitPress(): Promise<void> {
-        const payload = {
-            name: this.keyCreationModel.getProperty('/name') as string,
-            description: this.keyCreationModel.getProperty('/description') as string,
-            algorithm: this.keyCreationModel.getProperty('/algorithm') as string,
-            region: this.keyCreationModel.getProperty('/region') as string,
-            provider: this.keyCreationModel.getProperty('/provider') as string,
-            enabled: this.keyCreationModel.getProperty('/enabled') as boolean
+        let payload = {};
+        if (this.keyCreationModel.getProperty('/keyType') === this.Enums.KeyCreationTypes.SYSTEM_MANAGED) {
+            payload = {
+                name: this.keyCreationModel.getProperty('/name') as string,
+                keyConfigurationID: this.keyConfigId,
+                type: this.keyCreationModel.getProperty('/keyType') as string,
+                description: this.keyCreationModel.getProperty('/description') as string,
+                algorithm: this.keyCreationModel.getProperty('/algorithm') as string,
+                region: this.keyCreationModel.getProperty('/region') as string,
+                provider: this.keyCreationModel.getProperty('/provider') as string,
+                enabled: this.keyCreationModel.getProperty('/enabled') as boolean
+            }
+        } else {
+            payload = {
+                name: this.keyCreationModel.getProperty('/name') as string,
+                keyConfigurationID: this.keyConfigId,
+                type: this.keyCreationModel.getProperty('/keyType') as string,
+                description: this.keyCreationModel.getProperty('/description') as string,
+                enabled: this.keyCreationModel.getProperty('/enabled') as boolean,
+                nativeId: this.keyCreationModel.getProperty('/keyARN') as string
+            }
         }
         try {
             await this.api.post('keys', payload);
@@ -266,6 +301,18 @@ export default class KeyConfigDetail extends BaseController {
             this.keyCreationModel.setProperty('/keyRegionStepValid', true);
         }
     }
+    public onKeyCreateARNChanged(): void {
+        const keyARN = this.keyCreationModel.getProperty('/keyARN') as string;
+        if (!keyARN || keyARN.length < 15) {
+            this.keyCreationModel.setProperty('/keyARNValueState', 'Error');
+            this.keyCreationModel.setProperty('/keyARNValueStateText', this.getText('keyARNRequired'));
+            this.keyCreationModel.setProperty('/keySourceStepValid', false);
+        } else {
+            this.keyCreationModel.setProperty('/keyARNValueState', 'None');
+            this.keyCreationModel.setProperty('/keyARNValueStateText', '');
+            this.keyCreationModel.setProperty('/keySourceStepValid', true);
+        }
+    }
     public onKeyCreationWizardComplete(): void {
         const detailsStepValid = this.keyCreationModel.getProperty('/detailsStepValid') as boolean;
         const keyTypeStepValid = this.keyCreationModel.getProperty('/keyTypeStepValid') as boolean;
@@ -278,14 +325,29 @@ export default class KeyConfigDetail extends BaseController {
             this.keyCreationModel.setProperty('/createKeyEnabled', false);
         }
     }
+    public onHYOKKeyCreationWizardComplete(): void {
+        const detailsStepValid = this.keyCreationModel.getProperty('/detailsStepValid') as boolean;
+        const keySourceStepValid = this.keyCreationModel.getProperty('/keySourceStepValid') as boolean;
+        if (detailsStepValid && keySourceStepValid) {
+            this.keyCreationModel.setProperty('/createKeyEnabled', true);
+            this.HYOKKeyCreationNavContainer?.to(this.HYOKKeyCreationReviewPage);
+        } else {
+            this.keyCreationModel.setProperty('/createKeyEnabled', false);
+        }
+    }
     public onNavBackToStepPress(stepNumber: number): void {
         const fnAfterNavigate = function (this: KeyConfigDetail) {
-            this.keyCreationWizard.goToStep(this.keyCreationWizard.getSteps()[stepNumber], true);
-            this.keyCreationNavContainer.detachAfterNavigate(fnAfterNavigate);
-        }.bind(this);
+            this.keyCreationWizard?.goToStep(this.keyCreationWizard?.getSteps()[stepNumber], true);
+            this.keyCreationNavContainer?.detachAfterNavigate(fnAfterNavigate);
 
-        this.keyCreationNavContainer.attachAfterNavigate(fnAfterNavigate);
-        this.keyCreationNavContainer.backToPage(this.keyCreationWizardPage.getId());
+            this.HYOKKeyCreationWizard?.goToStep(this.HYOKKeyCreationWizard?.getSteps()[stepNumber], true);
+            this.HYOKKeyCreationNavContainer?.detachAfterNavigate(fnAfterNavigate);
+        }.bind(this);
+        this.keyCreationNavContainer?.attachAfterNavigate(fnAfterNavigate);
+        this.keyCreationNavContainer?.backToPage(this.keyCreationWizardPage.getId());
+
+        this.HYOKKeyCreationNavContainer?.attachAfterNavigate(fnAfterNavigate);
+        this.HYOKKeyCreationNavContainer?.backToPage(this.HYOKKeyCreationWizardPage.getId());
     }
     private async getKeyConfigData(): Promise<void> {
         try {
@@ -297,8 +359,10 @@ export default class KeyConfigDetail extends BaseController {
             this.twoWayModel.setProperty('/keyConfig', keyConfig);
             const keys = await this.getKeys();
             const systems = await this.getSystems();
+            const tags = await this.getTags();
             this.oneWayModel.setProperty('/keys', keys?.value);
             this.oneWayModel.setProperty('/systems', systems?.value);
+            this.oneWayModel.setProperty('/tags', tags?.value);
             this.oneWayModel.setProperty('/keysCount', keys?.count);
             this.oneWayModel.setProperty('/systemsCount', systems?.count);
         } catch (error) {
@@ -324,6 +388,46 @@ export default class KeyConfigDetail extends BaseController {
         } catch (error) {
             console.error(error);
             MessageBox.error(this.getText('errorFetchingSystems'));
+        }
+    }
+    private async getTags() {
+        try {
+            const tags = await this.api.get<TagsResponse>(`keyConfigurations/${this.keyConfigId}/tags`);
+            this.oneWayModel.setProperty('/tags', tags?.value);
+            const fnValidator = function (args: { text: string }): Token {
+                const text = args.text;
+                return new Token({ key: text, text: text });
+            };
+            const tagsInput = this.byId('tagsMultiInput') as MultiInput;
+            tagsInput.addValidator(fnValidator);
+            return tags;
+        } catch (error) {
+            console.error(error);
+            MessageBox.error(this.getText('errorFetchingTags'));
+        }
+    }
+    public async onTagsUpdate(event: MultiInput$TokenUpdateEvent): Promise<void> {
+        const tags = this.oneWayModel.getProperty('/tags') as [];
+
+        const removedTokens = event.getParameter('removedTokens');
+        const addedTokens = event.getParameter('addedTokens');
+        const removedTags = removedTokens?.map(token => token.getKey()) as [];
+        const addedTags = addedTokens?.map(token => token.getKey()) as [];
+        const updatedTags = tags?.filter(tag => !removedTags.includes(tag));
+        updatedTags?.push(...addedTags);
+        this.oneWayModel.setProperty('/tags', updatedTags || tags);
+
+        const payload = {
+            tags: updatedTags
+        }
+        try {
+            await this.api.put(`keyConfigurations/${this.keyConfigId}/tags`, payload);
+            MessageToast.show(this.getText('tagsUpdatedSuccessfully'));
+        } catch (error) {
+            console.error(error);
+            MessageBox.error(this.getText('errorUpdatingTags'));
+            const tags = await this.getTags();
+            this.oneWayModel.setProperty('/tags', tags?.value || []);
         }
     }
     private async patchKeyConfigData(keyConfig: KeyConfigPatchPayload) {
@@ -546,9 +650,12 @@ export default class KeyConfigDetail extends BaseController {
         });
 
     }
-    private resetKeyCreationModel() {
+    private resetKeyCreationModel(keyType: string = null) {
         this.keyCreationModel.setData({
             name: '' as string,
+            keyType: keyType || this.Enums.KeyCreationTypes.SYSTEM_MANAGED,
+            keySource: 'keyID' as string,
+            keyARN: '' as string,
             description: '' as string,
             algorithm: 'AES256' as string,
             region: '' as string,
@@ -562,11 +669,15 @@ export default class KeyConfigDetail extends BaseController {
             provider: '' as string,
             enabled: true as boolean,
             detailsStepValid: false as boolean,
+            keySourceStepValid: false as boolean,
             keyTypeStepValid: true as boolean,
             keyRegionStepValid: false as boolean,
             keyNameValueState: 'None' as string,
             keyNameValueStateText: '' as string,
-            createKeyEnabled: false as boolean
+            keyARNValueState: 'None' as string,
+            keyARNValueStateText: '' as string,
+            createKeyEnabled: false as boolean,
+            tags: [] as string[]
         }, true);
     }
     private resetConnectSystemModel() {

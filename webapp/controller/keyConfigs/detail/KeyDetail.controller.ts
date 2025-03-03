@@ -16,6 +16,10 @@ interface KeyPatchPayload {
     description: string;
     enabled: boolean;
 }
+interface KeyVersionResponse {
+    value: KeyVersion[] | undefined;
+    count: number | undefined;
+}
 
 export default class KeyDetail extends BaseController {
     public formatter: typeof Formatter = Formatter;
@@ -61,12 +65,12 @@ export default class KeyDetail extends BaseController {
     private async getKeyDetails(): Promise<void> {
         try {
             const selectedKey = await this.api.get<Key>(`keys/${this.keyId}`);
-            const keyVersions = await this.api.get<[]>(`keys/${this.keyId}/versions`);
+            const keyVersions = await this.api.get<KeyVersionResponse>(`keys/${this.keyId}/versions`);
             if (selectedKey) {
                 this.oneWayModel.setProperty('/selectedKey', selectedKey);
                 this.twoWayModel.setProperty('/selectedKey', selectedKey);
-                this.oneWayModel.setProperty('/keyVersions', keyVersions);
-                this.oneWayModel.setProperty('/keyVersionsCount', keyVersions?.length);
+                this.oneWayModel.setProperty('/keyVersions', keyVersions?.value);
+                this.oneWayModel.setProperty('/keyVersionsCount', keyVersions?.count);
             } else {
                 console.error('Key not found');
                 this.getRouter().navTo('keyConfigDetail', {
@@ -89,7 +93,7 @@ export default class KeyDetail extends BaseController {
     public async onRotateNowPress(): Promise<void> {
         this.getView().setBusy(true);
         try {
-            await this.api.post<null, Key>(`keys/${this.keyId}/versions`, null);
+            await this.api.post(`keys/${this.keyId}/versions`, {});
             MessageToast.show(this.getText('keyRotatedSuccessfully'));
             this.getKeyDetails().catch((error) => {
                 console.error(error);

@@ -68,7 +68,9 @@
                         <menu>
                             <Menu class="sapUiSizeCompact">
                                 <MenuItem text="{i18n>sapManaged}"
-                                    press="onKeyConfigDashboardCreateSAPKeyPress" />
+                                    press=".onKeyConfigDashboardCreateSAPKeyPress($event, 'SYSTEM_MANAGED')" />
+                                <MenuItem text="{i18n>hyok}"
+                                    press=".onKeyConfigDashboardCreateSAPKeyPress($event, 'HYOK')" />
                             </Menu>
                         </menu>
                     </MenuButton>

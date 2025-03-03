@@ -29,7 +29,7 @@
   },
   "scripts": {
     "start:mock": "UI5_ENV=mock ui5 serve -o index.html",
-    "start:dev": "UI5_ENV=dev ui5 serve -o index.html",
+    "start:dev": "UI5_ENV=dev ui5 serve -o index.html --port 8081",
     "start:staging": "UI5_ENV=staging ui5 serve -o index.html",
     "start:prod": "UI5_ENV=prod ui5 serve -o index.html",
     "start:test": "ui5 serve --port 8000",

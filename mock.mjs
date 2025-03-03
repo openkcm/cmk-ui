@@ -6,6 +6,7 @@ import groups from "./mockServer/mockdata/groups.mjs";
 import user from "./mockServer/mockdata/user.mjs";
 import keys from "./mockServer/mockdata/keys.mjs";
 import keyVersions from "./mockServer/mockdata/keyVersions.mjs";
+import tags from "./mockServer/mockdata/tags.mjs";
 
 const app = express();
 app.use(cors());
@@ -16,11 +17,21 @@ app.get("/api/v1/keyConfigurations/:id?", (req, res) => {
     res.json(keyConfig(id));
 });
 
+app.get("/api/v1/keyConfigurations/:id/tags", (req, res) => {
+    const { id } = req.params;
+    res.json(tags(id));
+});
+
+app.put("/api/v1/keyConfigurations/:id/tags", (req, res) => {
+    const { id } = req.params;
+    res.status(204).json(tags(id));
+});
+
 app.put("/api/v1/keyConfig/:id/primaryKey", (req, res) => {
     res.status(204).json(keys());
 });
 
-app.patch("/api/v1/keyConfigurations", (req, res) => {
+app.patch("/api/v1/keyConfigurations/:id", (req, res) => {
     const newConfig = req.body;
     res.status(200).json(newConfig);
 });
@@ -47,6 +58,10 @@ app.patch("/api/v1/keys/:id", (req, res) => {
 app.get("/api/v1/keys/:id/versions", (req, res) => {
     const { keyID } = req.params;
     res.json(keyVersions(keyID));
+});
+
+app.post("/api/v1/keys/:id/versions", (req, res) => {
+    res.status(200).json({});
 });
 
 app.get("/api/v1/systems/:systemID?/:keyConfigurationID?", (req, res) => {

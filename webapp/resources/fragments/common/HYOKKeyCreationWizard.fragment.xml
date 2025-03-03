@@ -1,0 +1,156 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:u="sap.ui.unified"
+    xmlns:layout="sap.ui.layout">
+    <Dialog
+        escapeHandler=".onKeyCreationWizardCancelPress"
+        showHeader="false"
+        verticalScrolling="false"
+        contentHeight="80%"
+        contentWidth="40%">
+        <f:DynamicPage
+            stickySubheaderProvider="keyCreationWizard"
+            toggleHeaderOnTitleClick="false"
+            class="sapUiNoContentPadding"
+            showFooter="true">
+            <f:title>
+                <f:DynamicPageTitle>
+                    <f:heading>
+                        <Title text="{i18n>HYOKKeyCreationWizard}" />
+                    </f:heading>
+                </f:DynamicPageTitle>
+            </f:title>
+            <f:content>
+                <NavContainer id="HYOKKeyCreationNavContainer">
+                    <pages>
+                        <Page id="HYOKKeyCreationWizardPage" showHeader="false">
+                            <content>
+                                <Wizard id="HYOKKeyCreationWizard"
+                                    class="sapUiResponsivePadding--header sapUiResponsivePadding--content"
+                                    complete="onHYOKKeyCreationWizardComplete">
+                                    <WizardStep id="HYOKDetailsStep"
+                                        title="{i18n>details}"
+                                        validated="{model>/detailsStepValid}"
+                                        activate="">
+                                        <VBox width="100%">
+                                            <Label text="{i18n>keyName}:" required="true" />
+                                            <Input value="{model>/name}"
+                                                liveChange="onKeyCreateNameChanged"
+                                                valueLiveUpdate="true"
+                                                valueState="{model>/keyNameValueState}"
+                                                valueStateText="{model>/keyNameValueStateText}" />
+                                            <Label text="{i18n>keyDescription}:"
+                                                class="sapUiTinyMarginTop" />
+                                            <TextArea value="{model>/description}" rows="4"
+                                                width="100%" />
+                                        </VBox>
+                                    </WizardStep>
+                                    <WizardStep id="HYOKKeySource"
+                                        validated="{model>/keySourceStepValid}"
+                                        activate=""
+                                        title="{i18n>keySource}">
+                                        <VBox width="100%">
+                                            <Label text="{i18n>keySource}:" required="true" />
+                                            <SegmentedButton selectedKey="{model>/keySource}">
+                                                <items>
+                                                    <SegmentedButtonItem text="{i18n>keyID}"
+                                                        key="keyID" />
+                                                    <SegmentedButtonItem text="{i18n>keyAlias}"
+                                                        key="keyAlias" />
+                                                </items>
+                                            </SegmentedButton>
+                                            <Label
+                                                class="sapUiTinyMarginTop"
+                                                text="{= ${model>/keySource} === 'keyID' ? ${i18n>keyARN} : ${i18n>keyAlias}}"
+                                                required="true" />
+                                            <Input value="{model>/keyARN}"
+                                                liveChange="onKeyCreateARNChanged"
+                                                valueLiveUpdate="true"
+                                                valueState="{model>/keyARNValueState}"
+                                                valueStateText="{model>/keyARNValueStateText}" />
+                                        </VBox>
+                                    </WizardStep>
+                                </Wizard>
+                            </content>
+                        </Page>
+                        <Page id="HYOKKeyCreationReviewPage" showHeader="false">
+                            <content>
+                                <VBox class="sapUiSmallMargin">
+                                    <form:SimpleForm
+                                        class="sapUiSmallMarginBottom"
+                                        editable="false"
+                                        layout="ResponsiveGridLayout">
+                                        <form:toolbar>
+                                            <Toolbar>
+                                                <Title text="1. {i18n>details}" />
+                                                <ToolbarSpacer />
+                                                <Button press=".onNavBackToStepPress(0)"
+                                                    text="{i18n>edit}" />
+                                            </Toolbar>
+                                        </form:toolbar>
+                                        <form:content>
+                                            <Label text="{i18n>keyName}" />
+                                            <Input value="{model>/name}"
+                                                editable="false" />
+                                            <Label text="{i18n>keyDescription}:"
+                                                class="sapUiTinyMarginTop" />
+                                            <TextArea editable="false" value="{model>/description}"
+                                                rows="4"
+                                                width="100%" />
+                                        </form:content>
+                                    </form:SimpleForm>
+
+                                    <form:SimpleForm
+                                        class="sapUiSmallMarginBottom"
+                                        editable="false"
+                                        layout="ResponsiveGridLayout">
+                                        <form:toolbar>
+                                            <Toolbar>
+                                                <Title text="2. {i18n>keySource}" />
+                                                <ToolbarSpacer />
+                                                <Button press=".onNavBackToStepPress(1)"
+                                                    text="{i18n>edit}" />
+                                            </Toolbar>
+                                        </form:toolbar>
+                                        <form:content>
+                                            <VBox width="100%">
+                                                <Label text="{i18n>keySource}:" />
+                                                <SegmentedButton selectedKey="{model>/keySource}"
+                                                    enabled="false">
+                                                    <items>
+                                                        <SegmentedButtonItem text="{i18n>keyID}"
+                                                            key="keyID" />
+                                                        <SegmentedButtonItem text="{i18n>keyAlias}"
+                                                            key="keyAlias" />
+                                                    </items>
+                                                </SegmentedButton>
+                                                <Label
+                                                    class="sapUiTinyMarginTop"
+                                                    text="{= ${model>/keySource} === 'keyID' ? ${i18n>keyARN} : ${i18n>keyAlias}}" />
+                                                <Input value="{model>/keyARN}"
+                                                    editable="false" />
+                                            </VBox>
+                                        </form:content>
+                                    </form:SimpleForm>
+                                </VBox>
+                            </content>
+                        </Page>
+                    </pages>
+                </NavContainer>
+            </f:content>
+            <f:footer>
+                <OverflowToolbar>
+                    <ToolbarSpacer />
+                    <Button text="{i18n>createKey}" type="Emphasized"
+                        visible="{model>/createKeyEnabled}"
+                        press="onKeyCreationWizardSubmitPress" />
+                    <Button text="{i18n>cancel}" type="Transparent"
+                        press="onKeyCreationWizardCancelPress" />
+                </OverflowToolbar>
+            </f:footer>
+        </f:DynamicPage>
+    </Dialog>
+</core:FragmentDefinition>
