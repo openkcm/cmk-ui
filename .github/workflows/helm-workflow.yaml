@@ -1,0 +1,22 @@
+name: Helm workflow
+  
+on:
+  workflow_dispatch:
+jobs:
+  piper:
+    permissions:
+      actions: write
+      checks: write
+      contents: write
+      deployments: write
+      id-token: write
+      issues: write
+      discussions: write
+      packages: write
+      pages: write
+      pull-requests: write
+      repository-projects: write
+      security-events: write
+      statuses: write
+    uses: kms/gitops-pipeline-generic/.github/workflows/helm.yaml@main
+    secrets: inherit

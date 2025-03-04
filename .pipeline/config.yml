@@ -12,14 +12,29 @@ general:
   vaultPipelineName: PIPELINE-43716
   vaultServerUrl: https://vault.tools.sap
   version: main
-stages: null
+  containerImageName: "ui"
+stages:
+  Build:
+    artifactPrepareVersion: true
+    kanikoExecute: true
+    imagePushToRegistry: true
+  Promote:
+    sapCallStagingService: true
+    sapCumulusUpload: true
+  Release:
+    sapDownloadArtifact: false
+
 steps:
   artifactPrepareVersion:
     gitHttpsCredentialVaultSecretName: GROUP-SECRETS/github-kms20-serviceuser
     versioningType: cloud_noTag
+  kanikoExecute:
+    containerImageName: ui
   sapCallStagingService:
     profile: group-7718-default
     url: https://staging.repositories.cloud.sap/stage/api
+  imagePushToRegistry:
+    targetRegistryUrl: https://kms.common.repositories.cloud.sap
   whitesourceExecuteScan:
     productName: SHC - KMS20
     projectName: KMS20-ui
@@ -30,3 +45,9 @@ steps:
   npmExecuteScripts:
     publish: false
     createBOM: false
+  helmExecute:
+    chartPath: ./charts
+    publish: true
+    targetRepositoryName: ui
+    targetRepositoryURL: https://common.repositories.cloud.sap/artifactory/kms-helm/ui
+    helmCommand: publish
