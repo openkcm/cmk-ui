@@ -69,6 +69,16 @@ app.get("/api/v1/systems/:systemID?/:keyConfigurationID?", (req, res) => {
     res.json(systems(systemID, keyConfigurationID));
 });
 
+app.patch("/api/v1/systems/:systemID?/link/", (req, res) => {
+    const { systemID, keyConfigurationID } = req.query;
+    res.json(systems(systemID, keyConfigurationID));
+});
+
+app.delete("/api/v1/systems/:systemID?/link/", (req, res) => {
+    const { systemID, keyConfigurationID } = req.query;
+    res.json(systems(systemID, keyConfigurationID));
+});
+
 app.get("/api/v1/groups", (req, res) => {
     res.json(groups());
 });

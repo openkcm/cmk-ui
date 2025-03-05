@@ -5,6 +5,8 @@ export interface System {
     keyConfiguration: KeyConfig;
     name: string;
     key: string;
+    connected: boolean;
+    keyConfigurationID: string;
 };
 export interface Groups {
     id: string;

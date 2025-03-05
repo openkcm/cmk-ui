@@ -102,6 +102,8 @@ export default class KeyConfigDetail extends BaseController {
     }
     public onRouteMatched(event: Route$PatternMatchedEvent): void {
         this.getView().setBusy(true);
+        const routeName = event.getParameter('name');
+        this.oneWayModel.setProperty('/keyConfigDetail', routeName === 'keyConfigDetail');
         const routeArgs = event.getParameter('arguments') as { keyConfigId?: string, '?query': { createKey?: string } };
         const queryParams = routeArgs['?query'] as { createKey?: string, keyType?: string };
         this.keyConfigId = routeArgs.keyConfigId;
@@ -210,7 +212,6 @@ export default class KeyConfigDetail extends BaseController {
             this.getView().setBusy(false);
             const binding = event.getSource().getBinding('items') as ListBinding;
             binding.filter([]);
-            this.connectSystemPopover?.close();
             this.connectSystemPopover?.destroy();
             this.connectSystemPopover = undefined;
             this.resetConnectSystemModel();
@@ -358,13 +359,16 @@ export default class KeyConfigDetail extends BaseController {
             this.oneWayModel.setProperty('/keyConfig', keyConfig);
             this.twoWayModel.setProperty('/keyConfig', keyConfig);
             const keys = await this.getKeys();
-            const systems = await this.getSystems();
+            const allSystems = await this.getAllSystems();
+            const connectedSystems = await this.getConnectedSystems();
             const tags = await this.getTags();
             this.oneWayModel.setProperty('/keys', keys?.value);
-            this.oneWayModel.setProperty('/systems', systems?.value);
+            this.oneWayModel.setProperty('/allSystems', allSystems?.value);
+            this.oneWayModel.setProperty('/systems', connectedSystems?.value);
             this.oneWayModel.setProperty('/tags', tags?.value);
             this.oneWayModel.setProperty('/keysCount', keys?.count);
-            this.oneWayModel.setProperty('/systemsCount', systems?.count);
+            this.oneWayModel.setProperty('/systemsCount', connectedSystems?.count);
+            this.oneWayModel.setProperty('/allSystemsCount', allSystems?.count);
         } catch (error) {
             console.error(error);
             MessageBox.error(this.getText('errorFetchingKeyConfigDetails'));
@@ -381,8 +385,17 @@ export default class KeyConfigDetail extends BaseController {
             MessageBox.error(this.getText('errorFetchingKeyDetails'));
         }
     }
-    private async getSystems() {
+    private async getConnectedSystems() {
         try {
+            const systems = await this.api.get<KeyResponse>(`systems`, { keyConfigurationID: this.keyConfigId });
+            return systems;
+        } catch (error) {
+            console.error(error);
+            MessageBox.error(this.getText('errorFetchingSystems'));
+        }
+    }
+    private async getAllSystems() {
+       try {
             const systems = await this.api.get<SystemsResponse>(`systems`);
             return systems;
         } catch (error) {
@@ -568,6 +581,33 @@ export default class KeyConfigDetail extends BaseController {
             }
         });
     }
+    public onSystemsTableDisconnectPress(event: Button$PressEvent): void {
+        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const selectedSystem = this.oneWayModel.getProperty(path) as System;
+        MessageBox.confirm(this.getText('confirmDisconnectSystem'), {
+            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            onClose: async (action: unknown) => {
+                if (action === MessageBox.Action.YES) {
+                    await this.disconnectSystem(selectedSystem.id);
+                }
+            }
+        });
+    }
+
+    private async disconnectSystem(systemsID: string): Promise<void> {
+        this.getView().setBusy(true);
+        try {
+            await this.api.delete(`systems/${systemsID}/link`);
+            MessageToast.show(this.getText('systemDisconnectedSuccessfully'));
+            await this.getKeyConfigData();
+        } catch (error) {
+            console.error(error);
+            MessageBox.error(this.getText('errorDeletingKey'));
+        } finally {
+            this.getView().setBusy(false);
+        }
+    }
+
     private async disableKey(keyId: string): Promise<void> {
         this.getView().setBusy(true);
         const payload = {
@@ -681,8 +721,16 @@ export default class KeyConfigDetail extends BaseController {
         }, true);
     }
     private resetConnectSystemModel() {
+        const allSystems = this.oneWayModel.getProperty('/allSystems') as System[];
+        const connectedSystems = this.oneWayModel.getProperty('/systems') as System[];
+
+        allSystems.forEach(system => {
+            const isConnected = connectedSystems.some(connectedSystem => connectedSystem.id === system.id);
+            system.connected = isConnected;
+        });
+    
         this.connectSystemModel.setData({
-            systemsList: this.oneWayModel.getProperty('/systems') as System[]
+            systemsList: this.oneWayModel.getProperty('/allSystems') as System[]
         }, true);
     }
     public async onCopyToClipboardPress(event: Button$PressEvent): Promise<void> {

@@ -16,6 +16,7 @@
         <StandardListItem
             title="{model>name}"
             description="{model>region}"
+            selected="{model>connected}"
             type="Active" />
     </SelectDialog>
 </core:FragmentDefinition>
