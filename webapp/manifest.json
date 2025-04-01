@@ -88,11 +88,11 @@
                     ]
                 },
                 {
-                    "pattern": "keyConfigs/{keyConfigId}/{keyId}:?query:",
-                    "name": "keyConfigKeyDetail",
+                    "pattern": "keyConfigs/{keyConfigId}/{type}/{id}:?query:",
+                    "name": "keyConfigDetailPanel",
                     "target": [
                         "keyConfigDetail",
-                        "keyConfigKeyDetail"
+                        "keyConfigDetailPanel"
                     ]
                 },
                 {
@@ -116,7 +116,7 @@
                     "target": [
                         "users",
                         "usersDetail"
-                    ] 
+                    ]
                 },
                 {
                     "pattern": "settings",
@@ -136,7 +136,7 @@
                     "target": [
                         "systems",
                         "systemsDetail"
-                    ] 
+                    ]
                 }
             ],
             "targets": {
@@ -159,10 +159,10 @@
                     "controlAggregation": "beginColumnPages",
                     "clearControlAggregation": true
                 },
-                "keyConfigKeyDetail": {
+                "keyConfigDetailPanel": {
                     "parent": "keyConfigDetailLayout",
                     "controlId": "keyConfigDetailLayout",
-                    "viewName": "keyConfigs.detail.KeyDetail",
+                    "viewName": "keyConfigs.detail.DetailPanel",
                     "controlAggregation": "midColumnPages",
                     "clearControlAggregation": true
                 },

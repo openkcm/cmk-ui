@@ -23,7 +23,7 @@ export default class Systems extends BaseController {
             if (routeName === 'systems') {
                 this.oneWayModel.setProperty('/layout', 'OneColumn');
             } else {
-                this.oneWayModel.setProperty('/layout', 'TwoColumnsMidExpanded');
+                this.oneWayModel.setProperty('/layout', 'TwoColumnsBeginExpanded');
             }
         }
     }

@@ -11,9 +11,8 @@ export default (systemID, keyConfigurationID) => {
                 keyConfigurationName: "Key Config XYZ",
                 name: `System ${chance.animal()}`,
                 region: chance.pickone(['eu-central-1', 'us-east-1', 'us-west-2']),
-                systemRole: chance.pickone(["SAP Analytics Cloud", "SuccessFactors Learning", "SAP Ariba", "SAP Fieldglass", "SAP Concur"]),
-                status: chance.pickone(["CONNECTED", "DISCONNECTED"]),
-                applicationRole: "HEC_HANA"
+                systemRole: 'HEC_HANA',
+                status: chance.pickone(["CONNECTED", "DISCONNECTED"])
             }
         ));
         return {

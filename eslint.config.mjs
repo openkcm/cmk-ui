@@ -17,9 +17,12 @@ export default tseslint.config(
                 project: true,
                 tsconfigRootDir: import.meta.dirname
             }
-        }
+        },
+        rules: {
+            "@typescript-eslint/no-unsafe-enum-comparison": "off"
+        },
     },
     {
-        ignores: ["eslint.config.mjs", "playwright.config.ts", "environment.d.ts", "mockServer/**/*", "mock.mjs"]
+        ignores: ["eslint.config.mjs", "playwright.config.ts", "environment.d.ts", "mockServer/**/*", "mock.mjs", "dist/**/*", "node_modules/**/*", "coverage/**/*", "report/**/*"],
     }
 );

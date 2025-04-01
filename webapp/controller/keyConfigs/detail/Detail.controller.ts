@@ -44,6 +44,10 @@ interface KeyPatchPayload {
     description: string;
     enabled: boolean;
 }
+interface KeyConfigsResponse {
+    value: KeyConfig[];
+    count: number;
+}
 export default class KeyConfigDetail extends BaseController {
     private readonly api: Api = new Api();
     private filterPopover: ViewSettingsDialog | undefined;
@@ -77,11 +81,13 @@ export default class KeyConfigDetail extends BaseController {
     private HYOKKeyCreationWizardPage: Page | undefined;
     private keyCreationReviewPage: Page | undefined;
     private HYOKKeyCreationReviewPage: Page | undefined;
+    private readonly switchKeyConfigModel = new JSONModel({});
+    private switchKeyConfigDialog: Dialog | undefined;
     private eventBus = EventBus.getInstance();
 
     public onInit(): void {
         super.onInit();
-        this.eventBus.subscribe('keys', 'loadKeyConfigDetails', (channelId, eventId, data) => this.onKeyDetailRouteEventTriggered(channelId, eventId, data as { keyConfigId: string }), this);
+        this.eventBus.subscribe('keys', 'loadKeyConfigDetails', (channelId, eventId, data) => this.onDetailPanelRouteEventTriggered(channelId, eventId, data as { keyConfigId: string }), this);
         this.getRouter().getRoute('keyConfigDetail').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.twoWayModel.setDefaultBindingMode(BindingMode.TwoWay);
@@ -92,8 +98,9 @@ export default class KeyConfigDetail extends BaseController {
         this.setModel(this.viewSettingModel, 'viewSettingModel');
         this.setModel(this.keyCreationModel, 'keyCreationModel');
     };
-    public onKeyDetailRouteEventTriggered(channelId: string, eventId: string, data: { keyConfigId: string }): void {
-        if (channelId === 'keys' && eventId === 'loadKeyConfigDetails') {
+    public onDetailPanelRouteEventTriggered(channelId: string, eventId: string, data: { keyConfigId: string }): void {
+        this.oneWayModel.setProperty('/keyConfigDetail', true);
+        if (channelId === 'keyConfig' && eventId === 'loadKeyConfigDetails') {
             this.keyConfigId = data.keyConfigId;
             this.getKeyConfigData().catch((error) => {
                 console.error(error);
@@ -147,6 +154,7 @@ export default class KeyConfigDetail extends BaseController {
     }
     private async handleCreateKeyRoute(type: string): Promise<void> {
         const view = this.getView();
+        view.setBusy(true);
         const component = this.getOwnerComponent();
         const wizardView = type === this.Enums.KeyCreationTypes.SYSTEM_MANAGED as string ? 'kms.resources.fragments.common.KeyCreationWizard' : 'kms.resources.fragments.common.HYOKKeyCreationWizard';
 
@@ -160,6 +168,7 @@ export default class KeyConfigDetail extends BaseController {
             this.keyCreatePopover.setModel(component.getModel('i18n'), 'i18n');
             this.keyCreatePopover.setModel(this.keyCreationModel, 'model');
             this.keyCreatePopover.open();
+            view.setBusy(false);
             this.resetKeyCreationModel(type)
             this.keyCreationWizard = this.byId('keyCreationWizard') as Wizard;
             this.HYOKKeyCreationWizard = this.byId('HYOKKeyCreationWizard') as Wizard;
@@ -173,6 +182,7 @@ export default class KeyConfigDetail extends BaseController {
             this.HYOKKeyCreationNavContainer?.to(this.HYOKKeyCreationWizardPage);
         } else {
             this.keyCreatePopover.open();
+            view.setBusy(false);
             this.resetKeyCreationModel(type)
             this.keyCreationNavContainer = this.byId('keyCreationNavContainer') as NavContainer;
             this.HYOKKeyCreationNavContainer = this.byId('HYOKKeyCreationNavContainer') as NavContainer;
@@ -185,7 +195,6 @@ export default class KeyConfigDetail extends BaseController {
         }
     }
     public onConnectSystemsCancelPress(): void {
-        this.connectSystemPopover?.close();
         this.connectSystemPopover?.destroy();
         this.connectSystemPopover = undefined;
         this.resetConnectSystemModel();
@@ -209,13 +218,9 @@ export default class KeyConfigDetail extends BaseController {
             console.error(error);
             MessageBox.error(this.getText('errorConnectingSystems'));
         } finally {
-            this.getView().setBusy(false);
-            const binding = event.getSource().getBinding('items') as ListBinding;
-            binding.filter([]);
-            this.connectSystemPopover?.destroy();
-            this.connectSystemPopover = undefined;
-            this.resetConnectSystemModel();
             await this.getKeyConfigData();
+            this.getView().setBusy(false);
+            this.onConnectSystemsCancelPress();
         }
     }
     public onSearchConnectSystems(event: SelectDialog$LiveChangeEvent): void {
@@ -316,10 +321,9 @@ export default class KeyConfigDetail extends BaseController {
     }
     public onKeyCreationWizardComplete(): void {
         const detailsStepValid = this.keyCreationModel.getProperty('/detailsStepValid') as boolean;
-        const keyTypeStepValid = this.keyCreationModel.getProperty('/keyTypeStepValid') as boolean;
         const keyRegionStepValid = this.keyCreationModel.getProperty('/keyRegionStepValid') as boolean;
 
-        if (detailsStepValid && keyTypeStepValid && keyRegionStepValid) {
+        if (detailsStepValid && keyRegionStepValid) {
             this.keyCreationModel.setProperty('/createKeyEnabled', true);
             this.keyCreationNavContainer?.to(this.keyCreationReviewPage);
         } else {
@@ -351,6 +355,7 @@ export default class KeyConfigDetail extends BaseController {
         this.HYOKKeyCreationNavContainer?.backToPage(this.HYOKKeyCreationWizardPage.getId());
     }
     private async getKeyConfigData(): Promise<void> {
+        this.getView().setBusy(true);
         try {
             const keyConfig = await this.api.get<KeyConfig>(`keyConfigurations/${this.keyConfigId}`);
             if (!keyConfig) {
@@ -395,7 +400,7 @@ export default class KeyConfigDetail extends BaseController {
         }
     }
     private async getAllSystems() {
-       try {
+        try {
             const systems = await this.api.get<SystemsResponse>(`systems`);
             return systems;
         } catch (error) {
@@ -426,7 +431,7 @@ export default class KeyConfigDetail extends BaseController {
         const addedTokens = event.getParameter('addedTokens');
         const removedTags = removedTokens?.map(token => token.getKey()) as [];
         const addedTags = addedTokens?.map(token => token.getKey()) as [];
-        const updatedTags = tags?.filter(tag => !removedTags.includes(tag));
+        const updatedTags = tags?.filter(tag => !removedTags.includes(tag)) || [] as [];
         updatedTags?.push(...addedTags);
         this.oneWayModel.setProperty('/tags', updatedTags || tags);
 
@@ -524,9 +529,10 @@ export default class KeyConfigDetail extends BaseController {
         const path = event.getSource().getBindingContext('oneWay').getPath();
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
         const keyId: string = selectedKey.id;
-        this.getRouter().navTo('keyConfigKeyDetail', {
+        this.getRouter().navTo('keyConfigDetailPanel', {
             keyConfigId: this.keyConfigId,
-            keyId: keyId
+            id: keyId,
+            type: this.Enums.KeyConfigDetailPanelTypes.KEY
         });
     }
     // eslint-disable-next-line @typescript-eslint/require-await
@@ -593,7 +599,16 @@ export default class KeyConfigDetail extends BaseController {
             }
         });
     }
-
+    public onSystemPress(event: ListItemBase$PressEvent): void {
+        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const selectedSystem = this.oneWayModel.getProperty(path) as System;
+        const systemId = selectedSystem.id;
+        this.getRouter().navTo('keyConfigDetailPanel', {
+            keyConfigId: this.keyConfigId,
+            id: systemId,
+            type: this.Enums.KeyConfigDetailPanelTypes.SYSTEM
+        });
+    };
     private async disconnectSystem(systemsID: string): Promise<void> {
         this.getView().setBusy(true);
         try {
@@ -602,7 +617,7 @@ export default class KeyConfigDetail extends BaseController {
             await this.getKeyConfigData();
         } catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorDeletingKey'));
+            MessageBox.error(this.getText('errorDisconnectingSystem'));
         } finally {
             this.getView().setBusy(false);
         }
@@ -626,8 +641,11 @@ export default class KeyConfigDetail extends BaseController {
     }
     private async enableKey(keyId: string): Promise<void> {
         this.getView().setBusy(true);
+        const payload = {
+            enabled: false
+        } as KeyPatchPayload;
         try {
-            await this.api.delete(`keys/${keyId}`);
+            await this.api.patch<KeyPatchPayload, Key>(`keys/${keyId}`, payload);
             MessageToast.show(this.getText('keyEnabledSuccessfully'));
             await this.getKeyConfigData();
         } catch (error) {
@@ -710,7 +728,6 @@ export default class KeyConfigDetail extends BaseController {
             enabled: true as boolean,
             detailsStepValid: false as boolean,
             keySourceStepValid: false as boolean,
-            keyTypeStepValid: true as boolean,
             keyRegionStepValid: false as boolean,
             keyNameValueState: 'None' as string,
             keyNameValueStateText: '' as string,
@@ -723,15 +740,58 @@ export default class KeyConfigDetail extends BaseController {
     private resetConnectSystemModel() {
         const allSystems = this.oneWayModel.getProperty('/allSystems') as System[];
         const connectedSystems = this.oneWayModel.getProperty('/systems') as System[];
+        const filteredSystems = allSystems?.filter(system =>
+            !connectedSystems?.some(connectedSystem => connectedSystem.id === system.id)
+        );
 
-        allSystems.forEach(system => {
-            const isConnected = connectedSystems.some(connectedSystem => connectedSystem.id === system.id);
-            system.connected = isConnected;
-        });
-    
-        this.connectSystemModel.setData({
-            systemsList: this.oneWayModel.getProperty('/allSystems') as System[]
-        }, true);
+        this.connectSystemModel.setProperty('/systemsList', filteredSystems);
+    }
+    public async onSwitchKeyConfigPress(event: Button$PressEvent): Promise<void> {
+        this.getView().setBusy(true);
+        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const selectedSystem = this.oneWayModel.getProperty(path) as System;
+        const component = this.getOwnerComponent();
+        const keyConfigs = await this.api.get<KeyConfigsResponse>('keyConfigurations', {});
+        const filteredKeyConfigs = keyConfigs.value.filter(keyConfig => keyConfig.id !== this.keyConfigId);
+        const connectedKeyConfig = this.oneWayModel.getProperty('/keyConfig') as KeyConfig;
+
+        if (!this.switchKeyConfigDialog) {
+            this.switchKeyConfigDialog = await Fragment.load({
+                name: 'kms.resources.fragments.systems.SwitchSystemKeyConfig',
+                controller: this
+            }) as Dialog;
+            this.switchKeyConfigDialog.addStyleClass('sapUiSizeCompact');
+            this.switchKeyConfigDialog.setModel(component.getModel('i18n'), 'i18n');
+            this.switchKeyConfigModel.setData(selectedSystem);
+            this.switchKeyConfigDialog.setModel(this.switchKeyConfigModel, 'switchKeyConfigModel');
+            this.switchKeyConfigModel.setProperty('/KeyConfigList', filteredKeyConfigs);
+            this.switchKeyConfigModel.setProperty('/connectedKeyConfig', connectedKeyConfig);
+            this.switchKeyConfigDialog.open();
+            this.getView().setBusy(false);
+        } else {
+            this.switchKeyConfigDialog.open();
+            this.getView().setBusy(false);
+        }
+    }
+    public onSwitchKeyConfigCancelPress(): void {
+        this.switchKeyConfigDialog?.close();
+        this.switchKeyConfigDialog?.destroy();
+        this.switchKeyConfigDialog = undefined;
+    }
+    public async onSwitchKeyConfigSubmitPress(): Promise<void> {
+        const systemId: string = this.switchKeyConfigModel.getProperty('/id') as string;
+        const keyConfigId: string = this.switchKeyConfigModel.getProperty('/selectedKeyConfig') as string;
+        try {
+            await this.api.patch(`systems/${systemId}/link`, { keyConfigurationID: keyConfigId })
+            MessageToast.show(this.getText('keyConfigConnectSystemSuccessfully'));
+            this.onSwitchKeyConfigCancelPress();
+        } catch (error) {
+            MessageBox.error(this.getText('keyConfigConnectSystemError'));
+            console.error('Error creating key', error);
+        } finally {
+            await this.getKeyConfigData();
+            this.getView().setBusy(false);
+        }
     }
     public async onCopyToClipboardPress(event: Button$PressEvent): Promise<void> {
         await copyToClipboard(event);

@@ -6,11 +6,11 @@ import { System } from "kms/common/Types";
 import { KeyConfig } from 'kms/common/Types';
 import MessageBox from "sap/m/MessageBox";
 import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
-import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import { Button$PressEvent } from 'sap/m/Button';
 import Dialog from 'sap/m/Dialog';
 import Fragment from 'sap/ui/core/Fragment';
 import MessageToast from 'sap/m/MessageToast';
+import EventBus from "sap/ui/core/EventBus";
 
 interface SystemsResponse {
     value: Systems[];
@@ -19,6 +19,7 @@ interface SystemsResponse {
 
 interface KeyConfigsResponse {
     value: KeyConfig[];
+    count: number;
 }
 export default class Systems extends BaseController {
     private readonly api: Api = new Api();
@@ -29,21 +30,27 @@ export default class Systems extends BaseController {
         systems: [] as System[],
         systemsCount: 0 as number
     });
+    private eventBus = EventBus.getInstance();
 
     public onInit(): void {
         super.onInit();
-        this.getRouter().getRoute('systems').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
+        this.getRouter().getRoute('systems').attachPatternMatched({}, () => this.onRouteMatched(), this);
+        this.eventBus.subscribe('systems', 'loadSystems', (channelId, eventId) => this.onSystemRouteEventTriggered(channelId, eventId), this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.setModel(this.oneWayModel, 'oneWay');
     };
-    public onRouteMatched(event: Route$PatternMatchedEvent): void {
-        const routeName = event.getParameter('name');
-        this.oneWayModel.setProperty('/keyConfigDetail', routeName === 'keyConfigDetail');
+    public onRouteMatched(): void {
         this.getSystems().catch((error) => {
             console.error(error);
         });
     };
-
+    public onSystemRouteEventTriggered(channelId: string, eventId: string): void {
+        if (channelId === 'systems' && eventId === 'loadSystems') {
+            this.getSystems().catch((error) => {
+                console.error(error);
+            });
+        }
+    }
     private async getSystems(): Promise<void> {
         this.getView().setBusy(true);
         try {
@@ -64,9 +71,9 @@ export default class Systems extends BaseController {
     public onSystemPress(event: ListItemBase$PressEvent): void {
         const path = event.getSource().getBindingContext('oneWay').getPath();
         const selectedSystem = this.oneWayModel.getProperty(path) as System;
-        const systemName = selectedSystem.name;
+        const systemId = selectedSystem.id;
         this.getRouter().navTo('systemsDetail', {
-            systemID: systemName
+            systemID: systemId
         });
     };
 
@@ -122,7 +129,7 @@ export default class Systems extends BaseController {
             });
         } catch (error) {
             MessageBox.error(this.getText('keyConfigConnectSystemError'));
-            console.error('Error creating key', error);
+            console.error(error);
         } finally {
             this.getView().setBusy(false);
         }

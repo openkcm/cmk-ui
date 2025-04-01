@@ -37,7 +37,7 @@ export default class App extends BaseController {
                 break;
             case 'keyConfigs':
             case 'keyConfigDetail':
-            case 'keyConfigKeyDetail':
+            case 'keyConfigDetailPanel':
                 this.oneWayModel.setProperty('/selectedKey', 'keyConfigs');
                 break;
             case 'systems':

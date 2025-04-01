@@ -21,7 +21,7 @@ interface KeyVersionResponse {
     count: number | undefined;
 }
 
-export default class KeyDetail extends BaseController {
+export default class DetailPanel extends BaseController {
     public formatter: typeof Formatter = Formatter;
     private readonly api: Api = new Api();
     private readonly oneWayModel = new JSONModel({
@@ -34,38 +34,47 @@ export default class KeyDetail extends BaseController {
         selectedKey: {} as Key
     });
 
-    private keyId: string;
+    private id: string;
+    private idType: string;
     private keyConfigId: string;
     private eventBus = EventBus.getInstance();
 
     public onInit(): void {
         super.onInit();
-        this.getRouter().getRoute('keyConfigKeyDetail').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onKeyDetailRouteMatched(event), this);
+        this.getRouter().getRoute('keyConfigDetailPanel').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onKeyConfigDetailPanelRouteMatched(event), this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.twoWayModel.setDefaultBindingMode(BindingMode.TwoWay);
         this.setModel(this.oneWayModel, 'oneWay');
         this.setModel(this.twoWayModel, 'twoWay');
     };
-    public onKeyDetailRouteMatched(event: Route$PatternMatchedEvent): void {
+    public onKeyConfigDetailPanelRouteMatched(event: Route$PatternMatchedEvent): void {
         this.getView().setBusy(true);
-        const routeArgs = event.getParameter('arguments') as { keyConfigId?: string, keyId?: string };
-        this.keyId = routeArgs.keyId;
+        const routeArgs = event.getParameter('arguments') as { keyConfigId?: string, type?: string, id?: string };
+        this.idType = routeArgs.type
+        this.id = routeArgs.id;
         this.keyConfigId = routeArgs.keyConfigId;
-
-        if (!isUUIDValid(this.keyId)) {
+        this.oneWayModel.setProperty('/type', this.idType);
+        this.oneWayModel.setProperty('/keyConfigDetail', true);
+        if (!isUUIDValid(this.id)) {
             console.error('Key config id or key id invalid');
             this.getRouter().navTo('keyConfigs');
             return;
         }
-        this.eventBus.publish('keys', 'loadKeyConfigDetails', { keyConfigId: this.keyConfigId });
-        this.getKeyDetails().catch((error) => {
-            console.error(error);
-        });
+        this.eventBus.publish('keyConfig', 'loadKeyConfigDetails', { keyConfigId: this.keyConfigId });
+        if (this.idType === this.Enums.KeyConfigDetailPanelTypes.KEY) {
+            this.getKeyDetails().catch((error) => {
+                console.error(error);
+            });
+        } else {
+            this.getSystemDetails().catch((error) => {
+                console.error(error);
+            });
+        }
     };
     private async getKeyDetails(): Promise<void> {
         try {
-            const selectedKey = await this.api.get<Key>(`keys/${this.keyId}`);
-            const keyVersions = await this.api.get<KeyVersionResponse>(`keys/${this.keyId}/versions`);
+            const selectedKey = await this.api.get<Key>(`keys/${this.id}`);
+            const keyVersions = await this.api.get<KeyVersionResponse>(`keys/${this.id}/versions`);
             if (selectedKey) {
                 this.oneWayModel.setProperty('/selectedKey', selectedKey);
                 this.twoWayModel.setProperty('/selectedKey', selectedKey);
@@ -84,6 +93,22 @@ export default class KeyDetail extends BaseController {
             this.getView().setBusy(false);
         }
     };
+    private async getSystemDetails(): Promise<void> {
+        try {
+            const selectedSystem = await this.api.get(`systems/${this.id}`);
+            if (selectedSystem) {
+                this.oneWayModel.setProperty('/selectedSystem', selectedSystem);
+            } else {
+                console.error('System not found');
+                this.getRouter().navTo('systems');
+            }
+        } catch (error) {
+            console.error('Error fetching system details', error);
+            MessageBox.error(this.getText('errorFetchingSystemDetails'));
+        } finally {
+            this.getView().setBusy(false);
+        }
+    };
     public onEditDetailsPress(): void {
         this.oneWayModel.setProperty('/edit', true);
     }
@@ -93,7 +118,7 @@ export default class KeyDetail extends BaseController {
     public async onRotateNowPress(): Promise<void> {
         this.getView().setBusy(true);
         try {
-            await this.api.post(`keys/${this.keyId}/versions`, {});
+            await this.api.post(`keys/${this.id}/versions`, {});
             MessageToast.show(this.getText('keyRotatedSuccessfully'));
             this.getKeyDetails().catch((error) => {
                 console.error(error);
@@ -114,7 +139,7 @@ export default class KeyDetail extends BaseController {
             enabled: key.enabled
         } as KeyPatchPayload;
         try {
-            await this.api.patch<KeyPatchPayload, Key>(`keys/${this.keyId}`, payload);
+            await this.api.patch<KeyPatchPayload, Key>(`keys/${this.id}`, payload);
             this.oneWayModel.setProperty('/edit', false);
             this.getKeyDetails().catch((error) => {
                 console.error(error);
@@ -129,9 +154,17 @@ export default class KeyDetail extends BaseController {
     public async onCopyToClipboardPress(event: Button$PressEvent): Promise<void> {
         await copyToClipboard(event);
     }
-    public onKeyDetailsClosePress(): void {
+    public onDetailsClosePress(): void {
         this.getRouter().navTo('keyConfigDetail', {
             keyConfigId: this.keyConfigId
         });
+    }
+    public async onDetailsRefresh(): Promise<void> {
+        this.getView().setBusy(true);
+        if (this.idType === 'key') {
+            await this.getKeyDetails();
+        } else {
+            await this.getSystemDetails();
+        }
     }
 }

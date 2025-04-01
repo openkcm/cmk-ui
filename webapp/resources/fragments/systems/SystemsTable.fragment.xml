@@ -12,7 +12,8 @@
                     text="{parts: ['i18n>systemsCount', 'oneWay>/systemsCount'], formatter: 'formatMessage'}"
                     level="H2" />
                 <ToolbarSpacer />
-                <Button text="{i18n>connect}" icon="sap-icon://add" type="Ghost" press="onConnectSystemPress" visible="{= !!${oneWay>/keyConfigDetail}}"></Button>
+                <Button text="{i18n>connect}" icon="sap-icon://add" type="Ghost"
+                    press="onConnectSystemPress" visible="{= !!${oneWay>/keyConfigDetail}}"></Button>
                 <Button
                     icon="sap-icon://filter"
                     press="onKeysTableFilterPress"
@@ -29,33 +30,32 @@
                 <Text text="{i18n>name}" />
             </Column>
             <Column minScreenWidth="Tablet" demandPopin="true">
-                <Text text="{i18n>sid}" />
+                <Text text="{i18n>identifier}" />
             </Column>
             <Column minScreenWidth="Tablet" demandPopin="true">
                 <Text text="{i18n>systemsRole}" />
             </Column>
-            <Column minScreenWidth="Tablet" demandPopin="true" visible="{= !${oneWay>/keyConfigDetail}}">
-                <Text text="{i18n>applicationRole}" />
-            </Column>
-            <Column minScreenWidth="Tablet" demandPopin="true" visible="{= !${oneWay>/keyConfigDetail}}">
+            <Column minScreenWidth="Tablet" demandPopin="true"
+                visible="{= !${oneWay>/keyConfigDetail}}">
                 <Text text="{i18n>keyConfiguration}" />
             </Column>
-            <Column minScreenWidth="Tablet" demandPopin="true" visible="{= !!${oneWay>/keyConfigDetail}}">
+            <Column minScreenWidth="Tablet" demandPopin="true"
+                visible="{= !!${oneWay>/keyConfigDetail}}">
                 <Text text="{i18n>state}" />
             </Column>
-            <Column minScreenWidth="Tablet" demandPopin="true" visible="{= !!${oneWay>/keyConfigDetail}}"                 hAlign="End"
+            <Column minScreenWidth="Tablet" demandPopin="true"
+                visible="{= !!${oneWay>/keyConfigDetail}}" hAlign="End"
                 vAlign="Middle">
-                <Text text="{i18n>actions}"/>
+                <Text text="{i18n>actions}" />
             </Column>
         </columns>
 
         <items>
-            <ColumnListItem vAlign="Middle" type="Inactive">
+            <ColumnListItem vAlign="Middle" type="Navigation" press="onSystemPress">
                 <cells>
                     <ObjectIdentifier title="{oneWay>name}" text="{oneWay>region}" />
-                    <Text text="{oneWay>sid}" />
+                    <Text text="{oneWay>id}" />
                     <Text text="{oneWay>systemRole}" />
-                    <Text text="{= ${oneWay>applicationRole} ? ${oneWay>applicationRole} : 'N/A' }" />
                     <VBox visible="{= !${oneWay>/keyConfigDetail}}">
                         <ObjectStatus
                             icon="sap-icon://sys-enter-2"
@@ -80,13 +80,15 @@
                             text="{i18n>disconnected}"
                             colorScheme="2" />
                     </VBox>
-                    <VBox alignContent="Center" visible="{= ${oneWay>status} === 'CONNECTED'}"
+                    <VBox alignContent="Center"
                         justifyContent="Start">
                         <MenuButton icon="sap-icon://action-settings" type="Transparent">
                             <menu>
                                 <Menu class="sapUiSizeCompact">
-                                    <MenuItem text="{i18n>switchKeyConfiguration}"/>
-                                    <MenuItem press="onSystemsTableDisconnectPress"
+                                    <MenuItem text="{i18n>switchKeyConfiguration}"
+                                        press="onSwitchKeyConfigPress" />
+                                    <MenuItem
+                                        press="onSystemsTableDisconnectPress"
                                         text="{i18n>disconnect}" />
                                 </Menu>
                             </menu>

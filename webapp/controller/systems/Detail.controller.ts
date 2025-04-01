@@ -2,18 +2,28 @@ import BaseController from "kms/controller/BaseController";
 import BindingMode from "sap/ui/model/BindingMode";
 import JSONModel from "sap/ui/model/json/JSONModel";
 import Api from "kms/services/Api.service";
-import { System } from "kms/common/Types";
+import { System, KeyConfig } from "kms/common/Types";
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
-
+import { Button$PressEvent } from "sap/m/Button";
+import MessageBox from "sap/m/MessageBox";
+import { copyToClipboard } from "kms/common/Helpers";
+import EventBus from "sap/ui/core/EventBus";
+import MessageToast from "sap/m/MessageToast";
+import Dialog from "sap/m/Dialog";
+import Fragment from "sap/ui/core/Fragment";
+interface KeyConfigsResponse {
+    value: KeyConfig[];
+    count: number;
+}
 export default class Systems extends BaseController {
     private readonly api: Api = new Api();
-
     private readonly oneWayModel = new JSONModel({
-        systems: [] as System[],
-        name: '' as string
+        selectedSystem: {} as System
     });
-    private name: string;
-
+    private id: string;
+    private eventBus = EventBus.getInstance();
+    private switchKeyConfigDialog: Dialog | undefined;
+    private readonly switchKeyConfigModel = new JSONModel({});
 
     public onInit(): void {
         super.onInit();
@@ -24,12 +34,102 @@ export default class Systems extends BaseController {
 
     public onRouteMatched(event: Route$PatternMatchedEvent): void {
         const routeArgs = event.getParameter('arguments') as { systemID?: string };
-        this.name = routeArgs.systemID;
+        this.id = routeArgs.systemID;
+        this.eventBus.publish('systems', 'loadSystems');
+        this.getSystemDetails().catch((error) => {
+            console.error(error);
+        });
+    }
+    private async getSystemDetails(): Promise<void> {
+        try {
+            const selectedSystem = await this.api.get(`systems/${this.id}`);
+            if (selectedSystem) {
+                this.oneWayModel.setProperty('/selectedSystem', selectedSystem);
+            } else {
+                console.error('System not found');
+                this.getRouter().navTo('systems');
+            }
+        } catch (error) {
+            console.error('Error fetching system details', error);
+            MessageBox.error(this.getText('errorFetchingSystemDetails'));
+        } finally {
+            this.getView().setBusy(false);
+        }
+    };
+    public onSystemDisconnectPress(): void {
+        MessageBox.confirm(this.getText('confirmDisconnectSystem'), {
+            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            onClose: async (action: unknown) => {
+                if (action === MessageBox.Action.YES) {
+                    await this.disconnectSystem(this.id);
+                }
+            }
+        });
+    }
+    private async disconnectSystem(systemsID: string): Promise<void> {
+        this.getView().setBusy(true);
+        try {
+            await this.api.delete(`systems/${systemsID}/link`);
+            MessageToast.show(this.getText('systemDisconnectedSuccessfully'));
+            await this.getSystemDetails();
+            this.eventBus.publish('systems', 'loadSystems');
+        } catch (error) {
+            console.error(error);
+            MessageBox.error(this.getText('errorDisconnectingSystem'));
+        } finally {
+            this.getView().setBusy(false);
+        }
+    }
+    public async onSwitchKeyConfigPress(): Promise<void> {
+        const selectedSystem = this.oneWayModel.getProperty('/selectedSystem') as System;
+        const component = this.getOwnerComponent();
+        const keyConfigs = await this.api.get<KeyConfigsResponse>('keyConfigurations', {});
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+        const connectedKeyConfig = selectedSystem.keyConfigurationID && await this.api.get(`keyConfigurations/${selectedSystem.keyConfigurationID}`) as KeyConfig;
+        const filteredKeyConfigs = keyConfigs.value.filter((keyConfig: KeyConfig) => keyConfig.id !== connectedKeyConfig?.id);
 
-        this.oneWayModel.setProperty('/name', this.name);
+        if (!this.switchKeyConfigDialog) {
+            this.switchKeyConfigDialog = await Fragment.load({
+                name: 'kms.resources.fragments.systems.SwitchSystemKeyConfig',
+                controller: this
+            }) as Dialog;
+            this.switchKeyConfigDialog.addStyleClass('sapUiSizeCompact');
+            this.switchKeyConfigDialog.setModel(component.getModel('i18n'), 'i18n');
+            this.switchKeyConfigModel.setData(selectedSystem);
+            this.switchKeyConfigDialog.setModel(this.switchKeyConfigModel, 'switchKeyConfigModel');
+            this.switchKeyConfigModel.setProperty('/KeyConfigList', filteredKeyConfigs);
+            this.switchKeyConfigModel.setProperty('/connectedKeyConfig', connectedKeyConfig);
+            this.switchKeyConfigDialog.open();
+        } else {
+            this.switchKeyConfigDialog.open();
+        }
+    }
+    public onSwitchKeyConfigCancelPress(): void {
+        this.switchKeyConfigDialog?.close();
+        this.switchKeyConfigDialog?.destroy();
+        this.switchKeyConfigDialog = undefined;
     }
 
+    public async onSwitchKeyConfigSubmitPress(): Promise<void> {
+        const systemId: string = this.switchKeyConfigModel.getProperty('/id') as string;
+        const keyConfigId: string = this.switchKeyConfigModel.getProperty('/selectedKeyConfig') as string;
+        try {
+            await this.api.patch(`systems/${systemId}/link`, { keyConfigurationID: keyConfigId })
+            MessageToast.show(this.getText('keyConfigConnectSystemSuccessfully'));
+            this.onSwitchKeyConfigCancelPress();
+            await this.getSystemDetails();
+            this.eventBus.publish('systems', 'loadSystems');
+        } catch (error) {
+            MessageBox.error(this.getText('keyConfigConnectSystemError'));
+            console.error('Error creating key', error);
+        } finally {
+            this.getView().setBusy(false);
+        }
+    }
     public onCancel(): void {
         this.getRouter().navTo('systems');
+    }
+    public async onCopyToClipboardPress(event: Button$PressEvent): Promise<void> {
+        await copyToClipboard(event);
     }
 }

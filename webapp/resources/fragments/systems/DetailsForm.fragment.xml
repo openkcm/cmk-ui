@@ -1,0 +1,11 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout"
+    xmlns:forms="sap.ui.layout.form">
+    <OverflowToolbar>
+        <Title text="{i18n>instances}" />
+    </OverflowToolbar>
+    <List items="{oneWay>/selectedSystem/instances}">
+        <StandardListItem title="&#8226; {oneWay>}" />
+    </List>
+</core:FragmentDefinition>

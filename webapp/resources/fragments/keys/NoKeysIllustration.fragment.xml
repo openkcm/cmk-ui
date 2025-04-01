@@ -20,7 +20,9 @@
                     <menu>
                         <Menu class="sapUiSizeCompact">
                             <MenuItem text="{i18n>sapManaged}"
-                                press="handleCreateKeyRoute" />
+                                press=".handleCreateKeyRoute('SYSTEM_MANAGED')" />
+                            <MenuItem text="{i18n>hyok}"
+                                press=".handleCreateKeyRoute('HYOK')" />
                         </Menu>
                     </menu>
                 </MenuButton>

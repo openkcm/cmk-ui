@@ -68,20 +68,6 @@
                                     </MultiComboBox>
                                 </fb:control>
                             </fb:FilterGroupItem>
-                            <fb:FilterGroupItem name="Application Role"
-                                label="{i18n>applicationRole}"
-                                groupName="Group1" visibleInFilterBar="true">
-                                <fb:control>
-                                    <MultiComboBox
-                                        placeholder="{i18n>all}"
-                                        name="{i18n>applicationRole}"
-                                        selectionChange=".onSelectionChange"
-                                        items="{oneWay>/systems}">
-                                        <core:Item key="{oneWay>applicationRole}"
-                                            text="{oneWay>applicationRole}" />
-                                    </MultiComboBox>
-                                </fb:control>
-                            </fb:FilterGroupItem>
                             <fb:FilterGroupItem name="Key Configuration"
                                 label="{i18n>keyConfiguration}"
                                 groupName="Group1" visibleInFilterBar="true">
