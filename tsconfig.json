@@ -9,10 +9,11 @@
 		"noImplicitAny": true,
 		"strictNullChecks": false,
 		"strictPropertyInitialization": false,
-		"rootDir": "./webapp",
+		"rootDir": "./",
 		"types": [
 			"@openui5/types",
-			"@types/qunit"
+			"@types/qunit",
+			"node"
 		],
 		"paths": {
 			"kms/*": [
@@ -28,6 +29,7 @@
 		"./webapp/coverage/**/*"
 	],
 	"include": [
-		"./webapp/**/*"
+		"./webapp/**/*",
+		"tests/**/*.ts"
 	]
 }

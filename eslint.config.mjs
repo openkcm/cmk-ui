@@ -20,6 +20,6 @@ export default tseslint.config(
         }
     },
     {
-        ignores: ["eslint.config.mjs", "webapp/test/**", "mockServer/**/*", "mock.mjs"]
+        ignores: ["eslint.config.mjs", "playwright.config.ts", "environment.d.ts", "mockServer/**/*", "mock.mjs"]
     }
 );
