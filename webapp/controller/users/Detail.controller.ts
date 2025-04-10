@@ -7,7 +7,7 @@ import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import MessageBox from "sap/m/MessageBox";
 
 export default class UsersDetail extends BaseController {
-    private readonly api: Api = new Api();
+    private api: Api;
     private userCount: string;
 
     private readonly oneWayModel = new JSONModel({
@@ -23,7 +23,8 @@ export default class UsersDetail extends BaseController {
     }
 
     public onRouteMatched(event: Route$PatternMatchedEvent): void {
-        const routeArgs = event.getParameter('arguments') as { userID?: string};
+        const routeArgs = event.getParameter('arguments') as { tenantId: string, userID?: string };
+        this.tenantId = routeArgs?.tenantId;
         this.userCount = routeArgs.userID;
         this.oneWayModel.setProperty('/userCount', this.userCount);
         this.setUser().catch((error) => {
@@ -37,7 +38,7 @@ export default class UsersDetail extends BaseController {
             const user = await this.api.get<User[]>(`user/${this.userCount}`)
             this.oneWayModel.setProperty('/user', user);
             this.oneWayModel.setProperty('/groupName', user[0].groupName);
-        } catch(error) {
+        } catch (error) {
             console.error(error);
             MessageBox.error(this.getText('errorFetchingUser'));
         } finally {
@@ -46,6 +47,8 @@ export default class UsersDetail extends BaseController {
     };
 
     public onCancel(): void {
-        this.getRouter().navTo('users');
+        this.getRouter().navTo('users', {
+            tenantId: this.tenantId
+        });
     }
 }

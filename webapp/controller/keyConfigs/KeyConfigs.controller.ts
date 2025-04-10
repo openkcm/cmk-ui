@@ -10,12 +10,13 @@ import Fragment from 'sap/ui/core/Fragment';
 import ViewSettingsDialog from 'sap/m/ViewSettingsDialog';
 import Dialog from 'sap/m/Dialog';
 import MessageToast from 'sap/m/MessageToast';
+import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 interface KeyConfigsResponse {
     value: KeyConfig[];
     count: number;
 }
 export default class Keys extends BaseController {
-    private readonly api: Api = new Api();
+    private api: Api;
     private readonly oneWayModel = new JSONModel({
         configs: [] as KeyConfig[],
         configsCount: 0 as number
@@ -31,14 +32,17 @@ export default class Keys extends BaseController {
 
     public onInit(): void {
         super.onInit();
-        this.getRouter().getRoute('keyConfigs').attachPatternMatched({}, () => this.onRouteMatched(), this);
+        this.getRouter().getRoute('keyConfigs').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.viewSettingModel.setDefaultBindingMode(BindingMode.TwoWay);
         this.setModel(this.oneWayModel, 'oneWay');
         this.setModel(this.viewSettingModel, 'viewSettingModel');
     };
 
-    public onRouteMatched(): void {
+    public onRouteMatched(event: Route$PatternMatchedEvent): void {
+        const routeArgs = event.getParameter('arguments') as { tenantId: string };
+        this.api = new Api(routeArgs?.tenantId);
+        this.tenantId = routeArgs?.tenantId;
         this.setKeyConfigs().catch((error) => {
             console.error(error);
         });
@@ -64,6 +68,7 @@ export default class Keys extends BaseController {
         const selectedConfig = this.oneWayModel.getProperty(path) as KeyConfig;
         const keyConfigId: string = selectedConfig.id;
         this.getRouter().navTo('keyConfigDetail', {
+            tenantId: this.tenantId,
             keyConfigId: keyConfigId
         });
     };
@@ -98,6 +103,7 @@ export default class Keys extends BaseController {
         const keyConfigId: string = selectedConfig.id;
         this.getRouter().navTo('keyConfigDetail', {
             query: { createKey: true, keyType: keyType },
+            tenantId: this.tenantId,
             keyConfigId: keyConfigId
         });
     }
@@ -150,6 +156,7 @@ export default class Keys extends BaseController {
             this.configCreatePopover = undefined;
             this.resetCreateConfigModel();
             this.getRouter().navTo('keyConfigDetail', {
+                tenantId: this.tenantId,
                 keyConfigId: keyConfig?.id
             });
             MessageToast.show(this.getText('keyConfigCreated'));

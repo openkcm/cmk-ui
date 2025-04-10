@@ -23,7 +23,7 @@ interface KeyVersionResponse {
 
 export default class DetailPanel extends BaseController {
     public formatter: typeof Formatter = Formatter;
-    private readonly api: Api = new Api();
+    private api: Api;
     private readonly oneWayModel = new JSONModel({
         edit: false as boolean,
         selectedKey: {} as Key,
@@ -49,15 +49,20 @@ export default class DetailPanel extends BaseController {
     };
     public onKeyConfigDetailPanelRouteMatched(event: Route$PatternMatchedEvent): void {
         this.getView().setBusy(true);
-        const routeArgs = event.getParameter('arguments') as { keyConfigId?: string, type?: string, id?: string };
+        const routeArgs = event.getParameter('arguments') as { tenantId: string, keyConfigId?: string, type?: string, id?: string };
         this.idType = routeArgs.type
         this.id = routeArgs.id;
         this.keyConfigId = routeArgs.keyConfigId;
+        this.api = new Api(routeArgs?.tenantId);
+        this.tenantId = routeArgs?.tenantId;
         this.oneWayModel.setProperty('/type', this.idType);
         this.oneWayModel.setProperty('/keyConfigDetail', true);
         if (!isUUIDValid(this.id)) {
             console.error('Key config id or key id invalid');
-            this.getRouter().navTo('keyConfigs');
+            this.getRouter().navTo('keyConfigs', {
+                tenantId: this.tenantId
+            }
+            );
             return;
         }
         this.eventBus.publish('keyConfig', 'loadKeyConfigDetails', { keyConfigId: this.keyConfigId });
@@ -83,6 +88,7 @@ export default class DetailPanel extends BaseController {
             } else {
                 console.error('Key not found');
                 this.getRouter().navTo('keyConfigDetail', {
+                    tenantId: this.tenantId,
                     keyConfigId: this.keyConfigId
                 });
             }
@@ -100,7 +106,9 @@ export default class DetailPanel extends BaseController {
                 this.oneWayModel.setProperty('/selectedSystem', selectedSystem);
             } else {
                 console.error('System not found');
-                this.getRouter().navTo('systems');
+                this.getRouter().navTo('systems', {
+                    tenantId: this.tenantId
+                });
             }
         } catch (error) {
             console.error('Error fetching system details', error);
@@ -156,6 +164,7 @@ export default class DetailPanel extends BaseController {
     }
     public onDetailsClosePress(): void {
         this.getRouter().navTo('keyConfigDetail', {
+            tenantId: this.tenantId,
             keyConfigId: this.keyConfigId
         });
     }

@@ -71,24 +71,24 @@
             },
             "routes": [
                 {
-                    "pattern": "home",
+                    "pattern": "tenant/{tenantId}/home",
                     "name": "home",
                     "target": "home"
                 },
                 {
-                    "pattern": "keyConfigs",
+                    "pattern": "tenant/{tenantId}/keyConfigs}",
                     "name": "keyConfigs",
                     "target": "keyConfigs"
                 },
                 {
-                    "pattern": "keyConfigs/{keyConfigId}:?query:",
+                    "pattern": "tenant/{tenantId}/keyConfigs/{keyConfigId}:?query:",
                     "name": "keyConfigDetail",
                     "target": [
                         "keyConfigDetail"
                     ]
                 },
                 {
-                    "pattern": "keyConfigs/{keyConfigId}/{type}/{id}:?query:",
+                    "pattern": "tenant/{tenantId}/keyConfigs/{keyConfigId}/{type}/{id}:?query:",
                     "name": "keyConfigDetailPanel",
                     "target": [
                         "keyConfigDetail",
@@ -96,22 +96,22 @@
                     ]
                 },
                 {
-                    "pattern": "systems",
+                    "pattern": "tenant/{tenantId}/systems",
                     "name": "systems",
                     "target": "systems"
                 },
                 {
-                    "pattern": "tasks",
+                    "pattern": "tenant/{tenantId}/tasks",
                     "name": "tasks",
                     "target": "tasks"
                 },
                 {
-                    "pattern": "users",
+                    "pattern": "tenant/{tenantId}/users",
                     "name": "users",
                     "target": "users"
                 },
                 {
-                    "pattern": "users/{userID}",
+                    "pattern": "tenant/{tenantId}/users",
                     "name": "usersDetail",
                     "target": [
                         "users",
@@ -119,19 +119,19 @@
                     ]
                 },
                 {
-                    "pattern": "settings",
+                    "pattern": "tenant/{tenantId}/settings",
                     "name": "settings",
                     "target": "settings"
                 },
                 {
-                    "pattern": "systems",
+                    "pattern": "tenant/{tenantId}/systems",
                     "name": "systems",
                     "target": [
                         "systems"
                     ]
                 },
                 {
-                    "pattern": "systems/{systemID}",
+                    "pattern": "tenant/{tenantId}/systems",
                     "name": "systemsDetail",
                     "target": [
                         "systems",

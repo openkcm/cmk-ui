@@ -49,7 +49,7 @@ interface KeyConfigsResponse {
     count: number;
 }
 export default class KeyConfigDetail extends BaseController {
-    private readonly api: Api = new Api();
+    private api: Api;
     private filterPopover: ViewSettingsDialog | undefined;
     private readonly oneWayModel = new JSONModel({
         keyConfig: {} as KeyConfig,
@@ -109,15 +109,21 @@ export default class KeyConfigDetail extends BaseController {
     }
     public onRouteMatched(event: Route$PatternMatchedEvent): void {
         this.getView().setBusy(true);
+
         const routeName = event.getParameter('name');
         this.oneWayModel.setProperty('/keyConfigDetail', routeName === 'keyConfigDetail');
-        const routeArgs = event.getParameter('arguments') as { keyConfigId?: string, '?query': { createKey?: string } };
+        const routeArgs = event.getParameter('arguments') as { tenantId: string, keyConfigId?: string, '?query': { createKey?: string } };
         const queryParams = routeArgs['?query'] as { createKey?: string, keyType?: string };
         this.keyConfigId = routeArgs.keyConfigId;
 
+        this.api = new Api(routeArgs?.tenantId);
+        this.tenantId = routeArgs?.tenantId;
+
         if (!isUUIDValid(this.keyConfigId)) {
             console.error('Key config id invalid');
-            this.getRouter().navTo('keyConfigs');
+            this.getRouter().navTo('keyConfigs', {
+                tenantId: this.tenantId
+            });
             return;
         }
         this.getKeyConfigData().catch((error) => {
@@ -530,6 +536,7 @@ export default class KeyConfigDetail extends BaseController {
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
         const keyId: string = selectedKey.id;
         this.getRouter().navTo('keyConfigDetailPanel', {
+            tenantId: this.tenantId,
             keyConfigId: this.keyConfigId,
             id: keyId,
             type: this.Enums.KeyConfigDetailPanelTypes.KEY
@@ -604,6 +611,7 @@ export default class KeyConfigDetail extends BaseController {
         const selectedSystem = this.oneWayModel.getProperty(path) as System;
         const systemId = selectedSystem.id;
         this.getRouter().navTo('keyConfigDetailPanel', {
+            tenantId: this.tenantId,
             keyConfigId: this.keyConfigId,
             id: systemId,
             type: this.Enums.KeyConfigDetailPanelTypes.SYSTEM
@@ -661,6 +669,7 @@ export default class KeyConfigDetail extends BaseController {
             await this.api.delete(`keys/${keyId}`);
             MessageToast.show(this.getText('keyDeletedSuccessfully'));
             this.getRouter().navTo('keyConfigDetail', {
+                tenantId: this.tenantId,
                 keyConfigId: this.keyConfigId
             });
             await this.getKeyConfigData();
@@ -697,7 +706,9 @@ export default class KeyConfigDetail extends BaseController {
                     try {
                         await this.api.delete(`keyConfigurations/${this.keyConfigId}`);
                         MessageToast.show(this.getText('keyConfigDeletedSuccessfully'));
-                        this.getRouter().navTo('keyConfigs');
+                        this.getRouter().navTo('keyConfigs', {
+                            tenantId: this.tenantId
+                        });
                     } catch (error) {
                         console.error(error);
                         MessageBox.error(this.getText('errorDeletingKeyConfig'));

@@ -6,13 +6,18 @@ import Model from "sap/ui/model/Model";
 import Router from "sap/ui/core/routing/Router";
 import ResourceModel from "sap/ui/model/resource/ResourceModel";
 import ResourceBundle from "sap/base/i18n/ResourceBundle";
+import { Link$PressEvent } from "sap/m/Link";
 export default class BaseController extends Controller {
     public Enums: typeof Enums;
     public Constants: typeof Constants;
+    public test: string;
+    public tenantId: string;
 
     public onInit(): void {
         this.Enums = Enums;
         this.Constants = Constants;
+        this.tenantId = undefined
+
     }
     public getRouter(): Router {
         return UIComponent.getRouterFor(this);
@@ -47,5 +52,8 @@ export default class BaseController extends Controller {
             }
         }
         return formattedText;
+    }
+    public onBreadCrumbLinkPress(event: Link$PressEvent, pageName: string, params?: object): void {
+        this.getRouter().navTo(pageName, { tenantId: this.tenantId, ...params });
     }
 }

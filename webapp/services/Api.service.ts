@@ -2,21 +2,22 @@ import axios, { AxiosInstance, AxiosError, AxiosResponse } from 'axios';
 export default class Api {
     private readonly axiosInstance: AxiosInstance;
     private readonly setAxiosHeaderContentType: (contentType: string) => void;
-    private readonly defaultContentType:string = 'application/json';
-    private readonly mergePatchContentType:string = 'application/merge-patch+json';
+    private readonly defaultContentType: string = 'application/json';
+    private readonly mergePatchContentType: string = 'application/merge-patch+json';
 
     // Configured using UI5 middleware, see webapp/ui5.yaml and /env
     private readonly baseURL: string = 'UI5_MIDDLEWARE_ENV_API_BASE_URL';
 
 
-    constructor() {
+    constructor(tenantId: string) {
         this.axiosInstance = axios.create({
             baseURL: this.baseURL,
             headers: {
                 'Content-Type': 'application/json',
+                'X-Tenant': tenantId
             },
         });
-        this.setAxiosHeaderContentType= (contentType) => {
+        this.setAxiosHeaderContentType = (contentType) => {
             this.axiosInstance.defaults.headers['Content-Type'] = contentType;
         };
 

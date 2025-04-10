@@ -5,24 +5,28 @@ import Api from 'kms/services/Api.service';
 import { Groups } from 'kms/common/Types';
 import MessageBox from 'sap/m/MessageBox';
 import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
+import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 interface GroupsResponse {
     value: Groups[];
     count: number;
 }
 export default class Users extends BaseController {
-    private readonly api: Api = new Api();
+    private api: Api;
     private readonly oneWayModel = new JSONModel({});
     private userCount: number = 0;
 
 
     public onInit(): void {
         super.onInit();
-        this.getRouter().getRoute('users').attachPatternMatched({}, () => this.onRouteMatched(), this);
+        this.getRouter().getRoute('users').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.setModel(this.oneWayModel, 'oneWay');
     };
 
-    public onRouteMatched(): void {
+    public onRouteMatched(event: Route$PatternMatchedEvent): void {
+        const routeArgs = event.getParameter('arguments') as { tenantId: string };
+        this.api = new Api(routeArgs?.tenantId);
+        this.tenantId = routeArgs?.tenantId;
         this.setGroups().catch((error) => {
             console.error(error);
         });
@@ -52,6 +56,7 @@ export default class Users extends BaseController {
         this.oneWayModel.setProperty('/userCount', this.userCount || 0);
 
         this.getRouter().navTo('usersDetail', {
+            tenantId: this.tenantId,
             userID: this.userCount
         });
     };

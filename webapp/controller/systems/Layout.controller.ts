@@ -5,7 +5,7 @@ import Api from "kms/services/Api.service";
 import { Router$RouteMatchedEvent } from 'sap/ui/core/routing/Router';
 
 export default class Systems extends BaseController {
-    private readonly api: Api = new Api();
+    private api: Api;
 
     private readonly oneWayModel = new JSONModel({});
 
@@ -19,6 +19,9 @@ export default class Systems extends BaseController {
 
     public onRouteMatched(event: Router$RouteMatchedEvent): void {
         const routeName = event.getParameter('name');
+        const routeArgs = event.getParameter('arguments') as { tenantId: string };
+        this.api = new Api(routeArgs?.tenantId);
+        this.tenantId = routeArgs?.tenantId;
         if (routeName && typeof routeName === 'string') {
             if (routeName === 'systems') {
                 this.oneWayModel.setProperty('/layout', 'OneColumn');

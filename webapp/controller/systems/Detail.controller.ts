@@ -16,7 +16,7 @@ interface KeyConfigsResponse {
     count: number;
 }
 export default class Systems extends BaseController {
-    private readonly api: Api = new Api();
+    private api: Api;
     private readonly oneWayModel = new JSONModel({
         selectedSystem: {} as System
     });
@@ -33,8 +33,10 @@ export default class Systems extends BaseController {
     }
 
     public onRouteMatched(event: Route$PatternMatchedEvent): void {
-        const routeArgs = event.getParameter('arguments') as { systemID?: string };
+        const routeArgs = event.getParameter('arguments') as { tenantId: string, systemID?: string };
         this.id = routeArgs.systemID;
+        this.api = new Api(routeArgs?.tenantId);
+        this.tenantId = routeArgs?.tenantId;
         this.eventBus.publish('systems', 'loadSystems');
         this.getSystemDetails().catch((error) => {
             console.error(error);
@@ -47,7 +49,9 @@ export default class Systems extends BaseController {
                 this.oneWayModel.setProperty('/selectedSystem', selectedSystem);
             } else {
                 console.error('System not found');
-                this.getRouter().navTo('systems');
+                this.getRouter().navTo('systems', {
+                    tenantId: this.tenantId
+                });
             }
         } catch (error) {
             console.error('Error fetching system details', error);
@@ -127,7 +131,9 @@ export default class Systems extends BaseController {
         }
     }
     public onCancel(): void {
-        this.getRouter().navTo('systems');
+        this.getRouter().navTo('systems', {
+            tenantId: this.tenantId
+        });
     }
     public async onCopyToClipboardPress(event: Button$PressEvent): Promise<void> {
         await copyToClipboard(event);

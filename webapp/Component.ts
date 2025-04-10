@@ -13,9 +13,6 @@ export default class Component extends UIComponent {
     public init(): void {
         super.init();
         this.getRouter().initialize();
-        if (window.location.hash === '') {
-            this.getRouter().navTo('home', {}, true);
-        }
         if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
             Theming.setTheme('sap_horizon_dark');
         }

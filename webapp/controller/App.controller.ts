@@ -6,26 +6,49 @@ import { NavigationList$ItemSelectEvent } from 'sap/tnt/NavigationList';
 import { Avatar$PressEvent } from 'sap/m/Avatar';
 import { Router$RouteMatchedEvent } from 'sap/ui/core/routing/Router';
 import ToolPage from 'sap/tnt/ToolPage';
+import { Menu$ItemSelectedEvent } from 'sap/m/Menu';
 
 export default class App extends BaseController {
     private userPopover: ResponsivePopover | undefined;
     private readonly oneWayModel = new JSONModel(
         {
-            selectedKey: ''
+            tenants: [
+                {
+                    id: 'tenant1',
+                },
+                {
+                    id: 'tenant2',
+                }]
+        }
+    );
+    private readonly twoWayModel = new JSONModel(
+        {
+            selectedKey: '',
+            selectedTenant: ''
         }
     );
     private toolPage: ToolPage | undefined;
 
     public onInit(): void {
         super.onInit();
+
         this.setModel(this.oneWayModel, 'oneWay');
-        this.oneWayModel.setProperty('/selectedKey', 'home');
+        this.setModel(this.twoWayModel, 'twoWay');
+        this.twoWayModel.setProperty('/selectedKey', 'home');
+        this.twoWayModel.setProperty('/selectedTenant', this.tenantId || 'tenant1');//temporary assignment, change this once the authorization is set.
+        if (window.location.hash === '') {
+            this.getRouter().navTo('home', {
+                tenantId: this.twoWayModel.getProperty('/selectedTenant') as string
+            });
+        }
         this.toolPage = this.byId('kmsApp') as ToolPage;
         this.getRouter().attachRouteMatched(this.onRouteChange.bind(this));
     }
 
     public onRouteChange(event: Router$RouteMatchedEvent): void {
         const routeName = event.getParameter('name');
+        const routeArgs = event.getParameter('arguments') as { tenantId: string };
+        this.twoWayModel.setProperty('/selectedTenant', routeArgs?.tenantId);
         if (routeName === 'home') {
             this.toolPage.setSideExpanded(true);
         } else {
@@ -33,30 +56,37 @@ export default class App extends BaseController {
         }
         switch (routeName) {
             case 'home':
-                this.oneWayModel.setProperty('/selectedKey', 'home');
+                this.twoWayModel.setProperty('/selectedKey', 'home');
+                this.getRouter().navTo('home', {
+                    tenantId: this.twoWayModel.getProperty('/selectedTenant') as string
+                });
                 break;
             case 'keyConfigs':
             case 'keyConfigDetail':
             case 'keyConfigDetailPanel':
-                this.oneWayModel.setProperty('/selectedKey', 'keyConfigs');
+                this.twoWayModel.setProperty('/selectedKey', 'keyConfigs');
                 break;
             case 'systems':
             case 'systemsDetail':
-                this.oneWayModel.setProperty('/selectedKey', 'systems');
+                this.twoWayModel.setProperty('/selectedKey', 'systems');
                 break;
             case 'tasks':
-                this.oneWayModel.setProperty('/selectedKey', 'tasks');
+                this.twoWayModel.setProperty('/selectedKey', 'tasks');
                 break;
             case 'users':
             case 'usersDetail':
-                this.oneWayModel.setProperty('/selectedKey', 'users');
+                this.twoWayModel.setProperty('/selectedKey', 'users');
                 break;
             case 'settings':
-                this.oneWayModel.setProperty('/selectedKey', 'settings');
+                this.twoWayModel.setProperty('/selectedKey', 'settings');
                 break;
             default:
-                this.oneWayModel.setProperty('/selectedKey', 'home');
+                this.twoWayModel.setProperty('/selectedKey', 'home');
         }
+    }
+
+    public onNavigationClick(): void {
+        this.navigateToSelectedPage()
     }
 
     public onSideNavButtonPress(): void {
@@ -82,7 +112,19 @@ export default class App extends BaseController {
         }
     }
     public onUserInfoListSelect(event: NavigationList$ItemSelectEvent): void {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const item = event.getParameter('item').getKey();
-        console.log(item);
+    }
+    public onTenantChanged(event: Menu$ItemSelectedEvent): void {
+        const selectedTenant = event.getParameter('item').getKey();
+        this.twoWayModel.setProperty('/selectedTenant', selectedTenant);
+        this.navigateToSelectedPage();
+    }
+    private navigateToSelectedPage(): void {
+        const selectedKey = this.twoWayModel.getProperty('/selectedKey') as string;
+        const selectedTenant = this.twoWayModel.getProperty('/selectedTenant') as string;
+        this.getRouter().navTo(selectedKey, {
+            tenantId: selectedTenant
+        });
     }
 }

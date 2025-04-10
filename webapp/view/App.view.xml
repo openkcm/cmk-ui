@@ -1,6 +1,7 @@
 <mvc:View height="100%"
     controllerName="kms.controller.App"
     xmlns="sap.m"
+    xmlns:core="sap.ui.core"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:tnt="sap.tnt">
     <tnt:ToolPage id="kmsApp" class="sapUiSizeCompact">
@@ -24,14 +25,11 @@
                 <ToolbarSpacer />
                 <ToolbarSpacer />
                 <tnt:InfoLabel id="il1" text="TEST" renderMode="Narrow" colorScheme="1" />
-                <MenuButton text="Tenant 123456" class="sapUiMediumMarginEnd">
+                <MenuButton text="{twoWay>/selectedTenant}" class="sapUiMediumMarginEnd">
                     <menu>
-                        <Menu class="sapUiSizeCompact">
-                            <MenuItem text="Tenant 235235" press="onPress" />
-                            <MenuItem text="Tenant 344477" press="onPress" />
-                            <MenuItem text="Tenant 473497" press="onPress" />
-                            <MenuItem icon="sap-icon://manager" text="Manage Tenants"
-                                press="onPress" />
+                        <Menu items="{oneWay>/tenants}" itemSelected="onTenantChanged"
+                            class="sapUiSizeCompact">
+                            <MenuItem key="{oneWay>id}" text="{oneWay>id}" />
                         </Menu>
                     </menu>
                 </MenuButton>
@@ -75,38 +73,35 @@
         </tnt:header>
         <tnt:sideContent>
             <tnt:SideNavigation
-                expanded="{= ${oneWay>/selectedKey} === 'home'}"
-                selectedKey="{oneWay>/selectedKey}">
+                expanded="{= ${twoWay>/selectedKey} === 'home'}"
+                selectedKey="{twoWay>/selectedKey}"
+                itemSelect="onNavigationClick">
+
                 <tnt:NavigationList>
                     <tnt:NavigationListItem
                         text="{i18n>sideContentHome}"
                         icon="sap-icon://home"
-                        key="home"
-                        href="#/home">
+                        key="home">
                     </tnt:NavigationListItem>
                     <tnt:NavigationListItem
                         text="{i18n>sideContentKeyConfiguration}"
                         icon="sap-icon://key"
-                        key="keyConfigs"
-                        href="#/keyConfigs">
+                        key="keyConfigs">
                     </tnt:NavigationListItem>
                     <tnt:NavigationListItem
                         text="{i18n>sideContentSystems}"
                         icon="sap-icon://it-system"
-                        key="systems"
-                        href="#/systems">
+                        key="systems">
                     </tnt:NavigationListItem>
                     <tnt:NavigationListItem
                         text="{i18n>sideContentTasks}"
                         icon="sap-icon://task"
-                        key="tasks"
-                        href="#/tasks">
+                        key="tasks">
                     </tnt:NavigationListItem>
                     <tnt:NavigationListItem
                         text="{i18n>sideContentUserManagement}"
                         icon="sap-icon://employee"
-                        key="users"
-                        href="#/users">
+                        key="users">
                     </tnt:NavigationListItem>
                 </tnt:NavigationList>
                 <tnt:fixedItem>

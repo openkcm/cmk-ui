@@ -11,6 +11,7 @@ import Dialog from 'sap/m/Dialog';
 import Fragment from 'sap/ui/core/Fragment';
 import MessageToast from 'sap/m/MessageToast';
 import EventBus from "sap/ui/core/EventBus";
+import { Route$PatternMatchedEvent } from "sap/ui/core/routing/Route";
 
 interface SystemsResponse {
     value: Systems[];
@@ -22,7 +23,7 @@ interface KeyConfigsResponse {
     count: number;
 }
 export default class Systems extends BaseController {
-    private readonly api: Api = new Api();
+    private api: Api;
     private connectTargetSystem: Dialog | undefined;
     private readonly connectSystemModel = new JSONModel({});
 
@@ -34,12 +35,15 @@ export default class Systems extends BaseController {
 
     public onInit(): void {
         super.onInit();
-        this.getRouter().getRoute('systems').attachPatternMatched({}, () => this.onRouteMatched(), this);
+        this.getRouter().getRoute('systems').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
         this.eventBus.subscribe('systems', 'loadSystems', (channelId, eventId) => this.onSystemRouteEventTriggered(channelId, eventId), this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.setModel(this.oneWayModel, 'oneWay');
     };
-    public onRouteMatched(): void {
+    public onRouteMatched(event: Route$PatternMatchedEvent): void {
+        const routeArgs = event.getParameter('arguments') as { tenantId: string };
+        this.api = new Api(routeArgs?.tenantId);
+        this.tenantId = routeArgs?.tenantId;
         this.getSystems().catch((error) => {
             console.error(error);
         });
@@ -73,6 +77,7 @@ export default class Systems extends BaseController {
         const selectedSystem = this.oneWayModel.getProperty(path) as System;
         const systemId = selectedSystem.id;
         this.getRouter().navTo('systemsDetail', {
+            tenantId: this.tenantId,
             systemID: systemId
         });
     };
@@ -82,6 +87,7 @@ export default class Systems extends BaseController {
         const selectedConfig = this.oneWayModel.getProperty(path) as System;
         const keyConfigId: string = selectedConfig.keyConfigurationID;
         this.getRouter().navTo('keyConfigDetail', {
+            tenantId: this.tenantId,
             keyConfigId: keyConfigId
         });
     }

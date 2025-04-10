@@ -14,7 +14,7 @@
                 <f:breadcrumbs>
                     <Breadcrumbs currentLocationText="{i18n>sideContentSystems}">
                         <Link text="{i18n>sideContentHome}"
-                            href="#/home" />
+                            press=".onBreadCrumbLinkPress($event, 'home')" />
                     </Breadcrumbs>
                 </f:breadcrumbs>
                 <f:heading>

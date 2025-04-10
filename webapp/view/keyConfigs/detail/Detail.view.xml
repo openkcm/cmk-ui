@@ -15,9 +15,9 @@
                 <breadcrumbs>
                     <m:Breadcrumbs currentLocationText="{oneWay>/keyConfig/name}">
                         <m:Link text="{i18n>sideContentHome}"
-                            href="#/home" />
-                        <m:Link text="{i18n>sideContentKeyConfiguration}"
-                            href="#/keyConfigs" />
+                            press=".onBreadCrumbLinkPress($event, 'home')" />
+                        <m:Link text=" {i18n>sideContentKeyConfiguration}"
+                            press=".onBreadCrumbLinkPress($event, 'keyConfigs')" />
                     </m:Breadcrumbs>
                 </breadcrumbs>
                 <expandedHeading>
