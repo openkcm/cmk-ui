@@ -53,6 +53,12 @@
                 demandPopin="true">
                 <Text text="{i18n>state}" wrapping="false" />
             </Column>
+            <Column
+                hAlign="End"
+                vAlign="Middle"
+                minScreenWidth="XSmall"
+                demandPopin="true">
+            </Column>
         </columns>
         <items>
             <ColumnListItem vAlign="Middle" type="Inactive">
@@ -72,13 +78,29 @@
                         wrapping="true" />
                     <VBox justifyContent="Center">
                         <tnt:InfoLabel
-                            visible="{= ${oneWay>status} === 'ENABLED'}"
+                            visible="{= ${oneWay>state} === 'ENABLED'}"
                             text="{i18n>enabled}"
                             colorScheme="8" />
                         <tnt:InfoLabel
-                            visible="{= ${oneWay>status} === 'DISABLED'}"
+                            visible="{= ${oneWay>state} === 'DISABLED'}"
                             text="{i18n>disabled}"
                             colorScheme="2" />
+                    </VBox>
+                    <VBox alignContent="Center" justifyContent="Start">
+                        <MenuButton icon="sap-icon://action-settings" type="Transparent">
+                            <menu>
+                                <Menu class="sapUiSizeCompact">
+                                    <MenuItem text="{i18n>disable}"
+                                        icon="sap-icon://log"
+                                        visible="{= ${oneWay>state} === 'ENABLED'}"
+                                        press="onDisableVersionPress" />
+                                    <MenuItem text="{i18n>enable}"
+                                        icon="sap-icon://log"
+                                        visible="{= ${oneWay>state} === 'DISABLED'}"
+                                        press="onEnableVersionPress" />
+                                </Menu>
+                            </menu>
+                        </MenuButton>
                     </VBox>
                 </cells>
             </ColumnListItem>

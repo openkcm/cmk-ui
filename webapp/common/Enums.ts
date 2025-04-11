@@ -1,6 +1,6 @@
-export enum KeyVersionStates {
-    ACTIVE = 'ACTIVE',
-    INACTIVE = 'INACTIVE',
+export enum KeyStates {
+    ENABLED = 'ENABLED',
+    DISABLED = 'DISABLED',
 }
 
 export enum CloudProviders {
@@ -19,4 +19,4 @@ export enum KeyConfigDetailPanelTypes {
     SYSTEM = 'system',
     KEY = 'key'
 }
-export default { KeyVersionStates, CloudProviders, KeyCreationTypes, KeyConfigDetailPanelTypes };
+export default { KeyStates, CloudProviders, KeyCreationTypes, KeyConfigDetailPanelTypes };

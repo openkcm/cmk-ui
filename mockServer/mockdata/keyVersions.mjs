@@ -13,7 +13,7 @@ export default (keyID) => {
                     createdAt: date1.replace(/\.\d{3}Z$/, '').replace('Z', ''),
                     updatedAt: date2.replace(/\.\d{3}Z$/, '').replace('Z', ''),
                 },
-                status: index === count - 1 ? 'ENABLED' : 'DISABLED',
+                state: index === count - 1 ? 'ENABLED' : 'DISABLED',
                 isPrimary: index === count - 1
             }
         ));

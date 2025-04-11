@@ -87,7 +87,7 @@ export default class KeyConfigDetail extends BaseController {
 
     public onInit(): void {
         super.onInit();
-        this.eventBus.subscribe('keys', 'loadKeyConfigDetails', (channelId, eventId, data) => this.onDetailPanelRouteEventTriggered(channelId, eventId, data as { keyConfigId: string }), this);
+        this.eventBus.subscribe('keyConfig', 'loadKeyConfigDetails', (channelId, eventId, data) => this.onDetailPanelRouteEventTriggered(channelId, eventId, data as { keyConfigId: string }), this);
         this.getRouter().getRoute('keyConfigDetail').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.twoWayModel.setDefaultBindingMode(BindingMode.TwoWay);
@@ -642,7 +642,7 @@ export default class KeyConfigDetail extends BaseController {
     private async enableKey(keyId: string): Promise<void> {
         this.getView().setBusy(true);
         const payload = {
-            enabled: false
+            enabled: true
         } as KeyPatchPayload;
         try {
             await this.api.patch<KeyPatchPayload, Key>(`keys/${keyId}`, payload);
@@ -663,6 +663,7 @@ export default class KeyConfigDetail extends BaseController {
             this.getRouter().navTo('keyConfigDetail', {
                 keyConfigId: this.keyConfigId
             });
+            await this.getKeyConfigData();
         } catch (error) {
             console.error(error);
             MessageBox.error(this.getText('errorDeletingKey'));

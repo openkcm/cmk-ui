@@ -1,4 +1,4 @@
-import { KeyVersionStates } from "kms/common/Enums";
+import { KeyStates } from "kms/common/Enums";
 
 export interface System {
     id: string;
@@ -57,8 +57,8 @@ export interface Key {
     }
 };
 export interface KeyVersion {
-    id: string;
-    status: KeyVersionStates;
+    version: number;
+    state: KeyStates;
     isPrimary: boolean;
     metadata: {
         createdAt: string;

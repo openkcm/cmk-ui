@@ -64,6 +64,10 @@ app.post("/api/v1/keys/:id/versions", (req, res) => {
     res.status(200).json({});
 });
 
+app.patch("/api/v1/keys/:id/versions/:id", (req, res) => {
+    res.status(200).json({});
+});
+
 app.get("/api/v1/systems/:systemID?/:keyConfigurationID?", (req, res) => {
     const { systemID, keyConfigurationID } = req.query;
     res.json(systems(systemID, keyConfigurationID));
