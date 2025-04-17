@@ -4,11 +4,13 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci --omit=dev
+RUN npm install
 
 COPY . .
 
-RUN npm run build:prod
+RUN npm run build
+
+RUN npm prune --production
 
 FROM nginx:stable-alpine AS production
 
