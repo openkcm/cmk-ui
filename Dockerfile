@@ -1,21 +1,21 @@
-# syntax=docker/dockerfile:1
-
 FROM node:22-alpine AS build
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+
+RUN npm ci --omit=dev
+
 COPY . .
-RUN npm run build:dev
 
-FROM node:22-alpine AS production
+RUN npm run build:prod
 
-WORKDIR /
+FROM nginx:stable-alpine AS production
 
-COPY package*.json ./
-RUN npm ci --only=production
-COPY --from=build /app/dist ./dist
-EXPOSE 80
+RUN rm -rf /usr/share/nginx/html/*
 
-CMD ["npm", "run", "start:webserver"]
+COPY --from=build /app/dist /usr/share/nginx/html
+
+RUN sed -i 's/listen\s\+80;/listen 8080;/' /etc/nginx/conf.d/default.conf
+
+EXPOSE 8080
