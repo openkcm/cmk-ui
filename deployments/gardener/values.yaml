@@ -4,6 +4,8 @@
 
 # Global values
 global:
+  # This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  imagePullSecrets: []
   # This is to override the chart name.
   nameOverride: ""
   fullnameOverride: ""
@@ -30,7 +32,7 @@ global:
     #   memory: 128Mi
     # requests:
     #   cpu: 100m
-    #   memory: 128Mi
+  #   memory: 128Mi
 
   # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
   livenessProbe:
@@ -70,7 +72,7 @@ ui:
     # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
     type: ClusterIP
     # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
-    port: 8080
+    port: 80
 
   pod:
     containerPort: 80
@@ -78,12 +80,13 @@ ui:
       # capabilities:
       #   drop:
       #   - ALL
-      # readOnlyRootFilesystem: true
+    # readOnlyRootFilesystem: true
     # runAsNonRoot: true
     # runAsUser: 1000
 
   # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
   replicaCount: 1
+
 
   # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
   image:
@@ -105,7 +108,7 @@ ui:
 
     # Setting a digest will override any tag.
     # +docs:property
-    digest: sha256:9c977350132ac6e918d0924cbbdb13f2d3353225b20d5a848b0e1391ca72ecb1
+    digest: sha256:87bd48c80387e39aae41339286d9f464fbd81a207fbb8e2cbcf8f96e40beb42a
 
     # Kubernetes imagePullPolicy.
     pullPolicy: IfNotPresent

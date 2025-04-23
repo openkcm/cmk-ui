@@ -158,14 +158,14 @@ make start-cmk
 ```
 or 
 ```bash
-make strat-cmk-colima
+make start-cmk-colima
 ```
 
 After setting up cmk cluster:
 
 #### Run
 ```bash
-make start-ui
+make k3d-start-ui
 ```
 
 To access UI, run the command displayed in console. For example:
