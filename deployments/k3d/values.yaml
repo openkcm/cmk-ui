@@ -92,20 +92,20 @@ ui:
     #   registry: kms.common.repositories.cloud.sap
     #   repository: cmk
     # +docs:property
-    registry:
+    registry: ""
 
     # The container image
     # +docs:property
-    repository:
+    repository: ui-server-dev
 
     # Override the image tag to deploy by setting this variable.
     # If no value is set, the chart's appVersion is used.
     # +docs:property
-    tag:
+    tag: latest
 
     # Setting a digest will override any tag.
     # +docs:property
-    digest:
+    # digest: sha256:9c977350132ac6e918d0924cbbdb13f2d3353225b20d5a848b0e1391ca72ecb1
 
     # Kubernetes imagePullPolicy.
     pullPolicy: IfNotPresent
@@ -139,5 +139,5 @@ ui:
   # fsGroup: 2000
 
 # This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-imagePullSecrets:
-  - name: "registry-access"
+#imagePullSecrets:
+#  - name:

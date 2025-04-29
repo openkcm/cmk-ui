@@ -108,7 +108,7 @@ ui:
 
     # Setting a digest will override any tag.
     # +docs:property
-    digest: sha256:87bd48c80387e39aae41339286d9f464fbd81a207fbb8e2cbcf8f96e40beb42a
+    digest: sha256:9c977350132ac6e918d0924cbbdb13f2d3353225b20d5a848b0e1391ca72ecb1
 
     # Kubernetes imagePullPolicy.
     pullPolicy: IfNotPresent

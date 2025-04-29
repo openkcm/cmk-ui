@@ -10,8 +10,9 @@ IMAGE_NAME := $(UI_APP_NAME)-$(UI_DEV_TARGET):$(TAG)
 DOCKERFILE_DIR := .
 DOCKERFILE_NAME := Dockerfile
 CONTEXT_DIR := .
-NAMESPACE:=ui
-CLUSTER_NAME:=cmkcluster
+NAMESPACE := ui
+CLUSTER_NAME := cmkcluster
+CHART_VALUES :=
 
 #
 # Docker commands
@@ -40,16 +41,16 @@ build-helm:
 # Target to apply helm chart
 apply-helm-chart:
 	@echo "Applying Helm chart."
-	helm upgrade --install $(CHART_NAME) $(CHART_DIR) --namespace $(APPLY_NAMESPACE) --create-namespace
+	helm upgrade --install $(CHART_NAME) $(CHART_DIR) --namespace $(APPLY_NAMESPACE) --create-namespace --values $(CHART_VALUES)
 
 # Target to apply UI helm chart
 apply-ui-helm-chart:
-	@echo "Applying CMK Helm chart."
-	$(MAKE) helm CHART_NAME=ui CHART_DIR=./charts APPLY_NAMESPACE=$(NAMESPACE)
+	@echo "Applying UI Helm chart."
+	@$(MAKE) apply-helm-chart CHART_NAME=ui CHART_DIR=./charts APPLY_NAMESPACE=$(NAMESPACE)
 
 # Target to port forward UI app from cluster port 8080 to local port 80
 port-forward:
-	kubectl port-forward --namespace $(NAMESPACE) svc/ui-ui-app 80:8080
+	kubectl port-forward --namespace $(NAMESPACE) svc/ui-ui-app 8082:8080
 
 #
 # k3d commands
@@ -57,21 +58,22 @@ port-forward:
 
 .PHONY: k3d-import-image k3d-build-helm k3d-import-ui-image k3d-apply-ui-helm-chart k3d-start-ui
 
+# Target to build helm chart for k3d
+k3d-build-helm: build-helm
+
 # Target to build Docker image within k3d
 k3d-import-image:
 	@echo "Importing Docker image into k3d."
 	k3d image import $(APPLY_IMAGE_NAME) -c $(CLUSTER_NAME)
 
-# Target to build helm chart for k3d
-k3d-build-helm: build-helm
-
-# Target to build the CMK image within k3d
+# Target to import a UI image within k3d
 k3d-import-ui-image:
-	@echo "Building the cmk image within k3d."
+	@echo "Importing UI image within k3d."
 	@$(MAKE) k3d-import-image APPLY_IMAGE_NAME=$(IMAGE_NAME)
 
 # Target to apply UI helm chart on k3d
-k3d-apply-ui-helm-chart: apply-ui-helm-chart
+k3d-apply-ui-helm-chart:
+	@$(MAKE) apply-ui-helm-chart CHART_VALUES=./deployments/k3d/values.yaml
 
 # Target to start UI locally on k3d
 k3d-start-ui: docker-dev-build k3d-import-ui-image k3d-apply-ui-helm-chart
@@ -86,4 +88,5 @@ k3d-start-ui: docker-dev-build k3d-import-ui-image k3d-apply-ui-helm-chart
 gardener-build-helm: build-helm
 
 # Target to apply UI helm chart on Gardener
-gardener-apply-ui-helm-chart: apply-ui-helm-chart
+gardener-apply-ui-helm-chart:
+	@$(MAKE) apply-ui-helm-chart CHART_VALUES=./deployments/gardener/values.yaml
