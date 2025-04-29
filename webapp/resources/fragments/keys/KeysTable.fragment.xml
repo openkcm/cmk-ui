@@ -95,11 +95,11 @@
                         wrapping="false" />
                     <VBox justifyContent="Center">
                         <tnt:InfoLabel
-                            visible="{= !!${oneWay>enabled}}"
+                            visible="{= ${oneWay>state} === 'ENABLED' }"
                             text="{i18n>enabled}"
                             colorScheme="8" />
                         <tnt:InfoLabel
-                            visible="{= !${oneWay>enabled}}"
+                            visible="{= ${oneWay>state} === 'DISABLED' }"
                             text="{i18n>disabled}"
                             colorScheme="2" />
                     </VBox>
@@ -114,11 +114,11 @@
                                         icon="sap-icon://favorite" />
                                     <MenuItem press="onKeyTableEnablePress"
                                         text="{i18n>enable}"
-                                        visible="{= !${oneWay>enabled}}"
+                                        visible="{= ${oneWay>state} === 'DISABLED'}"
                                         icon="sap-icon://log" />
                                     <MenuItem press="onKeyTableDisablePress"
                                         text="{i18n>disable}"
-                                        visible="{= !!${oneWay>enabled}}"
+                                        visible="{= ${oneWay>state} === 'ENABLED'}"
                                         icon="sap-icon://log" />
                                     <MenuItem press="onKeyTableDeletePress" text="{i18n>delete}"
                                         icon="sap-icon://delete" />

@@ -87,7 +87,8 @@
                             colorScheme="2" />
                     </VBox>
                     <VBox alignContent="Center" justifyContent="Start">
-                        <MenuButton icon="sap-icon://action-settings" type="Transparent">
+                        <MenuButton icon="sap-icon://action-settings" type="Transparent"
+                            visible="{= ${oneWay>/selectedKey/state} !== 'DISABLED'}">
                             <menu>
                                 <Menu class="sapUiSizeCompact">
                                     <MenuItem text="{i18n>disable}"

@@ -65,7 +65,7 @@ export default class DetailPanel extends BaseController {
             );
             return;
         }
-        this.eventBus.publish('keyConfig', 'loadKeyConfigDetails', { keyConfigId: this.keyConfigId });
+        this.eventBus.publish('keyConfig', 'loadKeyConfigDetails', { keyConfigId: this.keyConfigId, tenantId: this.tenantId });
         if (this.idType === this.Enums.KeyConfigDetailPanelTypes.KEY) {
             this.getKeyDetails().catch((error) => {
                 console.error(error);
