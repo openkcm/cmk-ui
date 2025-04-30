@@ -106,6 +106,21 @@
                     "target": "tasks"
                 },
                 {
+                    "pattern": "tenant/{tenantId}/tasks",
+                    "name": "tasks",
+                    "target": [
+                        "tasks"
+                    ]
+                },
+                {
+                    "pattern": "tenant/{tenantId}/tasks/{taskId}",
+                    "name": "tasksDetail",
+                    "target": [
+                        "tasks",
+                        "tasksDetail"
+                    ]
+                },
+                {
                     "pattern": "tenant/{tenantId}/users",
                     "name": "users",
                     "target": "users"
@@ -166,9 +181,23 @@
                     "controlAggregation": "midColumnPages",
                     "clearControlAggregation": true
                 },
+                "tasksLayout": {
+                    "viewId": "tasksLayout",
+                    "viewName": "tasks.Layout"
+                },
                 "tasks": {
-                    "viewId": "tasks",
-                    "viewName": "tasks.Tasks"
+                    "parent": "tasksLayout",
+                    "controlId": "tasksLayout",
+                    "viewName": "tasks.Tasks",
+                    "clearControlAggregation": true,
+                    "controlAggregation": "beginColumnPages"
+                },
+                "tasksDetail": {
+                    "parent": "tasksLayout",
+                    "controlId": "tasksLayout",
+                    "viewName": "tasks.Details",
+                    "clearControlAggregation": true,
+                    "controlAggregation": "midColumnPages"
                 },
                 "usersLayout": {
                     "viewId": "usersLayout",

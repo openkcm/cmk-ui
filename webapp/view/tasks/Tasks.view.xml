@@ -1,7 +1,10 @@
 <mvc:View
     controllerName="kms.controller.tasks.Tasks"
-    xmlns="sap.m"
     xmlns:f="sap.f"
+    xmlns="sap.m"
+    xmlns:m="sap.m"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:core="sap.ui.core"
     xmlns:mvc="sap.ui.core.mvc">
     <f:DynamicPage>
         <f:title>
@@ -20,7 +23,62 @@
                 </f:snappedTitleOnMobile>
             </f:DynamicPageTitle>
         </f:title>
+        <f:header>
+            <f:DynamicPageHeader>
+                <f:content>
+                    <fb:FilterBar useToolbar="false"
+                        search="getTasks" filterChange=".onTaskFilterChange">
+                        <fb:filterGroupItems>
+                            <fb:FilterGroupItem name="Status" label="{i18n>status}"
+                                groupName="Group1"
+                                visibleInFilterBar="true">
+                                <fb:control>
+                                    <MultiComboBox
+                                        name="{i18n>status}"
+                                        selectionChange=".ontaskStatusFilterSelect"
+                                        placeholder="{i18n>all}"
+                                        items="{oneWay>/tasksStatusItems}">
+                                        <core:Item key="{oneWay>}"
+                                            text="{parts: ['oneWay>'], formatter: '.getText'}" />
+                                    </MultiComboBox>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                        </fb:filterGroupItems>
+                        <fb:filterGroupItems>
+                            <fb:FilterGroupItem name="Workflow Type" label="{i18n>workflowType}"
+                                groupName="Group1"
+                                visibleInFilterBar="true">
+                                <fb:control>
+                                    <MultiComboBox
+                                        name="{i18n>taskType}"
+                                        selectionChange=".ontaskStatusFilterSelect"
+                                        placeholder="{i18n>all}"
+                                        items="{oneWay>/taskTypes}">
+                                        <core:Item key="{oneWay>}"
+                                            text="{parts: ['oneWay>'], formatter: '.getText'}" />
+                                    </MultiComboBox>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                        </fb:filterGroupItems>
+                    </fb:FilterBar>
+                </f:content>
+            </f:DynamicPageHeader>
+        </f:header>
         <f:content>
+            <m:VBox>
+                <Panel visible="{= ${oneWay>/workflowTasks}.length > 0 }">
+                    <m:VBox>
+                        <core:Fragment
+                            fragmentName="kms.resources.fragments.tasks.TasksTable"
+                            type="XML" />
+                    </m:VBox>
+                </Panel>
+                <m:VBox visible="{= ${oneWay>/workflowTasks}.length === 0 }">
+                    <core:Fragment
+                        fragmentName="kms.resources.fragments.common.NoDataTableIllustration"
+                        type="XML" />
+                </m:VBox>
+            </m:VBox>
         </f:content>
     </f:DynamicPage>
 </mvc:View>

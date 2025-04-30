@@ -71,6 +71,7 @@ export default class App extends BaseController {
                 this.twoWayModel.setProperty('/selectedKey', 'systems');
                 break;
             case 'tasks':
+            case 'tasksDetail':
                 this.twoWayModel.setProperty('/selectedKey', 'tasks');
                 break;
             case 'users':

@@ -1,3 +1,5 @@
+import { TaskStates } from "./Enums";
+
 export default class Formatter {
     public static timeElapsedSince(dateString: string): string {
         const inputDate = new Date(dateString);
@@ -18,6 +20,37 @@ export default class Formatter {
             return daysDifference === 1 ? "1 Day" : `${daysDifference} Days`;
         } else {
             return "Less than a day";
+        }
+    }
+    public static setTaskStatus(state: TaskStates): string {
+        switch (state) {
+            case TaskStates.SUCCESSFUL:
+                return "sap-icon://message-success";
+            case TaskStates.WAIT_APPROVAL:
+            case TaskStates.WAIT_CONFIRMATION:
+            case TaskStates.INITIAL:
+                return "sap-icon://lateness";
+            case TaskStates.EXPIRED:
+            case TaskStates.FAILED:
+            case TaskStates.REVOKED:
+            case TaskStates.REJECTED:
+                return "sap-icon://message-error";
+        }
+
+    }
+    public static setTaskStatusIndicationState(state: TaskStates): string {
+        switch (state) {
+            case TaskStates.SUCCESSFUL:
+                return "Indication14";
+            case TaskStates.WAIT_APPROVAL:
+            case TaskStates.WAIT_CONFIRMATION:
+            case TaskStates.INITIAL:
+                return "Indication15";
+            case TaskStates.EXPIRED:
+            case TaskStates.REVOKED:
+            case TaskStates.REJECTED:
+            case TaskStates.FAILED:
+                return "Indication11";
         }
     }
 }

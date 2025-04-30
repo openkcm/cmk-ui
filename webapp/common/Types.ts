@@ -1,4 +1,4 @@
-import { KeyStates } from "kms/common/Enums";
+import { ActionTypes, ArtifactTypes, KeyStates, TaskStates, TaskStatus } from "kms/common/Enums";
 
 export interface System {
     id: string;
@@ -70,3 +70,25 @@ export interface Label {
     name: string;
     value: string;
 };
+
+export interface Task {
+    id: string,
+    initiatorID: string,
+    initiatorName: string,
+    state: TaskStates,
+    actionType: ActionTypes,
+    artifactType: ArtifactTypes,
+    artifactID: string,
+    parameters?: string
+    failureReason: string,
+    metadata: {
+        createdAt: string,
+        updatedAt: string
+    }
+}
+
+export interface Approver {
+    id: string,
+    name: string,
+    decision: TaskStatus.APPROVED | TaskStatus.REJECTED | TaskStatus.PENDING
+}

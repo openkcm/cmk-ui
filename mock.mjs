@@ -7,6 +7,8 @@ import user from "./mockServer/mockdata/user.mjs";
 import keys from "./mockServer/mockdata/keys.mjs";
 import keyVersions from "./mockServer/mockdata/keyVersions.mjs";
 import tags from "./mockServer/mockdata/tags.mjs";
+import workflows from "./mockServer/mockdata/tasks.mjs";
+import approvers from "./mockServer/mockdata/approvers.mjs";
 
 const app = express();
 app.use(cors());
@@ -90,6 +92,21 @@ app.get("/api/v1/groups", (req, res) => {
 app.get("/api/v1/user/:id?", (req, res) => {
     const { id } = req.params;
     res.json(user(id));
+});
+
+app.get("/api/v1/workflows/:taskId?", (req, res) => {
+    const { taskId } = req.params;
+    res.json(workflows(taskId));
+});
+
+app.get("/api/v1/workflows/:taskId/approvers", (req, res) => {
+    const { taskId } = req.params;
+    res.json(approvers(taskId));
+});
+
+app.post("/api/v1/workflows/:taskId/state", (req, res) => {
+    const state = req.body;
+    res.status(200).json(state);
 });
 
 app.listen(3000, () => console.log("API Server running..."));
