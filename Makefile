@@ -41,7 +41,7 @@ build-helm:
 # Target to apply helm chart
 apply-helm-chart:
 	@echo "Applying Helm chart."
-	helm upgrade --install $(CHART_NAME) $(CHART_DIR) --namespace $(APPLY_NAMESPACE) --create-namespace --values $(CHART_VALUES)
+	helm upgrade --install $(CHART_NAME) $(CHART_DIR) --namespace $(APPLY_NAMESPACE) --values $(CHART_VALUES)
 
 # Target to apply UI helm chart
 apply-ui-helm-chart:
@@ -50,7 +50,7 @@ apply-ui-helm-chart:
 
 # Target to port forward UI app from cluster port 8080 to local port 80
 port-forward:
-	kubectl port-forward --namespace $(NAMESPACE) svc/ui-ui-app 8082:8080
+	kubectl port-forward --namespace $(NAMESPACE) svc/ui-ui-app 8086:8080
 
 #
 # k3d commands
@@ -76,7 +76,7 @@ k3d-apply-ui-helm-chart:
 	@$(MAKE) apply-ui-helm-chart CHART_VALUES=./deployments/k3d/values.yaml
 
 # Target to start UI locally on k3d
-k3d-start-ui: docker-dev-build k3d-import-ui-image k3d-apply-ui-helm-chart
+k3d-start-ui: docker-dev-build k3d-import-ui-image k3d-apply-ui-helm-chart port-forward
 
 #
 # Gardener commands
