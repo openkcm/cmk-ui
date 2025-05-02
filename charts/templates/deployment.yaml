@@ -4,6 +4,7 @@ metadata:
   name: {{ include "ui.fullname" . }}
   labels:
     {{- include "ui.labels" . | nindent 4 }}
+  namespace: {{ $.Values.namespace }}
 spec:
   {{- if not .Values.ui.autoscaling.enabled }}
   replicas: {{ .Values.ui.replicaCount }}

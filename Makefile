@@ -41,7 +41,7 @@ build-helm:
 # Target to apply helm chart
 apply-helm-chart:
 	@echo "Applying Helm chart."
-	helm upgrade --install $(CHART_NAME) $(CHART_DIR) --namespace $(APPLY_NAMESPACE) --values $(CHART_VALUES)
+	helm upgrade --install $(CHART_NAME) $(CHART_DIR) --values $(CHART_VALUES)
 
 # Target to apply UI helm chart
 apply-ui-helm-chart:
@@ -49,8 +49,23 @@ apply-ui-helm-chart:
 	@$(MAKE) apply-helm-chart CHART_NAME=ui CHART_DIR=./charts APPLY_NAMESPACE=$(NAMESPACE)
 
 # Target to port forward UI app from cluster port 8080 to local port 80
-port-forward:
+port-forward: wait-for-svc-cmk
 	kubectl port-forward --namespace $(NAMESPACE) svc/ui-ui-app 8086:8080
+
+wait-for-pod:
+	@echo "Waiting for pod with label $(LABEL) in namespace $(NAMESPACE) to be Running..."
+	@while [ -z "$$(kubectl get pod -n $(NAMESPACE) -l $(LABEL) -o jsonpath='{.items[*].metadata.name}')" ]; do \
+		echo "No pods found, waiting for pod creation..."; \
+		sleep 2; \
+	done
+	@while [ "$$(kubectl get pod -n $(NAMESPACE) -l $(LABEL) -o jsonpath='{.items[0].status.phase}' 2>/dev/null)" != "Running" ]; do \
+		echo "Pod not ready, waiting..."; \
+		sleep 2; \
+	done
+	@echo "Pod is Running!"
+
+wait-for-svc-cmk:
+	@$(MAKE) wait-for-pod LABEL=app.kubernetes.io/instance=ui
 
 #
 # k3d commands
