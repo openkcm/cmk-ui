@@ -19,4 +19,62 @@ export enum KeyConfigDetailPanelTypes {
     SYSTEM = 'system',
     KEY = 'key'
 }
-export default { KeyStates, CloudProviders, KeyCreationTypes, KeyConfigDetailPanelTypes };
+
+export enum TaskStatus {
+    APPROVED = 'APPROVED',
+    PENDING = 'PENDING',
+    REJECTED = 'REJECTED',
+    CONFIRMED = 'CONFIRMED'
+}
+
+export enum TaskStateTransitionAction {
+    APPROVE = 'APPROVE',
+    REJECT = 'REJECT',
+    CONFIRM = 'CONFIRM',
+    REVOKE = 'REVOKE'
+}
+
+export enum TaskStates {
+    INITIAL = 'INITIAL',
+    REVOKED = 'REVOKED',
+    REJECTED = 'REJECTED',
+    EXPIRED = 'EXPIRED',
+    WAIT_APPROVAL = 'WAIT_APPROVAL',
+    WAIT_CONFIRMATION = 'WAIT_CONFIRMATION',
+    EXECUTING = 'EXECUTING',
+    SUCCESSFUL = 'SUCCESSFUL',
+    FAILED = 'FAILED'
+}
+export enum ActionTypes {
+    UPDATE_STATE = 'UPDATE_STATE',
+    UPDATE_PRIMARY_KEY = 'UPDATE_PRIMARY_KEY',
+    UPDATE_KEY_CONFIGURATION = 'UPDATE_KEY_CONFIGURATION',
+    DELETE = 'DELETE'
+}
+export enum ArtifactTypes {
+    KEY = 'KEY',
+    KEY_CONFIGURATION = 'KEY_CONFIGURATION',
+    SYSTEM = 'SYSTEM'
+}
+export enum WorkflowActionTypes {
+    KEYDELETE = 'KEYDELETE',
+    KEYUPDATE = 'KEYUPDATE'
+}
+
+export enum TaskType {
+    KEY = 'KEY',
+    SYSTEM = 'SYSTEM',
+    USER = 'USER'
+
+}
+export enum EventChannelIds {
+    TASKS = 'TASKS',
+    SYSTEMS = 'SYSTEMS',
+    KEYCONFIG = 'KEYCONFIG'
+}
+export enum EventIDs {
+    LOAD_TASKS = 'LOAD_TASKS',
+    LOAD_SYSTEMS = 'LOAD_SYSTEMS',
+    LOAD_KEY_CONFIG_DETAILS = 'LOAD_KEY_CONFIG_DETAILS'
+}
+export default { KeyStates, CloudProviders, KeyCreationTypes, KeyConfigDetailPanelTypes, TaskStatus, TaskStates, ActionTypes, ArtifactTypes, WorkflowActionTypes, TaskType, EventChannelIds, EventIDs };

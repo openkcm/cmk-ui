@@ -5,7 +5,7 @@
     core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
     <IllustratedMessage
         enableVerticalResponsiveness="false"
-        title="{i18n>noSystemsAvailable}"
-        illustrationType="tnt-NoApplications"
+        title="{parts: ['oneWay>/noTableDataText'], formatter: '.getText'}"
+        illustrationType="{oneWay>/noTableDataIllustrationType}"
         illustrationSize="Dialog" />
 </core:FragmentDefinition>

@@ -12,7 +12,10 @@ interface GroupsResponse {
 }
 export default class Users extends BaseController {
     private api: Api;
-    private readonly oneWayModel = new JSONModel({});
+    private readonly oneWayModel = new JSONModel({
+        noTableDataText: 'noUserGroupsCreated',
+        noTableDataIllustrationType: 'tnt-NoUsers',
+    });
     private userCount: number = 0;
 
 

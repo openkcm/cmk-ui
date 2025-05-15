@@ -39,7 +39,7 @@
                 </Panel>
                 <VBox visible="{= ${oneWay>/groupsCount} === 0 }">
                     <core:Fragment
-                        fragmentName="kms.resources.fragments.users.NoUserGroupsIllustration"
+                        fragmentName="kms.resources.fragments.common.NoDataTableIllustration"
                         type="XML" />
                 </VBox>
             </VBox>

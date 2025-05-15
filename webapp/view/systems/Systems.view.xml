@@ -98,7 +98,7 @@
                 </Panel>
                 <m:VBox visible="{= ${oneWay>/systems}.length === 0 }">
                     <core:Fragment
-                        fragmentName="kms.resources.fragments.systems.NoSystemsTableIllustration"
+                        fragmentName="kms.resources.fragments.common.NoDataTableIllustration"
                         type="XML" />
                 </m:VBox>
             </m:VBox>

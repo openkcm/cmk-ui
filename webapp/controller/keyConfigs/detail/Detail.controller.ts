@@ -23,6 +23,7 @@ import ListBinding from 'sap/ui/model/ListBinding';
 import Context from 'sap/ui/model/Context';
 import MultiInput, { MultiInput$TokenUpdateEvent } from 'sap/m/MultiInput';
 import Token from 'sap/m/Token';
+import { EventChannelIds, EventIDs } from 'kms/common/Enums';
 interface KeyConfigPatchPayload {
     name: string;
 }
@@ -87,7 +88,7 @@ export default class KeyConfigDetail extends BaseController {
 
     public onInit(): void {
         super.onInit();
-        this.eventBus.subscribe('keyConfig', 'loadKeyConfigDetails', (channelId, eventId, data) => this.onDetailPanelRouteEventTriggered(channelId, eventId, data as { keyConfigId: string }), this);
+        this.eventBus.subscribe(EventChannelIds.KEYCONFIG, EventIDs.LOAD_KEY_CONFIG_DETAILS, (channelId, eventId, data) => this.onDetailPanelRouteEventTriggered(channelId, eventId, data as { keyConfigId: string, tenantId: string }), this);
         this.getRouter().getRoute('keyConfigDetail').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.twoWayModel.setDefaultBindingMode(BindingMode.TwoWay);

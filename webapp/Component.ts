@@ -22,7 +22,7 @@ export default class Component extends UIComponent {
             setURI: sap.ui.require.toUrl('sap/tnt/themes/base/illustrations')
         };
 
-        IllustrationPool.registerIllustrationSet(tntSet, false);
+        IllustrationPool.registerIllustrationSet(tntSet, false, []);
     }
     private watchForThemeChanges() {
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {

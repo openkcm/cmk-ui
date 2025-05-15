@@ -12,6 +12,7 @@ import Fragment from 'sap/ui/core/Fragment';
 import MessageToast from 'sap/m/MessageToast';
 import EventBus from "sap/ui/core/EventBus";
 import { Route$PatternMatchedEvent } from "sap/ui/core/routing/Route";
+import { EventChannelIds, EventIDs } from "kms/common/Enums";
 
 interface SystemsResponse {
     value: Systems[];
@@ -29,14 +30,16 @@ export default class Systems extends BaseController {
 
     private readonly oneWayModel = new JSONModel({
         systems: [] as System[],
-        systemsCount: 0 as number
+        systemsCount: 0 as number,
+        noTableDataText: 'noSystemsAvailable',
+        noTableDataIllustrationType: 'tnt-NoApplications'
     });
     private eventBus = EventBus.getInstance();
 
     public onInit(): void {
         super.onInit();
         this.getRouter().getRoute('systems').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
-        this.eventBus.subscribe('systems', 'loadSystems', (channelId, eventId) => this.onSystemRouteEventTriggered(channelId, eventId), this);
+        this.eventBus.subscribe(EventChannelIds.SYSTEMS, EventIDs.LOAD_SYSTEMS, (channelId, eventId) => this.onSystemRouteEventTriggered(channelId, eventId), this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.setModel(this.oneWayModel, 'oneWay');
     };

@@ -10,6 +10,7 @@ import MessageBox from 'sap/m/MessageBox';
 import { Button$PressEvent } from 'sap/m/Button';
 import Formatter from 'kms/common/Formatters';
 import MessageToast from 'sap/m/MessageToast';
+import { EventChannelIds, EventIDs } from 'kms/common/Enums';
 
 interface KeyPatchPayload {
     name: string;
@@ -65,7 +66,7 @@ export default class DetailPanel extends BaseController {
             );
             return;
         }
-        this.eventBus.publish('keyConfig', 'loadKeyConfigDetails', { keyConfigId: this.keyConfigId, tenantId: this.tenantId });
+        this.eventBus.publish(EventChannelIds.KEYCONFIG, EventIDs.LOAD_KEY_CONFIG_DETAILS, { keyConfigId: this.keyConfigId, tenantId: this.tenantId });
         if (this.idType === this.Enums.KeyConfigDetailPanelTypes.KEY) {
             this.getKeyDetails().catch((error) => {
                 console.error(error);

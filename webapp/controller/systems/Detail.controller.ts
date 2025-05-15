@@ -11,6 +11,7 @@ import EventBus from "sap/ui/core/EventBus";
 import MessageToast from "sap/m/MessageToast";
 import Dialog from "sap/m/Dialog";
 import Fragment from "sap/ui/core/Fragment";
+import { EventChannelIds, EventIDs } from "kms/common/Enums";
 interface KeyConfigsResponse {
     value: KeyConfig[];
     count: number;
@@ -37,7 +38,7 @@ export default class Systems extends BaseController {
         this.id = routeArgs.systemID;
         this.api = new Api(routeArgs?.tenantId);
         this.tenantId = routeArgs?.tenantId;
-        this.eventBus.publish('systems', 'loadSystems');
+        this.eventBus.publish(EventChannelIds.SYSTEMS, EventIDs.LOAD_SYSTEMS);
         this.getSystemDetails().catch((error) => {
             console.error(error);
         });
@@ -76,7 +77,7 @@ export default class Systems extends BaseController {
             await this.api.delete(`systems/${systemsID}/link`);
             MessageToast.show(this.getText('systemDisconnectedSuccessfully'));
             await this.getSystemDetails();
-            this.eventBus.publish('systems', 'loadSystems');
+            this.eventBus.publish(EventChannelIds.SYSTEMS, EventIDs.LOAD_SYSTEMS);
         } catch (error) {
             console.error(error);
             MessageBox.error(this.getText('errorDisconnectingSystem'));
@@ -122,7 +123,7 @@ export default class Systems extends BaseController {
             MessageToast.show(this.getText('keyConfigConnectSystemSuccessfully'));
             this.onSwitchKeyConfigCancelPress();
             await this.getSystemDetails();
-            this.eventBus.publish('systems', 'loadSystems');
+            this.eventBus.publish(EventChannelIds.SYSTEMS, EventIDs.LOAD_SYSTEMS);
         } catch (error) {
             MessageBox.error(this.getText('keyConfigConnectSystemError'));
             console.error('Error creating key', error);
