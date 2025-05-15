@@ -382,9 +382,9 @@ export default class KeyConfigDetail extends BaseController {
             this.oneWayModel.setProperty('/allSystems', allSystems?.value);
             this.oneWayModel.setProperty('/systems', connectedSystems?.value);
             this.oneWayModel.setProperty('/tags', tags?.value);
-            this.oneWayModel.setProperty('/keysCount', keys?.count);
-            this.oneWayModel.setProperty('/systemsCount', connectedSystems?.count);
-            this.oneWayModel.setProperty('/allSystemsCount', allSystems?.count);
+            this.oneWayModel.setProperty('/keysCount', keys?.count || 0);
+            this.oneWayModel.setProperty('/systemsCount', connectedSystems?.count || 0);
+            this.oneWayModel.setProperty('/allSystemsCount', allSystems?.count || 0);
         } catch (error) {
             console.error(error);
             MessageBox.error(this.getText('errorFetchingKeyConfigDetails'));
