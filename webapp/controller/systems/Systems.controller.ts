@@ -81,7 +81,7 @@ export default class Systems extends BaseController {
         const systemId = selectedSystem.id;
         this.getRouter().navTo('systemsDetail', {
             tenantId: this.tenantId,
-            systemID: systemId
+            systemId: systemId
         });
     };
 

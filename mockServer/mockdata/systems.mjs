@@ -1,6 +1,6 @@
 import Chance from "chance";
 const chance = new Chance();
-export default (systemID, keyConfigurationID) => {
+export default (systemId, keyConfigurationID) => {
     const states = ['CONNECTED', 'PENDING', 'AWAITING_APPROVAL'];
     const generateSystems = (count, keyConfigurationID) => {
         const response = Array.from({ length: count }, () => (
@@ -20,11 +20,11 @@ export default (systemID, keyConfigurationID) => {
             count: response.length
         };
     };
-    if (!systemID && keyConfigurationID) {
+    if (!systemId && keyConfigurationID) {
         return generateSystems(chance.integer({ min: 1, max: 5 }), keyConfigurationID);
-    } else if (systemID && !keyConfigurationID) {
+    } else if (systemId && !keyConfigurationID) {
         return {
-            id: systemID,
+            id: systemId,
             sid: chance.string({ length: 3, pool: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' }),
             keyConfigurationID: chance.guid(),
             keyConfigurationName: `Key Config ${chance.state({ full: true })}`,

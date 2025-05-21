@@ -70,19 +70,19 @@ app.patch("/api/v1/keys/:id/versions/:id", (req, res) => {
     res.status(200).json({});
 });
 
-app.get("/api/v1/systems/:systemID?/:keyConfigurationID?", (req, res) => {
-    const { systemID, keyConfigurationID } = req.query;
-    res.json(systems(systemID, keyConfigurationID));
+app.get("/api/v1/systems/:systemId?/:keyConfigurationID?", (req, res) => {
+    const { systemId, keyConfigurationID } = req.query;
+    res.json(systems(systemId, keyConfigurationID));
 });
 
-app.patch("/api/v1/systems/:systemID?/link/", (req, res) => {
-    const { systemID, keyConfigurationID } = req.query;
-    res.json(systems(systemID, keyConfigurationID));
+app.patch("/api/v1/systems/:systemId?/link/", (req, res) => {
+    const { systemId, keyConfigurationID } = req.query;
+    res.json(systems(systemId, keyConfigurationID));
 });
 
-app.delete("/api/v1/systems/:systemID?/link/", (req, res) => {
-    const { systemID, keyConfigurationID } = req.query;
-    res.json(systems(systemID, keyConfigurationID));
+app.delete("/api/v1/systems/:systemId?/link/", (req, res) => {
+    const { systemId, keyConfigurationID } = req.query;
+    res.json(systems(systemId, keyConfigurationID));
 });
 
 app.get("/api/v1/groups", (req, res) => {

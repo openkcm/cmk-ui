@@ -146,7 +146,7 @@
                     ]
                 },
                 {
-                    "pattern": "tenant/{tenantId}/systems",
+                    "pattern": "tenant/{tenantId}/systems/{systemId}",
                     "name": "systemsDetail",
                     "target": [
                         "systems",

@@ -34,8 +34,8 @@ export default class Systems extends BaseController {
     }
 
     public onRouteMatched(event: Route$PatternMatchedEvent): void {
-        const routeArgs = event.getParameter('arguments') as { tenantId: string, systemID?: string };
-        this.id = routeArgs.systemID;
+        const routeArgs = event.getParameter('arguments') as { tenantId: string, systemId?: string };
+        this.id = routeArgs.systemId;
         this.api = new Api(routeArgs?.tenantId);
         this.tenantId = routeArgs?.tenantId;
         this.eventBus.publish(EventChannelIds.SYSTEMS, EventIDs.LOAD_SYSTEMS);
