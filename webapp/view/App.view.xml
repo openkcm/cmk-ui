@@ -73,16 +73,10 @@
         </tnt:header>
         <tnt:sideContent>
             <tnt:SideNavigation
-                expanded="{= ${twoWay>/selectedKey} === 'home'}"
+                expanded="{= ${twoWay>/selectedKey} === 'keyConfigs'}"
                 selectedKey="{twoWay>/selectedKey}"
                 itemSelect="onNavigationClick">
-
                 <tnt:NavigationList>
-                    <tnt:NavigationListItem
-                        text="{i18n>sideContentHome}"
-                        icon="sap-icon://home"
-                        key="home">
-                    </tnt:NavigationListItem>
                     <tnt:NavigationListItem
                         text="{i18n>sideContentKeyConfiguration}"
                         icon="sap-icon://key"

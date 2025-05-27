@@ -52,7 +52,7 @@ export default class Systems extends BaseController {
         });
     };
     public onSystemRouteEventTriggered(channelId: string, eventId: string): void {
-        if (channelId === 'systems' && eventId === 'loadSystems') {
+        if (channelId === EventChannelIds.SYSTEMS && eventId === EventIDs.LOAD_SYSTEMS) {
             this.getSystems().catch((error) => {
                 console.error(error);
             });

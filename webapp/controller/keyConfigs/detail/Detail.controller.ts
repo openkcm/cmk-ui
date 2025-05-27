@@ -101,7 +101,7 @@ export default class KeyConfigDetail extends BaseController {
     };
     public onDetailPanelRouteEventTriggered(channelId: string, eventId: string, data: { keyConfigId: string, tenantId: string }): void {
         this.oneWayModel.setProperty('/keyConfigDetail', true);
-        if (channelId === 'keyConfig' && eventId === 'loadKeyConfigDetails') {
+        if (channelId === EventChannelIds.KEYCONFIG && eventId === EventIDs.LOAD_KEY_CONFIG_DETAILS) {
             this.keyConfigId = data.keyConfigId;
             if (!this.api || this.tenantId !== data.tenantId) {
                 this.tenantId = data.tenantId;

@@ -10,12 +10,6 @@
     <f:DynamicPage>
         <f:title>
             <f:DynamicPageTitle>
-                <f:breadcrumbs>
-                    <Breadcrumbs currentLocationText="{i18n>sideContentKeyConfiguration}">
-                        <Link text="{i18n>sideContentHome}"
-                            press=".onBreadCrumbLinkPress($event, 'home')" />
-                    </Breadcrumbs>
-                </f:breadcrumbs>
                 <f:heading>
                     <Title
                         text="{parts: ['i18n>keyConfigurationWithCount', 'oneWay>/configsCount'], formatter: 'formatMessage'}" />

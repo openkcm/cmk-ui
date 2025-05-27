@@ -34,10 +34,10 @@ export default class App extends BaseController {
 
         this.setModel(this.oneWayModel, 'oneWay');
         this.setModel(this.twoWayModel, 'twoWay');
-        this.twoWayModel.setProperty('/selectedKey', 'home');
+        this.twoWayModel.setProperty('/selectedKey', 'keyConfigs');
         this.twoWayModel.setProperty('/selectedTenant', this.tenantId || 'tenant1');//temporary assignment, change this once the authorization is set.
         if (window.location.hash === '') {
-            this.getRouter().navTo('home', {
+            this.getRouter().navTo('keyConfigs', {
                 tenantId: this.twoWayModel.getProperty('/selectedTenant') as string
             });
         }
@@ -49,18 +49,12 @@ export default class App extends BaseController {
         const routeName = event.getParameter('name');
         const routeArgs = event.getParameter('arguments') as { tenantId: string };
         this.twoWayModel.setProperty('/selectedTenant', routeArgs?.tenantId);
-        if (routeName === 'home') {
+        if (routeName === 'keyConfigs') {
             this.toolPage.setSideExpanded(true);
         } else {
             this.toolPage.setSideExpanded(false);
         }
         switch (routeName) {
-            case 'home':
-                this.twoWayModel.setProperty('/selectedKey', 'home');
-                this.getRouter().navTo('home', {
-                    tenantId: this.twoWayModel.getProperty('/selectedTenant') as string
-                });
-                break;
             case 'keyConfigs':
             case 'keyConfigDetail':
             case 'keyConfigDetailPanel':
@@ -82,7 +76,7 @@ export default class App extends BaseController {
                 this.twoWayModel.setProperty('/selectedKey', 'settings');
                 break;
             default:
-                this.twoWayModel.setProperty('/selectedKey', 'home');
+                this.twoWayModel.setProperty('/selectedKey', 'keyConfigs');
         }
     }
 

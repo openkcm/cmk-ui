@@ -14,8 +14,6 @@
             <ObjectPageDynamicHeaderTitle>
                 <breadcrumbs>
                     <m:Breadcrumbs currentLocationText="{oneWay>/keyConfig/name}">
-                        <m:Link text="{i18n>sideContentHome}"
-                            press=".onBreadCrumbLinkPress($event, 'home')" />
                         <m:Link text=" {i18n>sideContentKeyConfiguration}"
                             press=".onBreadCrumbLinkPress($event, 'keyConfigs')" />
                     </m:Breadcrumbs>

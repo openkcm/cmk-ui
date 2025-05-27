@@ -71,11 +71,6 @@
             },
             "routes": [
                 {
-                    "pattern": "tenant/{tenantId}/home",
-                    "name": "home",
-                    "target": "home"
-                },
-                {
                     "pattern": "tenant/{tenantId}/keyConfigs}",
                     "name": "keyConfigs",
                     "target": "keyConfigs"
@@ -155,10 +150,6 @@
                 }
             ],
             "targets": {
-                "home": {
-                    "viewId": "home",
-                    "viewName": "Home"
-                },
                 "keyConfigs": {
                     "viewId": "keyConfigs",
                     "viewName": "keyConfigs.KeyConfigs"

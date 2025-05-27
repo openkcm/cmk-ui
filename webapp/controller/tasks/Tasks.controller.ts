@@ -19,8 +19,8 @@ export default class Tasks extends BaseController {
     private eventBus = EventBus.getInstance();
 
     private readonly oneWayModel = new JSONModel({
-        tasksStatusItems: ['All', ...Object.values(TaskStates).filter(type => type !== 'INITIAL' && type !== 'EXECUTING')] as TaskStates[] | 'All'[],
-        taskTypes: ['All', ...Object.values(TaskType)] as TaskType[] | 'All'[],
+        tasksStatusItems: ['all', ...Object.values(TaskStates).filter(type => type !== 'INITIAL' && type !== 'EXECUTING')] as TaskStates[] | 'all'[],
+        taskTypes: ['all', ...Object.values(TaskType)] as TaskType[] | 'all'[],
         noTableDataText: 'NoTasksAvailable',
         noTableDataIllustrationType: 'sapIllus-NoTasks_v1',
         workflowTasks: [] as WorkflowTasksResponse[],

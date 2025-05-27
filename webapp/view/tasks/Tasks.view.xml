@@ -9,12 +9,6 @@
     <f:DynamicPage>
         <f:title>
             <f:DynamicPageTitle>
-                <f:breadcrumbs>
-                    <Breadcrumbs currentLocationText="{i18n>sideContentTasks}">
-                        <Link text="{i18n>sideContentHome}"
-                            press=".onBreadCrumbLinkPress($event, 'home')" />
-                    </Breadcrumbs>
-                </f:breadcrumbs>
                 <f:heading>
                     <Title text="{i18n>sideContentTasks}" />
                 </f:heading>
