@@ -22,6 +22,7 @@ import MultiInput, { MultiInput$TokenUpdateEvent } from 'sap/m/MultiInput';
 import Token from 'sap/m/Token';
 import { BYOKProviders, EventChannelIds, EventIDs, HYOKProviders, KeyCreationTypes } from 'kms/common/Enums';
 import KeyCreation from 'kms/component/KeyCreation';
+
 interface KeyConfigPatchPayload {
     name: string;
 }
@@ -58,6 +59,8 @@ export default class KeyConfigDetail extends BaseController {
         edit: false as boolean,
         keys: [] as Key[],
         systems: [] as System[],
+        keysTableUpdating: false as boolean,
+        systemsTableUpdating: false as boolean
     });
     private readonly viewSettingModel = new JSONModel({
         sortColumns: [] as object[],
@@ -76,8 +79,29 @@ export default class KeyConfigDetail extends BaseController {
     private switchKeyConfigDialog: Dialog | undefined;
     private eventBus = EventBus.getInstance();
 
+    private top: number;
+    private keysSkip: number;
+    private systemsSkip: number;
+    private keysCurrentPage: number;
+    private systemsCurrentPage: number;
+
+    private readonly keysPaginationModel = new JSONModel({
+        totalPages: 0,
+        currentPage: 1
+    });
+    private readonly systemsPaginationModel = new JSONModel({
+        totalPages: 0,
+        currentPage: 1
+    });
+
     public onInit(): void {
         super.onInit();
+        this.top = 10;
+        this.keysSkip = 0;
+        this.systemsSkip = 0;
+        this.keysCurrentPage = 0;
+        this.systemsCurrentPage = 0;
+
         this.eventBus.subscribe(EventChannelIds.KEYCONFIG, EventIDs.LOAD_KEY_CONFIG_DETAILS, (channelId, eventId, data) => this.onDetailPanelRouteEventTriggered(channelId, eventId, data as { keyConfigId: string, tenantId: string }), this);
         this.getRouter().getRoute('keyConfigDetail').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
@@ -88,6 +112,8 @@ export default class KeyConfigDetail extends BaseController {
         this.setModel(this.twoWayModel, 'twoWay');
         this.setModel(this.viewSettingModel, 'viewSettingModel');
         this.setModel(this.keyCreationModel, 'keyCreationModel');
+        this.setModel(this.systemsPaginationModel, 'systemsPagination');
+        this.setModel(this.keysPaginationModel, 'keysPagination');
     };
     public onDetailPanelRouteEventTriggered(channelId: string, eventId: string, data: { keyConfigId: string, tenantId: string }): void {
         this.oneWayModel.setProperty('/keyConfigDetail', true);
@@ -104,7 +130,7 @@ export default class KeyConfigDetail extends BaseController {
     }
     public onRouteMatched(event: Route$PatternMatchedEvent): void {
         this.getView().setBusy(true);
-
+        this.resetPagination();
         const routeName = event.getParameter('name');
         this.oneWayModel.setProperty('/keyConfigDetail', routeName === 'keyConfigDetail');
         this.setHyokProviders();
@@ -216,17 +242,10 @@ export default class KeyConfigDetail extends BaseController {
             }
             this.oneWayModel.setProperty('/keyConfig', keyConfig);
             this.twoWayModel.setProperty('/keyConfig', keyConfig);
-            const keys = await this.getKeys();
-            const allSystems = await this.getAllSystems();
-            const connectedSystems = await this.getConnectedSystems();
+            await this.updateKeysTable();
+            await this.updateSystemsTable();
             const tags = await this.getTags();
-            this.oneWayModel.setProperty('/keys', keys?.value);
-            this.oneWayModel.setProperty('/allSystems', allSystems?.value);
-            this.oneWayModel.setProperty('/systems', connectedSystems?.value);
             this.oneWayModel.setProperty('/tags', tags?.value);
-            this.oneWayModel.setProperty('/keysCount', keys?.count || 0);
-            this.oneWayModel.setProperty('/systemsCount', connectedSystems?.count || 0);
-            this.oneWayModel.setProperty('/allSystemsCount', allSystems?.count || 0);
         } catch (error) {
             console.error(error);
             MessageBox.error(this.getText('errorFetchingKeyConfigDetails'));
@@ -234,10 +253,64 @@ export default class KeyConfigDetail extends BaseController {
             this.getView().setBusy(false);
         }
     }
+    //* We have two tables one for Keys and one for Systems, hence two sets of navigation functions *//
+    private async onKeysNextPage() {
+        this.keysCurrentPage++;
+        this.keysSkip += 10;
+        await this.updateKeysTable();
+    }
+    private async onKeysPreviousPage() {
+        this.keysCurrentPage--;
+        this.keysSkip -= 10;
+        await this.updateKeysTable();
+    }
+    private async onSystemsNextPage() {
+        this.systemsCurrentPage++;
+        this.systemsSkip += 10;
+        await this.updateSystemsTable();
+    }
+    private async onSystemsPreviousPage() {
+        this.systemsCurrentPage--;
+        this.systemsSkip -= 10;
+        await this.updateSystemsTable();
+    }
+    private resetPagination(): void {
+        this.keysCurrentPage = 0;
+        this.keysSkip = 0;
+        this.keysPaginationModel.setProperty('/currentPage', 0);
+        this.keysPaginationModel.setProperty('/totalPages', 1);
+        this.systemsCurrentPage = 0;
+        this.systemsSkip = 0;
+        this.systemsPaginationModel.setProperty('/currentPage', 0);
+        this.systemsPaginationModel.setProperty('/totalPages', 1);
+    }
+
+    private async updateKeysTable() {
+        this.oneWayModel.setProperty('/keysTableUpdating', true);
+        const keys = await this.getKeys();
+        this.oneWayModel.setProperty('/keys', keys?.value);
+        this.oneWayModel.setProperty('/keysCount', keys?.count || 0);
+        this.keysPaginationModel.setProperty('/totalPages', Math.ceil(keys.count / this.top));
+        this.keysPaginationModel.setProperty('/currentPage', this.keysCurrentPage + 1);
+        this.oneWayModel.setProperty('/keysCount', keys?.count || 0);
+        this.oneWayModel.setProperty('/keysTableUpdating', false);
+    }
+    private async updateSystemsTable() {
+        this.oneWayModel.setProperty('/systemsTableUpdating', true);
+        const allSystems = await this.getAllSystems();
+        const connectedSystems = await this.getConnectedSystems();
+        this.oneWayModel.setProperty('/allSystems', allSystems?.value);
+        this.oneWayModel.setProperty('/systems', connectedSystems?.value);
+        this.oneWayModel.setProperty('/systemsCount', connectedSystems?.count || 0);
+        this.systemsPaginationModel.setProperty('/totalPages', Math.ceil(connectedSystems.count / this.top));
+        this.systemsPaginationModel.setProperty('/currentPage', this.systemsCurrentPage + 1);
+
+        this.oneWayModel.setProperty('/allSystemsCount', allSystems?.count || 0);
+        this.oneWayModel.setProperty('/systemsTableUpdating', false);
+    }
     private async getKeys() {
         try {
-            const keys = await this.api.get<KeyResponse>(`keys`, { keyConfigurationID: this.keyConfigId });
-            return keys;
+            return await this.api.get<KeyResponse>(`keys`, { keyConfigurationID: this.keyConfigId, $top: this.top, $skip: this.keysSkip });
         } catch (error) {
             console.error(error);
             MessageBox.error(this.getText('errorFetchingKeyDetails'));
@@ -245,8 +318,7 @@ export default class KeyConfigDetail extends BaseController {
     }
     private async getConnectedSystems() {
         try {
-            const systems = await this.api.get<KeyResponse>(`systems`, { keyConfigurationID: this.keyConfigId });
-            return systems;
+            return await this.api.get<KeyResponse>(`systems`, { keyConfigurationID: this.keyConfigId, $top: this.top, $skip: this.systemsSkip });
         } catch (error) {
             console.error(error);
             MessageBox.error(this.getText('errorFetchingSystems'));
@@ -254,8 +326,7 @@ export default class KeyConfigDetail extends BaseController {
     }
     private async getAllSystems() {
         try {
-            const systems = await this.api.get<SystemsResponse>(`systems`);
-            return systems;
+            return await this.api.get<SystemsResponse>(`systems`);
         } catch (error) {
             console.error(error);
             MessageBox.error(this.getText('errorFetchingSystems'));

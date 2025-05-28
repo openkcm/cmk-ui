@@ -2,9 +2,8 @@
     controllerName="kms.controller.keyConfigs.KeyConfigs"
     xmlns="sap.m"
     xmlns:f="sap.f"
-    xmlns:card="sap.f.cards"
     xmlns:core="sap.ui.core"
-    xmlns:mdc="sap.ui.mdc"
+    xmlns:kms="kms.control"
     xmlns:mvc="sap.ui.core.mvc"
     core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
     <f:DynamicPage>
@@ -44,6 +43,11 @@
                     <core:Fragment
                         fragmentName="kms.resources.fragments.keyConfigs.Dashboard"
                         type="XML" />
+                    <kms:Pagination
+                            currentPage="{pagination>/currentPage}"
+                            totalPages="{pagination>/totalPages}"
+                            onPreviousPage="onPreviousPage"
+                            onNextPage="onNextPage" />
                 </VBox>
                 <IllustratedMessage enableVerticalResponsiveness="false"
                     title="{i18n>noKeyConfigurations}"

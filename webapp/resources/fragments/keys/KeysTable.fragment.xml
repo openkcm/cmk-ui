@@ -12,6 +12,7 @@
                     }
                 }"
         contextualWidth="Auto"
+        busy="{oneWay>/keysTableUpdating}"
         popinLayout="GridSmall">
         <headerToolbar>
             <OverflowToolbar>

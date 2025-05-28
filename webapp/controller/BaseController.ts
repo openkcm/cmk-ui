@@ -17,7 +17,6 @@ export default class BaseController extends Controller {
         this.Enums = Enums;
         this.Constants = Constants;
         this.tenantId = undefined
-
     }
     public getRouter(): Router {
         return UIComponent.getRouterFor(this);
@@ -33,7 +32,7 @@ export default class BaseController extends Controller {
         const component = this.getOwnerComponent() as UIComponent & { _currentRoute: string };
         return component._currentRoute;
     }
-    public getText(key: string, params?: string | string[]) {
+    public getText(key: string, params?: string | string[] | number | number[] ) {
         const paramsType = typeof params;
         const resourceBundle = (this.getOwnerComponent().getModel("i18n") as ResourceModel).getResourceBundle() as ResourceBundle;
         let formattedText: string = "";

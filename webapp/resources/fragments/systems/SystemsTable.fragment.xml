@@ -5,7 +5,8 @@
     <Table
         id="systemsTable"
         inset="false"
-        items="{oneWay>/systems}">
+        items="{oneWay>/systems}"
+        busy="{oneWay>/systemsTableUpdating}">
         <headerToolbar>
             <OverflowToolbar>
                 <Title
@@ -13,7 +14,7 @@
                     level="H2" />
                 <ToolbarSpacer />
                 <Button text="{i18n>connect}" icon="sap-icon://add" type="Ghost"
-                    press="onConnectSystemPress" visible="{= !!${oneWay>/keyConfigDetail}}"></Button>
+                    press="onConnectSystemPress" visible="{= !!${oneWay>/keyConfigDetail}}"/>
                 <Button
                     icon="sap-icon://filter"
                     press="onKeysTableFilterPress"

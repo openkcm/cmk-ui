@@ -22,7 +22,7 @@ export default class Api {
 
     }
 
-    public async get<T>(endpoint: string, params?: Record<string, string | number>): Promise<T> {
+    public async get<T>(endpoint: string, params?: Record<string, string | number | boolean>): Promise<T> {
         this.setAxiosHeaderContentType(this.defaultContentType);
         try {
             const response: AxiosResponse<T> = await this.axiosInstance.get(endpoint, { params: { ...params, $count: true } });

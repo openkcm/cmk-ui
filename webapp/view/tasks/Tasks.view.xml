@@ -5,6 +5,7 @@
     xmlns:m="sap.m"
     xmlns:fb="kms.control"
     xmlns:core="sap.ui.core"
+    xmlns:kms="kms.control"
     xmlns:mvc="sap.ui.core.mvc">
     <f:DynamicPage>
         <f:title>
@@ -53,6 +54,11 @@
                         <core:Fragment
                             fragmentName="kms.resources.fragments.tasks.TasksTable"
                             type="XML" />
+                        <kms:Pagination
+                                currentPage="{pagination>/currentPage}"
+                                totalPages="{pagination>/totalPages}"
+                                onPreviousPage="onPreviousPage"
+                                onNextPage="onNextPage" />
                     </m:VBox>
                 </Panel>
                 <m:VBox visible="{= ${oneWay>/workflowTasks}.length === 0 }">

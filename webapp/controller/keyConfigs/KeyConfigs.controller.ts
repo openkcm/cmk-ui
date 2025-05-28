@@ -31,17 +31,29 @@ export default class Keys extends BaseController {
     private sortPopover: ViewSettingsDialog | undefined;
     private readonly createConfigModel = new JSONModel({});
     private configCreatePopover: Dialog | undefined;
+    private skip: number;
+    private top: number;
+    private currentPage: number;
+    private readonly paginationModel = new JSONModel({
+        totalPages: 0,
+        currentPage: 1
+    });
 
     public onInit(): void {
         super.onInit();
+        this.skip = 0;
+        this.top = 10;
+        this.currentPage = 0;
         this.getRouter().getRoute('keyConfigs').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.viewSettingModel.setDefaultBindingMode(BindingMode.TwoWay);
         this.setModel(this.oneWayModel, 'oneWay');
         this.setModel(this.viewSettingModel, 'viewSettingModel');
+        this.setModel(this.paginationModel, 'pagination');
     };
 
     public onRouteMatched(event: Route$PatternMatchedEvent): void {
+        this.resetPagination();
         const routeArgs = event.getParameter('arguments') as { tenantId: string };
         this.api = new Api(routeArgs?.tenantId);
         this.tenantId = routeArgs?.tenantId;
@@ -60,14 +72,32 @@ export default class Keys extends BaseController {
         ];
         this.oneWayModel.setProperty('/hyokProviders', hyokProviders);
     }
+    private async onNextPage() {
+        this.currentPage++;
+        this.skip += 10;
+        await this.setKeyConfigs();
+    }
+    private async onPreviousPage() {
+        this.currentPage--;
+        this.skip -= 10;
+        await this.setKeyConfigs();
+    }
+    private resetPagination(): void {
+        this.currentPage = 0;
+        this.skip = 0;
+        this.paginationModel.setProperty('/currentPage', 0);
+        this.paginationModel.setProperty('/totalPages', 1);
+    }
 
     private async setKeyConfigs(): Promise<void> {
         this.getView().setBusy(true);
         try {
-            const keyConfigs = await this.api.get<KeyConfigsResponse>('keyConfigurations', {});
+            const keyConfigs = await this.api.get<KeyConfigsResponse>('keyConfigurations', { $top: this.top, $skip: this.skip });
             const keyConfigsData = keyConfigs.value;
             this.oneWayModel.setProperty('/configs', keyConfigsData);
             this.oneWayModel.setProperty('/configsCount', keyConfigs.count || 0);
+            this.paginationModel.setProperty('/totalPages', Math.ceil(keyConfigs.count / this.top));
+            this.paginationModel.setProperty('/currentPage', this.currentPage + 1);
         } catch (error) {
             console.error(error);
             MessageBox.error(this.getText('errorFetchingKeyConfigs'));

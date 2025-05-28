@@ -1,8 +1,6 @@
 <core:FragmentDefinition xmlns="sap.m"
     xmlns:core="sap.ui.core"
-    xmlns:tnt="sap.tnt"
-    core:require="{ formatMessage: 'sap/base/strings/formatMessage', commonFormatter: 'kms/common/Formatters' }"
->
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage', commonFormatter: 'kms/common/Formatters' }">
     <Table
         id="tasksTable"
         inset="false"
