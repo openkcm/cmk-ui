@@ -11,10 +11,9 @@ export default class Api {
 
     constructor(tenantId: string) {
         this.axiosInstance = axios.create({
-            baseURL: this.baseURL,
+            baseURL: `${this.baseURL}/${tenantId}`,
             headers: {
-                'Content-Type': 'application/json',
-                'X-Tenant': tenantId
+                'Content-Type': 'application/json'
             },
         });
         this.setAxiosHeaderContentType = (contentType) => {
