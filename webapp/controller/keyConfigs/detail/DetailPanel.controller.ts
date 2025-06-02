@@ -177,48 +177,4 @@ export default class DetailPanel extends BaseController {
             await this.getSystemDetails();
         }
     }
-    // eslint-disable-next-line @typescript-eslint/require-await
-    public async onDisableVersionPress(event: Button$PressEvent): Promise<void> {
-        const path = event.getSource().getBindingContext('oneWay').getPath();
-        const selectedKey = this.oneWayModel.getProperty(path) as KeyVersion;
-        const version = selectedKey.version;
-        MessageBox.confirm(this.getText('confirmKeyDisable'), {
-            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-            onClose: async (action: unknown) => {
-                if (action === MessageBox.Action.YES) {
-                    await this.patchKeyVersion(this.id, version, false);
-                }
-            }
-        });
-    }
-    // eslint-disable-next-line @typescript-eslint/require-await
-    public async onEnableVersionPress(event: Button$PressEvent): Promise<void> {
-        const path = event.getSource().getBindingContext('oneWay').getPath();
-        const selectedKey = this.oneWayModel.getProperty(path) as KeyVersion;
-        const version = selectedKey.version;
-        MessageBox.confirm(this.getText('confirmKeyEnable'), {
-            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-            onClose: async (action: unknown) => {
-                if (action === MessageBox.Action.YES) {
-                    await this.patchKeyVersion(this.id, version, true);
-                }
-            }
-        });
-    }
-    private async patchKeyVersion(keyId: string, version: number, enabled: boolean): Promise<void> {
-        this.getView().setBusy(true);
-        const payload = {
-            enabled: enabled
-        } as KeyPatchPayload;
-        try {
-            await this.api.patch<KeyPatchPayload, KeyVersion>(`keys/${keyId}/versions/${version}`, payload);
-            MessageToast.show(this.getText('keyDisabledSuccessfully'));
-            await this.getKeyDetails();
-        } catch (error) {
-            console.error(error);
-            MessageBox.error(this.getText('errorUpdatingKeyVersion'));
-        } finally {
-            this.getView().setBusy(false);
-        }
-    }
 }

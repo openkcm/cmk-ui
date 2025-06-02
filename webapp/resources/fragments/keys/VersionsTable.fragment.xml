@@ -46,19 +46,6 @@
                 demandPopin="true">
                 <Text text="{i18n>createdOn}" wrapping="true" />
             </Column>
-            <Column
-                hAlign="End"
-                vAlign="Middle"
-                minScreenWidth="XSmall"
-                demandPopin="true">
-                <Text text="{i18n>state}" wrapping="false" />
-            </Column>
-            <Column
-                hAlign="End"
-                vAlign="Middle"
-                minScreenWidth="XSmall"
-                demandPopin="true">
-            </Column>
         </columns>
         <items>
             <ColumnListItem vAlign="Middle" type="Inactive">
@@ -68,7 +55,7 @@
                             icon="sap-icon://favorite"
                             visible="{= !!${oneWay>isPrimary}}"
                             class="sapUiTinyMarginEnd"
-                            text="{oneWay>version} • {i18n>primary}"
+                            text="{oneWay>version} • {i18n>active}"
                             displayOnly="true"
                             colorScheme="5" />
                         <Text text="{oneWay>version}" visible="{= !${oneWay>isPrimary}}" />
@@ -85,23 +72,6 @@
                             visible="{= ${oneWay>state} === 'DISABLED'}"
                             text="{i18n>disabled}"
                             colorScheme="2" />
-                    </VBox>
-                    <VBox alignContent="Center" justifyContent="Start">
-                        <MenuButton icon="sap-icon://action-settings" type="Transparent"
-                            visible="{= ${oneWay>/selectedKey/state} !== 'DISABLED' &amp;&amp; !!${oneWay>/selectedKey/state}}">
-                            <menu>
-                                <Menu class="sapUiSizeCompact">
-                                    <MenuItem text="{i18n>disable}"
-                                        icon="sap-icon://log"
-                                        visible="{= ${oneWay>state} === 'ENABLED'}"
-                                        press="onDisableVersionPress" />
-                                    <MenuItem text="{i18n>enable}"
-                                        icon="sap-icon://log"
-                                        visible="{= ${oneWay>state} === 'DISABLED'}"
-                                        press="onEnableVersionPress" />
-                                </Menu>
-                            </menu>
-                        </MenuButton>
                     </VBox>
                 </cells>
             </ColumnListItem>
