@@ -16,13 +16,23 @@
                     text="{parts: ['i18n>keysWithCount', 'oneWay>/keysCount'], formatter: 'formatMessage'}"
                     level="H2" />
                 <ToolbarSpacer />
-                <MenuButton text="{i18n>create}" icon="sap-icon://add" type="Ghost">
+                <MenuButton text="{i18n>add}" icon="sap-icon://add" type="Ghost">
                     <menu>
                         <Menu class="sapUiSizeCompact">
                             <MenuItem text="{i18n>sapManaged}"
                                 press=".handleCreateKeyRoute('SYSTEM_MANAGED')" />
-                            <MenuItem text="{i18n>hyok}"
-                                press=".handleCreateKeyRoute('HYOK')" />
+                            <MenuItem text="{i18n>hyok}">
+                                <items>
+                                    <MenuItemGroup
+                                        items="{oneWay>/hyokProviders}"
+                                        itemSelectionMode="None">
+                                        <items>
+                                            <MenuItem text="{oneWay>}"
+                                                press=".handleCreateKeyRoute('HYOK', ${oneWay>})" />
+                                        </items>
+                                    </MenuItemGroup>
+                                </items>
+                            </MenuItem>
                         </Menu>
                     </menu>
                 </MenuButton>

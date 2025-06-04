@@ -64,13 +64,23 @@
                     visible="{= !${oneWay>primaryKey}}"
                     height="110px"
                     class="outlined-dotted-box-rounded-corners sapUiSmallMargin">
-                    <MenuButton text="{i18n>createKey}" icon="sap-icon://add">
+                    <MenuButton text="{i18n>addKey}" icon="sap-icon://add">
                         <menu>
                             <Menu class="sapUiSizeCompact">
                                 <MenuItem text="{i18n>sapManaged}"
                                     press=".onKeyConfigDashboardCreateSAPKeyPress($event, 'SYSTEM_MANAGED')" />
-                                <MenuItem text="{i18n>hyok}"
-                                    press=".onKeyConfigDashboardCreateSAPKeyPress($event, 'HYOK')" />
+                                <MenuItem text="{i18n>hyok}">
+                                    <items>
+                                        <MenuItemGroup
+                                            items="{oneWay>/hyokProviders}"
+                                            itemSelectionMode="None">
+                                            <items>
+                                                <MenuItem text="{oneWay>}"
+                                                    press=".onKeyConfigDashboardCreateSAPKeyPress($event, 'HYOK', ${oneWay>})" />
+                                            </items>
+                                        </MenuItemGroup>
+                                    </items>
+                                </MenuItem>
                             </Menu>
                         </menu>
                     </MenuButton>

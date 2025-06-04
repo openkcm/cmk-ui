@@ -11,6 +11,7 @@ import ViewSettingsDialog from 'sap/m/ViewSettingsDialog';
 import Dialog from 'sap/m/Dialog';
 import MessageToast from 'sap/m/MessageToast';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
+import { BYOKProviders, HYOKProviders } from 'kms/common/Enums';
 interface KeyConfigsResponse {
     value: KeyConfig[];
     count: number;
@@ -19,7 +20,8 @@ export default class Keys extends BaseController {
     private api: Api;
     private readonly oneWayModel = new JSONModel({
         configs: [] as KeyConfig[],
-        configsCount: 0 as number
+        configsCount: 0 as number,
+        hyokProviders: [] as HYOKProviders[]
     });
     private readonly viewSettingModel = new JSONModel({
         sortColumns: [] as object[],
@@ -43,10 +45,21 @@ export default class Keys extends BaseController {
         const routeArgs = event.getParameter('arguments') as { tenantId: string };
         this.api = new Api(routeArgs?.tenantId);
         this.tenantId = routeArgs?.tenantId;
+        this.setHyokProviders();
         this.setKeyConfigs().catch((error) => {
             console.error(error);
         });
     };
+
+    private setHyokProviders(): void {
+        //@TODO Fetch the HYOK providers from the API when available
+        //For now, we are using a static list
+        const hyokProviders = [
+            HYOKProviders.AWS,
+            HYOKProviders.XYZ
+        ];
+        this.oneWayModel.setProperty('/hyokProviders', hyokProviders);
+    }
 
     private async setKeyConfigs(): Promise<void> {
         this.getView().setBusy(true);
@@ -97,12 +110,12 @@ export default class Keys extends BaseController {
             this.sortPopover.open();
         }
     };
-    public onKeyConfigDashboardCreateSAPKeyPress(event: Button$PressEvent, keyType: string): void {
+    public onKeyConfigDashboardCreateSAPKeyPress(event: Button$PressEvent, keyType: string, keySubtype?: HYOKProviders | BYOKProviders): void {
         const path = event.getSource().getBindingContext('oneWay').getPath();
         const selectedConfig = this.oneWayModel.getProperty(path) as KeyConfig;
         const keyConfigId: string = selectedConfig.id;
         this.getRouter().navTo('keyConfigDetail', {
-            query: { createKey: true, keyType: keyType },
+            query: { createKey: true, keyType, keySubtype },
             tenantId: this.tenantId,
             keyConfigId: keyConfigId
         });

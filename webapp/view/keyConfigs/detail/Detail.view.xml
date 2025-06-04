@@ -56,7 +56,6 @@
                                 fragmentName="kms.resources.fragments.keyConfigs.DetailsForm"
                                 type="XML" />
                         </m:VBox>
-
                         <m:VBox visible="{= !!${oneWay>/edit}}">
                             <core:Fragment
                                 fragmentName="kms.resources.fragments.keyConfigs.DetailsFormEditable"

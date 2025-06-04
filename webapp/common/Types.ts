@@ -1,4 +1,4 @@
-import { ActionTypes, ArtifactTypes, KeyStates, TaskStates, TaskStatus } from "kms/common/Enums";
+import { ActionTypes, ArtifactTypes, KeyCreationTypes, KeyStates, TaskStates, TaskStatus } from "kms/common/Enums";
 
 export interface System {
     id: string;
@@ -91,4 +91,24 @@ export interface Approver {
     id: string,
     name: string,
     decision: TaskStatus.APPROVED | TaskStatus.REJECTED | TaskStatus.PENDING
+}
+
+//Change the types once the backlend schema is ready for HYOK
+export interface MangedKeyPayload {
+    name: string,
+    keyConfigurationID: string,
+    type: KeyCreationTypes,
+    description: string,
+    algorithm: string,
+    region: string,
+    provider: string,
+    enabled: boolean
+}
+export interface HyokKeyPayload {
+    name: string,
+    keyConfigurationID: string,
+    type: KeyCreationTypes,
+    description: string,
+    enabled: boolean,
+    nativeId: string
 }

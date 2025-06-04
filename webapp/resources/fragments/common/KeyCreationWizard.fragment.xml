@@ -7,7 +7,6 @@
     xmlns:layout="sap.ui.layout">
     <Dialog
         escapeHandler=".onKeyCreationWizardCancelPress"
-        id="wizardDialog"
         showHeader="false"
         verticalScrolling="false"
         contentHeight="80%"
