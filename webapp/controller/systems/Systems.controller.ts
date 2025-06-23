@@ -31,6 +31,7 @@ export default class Systems extends BaseController {
     private readonly oneWayModel = new JSONModel({
         systems: [] as System[],
         systemsCount: 0 as number,
+        isSytemsView: true as boolean,
         noTableDataText: 'noSystemsAvailable',
         noTableDataIllustrationType: 'tnt-NoApplications',
         systemsTableUpdating: false as boolean
@@ -68,7 +69,7 @@ export default class Systems extends BaseController {
         this.oneWayModel.setProperty('/systemsTableUpdating', true);
         this.getSystems().catch((error) => {
             console.error(error);
-        }).finally( () => {
+        }).finally(() => {
             this.oneWayModel.setProperty('/systemsTableUpdating', false);
         });
     }
@@ -77,7 +78,7 @@ export default class Systems extends BaseController {
         this.skip += 10;
         this.updateSystemsTable();
     }
-    private onPreviousPage () {
+    private onPreviousPage() {
         this.currentPage--;
         this.skip -= 10;
         this.updateSystemsTable();
@@ -133,12 +134,14 @@ export default class Systems extends BaseController {
         const component = this.getOwnerComponent();
         const keyConfigs = await this.api.get<KeyConfigsResponse>('keyConfigurations', {});
 
+
         if (!this.connectTargetSystem) {
             this.connectTargetSystem = await Fragment.load({
                 name: 'kms.resources.fragments.common.ConnectTargetSystem',
                 controller: this
             }) as Dialog;
-            const keyConfigsData = keyConfigs.value;
+            //TODO:Perhaps it is better to have this filter in the backend.
+            const keyConfigsData = keyConfigs.value.filter((keyConfig: KeyConfig) => keyConfig?.canConnectSystems);
             this.connectTargetSystem.addStyleClass('sapUiSizeCompact');
             this.connectTargetSystem.setModel(component.getModel('i18n'), 'i18n');
             this.connectSystemModel.setData(selectedSystem);

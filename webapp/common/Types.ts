@@ -23,6 +23,7 @@ export interface KeyConfig {
     id: string;
     description: string;
     adminGroupID: string;
+    canConnectSystems: boolean;
     metadata: {
         creatorID: string,
         creatorName: string,

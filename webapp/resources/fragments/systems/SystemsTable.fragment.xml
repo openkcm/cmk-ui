@@ -2,6 +2,16 @@
     xmlns:core="sap.ui.core"
     xmlns:tnt="sap.tnt"
     core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    <Hbox width="100%"
+        justifyContent="End">
+        <tnt:InfoLabel
+            visible="{= !${oneWay>/keyConfig/canConnectSystems} &amp;&amp; !${oneWay>/isSytemsView}}"
+            icon="sap-icon://warning"
+            text="{i18n>connectSystemDisabledTooltip}"
+            renderMode="Narrow"
+            colorScheme="1"
+        />
+    </Hbox>
     <Table
         id="systemsTable"
         inset="false"
@@ -13,8 +23,11 @@
                     text="{parts: ['i18n>systemsCount', 'oneWay>/systemsCount'], formatter: 'formatMessage'}"
                     level="H2" />
                 <ToolbarSpacer />
-                <Button text="{i18n>connect}" icon="sap-icon://add" type="Ghost"
-                    press="onConnectSystemPress" visible="{= !!${oneWay>/keyConfigDetail}}"/>
+                <Button text="{i18n>connect}" icon="sap-icon://add"
+                    enabled="{= ${oneWay>/keyConfig/canConnectSystems}}"
+                    press="onConnectSystemPress"
+                    visible="{= !!${oneWay>/keyConfigDetail}}"
+                ></Button>
                 <Button
                     icon="sap-icon://filter"
                     press="onKeysTableFilterPress"
@@ -26,6 +39,7 @@
                     type="Transparent" />
             </OverflowToolbar>
         </headerToolbar>
+
         <columns>
             <Column minScreenWidth="Tablet" demandPopin="true">
                 <Text text="{i18n>name}" />

@@ -17,14 +17,16 @@
                     level="H2" />
                 <ToolbarSpacer />
                 <Button text="{i18n>connect}" icon="sap-icon://chain-link" type="Ghost"
+                    enabled="{= ${oneWay>/keyConfig/canConnectSystems}}"
                     press="onConnectSystemPress" />
             </OverflowToolbar>
         </forms:toolbar>
     </forms:Form>
     <IllustratedMessage
         enableVerticalResponsiveness="false"
-        title="{i18n>noSystems}"
-        description="{i18n>connectSystemHint}"
+        title="{= ${oneWay>/keyConfig/canConnectSystems}? ${i18n>noSystems}: ${i18n>connectSystemsDisabled} }"
+        description="{= ${oneWay>/keyConfig/canConnectSystems}? ${i18n>connectSystemHint}: ${i18n>connectSystemDisabledTooltip} }"
         illustrationType="tnt-NoApplications"
         illustrationSize="Dialog" />
+
 </core:FragmentDefinition>
