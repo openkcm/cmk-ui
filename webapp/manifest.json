@@ -49,7 +49,6 @@
                 "sap.m": {},
                 "sap.tnt": {},
                 "sap.ui.core": {},
-                "sap.ui.comp": {},
                 "sap.ui.layout": {},
                 "sap.uxap": {}
             }

@@ -2,10 +2,10 @@
     controllerName="kms.controller.systems.Systems"
     xmlns="sap.m"
     xmlns:table="sap.ui.table"
-    xmlns:fb="sap.ui.comp.filterbar"
     xmlns:core="sap.ui.core"
     xmlns:m="sap.m"
     xmlns:f="sap.f"
+    xmlns:fb="kms.control"
     core:require="{ formatMessage: 'sap/base/strings/formatMessage' }"
     xmlns:mvc="sap.ui.core.mvc">
     <f:DynamicPage>
@@ -22,61 +22,46 @@
         <f:header>
             <f:DynamicPageHeader>
                 <f:content>
-                    <fb:FilterBar useToolbar="false"
-                        search="getSystems" filterChange=".onFilterChange">
-                        <fb:filterGroupItems>
-                            <fb:FilterGroupItem name="Region" label="{i18n>region}"
-                                groupName="Group1"
-                                visibleInFilterBar="true">
-                                <fb:control>
-                                    <MultiComboBox
-                                        name="{i18n>region}"
-                                        selectionChange=".onSelectionChange"
-                                        placeholder="{i18n>all}"
-                                        items="{oneWay>/systems}">
-                                        <core:Item key="{oneWay>region}" text="{oneWay>region}" />
-                                    </MultiComboBox>
-                                </fb:control>
-                            </fb:FilterGroupItem>
-                            <fb:FilterGroupItem name="SID" label="{i18n>sid}" groupName="Group1"
-                                visibleInFilterBar="true">
-                                <fb:control>
-                                    <MultiComboBox
-                                        placeholder="{i18n>all}"
-                                        name="{i18n>sid}"
-                                        items="{oneWay>/systems}">
-                                        <core:Item key="{oneWay>sid}" text="{oneWay>sid}" />
-                                    </MultiComboBox>
-                                </fb:control>
-                            </fb:FilterGroupItem>
-                            <fb:FilterGroupItem name="System Role" label="{i18n>systemsRole}"
-                                groupName="Group1" visibleInFilterBar="true">
-                                <fb:control>
-                                    <MultiComboBox
-                                        placeholder="{i18n>all}"
-                                        name="{i18n>systemsRole}"
-                                        selectionChange=".onSelectionChange"
-                                        items="{oneWay>/systems}">
-                                        <core:Item key="{oneWay>systemRole}"
-                                            text="{oneWay>systemRole}" />
-                                    </MultiComboBox>
-                                </fb:control>
-                            </fb:FilterGroupItem>
-                            <fb:FilterGroupItem name="Key Configuration"
-                                label="{i18n>keyConfiguration}"
-                                groupName="Group1" visibleInFilterBar="true">
-                                <fb:control>
-                                    <MultiComboBox
-                                        placeholder="{i18n>all}"
-                                        name="{i18n>keyConfiguration}"
-                                        selectionChange=".onSelectionChange"
-                                        items="{oneWay>/systems}">
-                                        <core:Item key="{oneWay>keyConfig}"
-                                            text="{oneWay>keyConfig}" />
-                                    </MultiComboBox>
-                                </fb:control>
-                            </fb:FilterGroupItem>
-                        </fb:filterGroupItems>
+                    <fb:FilterBar id="systemsFilterBar" search="getSystems"
+                        reset="onReset">
+                        <fb:FilterBarItem label="{i18n>region}">
+                            <MultiComboBox
+                                name="{i18n>region}"
+                                selectionChange=".onSelectionChange"
+                                placeholder="{i18n>all}"
+                                items="{oneWay>/systems}">
+                                <core:Item key="{oneWay>region}" text="{oneWay>region}" />
+                            </MultiComboBox>
+                        </fb:FilterBarItem>
+                        <fb:FilterBarItem label="{i18n>sid}">
+                            <MultiComboBox
+                                placeholder="{i18n>all}"
+                                name="{i18n>sid}"
+                                items="{oneWay>/systems}">
+                                <core:Item key="{oneWay>sid}" text="{oneWay>sid}" />
+                            </MultiComboBox>
+                        </fb:FilterBarItem>
+
+                        <fb:FilterBarItem label="{i18n>systemsRole}">
+                            <MultiComboBox
+                                placeholder="{i18n>all}"
+                                name="{i18n>systemsRole}"
+                                selectionChange=".onSelectionChange"
+                                items="{oneWay>/systems}">
+                                <core:Item key="{oneWay>systemRole}"
+                                    text="{oneWay>systemRole}" />
+                            </MultiComboBox>
+                        </fb:FilterBarItem>
+                        <fb:FilterBarItem label="{i18n>keyConfiguration}">
+                            <MultiComboBox
+                                placeholder="{i18n>all}"
+                                name="{i18n>keyConfiguration}"
+                                selectionChange=".onSelectionChange"
+                                items="{oneWay>/systems}">
+                                <core:Item key="{oneWay>keyConfig}"
+                                    text="{oneWay>keyConfig}" />
+                            </MultiComboBox>
+                        </fb:FilterBarItem>
                     </fb:FilterBar>
                 </f:content>
             </f:DynamicPageHeader>

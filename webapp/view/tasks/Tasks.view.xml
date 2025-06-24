@@ -3,7 +3,7 @@
     xmlns:f="sap.f"
     xmlns="sap.m"
     xmlns:m="sap.m"
-    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:fb="kms.control"
     xmlns:core="sap.ui.core"
     xmlns:mvc="sap.ui.core.mvc">
     <f:DynamicPage>
@@ -20,40 +20,28 @@
         <f:header>
             <f:DynamicPageHeader>
                 <f:content>
-                    <fb:FilterBar useToolbar="false"
-                        search="getTasks" filterChange=".onTaskFilterChange">
-                        <fb:filterGroupItems>
-                            <fb:FilterGroupItem name="Status" label="{i18n>status}"
-                                groupName="Group1"
-                                visibleInFilterBar="true">
-                                <fb:control>
-                                    <MultiComboBox
-                                        name="{i18n>status}"
-                                        selectionChange=".ontaskStatusFilterSelect"
-                                        placeholder="{i18n>all}"
-                                        items="{oneWay>/tasksStatusItems}">
-                                        <core:Item key="{oneWay>}"
-                                            text="{parts: ['oneWay>'], formatter: '.getText'}" />
-                                    </MultiComboBox>
-                                </fb:control>
-                            </fb:FilterGroupItem>
-                        </fb:filterGroupItems>
-                        <fb:filterGroupItems>
-                            <fb:FilterGroupItem name="Workflow Type" label="{i18n>workflowType}"
-                                groupName="Group1"
-                                visibleInFilterBar="true">
-                                <fb:control>
-                                    <MultiComboBox
-                                        name="{i18n>taskType}"
-                                        selectionChange=".ontaskStatusFilterSelect"
-                                        placeholder="{i18n>all}"
-                                        items="{oneWay>/taskTypes}">
-                                        <core:Item key="{oneWay>}"
-                                            text="{parts: ['oneWay>'], formatter: '.getText'}" />
-                                    </MultiComboBox>
-                                </fb:control>
-                            </fb:FilterGroupItem>
-                        </fb:filterGroupItems>
+                    <fb:FilterBar id="tasksFilterBar" search="getTasks"
+                        reset="onReset">
+                        <fb:FilterBarItem label="{i18n>status}">
+                            <MultiComboBox
+                                name="{i18n>status}"
+                                selectionChange=".ontaskStatusFilterSelect"
+                                placeholder="{i18n>all}"
+                                items="{oneWay>/tasksStatusItems}">
+                                <core:Item key="{oneWay>}"
+                                    text="{parts: ['oneWay>'], formatter: '.getText'}" />
+                            </MultiComboBox>
+                        </fb:FilterBarItem>
+                        <fb:FilterBarItem label="{i18n>workflowType}">
+                            <MultiComboBox
+                                name="{i18n>taskType}"
+                                selectionChange=".ontaskStatusFilterSelect"
+                                placeholder="{i18n>all}"
+                                items="{oneWay>/taskTypes}">
+                                <core:Item key="{oneWay>}"
+                                    text="{parts: ['oneWay>'], formatter: '.getText'}" />
+                            </MultiComboBox>
+                        </fb:FilterBarItem>
                     </fb:FilterBar>
                 </f:content>
             </f:DynamicPageHeader>
