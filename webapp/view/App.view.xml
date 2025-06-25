@@ -93,9 +93,9 @@
                         key="tasks">
                     </tnt:NavigationListItem>
                     <tnt:NavigationListItem
-                        text="{i18n>sideContentUserManagement}"
+                        text="{i18n>sideContentGroupManagement}"
                         icon="sap-icon://employee"
-                        key="users">
+                        key="groups">
                     </tnt:NavigationListItem>
                 </tnt:NavigationList>
                 <tnt:fixedItem>

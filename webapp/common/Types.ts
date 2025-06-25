@@ -12,12 +12,11 @@ export interface Groups {
     id: string;
     groups: Groups[];
     name: string;
+    edit: boolean;
 };
-export interface User {
-    id: string;
+export interface Group {
     name: string;
-    email: string;
-    groupName: string;
+    description: string;
 };
 export interface KeyConfig {
     name: string;

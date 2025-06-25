@@ -1,5 +1,5 @@
 <mvc:View
-    controllerName="kms.controller.users.Users"
+    controllerName="kms.controller.groups.Groups"
     xmlns="sap.m"
     xmlns:f="sap.f"
     xmlns:mvc="sap.ui.core.mvc"
@@ -9,16 +9,21 @@
         <f:title>
             <f:DynamicPageTitle>
                 <f:heading>
-                    <Title text="{i18n>sideContentUserManagement}" />
+                    <Title text="{i18n>sideContentGroupManagement}" />
                 </f:heading>
                 <f:snappedTitleOnMobile>
-                    <Title text="{i18n>sideContentUserManagement}" />
+                    <Title text="{i18n>sideContentGroupManagement}" />
                 </f:snappedTitleOnMobile>
                 <f:actions>
                     <Button
                         icon="sap-icon://refresh"
                         type="Transparent"
                         press="setGroups" />
+                    <Button
+                        icon="sap-icon://add"
+                        type="Emphasized"
+                        text="{i18n>createGroup}"
+                        press="onCreateGroupPress" />
                 </f:actions>
             </f:DynamicPageTitle>
         </f:title>
@@ -27,7 +32,7 @@
                 <Panel visible="{= ${oneWay>/groupsCount} > 0 }">
                     <VBox>
                         <core:Fragment
-                            fragmentName="kms.resources.fragments.users.UserGroupsTable"
+                            fragmentName="kms.resources.fragments.groups.UserGroupsTable"
                             type="XML" />
                     </VBox>
                 </Panel>

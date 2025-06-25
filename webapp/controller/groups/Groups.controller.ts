@@ -1,0 +1,205 @@
+import BaseController from 'kms/controller/BaseController';
+import JSONModel from 'sap/ui/model/json/JSONModel';
+import BindingMode from 'sap/ui/model/BindingMode';
+import Api from 'kms/services/Api.service';
+import { Groups } from 'kms/common/Types';
+import MessageBox from 'sap/m/MessageBox';
+import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
+import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
+import Dialog from 'sap/m/Dialog';
+import Fragment from 'sap/ui/core/Fragment';
+import MessageToast from 'sap/m/MessageToast';
+import { setNameValueState } from 'kms/common/Helpers';
+
+
+interface GroupsResponse {
+    value: Groups[];
+    count: number;
+}
+export default class Group extends BaseController {
+    private api: Api;
+    private readonly oneWayModel = new JSONModel({
+        noTableDataText: 'noUserGroupsCreated',
+        noTableDataIllustrationType: 'tnt-NoUsers',
+    });
+    private groupCreatePopover: Dialog | undefined;
+    private readonly createGroupModel = new JSONModel({});
+    id: string | number;
+    groupId: string;
+
+    public onInit(): void {
+        super.onInit();
+        this.getRouter().getRoute('groups').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
+        this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
+        this.setModel(this.oneWayModel, 'oneWay');
+    };
+
+    public onRouteMatched(event: Route$PatternMatchedEvent): void {
+        const routeArgs = event.getParameter('arguments') as { tenantId: string };
+        this.api = new Api(routeArgs?.tenantId);
+        this.tenantId = routeArgs?.tenantId;
+        this.setGroups().catch((error) => {
+            console.error(error);
+        });
+    };
+
+    private async setGroups(): Promise<void> {
+        this.getView().setBusy(true);
+        try {
+            const groups = await this.api.get<GroupsResponse>('groups', {});
+            const groupsData = groups.value;
+            this.oneWayModel.setProperty('/groupsData', groupsData);
+            this.oneWayModel.setProperty('/groupsCount', groups.count || 0);
+
+            this.createGroupModel.setData({
+                name: '' as string,
+                description: '' as string,
+                adminGroup: '' as string,
+                adminGroupList: [
+                    {
+                        key: '',
+                        text: 'Tenant Administrator'
+                    }
+                ],
+                createButtonEnabled: false as boolean,
+                nameValueState: 'None' as string,
+                nameValueStateText: '' as string,
+                adminGroupValueState: 'None' as string,
+                adminGroupValueStateText: '' as string
+            }, true);
+
+        } catch (error) {
+            console.error(error);
+            this.oneWayModel.setProperty('/groupsCount', 0);
+            MessageBox.error(this.getText('errorFetchingGroups'));
+        } finally {
+            this.getView().setBusy(false);
+        }
+    };
+
+    public onUserPress(event: ListItemBase$PressEvent): void {
+        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const selectedGroup = this.oneWayModel.getProperty(path) as { id: string };
+        this.groupId = selectedGroup.id;
+        this.getRouter().navTo('groupDetail', {
+            tenantId: this.tenantId,
+            groupId: this.groupId
+        });
+    };
+
+    public onGroupNameChange(): void {
+        const name = this.createGroupModel.getProperty('/name') as string;
+        const { valueState, valueStateText } = setNameValueState(name);
+        this.createGroupModel.setProperty('/nameValueState', valueState);
+        this.createGroupModel.setProperty('/nameValueStateText', valueStateText);
+        this.createGroupModel.setProperty('/createButtonEnabled', valueState === 'None');
+    };
+
+    public async onCreateGroupPress(): Promise<void> {
+        const view = this.getView();
+        const component = this.getOwnerComponent();
+        if (!this.groupCreatePopover) {
+            this.groupCreatePopover = await Fragment.load({
+                id: view.getId(),
+                name: 'kms.resources.fragments.groups.CreateGroup',
+                controller: this
+            }) as Dialog;
+            this.groupCreatePopover.addStyleClass('sapUiSizeCompact');
+            this.groupCreatePopover.setModel(component.getModel('i18n'), 'i18n');
+            this.groupCreatePopover.setModel(this.createGroupModel, 'model');
+            this.groupCreatePopover.open();
+        } else {
+            this.groupCreatePopover.open();
+        }
+    };
+
+    public async onGroupCreationCreatePress(): Promise<void> {
+        interface GroupPostPayload {
+            name: string;
+            description: string;
+            role: string;
+        }
+
+        const name = this.createGroupModel.getProperty('/name') as string;
+        const description = this.createGroupModel.getProperty('/description') as string;
+        const newGroup = {
+            name: name,
+            description: description,
+            role: 'Tenant Administrator'
+        } as GroupPostPayload;
+
+        this.getView().setBusy(true);
+        try {
+            const group = await this.api.post<GroupPostPayload, Groups>('groups', newGroup);
+            MessageToast.show(this.getText('groupCreated'));
+            this.groupCreatePopover?.close();
+            this.groupCreatePopover?.destroy();
+            this.groupCreatePopover = undefined;
+            this.resetCreateConfigModel();
+            this.setGroups().catch((error) => {
+                console.error(error);
+            });
+            this.getRouter().navTo('groupDetail', {
+                tenantId: this.tenantId,
+                groupId: group?.id
+            });
+        } catch (error) {
+            console.error(error);
+            MessageBox.error(this.getText('errorCreatingGroup'));
+        } finally {
+            this.getView().setBusy(false);
+        }
+    };
+
+    public resetCreateConfigModel(): void {
+        this.createGroupModel.setData({
+            name: '' as string,
+            description: '' as string,
+            createButtonEnabled: false as boolean,
+            nameValueState: 'None' as string,
+            nameValueStateText: '' as string,
+            adminGroupValueState: 'None' as string,
+            adminGroupValueStateText: '' as string
+        }, true);
+    };
+
+    public onGroupCreationCancelPress(): void {
+        if (this.groupCreatePopover) {
+            this.groupCreatePopover.close();
+            this.groupCreatePopover.destroy();
+            this.groupCreatePopover = undefined;
+        }
+        this.resetCreateConfigModel();
+    }
+
+    public onKeyTableDeletePress(event: ListItemBase$PressEvent): void {
+        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const selectedGroup = this.oneWayModel.getProperty(path) as { id: string };
+        this.groupId = selectedGroup.id;
+
+        MessageBox.confirm(this.getText('confirmGroupDelete'), {
+            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            onClose: async (action: unknown) => {
+                if (action === MessageBox.Action.YES) {
+                    this.getView().setBusy(true);
+                    try {
+                        await this.api.delete(`groups/${this.groupId}`);
+                        MessageToast.show(this.getText('groupDeletedSuccessfully'));
+                        this.setGroups().catch((error) => {
+                            console.error(error);
+                        });
+                    } catch (error) {
+                        console.error(error);
+                        MessageBox.error(this.getText('errorDeletingGroup'));
+                    } finally {
+                        this.getRouter().navTo('groups', {
+                            tenantId: this.tenantId
+                        });
+                        this.getView().setBusy(false);
+                    }
+                }
+            }
+        });
+
+    }
+}

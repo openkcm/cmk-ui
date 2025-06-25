@@ -115,16 +115,16 @@
                     ]
                 },
                 {
-                    "pattern": "tenant/{tenantId}/users",
-                    "name": "users",
-                    "target": "users"
+                    "pattern": "tenant/{tenantId}/groups",
+                    "name": "groups",
+                    "target": "groups"
                 },
                 {
-                    "pattern": "tenant/{tenantId}/users",
-                    "name": "usersDetail",
+                    "pattern": "tenant/{tenantId}/group/{groupId}",
+                    "name": "groupDetail",
                     "target": [
-                        "users",
-                        "usersDetail"
+                        "groups",
+                        "groupDetail"
                     ]
                 },
                 {
@@ -189,21 +189,21 @@
                     "clearControlAggregation": true,
                     "controlAggregation": "midColumnPages"
                 },
-                "usersLayout": {
-                    "viewId": "usersLayout",
-                    "viewName": "users.Layout"
+                "groupsLayout": {
+                    "viewId": "groupsLayout",
+                    "viewName": "groups.Layout"
                 },
-                "users": {
-                    "parent": "usersLayout",
-                    "controlId": "usersLayout",
-                    "viewName": "users.Users",
+                "groups": {
+                    "parent": "groupsLayout",
+                    "controlId": "groupsLayout",
+                    "viewName": "groups.Groups",
                     "clearControlAggregation": true,
                     "controlAggregation": "beginColumnPages"
                 },
-                "usersDetail": {
-                    "parent": "usersLayout",
-                    "controlId": "usersLayout",
-                    "viewName": "users.UsersDetail",
+                "groupDetail": {
+                    "parent": "groupsLayout",
+                    "controlId": "groupsLayout",
+                    "viewName": "groups.GroupDetail",
                     "clearControlAggregation": true,
                     "controlAggregation": "midColumnPages"
                 },

@@ -1,0 +1,52 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:tnt="sap.tnt"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    <Table
+        id="userGroupsTable"
+        inset="false"
+        items="{oneWay>/groupsData}">
+        <headerToolbar>
+            <OverflowToolbar>
+                <Title
+                    text="{parts: ['i18n>groupsWithCount', 'oneWay>/groupsCount'], formatter: 'formatMessage'}"
+                    level="H2" />
+            </OverflowToolbar>
+        </headerToolbar>
+        <columns>
+            <Column minScreenWidth="Tablet" demandPopin="true">
+                <Text text="{i18n>name}" />
+            </Column>
+            <Column minScreenWidth="Tablet" demandPopin="true">
+                <Text text="{i18n>systemsRole}" />
+            </Column>
+            <Column minScreenWidth="Tablet" demandPopin="true">
+                <Text text="{i18n>actions}" />
+            </Column>
+        </columns>
+        <items>
+            <ColumnListItem vAlign="Middle" type="Navigation" press="onUserPress">
+                <cells>
+                    <VBox>
+                    <Input type="Text" value="{oneWay>name}" editable="true" visible="{= !!${oneWay>edit}}"></Input>
+                    <Text text="{oneWay>name}" visible="{= !${oneWay>edit}}"/>
+                    </VBox>
+                    <Text text="{path:'oneWay>role'}" />
+                    <VBox>
+                        <MenuButton icon="sap-icon://action-settings" type="Transparent" visible="{= !${oneWay>edit}}">
+                            <menu>
+                                <Menu class="sapUiSizeCompact">
+                                    <MenuItem press="onKeyTableDeletePress" text="{i18n>delete}"
+                                        icon="sap-icon://delete" />
+                                    <!-- <MenuItem press="onIASsyncPress"
+                                        text="IAS Sync"
+                                        icon="sap-icon://log" /> -->
+                                </Menu>
+                            </menu>
+                        </MenuButton>
+                    </VBox>
+                </cells>
+            </ColumnListItem>
+        </items>
+    </Table>
+</core:FragmentDefinition>

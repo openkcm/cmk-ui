@@ -1,0 +1,43 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:u="sap.ui.unified"
+    xmlns:layout="sap.ui.layout">
+    <Dialog
+        id="createGroupDialog"
+        title="{i18n>createGroup}"
+        verticalScrolling="false"
+        class="sapUiContentPadding"
+        contentHeight="auto"
+        contentWidth="40%">
+        <content>
+            <VBox>
+                <Label text="{i18n>name}:" required="true" />
+                <Input value="{model>/name}" valueState="{model>/nameValueState}"
+                    valueLiveUpdate="true" liveChange="onGroupNameChange"
+                    valueStateText="{model>/nameValueStateText}" />
+                <Label text="{i18n>description}:"
+                    class="sapUiTinyMarginTop" />
+                <TextArea value="{model>/description}" rows="4"
+                    width="100%" />
+                <Label text="{i18n>systemsRole}" required="true" class="sapUiTinyMarginTop" />
+                <Select
+                    width="100%"
+                    editable="false"
+                    items="{model>/adminGroupList}"
+                    selectedKey="{model>/adminGroup}">
+                    <core:Item key="{model>key}" text="{model>text}" />
+                </Select>
+            </VBox>
+        </content>
+        <beginButton>
+            <Button text="{i18n>create}" press="onGroupCreationCreatePress" type="Emphasized"
+                enabled="{model>/createButtonEnabled}" />
+        </beginButton>
+        <endButton>
+            <Button text="{i18n>cancel}" press="onGroupCreationCancelPress" type="Transparent" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

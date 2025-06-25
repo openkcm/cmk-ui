@@ -12,6 +12,8 @@ import Dialog from 'sap/m/Dialog';
 import MessageToast from 'sap/m/MessageToast';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import { BYOKProviders, HYOKProviders } from 'kms/common/Enums';
+import { _isNameValid } from "kms/common/Helpers";
+
 interface KeyConfigsResponse {
     value: KeyConfig[];
     count: number;
@@ -214,7 +216,7 @@ export default class Keys extends BaseController {
     public onConfigCreationNameChange(): void {
         const name = this.createConfigModel.getProperty('/name') as string;
         const adminGroup = this.createConfigModel.getProperty('/adminGroup') as string;
-        if (!this._isNameValid(name)) {
+        if (!_isNameValid(name)) {
             this.createConfigModel.setProperty('/nameValueState', 'Error');
             this.createConfigModel.setProperty('/nameValueStateText', this.getText('nameRequired'));
             this.createConfigModel.setProperty('/createButtonEnabled', false);
@@ -223,14 +225,6 @@ export default class Keys extends BaseController {
             this.createConfigModel.setProperty('/nameValueStateText', '');
             this.createConfigModel.setProperty('/createButtonEnabled', this._isAdminGroupValid(adminGroup));
         }
-    };
-
-    public _isNameValid(name: string): boolean {
-        const nameRegex = /^.{3,}$/;
-        if (!name || !nameRegex.test(name)) {
-            return false;
-        }
-        return true;
     };
 
     public _isAdminGroupValid(adminGroup: string): boolean {
@@ -251,7 +245,7 @@ export default class Keys extends BaseController {
         } else {
             this.createConfigModel.setProperty('/adminGroupValueState', 'None');
             this.createConfigModel.setProperty('/adminGroupValueStateText', '');
-            this.createConfigModel.setProperty('/createButtonEnabled', this._isNameValid(name));
+            this.createConfigModel.setProperty('/createButtonEnabled', _isNameValid(name));
         }
     };
 
