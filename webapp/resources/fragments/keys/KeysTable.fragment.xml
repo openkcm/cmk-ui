@@ -7,7 +7,7 @@
         items="{
                     path: 'oneWay>/keys',
                     sorter: {
-                        path: 'enabled',
+                        path: 'isPrimary',
                         descending: true
                     }
                 }"
@@ -90,14 +90,14 @@
                 <cells>
                     <VBox justifyContent="Center" alignContent="Center">
                         <HBox alignItems="End" justifyContent="Start">
+                            <Text text="{oneWay>name}" wrapping="false" />
                             <tnt:InfoLabel
                                 icon="sap-icon://favorite"
-                                visible="{= !!${oneWay>primary}}"
-                                class="sapUiTinyMarginEnd"
+                                visible="{= !!${oneWay>isPrimary}}"
+                                class="sapUiTinyMarginBegin"
                                 text="{i18n>primary}"
                                 displayOnly="true"
                                 colorScheme="5" />
-                            <Text text="{oneWay>name}" wrapping="false" />
                         </HBox>
                         <Label text="{oneWay>provider} • {oneWay>region}" />
                     </VBox>
@@ -121,7 +121,7 @@
                                 <Menu class="sapUiSizeCompact">
                                     <MenuItem press="onKeyTableMakePrimaryPress"
                                         text="{i18n>makePrimary}"
-                                        visible="{= !${oneWay>primary}}"
+                                        visible="{= !${oneWay>isPrimary}}"
                                         icon="sap-icon://favorite" />
                                     <MenuItem press="onKeyTableEnablePress"
                                         text="{i18n>enable}"

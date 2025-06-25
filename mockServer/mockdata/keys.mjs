@@ -15,7 +15,7 @@ export default (keyID) => {
                 description: chance.sentence(),
                 enabled: false,
                 id: chance.guid(),
-                primary: chance.bool(),
+                isPrimary: chance.bool(),
                 state: chance.pickone(states),
                 customerHeld: chance.bool(),
                 nativeId: chance.guid(),
@@ -45,7 +45,7 @@ export default (keyID) => {
             description: chance.sentence(),
             enabled: chance.bool(),
             id: keyID,
-            primary: chance.bool(),
+            isPrimary: chance.bool(),
             state: chance.pickone(states),
             customerHeld: chance.bool(),
             nativeId: chance.guid(),
@@ -67,7 +67,7 @@ export default (keyID) => {
         const enabledKeyIndex = chance.integer({ min: 0, max: keys.value.length - 1 });
         keys.value.forEach((key, index) => {
             key.enabled = index === enabledKeyIndex;
-            key.primary = index === enabledKeyIndex;
+            key.isPrimary = index === enabledKeyIndex;
         });
         return keys;
     }

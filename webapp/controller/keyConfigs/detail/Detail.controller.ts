@@ -397,7 +397,7 @@ export default class KeyConfigDetail extends BaseController {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
             onClose: async (action: unknown) => {
                 if (action === MessageBox.Action.YES) {
-                    await this.makeKeyPrimary(selectedKey.id);
+                    await this.makeKeyPrimary(selectedKey);
                 }
             }
         });
@@ -527,13 +527,16 @@ export default class KeyConfigDetail extends BaseController {
             this.getView().setBusy(false);
         }
     }
-    private async makeKeyPrimary(keyId: string): Promise<void> {
+    private async makeKeyPrimary(key: Key): Promise<void> {
         this.getView().setBusy(true);
         const payload = {
-            keyID: keyId
+            name: key.name,
+            description: key.description,
+            enabled: key.enabled,
+            isPrimary: true
         }
         try {
-            await this.api.put(`keyConfigurations/${this.keyConfigId}/primaryKey`, payload);
+            await this.api.patch(`keys/${key.id}`, payload);
             MessageToast.show(this.getText('keyMadePrimarySuccessfully'));
             await this.getKeyConfigData();
         } catch (error) {

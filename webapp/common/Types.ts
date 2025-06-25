@@ -39,7 +39,7 @@ export interface Key {
     name: string,
     description: string,
     enabled: boolean,
-    primary: boolean,
+    isPrimary: boolean,
     state: string,
     customerHeld: boolean,
     nativeId: string,

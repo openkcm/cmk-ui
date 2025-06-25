@@ -13,12 +13,30 @@
         <headerTitle>
             <ObjectPageDynamicHeaderTitle>
                 <expandedHeading>
-                    <m:Title
-                        text="{= ${oneWay>/type} === 'key' ? ${oneWay>/selectedKey/name} : ${oneWay>/selectedSystem/name}}" />
+                    <m:HBox alignContent="Center" alignItems="Center">
+                        <m:Title
+                            text="{= ${oneWay>/type} === 'key' ? ${oneWay>/selectedKey/name} : ${oneWay>/selectedSystem/name}}" />
+                        <tnt:InfoLabel
+                            icon="sap-icon://favorite"
+                            visible="{= !!${oneWay>/selectedKey/isPrimary}}"
+                            class="sapUiTinyMarginBegin"
+                            text="{i18n>primary}"
+                            displayOnly="true"
+                            colorScheme="5" />
+                    </m:HBox>
                 </expandedHeading>
                 <snappedHeading>
-                    <m:Title
-                        text="{= ${oneWay>/type} === 'key' ? ${oneWay>/selectedKey/name} : ${oneWay>/selectedSystem/name}}" />
+                    <m:HBox alignContent="Center" alignItems="Center">
+                        <m:Title
+                            text="{= ${oneWay>/type} === 'key' ? ${oneWay>/selectedKey/name} : ${oneWay>/selectedSystem/name}}" />
+                        <tnt:InfoLabel
+                            icon="sap-icon://favorite"
+                            visible="{= !!${oneWay>/selectedKey/isPrimary}}"
+                            class="sapUiTinyMarginBegin"
+                            text="{i18n>primary}"
+                            displayOnly="true"
+                            colorScheme="5" />
+                    </m:HBox>
                 </snappedHeading>
                 <expandedContent>
                     <m:VBox visible="{= ${oneWay>/type} === 'key'}">
