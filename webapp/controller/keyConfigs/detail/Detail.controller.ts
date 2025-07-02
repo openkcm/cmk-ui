@@ -385,8 +385,9 @@ export default class KeyConfigDetail extends BaseController {
     public onEditDetailsPress(): void {
         this.oneWayModel.setProperty('/edit', true);
     }
-    public onCancelEditPress(): void {
+    public async onCancelEditPress(): Promise<void> {
         this.oneWayModel.setProperty('/edit', false);
+        await this.getKeyConfigData();
     }
     public async onSaveKeyConfigPress(): Promise<void> {
         this.getView().setBusy(true);
@@ -398,7 +399,7 @@ export default class KeyConfigDetail extends BaseController {
         try {
             await this.patchKeyConfigData(payload);
             await this.getKeyConfigData();
-            this.onCancelEditPress();
+            await this.onCancelEditPress();
         } catch (error) {
             console.error('Error patching key config', error);
             MessageBox.error(this.getText('errorPatchingKeyConfigDetails'));
