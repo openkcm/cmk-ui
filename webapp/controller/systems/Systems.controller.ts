@@ -39,16 +39,13 @@ export default class Systems extends BaseController {
     private skip: number;
     private top: number;
     private currentPage: number;
-    private readonly paginationModel = new JSONModel({
-        totalPages: 0,
-        currentPage: 1
-    });
+    private readonly paginationModel = new JSONModel({});
 
     public onInit(): void {
         super.onInit();
         this.skip = 0;
         this.top = 10;
-        this.currentPage = 0;
+        this.currentPage = 1;
         this.getRouter().getRoute('systems').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
         this.eventBus.subscribe(EventChannelIds.SYSTEMS, EventIDs.LOAD_SYSTEMS, (channelId, eventId) => this.onSystemRouteEventTriggered(channelId, eventId), this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
@@ -86,10 +83,9 @@ export default class Systems extends BaseController {
         this.updateSystemsTable();
     }
     private resetPagination(): void {
-        this.currentPage = 0;
+        this.currentPage = 1;
         this.skip = 0;
-        this.paginationModel.setProperty('/currentPage', 0);
-        this.paginationModel.setProperty('/totalPages', 1);
+        this.paginationModel.setProperty('/currentPage', this.currentPage);
     }
 
     private async getSystems(): Promise<void> {
@@ -102,7 +98,7 @@ export default class Systems extends BaseController {
             this.oneWayModel.setProperty('/systems', systems.value);
             this.oneWayModel.setProperty('/systemsCount', systems.count || 0);
             this.paginationModel.setProperty('/totalPages', Math.ceil(systems.count / this.top));
-            this.paginationModel.setProperty('/currentPage', this.currentPage + 1);
+            this.paginationModel.setProperty('/currentPage', this.currentPage);
         } catch (error) {
             console.error('Error fetching systems', error);
             MessageBox.error(this.getText('errorFetchingSystems'));

@@ -26,15 +26,24 @@ export default class Group extends BaseController {
     private readonly createGroupModel = new JSONModel({});
     id: string | number;
     groupId: string;
+    private skip: number;
+    private top: number;
+    private currentPage: number;
+    private readonly paginationModel = new JSONModel({});
 
     public onInit(): void {
         super.onInit();
+        this.skip = 0;
+        this.top = 10;
+        this.currentPage = 1;
         this.getRouter().getRoute('groups').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.setModel(this.oneWayModel, 'oneWay');
+        this.setModel(this.paginationModel, 'pagination');
     };
 
     public onRouteMatched(event: Route$PatternMatchedEvent): void {
+        this.resetPagination();
         const routeArgs = event.getParameter('arguments') as { tenantId: string };
         this.api = new Api(routeArgs?.tenantId);
         this.tenantId = routeArgs?.tenantId;
@@ -43,13 +52,31 @@ export default class Group extends BaseController {
         });
     };
 
+    private async onNextPage() {
+        this.currentPage++;
+        this.skip += 10;
+        await this.setGroups();
+    }
+    private async onPreviousPage () {
+        this.currentPage--;
+        this.skip -= 10;
+        await this.setGroups();
+    }
+    private resetPagination(): void {
+        this.currentPage = 1;
+        this.skip = 0;
+        this.paginationModel.setProperty('/currentPage', this.currentPage);
+    }
+
     private async setGroups(): Promise<void> {
         this.getView().setBusy(true);
         try {
-            const groups = await this.api.get<GroupsResponse>('groups', {});
+            const groups = await this.api.get<GroupsResponse>('groups', {$top: this.top, $skip: this.skip});
             const groupsData = groups.value;
             this.oneWayModel.setProperty('/groupsData', groupsData);
             this.oneWayModel.setProperty('/groupsCount', groups.count || 0);
+            this.paginationModel.setProperty('/totalPages', Math.ceil(groups.count / this.top));
+            this.paginationModel.setProperty('/currentPage', this.currentPage);
 
             this.createGroupModel.setData({
                 name: '' as string,

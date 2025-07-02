@@ -36,16 +36,13 @@ export default class Keys extends BaseController {
     private skip: number;
     private top: number;
     private currentPage: number;
-    private readonly paginationModel = new JSONModel({
-        totalPages: 0,
-        currentPage: 1
-    });
+    private readonly paginationModel = new JSONModel({});
 
     public onInit(): void {
         super.onInit();
         this.skip = 0;
         this.top = 10;
-        this.currentPage = 0;
+        this.currentPage = 1;
         this.getRouter().getRoute('keyConfigs').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.viewSettingModel.setDefaultBindingMode(BindingMode.TwoWay);
@@ -85,10 +82,9 @@ export default class Keys extends BaseController {
         await this.setKeyConfigs();
     }
     private resetPagination(): void {
-        this.currentPage = 0;
+        this.currentPage = 1;
         this.skip = 0;
-        this.paginationModel.setProperty('/currentPage', 0);
-        this.paginationModel.setProperty('/totalPages', 1);
+        this.paginationModel.setProperty('/currentPage', this.currentPage);
     }
 
     private async setKeyConfigs(): Promise<void> {
@@ -99,7 +95,7 @@ export default class Keys extends BaseController {
             this.oneWayModel.setProperty('/configs', keyConfigsData);
             this.oneWayModel.setProperty('/configsCount', keyConfigs.count || 0);
             this.paginationModel.setProperty('/totalPages', Math.ceil(keyConfigs.count / this.top));
-            this.paginationModel.setProperty('/currentPage', this.currentPage + 1);
+            this.paginationModel.setProperty('/currentPage', this.currentPage);
         } catch (error) {
             console.error(error);
             MessageBox.error(this.getText('errorFetchingKeyConfigs'));

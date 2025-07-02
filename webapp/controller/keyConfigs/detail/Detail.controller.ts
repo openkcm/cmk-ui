@@ -78,29 +78,21 @@ export default class KeyConfigDetail extends BaseController {
     private readonly switchKeyConfigModel = new JSONModel({});
     private switchKeyConfigDialog: Dialog | undefined;
     private eventBus = EventBus.getInstance();
-
     private top: number;
     private keysSkip: number;
     private systemsSkip: number;
     private keysCurrentPage: number;
     private systemsCurrentPage: number;
-
-    private readonly keysPaginationModel = new JSONModel({
-        totalPages: 0,
-        currentPage: 1
-    });
-    private readonly systemsPaginationModel = new JSONModel({
-        totalPages: 0,
-        currentPage: 1
-    });
+    private readonly keysPaginationModel = new JSONModel({});
+    private readonly systemsPaginationModel = new JSONModel({});
 
     public onInit(): void {
         super.onInit();
         this.top = 10;
         this.keysSkip = 0;
         this.systemsSkip = 0;
-        this.keysCurrentPage = 0;
-        this.systemsCurrentPage = 0;
+        this.keysCurrentPage = 1;
+        this.systemsCurrentPage = 1;
 
         this.eventBus.subscribe(EventChannelIds.KEYCONFIG, EventIDs.LOAD_KEY_CONFIG_DETAILS, (channelId, eventId, data) => this.onDetailPanelRouteEventTriggered(channelId, eventId, data as { keyConfigId: string, tenantId: string }), this);
         this.getRouter().getRoute('keyConfigDetail').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
@@ -275,14 +267,12 @@ export default class KeyConfigDetail extends BaseController {
         await this.updateSystemsTable();
     }
     private resetPagination(): void {
-        this.keysCurrentPage = 0;
+        this.keysCurrentPage = 1;
         this.keysSkip = 0;
-        this.keysPaginationModel.setProperty('/currentPage', 0);
-        this.keysPaginationModel.setProperty('/totalPages', 1);
-        this.systemsCurrentPage = 0;
+        this.keysPaginationModel.setProperty('/currentPage', this.keysCurrentPage);
+        this.systemsCurrentPage = 1;
         this.systemsSkip = 0;
-        this.systemsPaginationModel.setProperty('/currentPage', 0);
-        this.systemsPaginationModel.setProperty('/totalPages', 1);
+        this.systemsPaginationModel.setProperty('/currentPage', this.systemsCurrentPage);
     }
 
     private async updateKeysTable() {
@@ -291,7 +281,7 @@ export default class KeyConfigDetail extends BaseController {
         this.oneWayModel.setProperty('/keys', keys?.value);
         this.oneWayModel.setProperty('/keysCount', keys?.count || 0);
         this.keysPaginationModel.setProperty('/totalPages', Math.ceil(keys.count / this.top));
-        this.keysPaginationModel.setProperty('/currentPage', this.keysCurrentPage + 1);
+        this.keysPaginationModel.setProperty('/currentPage', this.keysCurrentPage);
         this.oneWayModel.setProperty('/keysCount', keys?.count || 0);
         this.oneWayModel.setProperty('/keysTableUpdating', false);
     }
@@ -303,8 +293,7 @@ export default class KeyConfigDetail extends BaseController {
         this.oneWayModel.setProperty('/systems', connectedSystems?.value);
         this.oneWayModel.setProperty('/systemsCount', connectedSystems?.count || 0);
         this.systemsPaginationModel.setProperty('/totalPages', Math.ceil(connectedSystems.count / this.top));
-        this.systemsPaginationModel.setProperty('/currentPage', this.systemsCurrentPage + 1);
-
+        this.systemsPaginationModel.setProperty('/currentPage', this.systemsCurrentPage);
         this.oneWayModel.setProperty('/allSystemsCount', allSystems?.count || 0);
         this.oneWayModel.setProperty('/systemsTableUpdating', false);
     }

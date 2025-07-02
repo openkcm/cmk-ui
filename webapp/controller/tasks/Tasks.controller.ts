@@ -20,10 +20,7 @@ export default class Tasks extends BaseController {
     private skip: number;
     private top: number;
     private currentPage: number;
-    private readonly paginationModel = new JSONModel({
-        totalPages: 0,
-        currentPage: 1
-    });
+    private readonly paginationModel = new JSONModel({});
 
     private readonly oneWayModel = new JSONModel({
         tasksStatusItems: ['all', ...Object.values(TaskStates).filter(type => type !== 'INITIAL' && type !== 'EXECUTING')] as TaskStates[] | 'all'[],
@@ -38,7 +35,7 @@ export default class Tasks extends BaseController {
         super.onInit();
         this.skip = 0;
         this.top = 10;
-        this.currentPage = 0;
+        this.currentPage = 1;
         this.eventBus.subscribe(EventChannelIds.TASKS, EventIDs.LOAD_TASKS, (channelId, eventId, data) => this.onLoadTaskEventTrigger(channelId as EventChannelIds.TASKS, eventId as EventIDs.LOAD_TASKS, data as { tenantId: string }), this);
         this.getRouter().getRoute('tasks').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
@@ -90,10 +87,9 @@ export default class Tasks extends BaseController {
         await this.getTasks();
     }
     private resetPagination(): void {
-        this.currentPage = 0;
+        this.currentPage = 1;
         this.skip = 0;
-        this.paginationModel.setProperty('/currentPage', 0);
-        this.paginationModel.setProperty('/totalPages', 1);
+        this.paginationModel.setProperty('/currentPage', this.currentPage);
     }
 
     private async getTasks(): Promise<void> {
@@ -102,11 +98,11 @@ export default class Tasks extends BaseController {
             const workflowTasks = await this.api.get<WorkflowTasksResponse>('workflows', {$top: this.top, $skip: this.skip});
             if (!workflowTasks) {
                 return;
-            };
+            }
             this.oneWayModel.setProperty('/workflowTasks', workflowTasks.value);
             this.oneWayModel.setProperty('/workflowTasksCount', workflowTasks.count || 0);
             this.paginationModel.setProperty('/totalPages', Math.ceil(workflowTasks.count / this.top));
-            this.paginationModel.setProperty('/currentPage', this.currentPage + 1);
+            this.paginationModel.setProperty('/currentPage', this.currentPage);
         } catch (error) {
             console.error('Error fetching systems', error);
             MessageBox.error(this.getText('errorFetchingTasks'));

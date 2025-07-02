@@ -4,6 +4,7 @@
     xmlns:f="sap.f"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:core="sap.ui.core"
+    xmlns:kms="kms.control"
     core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
     <f:DynamicPage>
         <f:title>
@@ -34,6 +35,11 @@
                         <core:Fragment
                             fragmentName="kms.resources.fragments.groups.UserGroupsTable"
                             type="XML" />
+                        <kms:Pagination
+                                currentPage="{pagination>/currentPage}"
+                                totalPages="{pagination>/totalPages}"
+                                onPreviousPage="onPreviousPage"
+                                onNextPage="onNextPage" />
                     </VBox>
                 </Panel>
                 <VBox visible="{= ${oneWay>/groupsCount} === 0 }">
