@@ -22,8 +22,7 @@ export default class FilterBar extends Control {
             filters: { type: 'sap.ui.core.Control', multiple: true },
             layoutForm: {
                 type: 'sap.ui.layout.form.SimpleForm',
-                multiple: false,
-                visibility: 'hidden'
+                multiple: false
             }
         },
         defaultAggregation: 'filters',
@@ -79,18 +78,19 @@ export default class FilterBar extends Control {
 
     onBeforeRendering(): void {
         const form = this.layoutForm;
-        form.removeAllContent();
+        form.destroyContent();
 
         const items = this.getAggregation("filters") as FilterBarItem[] || [];
 
         items.forEach((item) => {
+            const clonedContent = item.getContent().clone();
             const label = new Label({
                 text: `${item.getProperty("label") as string}:`,
-                labelFor: item.getContent()?.getId()
+                labelFor: clonedContent?.getId()
             });
 
             const container = new VBox({
-                items: [label, item.getContent()]
+                items: [label, clonedContent]
             });
 
             container.setLayoutData(new GridData({

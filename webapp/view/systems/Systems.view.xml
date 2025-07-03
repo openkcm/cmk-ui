@@ -5,7 +5,7 @@
     xmlns:core="sap.ui.core"
     xmlns:m="sap.m"
     xmlns:f="sap.f"
-    xmlns:fb="kms.control"
+    xmlns:kms="kms.control"
     core:require="{ formatMessage: 'sap/base/strings/formatMessage' }"
     xmlns:mvc="sap.ui.core.mvc">
     <f:DynamicPage>
@@ -22,28 +22,28 @@
         <f:header>
             <f:DynamicPageHeader>
                 <f:content>
-                    <fb:FilterBar id="systemsFilterBar" search="getSystems"
+                    <kms:FilterBar id="systemsFilterBar" search="getSystems"
                         reset="onReset">
-                        <fb:FilterBarItem label="{i18n>region}">
+                        <kms:FilterBarItem label="{i18n>region}">
                             <MultiComboBox
                                 name="{i18n>region}"
                                 selectionChange=".onSelectionChange"
                                 placeholder="{i18n>all}"
-                                items="{oneWay>/systems}"
-                                busy="{oneWay>/systemsTableUpdating}">
+                                items="{oneWay>/systems}">
                                 <core:Item key="{oneWay>region}" text="{oneWay>region}" />
                             </MultiComboBox>
-                        </fb:FilterBarItem>
-                        <fb:FilterBarItem label="{i18n>sid}">
+                        </kms:FilterBarItem>
+                        <kms:FilterBarItem label="{i18n>sid}">
+
                             <MultiComboBox
                                 placeholder="{i18n>all}"
                                 name="{i18n>sid}"
                                 items="{oneWay>/systems}">
                                 <core:Item key="{oneWay>sid}" text="{oneWay>sid}" />
                             </MultiComboBox>
-                        </fb:FilterBarItem>
+                        </kms:FilterBarItem>
 
-                        <fb:FilterBarItem label="{i18n>systemsRole}">
+                        <kms:FilterBarItem label="{i18n>systemsRole}">
                             <MultiComboBox
                                 placeholder="{i18n>all}"
                                 name="{i18n>systemsRole}"
@@ -52,8 +52,9 @@
                                 <core:Item key="{oneWay>systemRole}"
                                     text="{oneWay>systemRole}" />
                             </MultiComboBox>
-                        </fb:FilterBarItem>
-                        <fb:FilterBarItem label="{i18n>keyConfiguration}">
+                        </kms:FilterBarItem>
+                        <kms:FilterBarItem label="{i18n>keyConfiguration}">
+
                             <MultiComboBox
                                 placeholder="{i18n>all}"
                                 name="{i18n>keyConfiguration}"
@@ -62,8 +63,8 @@
                                 <core:Item key="{oneWay>keyConfig}"
                                     text="{oneWay>keyConfig}" />
                             </MultiComboBox>
-                        </fb:FilterBarItem>
-                    </fb:FilterBar>
+                        </kms:FilterBarItem>
+                    </kms:FilterBar>
                 </f:content>
             </f:DynamicPageHeader>
         </f:header>
@@ -74,11 +75,11 @@
                         <core:Fragment
                             fragmentName="kms.resources.fragments.systems.SystemsTable"
                             type="XML" />
-                        <fb:Pagination
-                                currentPage="{pagination>/currentPage}"
-                                totalPages="{pagination>/totalPages}"
-                                onPreviousPage="onPreviousPage"
-                                onNextPage="onNextPage" />
+                        <kms:Pagination
+                            currentPage="{pagination>/currentPage}"
+                            totalPages="{pagination>/totalPages}"
+                            onPreviousPage="onPreviousPage"
+                            onNextPage="onNextPage" />
                     </m:VBox>
                 </Panel>
                 <m:VBox visible="{= ${oneWay>/systems}.length === 0 }">

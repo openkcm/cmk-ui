@@ -3,7 +3,6 @@
     xmlns:f="sap.f"
     xmlns="sap.m"
     xmlns:m="sap.m"
-    xmlns:fb="kms.control"
     xmlns:core="sap.ui.core"
     xmlns:kms="kms.control"
     xmlns:mvc="sap.ui.core.mvc">
@@ -21,9 +20,9 @@
         <f:header>
             <f:DynamicPageHeader>
                 <f:content>
-                    <fb:FilterBar id="tasksFilterBar" search="getTasks"
+                    <kms:FilterBar id="tasksFilterBar" search="getTasks"
                         reset="onReset">
-                        <fb:FilterBarItem label="{i18n>status}">
+                        <kms:FilterBarItem label="{i18n>status}">
                             <MultiComboBox
                                 name="{i18n>status}"
                                 selectionChange=".ontaskStatusFilterSelect"
@@ -32,8 +31,8 @@
                                 <core:Item key="{oneWay>}"
                                     text="{parts: ['oneWay>'], formatter: '.getText'}" />
                             </MultiComboBox>
-                        </fb:FilterBarItem>
-                        <fb:FilterBarItem label="{i18n>workflowType}">
+                        </kms:FilterBarItem>
+                        <kms:FilterBarItem label="{i18n>workflowType}">
                             <MultiComboBox
                                 name="{i18n>taskType}"
                                 selectionChange=".ontaskStatusFilterSelect"
@@ -42,8 +41,8 @@
                                 <core:Item key="{oneWay>}"
                                     text="{parts: ['oneWay>'], formatter: '.getText'}" />
                             </MultiComboBox>
-                        </fb:FilterBarItem>
-                    </fb:FilterBar>
+                        </kms:FilterBarItem>
+                    </kms:FilterBar>
                 </f:content>
             </f:DynamicPageHeader>
         </f:header>
@@ -55,10 +54,10 @@
                             fragmentName="kms.resources.fragments.tasks.TasksTable"
                             type="XML" />
                         <kms:Pagination
-                                currentPage="{pagination>/currentPage}"
-                                totalPages="{pagination>/totalPages}"
-                                onPreviousPage="onPreviousPage"
-                                onNextPage="onNextPage" />
+                            currentPage="{pagination>/currentPage}"
+                            totalPages="{pagination>/totalPages}"
+                            onPreviousPage="onPreviousPage"
+                            onNextPage="onNextPage" />
                     </m:VBox>
                 </Panel>
                 <m:VBox visible="{= ${oneWay>/workflowTasks}.length === 0 }">
