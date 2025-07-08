@@ -13,6 +13,23 @@ import type { MetadataOptions } from 'sap/ui/core/Element';
  * @namespace kms.control
  */
 export default class FilterBar extends Control {
+    // The following three lines were generated and should remain as-is to make TypeScript aware of the constructor signatures
+    constructor(idOrSettings?: string | $FilterBarSettings);
+    constructor(id?: string, settings?: $FilterBarSettings);
+    constructor(id?: string, settings?: $FilterBarSettings) {
+        super(id, settings);
+        this.layoutForm = new SimpleForm({
+            editable: true,
+            layout: "ResponsiveGridLayout",
+            columnsL: 4,
+            columnsM: 3,
+            labelSpanL: 0,
+            labelSpanM: 0,
+            labelSpanS: 0
+        });
+
+        this.setAggregation('layoutForm', this.layoutForm);
+    }
 
     static readonly metadata: MetadataOptions = {
         properties: {
@@ -33,22 +50,6 @@ export default class FilterBar extends Control {
     }
 
     private layoutForm: SimpleForm;
-
-    constructor(id?: string) {
-        super(id);
-
-        this.layoutForm = new SimpleForm({
-            editable: true,
-            layout: "ResponsiveGridLayout",
-            columnsL: 4,
-            columnsM: 3,
-            labelSpanL: 0,
-            labelSpanM: 0,
-            labelSpanS: 0
-        });
-
-        this.setAggregation('layoutForm', this.layoutForm);
-    }
 
     renderer = {
         render: (rm: RenderManager, control: FilterBar) => {

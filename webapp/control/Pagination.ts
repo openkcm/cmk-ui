@@ -11,6 +11,11 @@ import type { MetadataOptions } from 'sap/ui/core/Element';
  * @namespace kms.control
  */
 export default class Pagination extends Control {
+    // The following three lines were generated and should remain as-is to make TypeScript aware of the constructor signatures
+    constructor(idOrSettings?: string | $PaginationSettings);
+    constructor(id?: string, settings?: $PaginationSettings);
+    constructor(id?: string, settings?: $PaginationSettings) { super(id, settings); }
+
     static readonly metadata: MetadataOptions = {
         properties: {
             totalPages: { type: 'int', defaultValue: 0 },

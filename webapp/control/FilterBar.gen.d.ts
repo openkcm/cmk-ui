@@ -1,5 +1,6 @@
 import Event from "sap/ui/base/Event";
 import Control from "sap/ui/core/Control";
+import SimpleForm from "sap/ui/layout/form/SimpleForm";
 import { PropertyBindingInfo } from "sap/ui/base/ManagedObject";
 import { AggregationBindingInfo } from "sap/ui/base/ManagedObject";
 import { $ControlSettings } from "sap/ui/core/Control";
@@ -12,6 +13,7 @@ declare module "./FilterBar" {
     interface $FilterBarSettings extends $ControlSettings {
         title?: string | PropertyBindingInfo;
         filters?: Control[] | Control | AggregationBindingInfo | `{${string}}`;
+        layoutForm?: SimpleForm;
         search?: (event: FilterBar$SearchEvent) => void;
         reset?: (event: FilterBar$ResetEvent) => void;
     }
@@ -30,6 +32,11 @@ declare module "./FilterBar" {
         removeAllFilters(): Control[];
         indexOfFilter(filters: Control): number;
         destroyFilters(): this;
+
+        // aggregation: layoutForm
+        getLayoutForm(): SimpleForm;
+        setLayoutForm(layoutForm: SimpleForm): this;
+        destroyLayoutForm(): this;
 
         // event: search
         attachSearch(fn: (event: FilterBar$SearchEvent) => void, listener?: object): this;

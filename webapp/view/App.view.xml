@@ -23,9 +23,7 @@
                     text="{i18n>appTitle}"
                     level="H2" />
                 <ToolbarSpacer />
-                <ToolbarSpacer />
-                <tnt:InfoLabel id="il1" text="TEST" renderMode="Narrow" colorScheme="1" />
-                <MenuButton text="{twoWay>/selectedTenant}" class="sapUiMediumMarginEnd">
+                <MenuButton text="{twoWay>/selectedTenant}" class="sapUiTinyMarginEnd">
                     <menu>
                         <Menu items="{oneWay>/tenants}" itemSelected="onTenantChanged"
                             class="sapUiSizeCompact">
@@ -33,37 +31,6 @@
                         </Menu>
                     </menu>
                 </MenuButton>
-                <Button
-                    id="feedbackButton"
-                    icon="sap-icon://message-popup"
-                    type="Transparent">
-                    <layoutData>
-                        <OverflowToolbarLayoutData closeOverflowOnInteraction="false" />
-                    </layoutData>
-                </Button>
-                <Button
-                    id="helpButton"
-                    icon="sap-icon://sys-help"
-                    type="Transparent">
-                    <layoutData>
-                        <OverflowToolbarLayoutData closeOverflowOnInteraction="false" />
-                    </layoutData>
-                </Button>
-                <Button
-                    id="notificationButton"
-                    icon="sap-icon://bell"
-                    class="sapUiTinyMarginEnd"
-                    type="Transparent"
-                    press="onNotificationPress">
-                    <customData>
-                        <BadgeCustomData
-                            key="badge"
-                            value="2" />
-                    </customData>
-                    <layoutData>
-                        <OverflowToolbarLayoutData closeOverflowOnInteraction="false" />
-                    </layoutData>
-                </Button>
                 <Avatar initials="KM" displaySize="XS" press="onUserNamePress">
                     <layoutData>
                         <OverflowToolbarLayoutData priority="NeverOverflow" />
