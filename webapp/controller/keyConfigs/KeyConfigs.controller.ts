@@ -13,6 +13,7 @@ import MessageToast from 'sap/m/MessageToast';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import { BYOKProviders, HYOKProviders } from 'kms/common/Enums';
 import { _isNameValid } from "kms/common/Helpers";
+import {AxiosError} from "axios";
 
 interface KeyConfigsResponse {
     value: KeyConfig[];
@@ -203,7 +204,25 @@ export default class Keys extends BaseController {
             MessageToast.show(this.getText('keyConfigCreated'));
         } catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorCreatingKeyConfig'));
+            const apiError = error as AxiosError;
+            const errorMessage = JSON.parse(apiError.message) as {
+                error: {
+                    message: string;
+                    data: {
+                        error: {
+                            code: string;
+                        };
+                    };
+                };
+            };
+
+            const errorCode = errorMessage?.error?.data?.error?.code;
+
+            if (errorCode === 'UNIQUE_ERROR') {
+                MessageBox.error(this.getText('errorDuplicateKeyConfig'));
+            } else {
+                MessageBox.error(this.getText('errorCreatingKeyConfig'));
+            }
         } finally {
             this.getView().setBusy(false);
         }
