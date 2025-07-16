@@ -3,6 +3,7 @@ import HBox from 'sap/m/HBox';
 import VBox from 'sap/m/VBox';
 import Text from 'sap/m/Text';
 import Button from 'sap/m/Button';
+import CustomData from "sap/ui/core/CustomData";
 import FlexItemData from 'sap/m/FlexItemData';
 import RenderManager from 'sap/ui/core/RenderManager';
 import type { MetadataOptions } from 'sap/ui/core/Element';
@@ -32,7 +33,16 @@ export default class Pagination extends Control {
             rm.openEnd();
 
             const currentPage = control.getProperty('currentPage') as number;
-
+            const previousButtonCustomData = new CustomData({
+                key: "testId",
+                value: "pagination-previousButton",
+                writeToDom: true
+            });
+            const nextButtonCustomData = new CustomData({
+                key: "testId",
+                value: "pagination-nextButton",
+                writeToDom: true
+            });
             const paginationControls = new HBox({
                 alignItems: 'Center',
                 justifyContent: 'Center',
@@ -42,7 +52,7 @@ export default class Pagination extends Control {
                         type: 'Transparent',
                         enabled: currentPage > 1,
                         press: () => control._onPreviousPage(),
-                    }),
+                    }).addCustomData(previousButtonCustomData),
                     new Text({
                         text: `Page ${currentPage} of ${control.getProperty('totalPages')}`
                     }),
@@ -51,7 +61,7 @@ export default class Pagination extends Control {
                         type: 'Transparent',
                         enabled: currentPage < control.getProperty('totalPages'),
                         press: () => control._onNextPage(),
-                    }),
+                    }).addCustomData(nextButtonCustomData),
                 ],
                 layoutData: new FlexItemData({
                     growFactor: 0,

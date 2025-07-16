@@ -14,7 +14,14 @@
                 <Title text="{i18n>details}" />
                 <ToolbarSpacer />
                 <Button icon="sap-icon://edit" text="{i18n>edit}" type="Ghost"
-                    press="onEditDetailsPress" />
+                    press="onEditDetailsPress">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="keyDetail-editButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
             </OverflowToolbar>
         </forms:toolbar>
         <forms:formContainers>
@@ -22,67 +29,146 @@
                 <forms:formElements>
                     <forms:FormElement label="{i18n>uuid}">
                         <forms:fields>
-                            <Text text="{oneWay>/selectedKey/id}" />
+                            <Text text="{oneWay>/selectedKey/id}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyDetail-idText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>name}">
                         <forms:fields>
-                            <Text text="{oneWay>/selectedKey/name}" />
+                            <Text text="{oneWay>/selectedKey/name}">
+
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>description}">
                         <forms:fields>
-                            <Text text="{oneWay>/selectedKey/description}" wrapping="true" />
+                            <Text text="{oneWay>/selectedKey/description}" wrapping="true">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyDetail-descriptionText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>enabled}">
                         <forms:fields>
                             <Text
-                                text="{= !!${oneWay>/selectedKey/enabled} ? ${i18n>yes} : ${i18n>no}}" />
+                                text="{= !!${oneWay>/selectedKey/enabled} ? ${i18n>yes} : ${i18n>no}}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyDetail-enabledText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>keystore}">
                         <forms:fields>
-                            <Text text="{oneWay>/selectedKey/provider}" />
+                            <Text text="{oneWay>/selectedKey/provider}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyDetail-keystoreText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>region}">
                         <forms:fields>
-                            <Text text="{oneWay>/selectedKey/region}" />
+                            <Text text="{oneWay>/selectedKey/region}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyDetail-regionText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>algorithm}">
                         <forms:fields>
-                            <Text text="{oneWay>/selectedKey/algorithm}" />
+                            <Text text="{oneWay>/selectedKey/algorithm}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyDetail-algorithmText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>nativeId}"
                         visible="{= !!${oneWay>/customerHeld}}">
                         <forms:fields>
-                            <Text text="{oneWay>/selectedKey/nativeID}" />
+                            <Text text="{oneWay>/selectedKey/nativeID}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyDetail-nativeIdText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>customerHeld}">
                         <forms:fields>
                             <Text
-                                text="{= !!${oneWay>/selectedKey/customerHeld} ? ${i18n>yes} : ${i18n>no}}" />
+                                text="{= !!${oneWay>/selectedKey/customerHeld} ? ${i18n>yes} : ${i18n>no}}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyDetail-customerHeldText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>createdBy}">
                         <forms:fields>
-                            <Text text="{oneWay>/selectedKey/metadata/createdBy}" />
+                            <Text text="{oneWay>/selectedKey/metadata/createdBy}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyDetail-createdByText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>createdOn}">
                         <forms:fields>
                             <Text
-                                text="{path:'oneWay>/selectedKey/metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC" />
+                                text="{path:'oneWay>/selectedKey/metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyDetail-createdOnText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>updatedOn}">
                         <forms:fields>
                             <Text
-                                text="{path:'oneWay>/selectedKey/metadata/updatedAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC" />
+                                text="{path:'oneWay>/selectedKey/metadata/updatedAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyDetail-updatedOnText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                 </forms:formElements>

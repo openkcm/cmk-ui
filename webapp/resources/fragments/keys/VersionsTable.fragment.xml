@@ -23,11 +23,31 @@
                     <menu>
                         <Menu class="sapUiSizeCompact">
                             <MenuItem text="{i18n>rotateNow}"
-                                press="onRotateNowPress" />
+                                press="onRotateNowPress">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="versionsTable-rotateNowButton"
+                                        writeToDom="true" />
+                                </customData>
+                            </MenuItem>
                             <MenuItem text="{i18n>confgureRotation}" enabled="false"
-                                press="onConfigureRotationPress" />
+                                press="onConfigureRotationPress">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="versionsTable-configureRotationButton"
+                                        writeToDom="true" />
+                                </customData>
+                            </MenuItem>
                         </Menu>
                     </menu>
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="versionsTable-rotateButton"
+                            writeToDom="true" />
+                    </customData>
                 </MenuButton>
             </OverflowToolbar>
         </headerToolbar>
@@ -58,11 +78,25 @@
                             text="{oneWay>version} • {i18n>active}"
                             displayOnly="true"
                             colorScheme="5" />
-                        <Text text="{oneWay>version}" visible="{= !${oneWay>isPrimary}}" />
+                        <Text text="{oneWay>version}" visible="{= !${oneWay>isPrimary}}">
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="versionsTable-versionText"
+                                    writeToDom="true" />
+                            </customData>
+                        </Text>
                     </HBox>
                     <Text
                         text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC"
-                        wrapping="true" />
+                        wrapping="true">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="versionsTable-createdOnText"
+                                writeToDom="true" />
+                        </customData>
+                    </Text>
                     <VBox justifyContent="Center">
                         <tnt:InfoLabel
                             visible="{= ${oneWay>state} === 'ENABLED'}"

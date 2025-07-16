@@ -4,6 +4,10 @@ import type { MetadataOptions } from "sap/ui/core/Element";
  * @namespace kms.control
  */
 export default class FilterBarItem extends Control {
+    // The following three lines were generated and should remain as-is to make TypeScript aware of the constructor signatures
+    constructor(idOrSettings?: string | $FilterBarItemSettings);
+    constructor(id?: string, settings?: $FilterBarItemSettings);
+    constructor(id?: string, settings?: $FilterBarItemSettings) { super(id, settings); }
     static readonly metadata: MetadataOptions = {
         properties: {
             label: { type: "string" },

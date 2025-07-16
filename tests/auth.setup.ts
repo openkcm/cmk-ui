@@ -12,3 +12,14 @@ setup('Check environment variables', async ({ page }) => {
     }
     await page.goto(url);
 });
+
+setup('Check if testIDs are set', async ({ page }) => {
+    await page.goto(url);
+    const homeIcon = page.getByTestId('shellBar-homeIcon');
+    const avatar = page.getByTestId('shellBar-avatar');
+    const sideNavigationButton = page.getByTestId('shellBar-sideNavigationToggleButton');
+    const tenantMenuButton = page.getByTestId('shellBar-tenantMenuButton');
+    if (!homeIcon || !avatar || !sideNavigationButton || !tenantMenuButton) {
+        throw new Error('One or more testIDs are not set correctly in the application.');
+    }
+});

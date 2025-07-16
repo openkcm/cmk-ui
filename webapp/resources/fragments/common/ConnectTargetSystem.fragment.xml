@@ -22,12 +22,26 @@
                 backgroundDesign="Solid"
                 class="gray-background-color rounded-box">
                 <Title text="{connectSystemModel>/name}" titleStyle="H5"
-                    class="sapUiSmallMarginBegin sapUiSmallMarginTop" />
+                    class="sapUiSmallMarginBegin sapUiSmallMarginTop">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="connectSystem-nameTitle"
+                            writeToDom="true" />
+                    </customData>
+                </Title>
                 <Label text="{connectSystemModel>/id}"
                     class="sapUiSmallMarginBegin" />
                 <HBox class="sapUiSmallMarginBegin sapUiSmallMarginTop sapUiSmallMarginBottom">
                     <Label text="{i18n>region}:" />
-                    <Text text="{connectSystemModel>/region}" class="sapUiTinyMarginBegin" />
+                    <Text text="{connectSystemModel>/region}" class="sapUiTinyMarginBegin">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="connectSystem-regionText"
+                                writeToDom="true" />
+                        </customData>
+                    </Text>
                 </HBox>
             </VBox>
             <HBox justifyContent="Center" alignContent="Center"
@@ -47,6 +61,12 @@
                         selectedKey="{connectSystemModel>/selectedKeyConfig}"
                         items="{connectSystemModel>/KeyConfigList}">
                         <core:Item key="{connectSystemModel>id}" text="{connectSystemModel>name}" />
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="connectSystem-selectKeyConfigComboBox"
+                                writeToDom="true" />
+                        </customData>
                     </ComboBox>
                 </VBox>
             </VBox>
@@ -58,9 +78,23 @@
                     type="Emphasized"
                     enabled="{= !!${connectSystemModel>/selectedKeyConfig}}"
                     visible="{model>/createKeyEnabled}"
-                    press="onConnectSystemSubmitPress" />
+                    press="onConnectSystemSubmitPress">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="connectSystem-submitButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
                 <Button text="{i18n>cancel}" type="Transparent"
-                    press="onConnectSystemCancelPress" />
+                    press="onConnectSystemCancelPress">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="connectSystem-cancelButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
             </OverflowToolbar>
         </footer>
     </Dialog>

@@ -28,7 +28,14 @@
                             <m:Button icon="sap-icon://copy" type="Transparent"
                                 class="sapUiTinyMarginBegin sapUiTinyMarginBottom"
                                 dataHelp:textToCopy="{oneWay>/task/id}"
-                                press="onCopyToClipboardPress" />
+                                press="onCopyToClipboardPress">
+                                <m:customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="taskDetail-copyIdButton"
+                                        writeToDom="true" />
+                                </m:customData>
+                            </m:Button>
                         </m:HBox>
                     </m:VBox>
 
@@ -36,11 +43,25 @@
                 <actions>
                     <m:Button icon="sap-icon://refresh"
                         type="Transparent"
-                        press="onRefresh" />
+                        press="onRefresh">
+                        <m:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="taskDetail-refreshButton"
+                                writeToDom="true" />
+                        </m:customData>
+                    </m:Button>
                     <m:Button
                         icon="sap-icon://decline"
                         type="Transparent"
-                        press="onCancel" />
+                        press="onCancel">
+                        <m:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="taskDetail-cancelButton"
+                                writeToDom="true" />
+                        </m:customData>
+                    </m:Button>
                 </actions>
             </ObjectPageDynamicHeaderTitle>
         </headerTitle>
@@ -65,7 +86,14 @@
                     <m:Button class="sapUiTinyMarginBegin"
                         type="{oneWay>buttonType}"
                         text="{oneWay>text}"
-                        press='.onTaskActionPress($event, ${oneWay>key})' />
+                        press='.onTaskActionPress($event, ${oneWay>key})'>
+                        <m:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="taskDetail-actionButton}"
+                                writeToDom="true" />
+                        </m:customData>
+                    </m:Button>
                 </m:HBox>
             </m:OverflowToolbar>
         </footer>

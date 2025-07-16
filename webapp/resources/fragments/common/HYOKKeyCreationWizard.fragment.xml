@@ -41,11 +41,25 @@
                                                 liveChange="onKeyCreateNameChanged"
                                                 valueLiveUpdate="true"
                                                 valueState="{model>/keyNameValueState}"
-                                                valueStateText="{model>/keyNameValueStateText}" />
+                                                valueStateText="{model>/keyNameValueStateText}">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="HYOKKeyCreationWizard-nameInput"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </Input>
                                             <Label text="{i18n>keyDescription}:"
                                                 class="sapUiTinyMarginTop" />
                                             <TextArea value="{model>/description}" rows="4"
-                                                width="100%" />
+                                                width="100%">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="HYOKKeyCreationWizard-descriptionInput"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </TextArea>
                                         </VBox>
                                     </WizardStep>
                                     <WizardStep id="HYOKKeySource"
@@ -57,10 +71,30 @@
                                             <SegmentedButton selectedKey="{model>/keySource}">
                                                 <items>
                                                     <SegmentedButtonItem text="{i18n>keyID}"
-                                                        key="keyID" />
+                                                        key="keyID">
+                                                        <customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="HYOKKeyCreationWizard-keyIDSegmentedButton"
+                                                                writeToDom="true" />
+                                                        </customData>
+                                                    </SegmentedButtonItem>
                                                     <SegmentedButtonItem text="{i18n>keyAlias}"
-                                                        key="keyAlias" />
+                                                        key="keyAlias">
+                                                        <customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="HYOKKeyCreationWizard-keyAliasSegmentedButton"
+                                                                writeToDom="true" />
+                                                        </customData>
+                                                    </SegmentedButtonItem>
                                                 </items>
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="HYOKKeyCreationWizard-keySourceSegmentedButton"
+                                                        writeToDom="true" />
+                                                </customData>
                                             </SegmentedButton>
                                             <Label
                                                 class="sapUiTinyMarginTop"
@@ -70,7 +104,14 @@
                                                 liveChange="onKeyCreateARNChanged"
                                                 valueLiveUpdate="true"
                                                 valueState="{model>/keyARNValueState}"
-                                                valueStateText="{model>/keyARNValueStateText}" />
+                                                valueStateText="{model>/keyARNValueStateText}">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="HYOKKeyCreationWizard-keyARNInput"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </Input>
                                         </VBox>
                                     </WizardStep>
                                 </Wizard>
@@ -88,18 +129,39 @@
                                                 <Title text="1. {i18n>details}" />
                                                 <ToolbarSpacer />
                                                 <Button press=".onNavBackToStepPress(0)"
-                                                    text="{i18n>edit}" />
+                                                    text="{i18n>edit}">
+                                                    <customData>
+                                                        <core:CustomData
+                                                            key="testId"
+                                                            value="HYOKKeyCreationWizard-editDetailsButton"
+                                                            writeToDom="true" />
+                                                    </customData>
+                                                </Button>
                                             </Toolbar>
                                         </form:toolbar>
                                         <form:content>
                                             <Label text="{i18n>keyName}" />
                                             <Input value="{model>/name}"
-                                                editable="false" />
+                                                editable="false">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="HYOKKeyCreationWizard-nameText"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </Input>
                                             <Label text="{i18n>keyDescription}:"
                                                 class="sapUiTinyMarginTop" />
                                             <TextArea editable="false" value="{model>/description}"
                                                 rows="4"
-                                                width="100%" />
+                                                width="100%">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="HYOKKeyCreationWizard-descriptionText"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </TextArea>
                                         </form:content>
                                     </form:SimpleForm>
 
@@ -112,7 +174,14 @@
                                                 <Title text="2. {i18n>keySource}" />
                                                 <ToolbarSpacer />
                                                 <Button press=".onNavBackToStepPress(1)"
-                                                    text="{i18n>edit}" />
+                                                    text="{i18n>edit}">
+                                                    <customData>
+                                                        <core:CustomData
+                                                            key="testId"
+                                                            value="HYOKKeyCreationWizard-editKeySourceButton"
+                                                            writeToDom="true" />
+                                                    </customData>
+                                                </Button>
                                             </Toolbar>
                                         </form:toolbar>
                                         <form:content>
@@ -126,12 +195,25 @@
                                                         <SegmentedButtonItem text="{i18n>keyAlias}"
                                                             key="keyAlias" />
                                                     </items>
+                                                    <customData>
+                                                        <core:CustomData
+                                                            key="testId"
+                                                            value="HYOKKeyCreationWizard-keySourceDisabledSegmentedButton"
+                                                            writeToDom="true" />
+                                                    </customData>
                                                 </SegmentedButton>
                                                 <Label
                                                     class="sapUiTinyMarginTop"
                                                     text="{= ${model>/keySource} === 'keyID' ? ${i18n>keyARN} : ${i18n>keyAlias}}" />
                                                 <Input value="{model>/keyARN}"
-                                                    editable="false" />
+                                                    editable="false">
+                                                    <customData>
+                                                        <core:CustomData
+                                                            key="testId"
+                                                            value="HYOKKeyCreationWizard-keyARNDisabledText"
+                                                            writeToDom="true" />
+                                                    </customData>
+                                                </Input>
                                             </VBox>
                                         </form:content>
                                     </form:SimpleForm>
@@ -146,9 +228,23 @@
                     <ToolbarSpacer />
                     <Button text="{i18n>createKey}" type="Emphasized"
                         visible="{model>/createKeyEnabled}"
-                        press="onKeyCreationWizardSubmitPress" />
+                        press="onKeyCreationWizardSubmitPress">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="HYOKKeyCreationWizard-submitButton"
+                                writeToDom="true" />
+                        </customData>
+                    </Button>
                     <Button text="{i18n>cancel}" type="Transparent"
-                        press="onKeyCreationWizardCancelPress" />
+                        press="onKeyCreationWizardCancelPress">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="HYOKKeyCreationWizard-cancelButton"
+                                writeToDom="true" />
+                        </customData>
+                    </Button>
                 </OverflowToolbar>
             </f:footer>
         </f:DynamicPage>

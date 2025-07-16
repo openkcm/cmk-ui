@@ -30,6 +30,12 @@
                                 items="{oneWay>/tasksStatusItems}">
                                 <core:Item key="{oneWay>}"
                                     text="{parts: ['oneWay>'], formatter: '.getText'}" />
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="tasksFilterBar-statusComboBox"
+                                        writeToDom="true" />
+                                </customData>
                             </MultiComboBox>
                         </kms:FilterBarItem>
                         <kms:FilterBarItem label="{i18n>workflowType}">
@@ -40,6 +46,12 @@
                                 items="{oneWay>/taskTypes}">
                                 <core:Item key="{oneWay>}"
                                     text="{parts: ['oneWay>'], formatter: '.getText'}" />
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="tasksFilterBar-taskTypeComboBox"
+                                        writeToDom="true" />
+                                </customData>
                             </MultiComboBox>
                         </kms:FilterBarItem>
                     </kms:FilterBar>

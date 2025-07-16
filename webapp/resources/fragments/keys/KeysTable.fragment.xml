@@ -25,7 +25,14 @@
                     <menu>
                         <Menu class="sapUiSizeCompact">
                             <MenuItem text="{i18n>sapManaged}"
-                                press=".handleCreateKeyRoute('SYSTEM_MANAGED')" />
+                                press=".handleCreateKeyRoute('SYSTEM_MANAGED')">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keysTable-createSapManagedKey"
+                                        writeToDom="true" />
+                                </customData>
+                            </MenuItem>
                             <MenuItem text="{i18n>hyok}">
                                 <items>
                                     <MenuItemGroup
@@ -37,6 +44,12 @@
                                         </items>
                                     </MenuItemGroup>
                                 </items>
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keysTable-createHyokKey"
+                                        writeToDom="true" />
+                                </customData>
                             </MenuItem>
                         </Menu>
                     </menu>
@@ -44,12 +57,26 @@
                 <Button
                     icon="sap-icon://filter"
                     press="onKeysTableFilterPress"
-                    type="Transparent" />
+                    type="Transparent">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="keysTable-filterButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
                 <Button
                     icon="sap-icon://sort"
                     press="onKeysTableSortPress"
                     class="sapUiSmallMarginEnd"
-                    type="Transparent" />
+                    type="Transparent">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="keysTable-sortButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
             </OverflowToolbar>
         </headerToolbar>
         <columns>
@@ -100,11 +127,25 @@
                                 displayOnly="true"
                                 colorScheme="5" />
                         </HBox>
-                        <Label text="{oneWay>provider} • {oneWay>region}" />
+                        <Label text="{oneWay>provider} • {oneWay>region}">
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="keysTable-regionLabel"
+                                    writeToDom="true" />
+                            </customData>
+                        </Label>
                     </VBox>
                     <Text
                         text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC"
-                        wrapping="false" />
+                        wrapping="false">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="keysTable-createdOnText"
+                                writeToDom="true" />
+                        </customData>
+                    </Text>
                     <VBox justifyContent="Center">
                         <tnt:InfoLabel
                             visible="{= ${oneWay>state} === 'ENABLED' }"
@@ -123,19 +164,53 @@
                                     <MenuItem press="onKeyTableMakePrimaryPress"
                                         text="{i18n>makePrimary}"
                                         visible="{= !${oneWay>isPrimary}}"
-                                        icon="sap-icon://favorite" />
+                                        icon="sap-icon://favorite">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="keysTable-makePrimaryMenuItem"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </MenuItem>
                                     <MenuItem press="onKeyTableEnablePress"
                                         text="{i18n>enable}"
                                         visible="{= ${oneWay>state} === 'DISABLED'}"
-                                        icon="sap-icon://log" />
+                                        icon="sap-icon://log">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="keysTable-enableMenuItem"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </MenuItem>
                                     <MenuItem press="onKeyTableDisablePress"
                                         text="{i18n>disable}"
                                         visible="{= ${oneWay>state} === 'ENABLED'}"
-                                        icon="sap-icon://log" />
+                                        icon="sap-icon://log">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="keysTable-disableMenuItem"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </MenuItem>
                                     <MenuItem press="onKeyTableDeletePress" text="{i18n>delete}"
-                                        icon="sap-icon://delete" />
+                                        icon="sap-icon://delete">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="keysTable-deleteMenuItem"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </MenuItem>
                                 </Menu>
                             </menu>
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="keysTable-actionsMenuButton"
+                                    writeToDom="true" />
+                            </customData>
                         </MenuButton>
                     </VBox>
                 </cells>

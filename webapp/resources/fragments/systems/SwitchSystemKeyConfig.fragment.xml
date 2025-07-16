@@ -30,7 +30,14 @@
                         <Label text="{i18n>description}:" />
                         <TextArea value="{switchKeyConfigModel>/connectedKeyConfig/description}"
                             width="95%"
-                            editable="false" />
+                            editable="false">
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="switchKeyConfig-descriptionText"
+                                    writeToDom="true" />
+                            </customData>
+                        </TextArea>
                     </VBox>
                 </VBox>
                 <HBox justifyContent="Center" alignContent="Center"
@@ -60,6 +67,12 @@
                             items="{switchKeyConfigModel>/KeyConfigList}">
                             <core:Item key="{switchKeyConfigModel>id}"
                                 text="{switchKeyConfigModel>name}" />
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="switchKeyConfig-selectKeyConfigComboBox"
+                                    writeToDom="true" />
+                            </customData>
                         </ComboBox>
                     </VBox>
                 </VBox>
@@ -71,9 +84,23 @@
                 <Button text="{i18n>sendForApproval}" icon="sap-icon://paper-plane"
                     type="Emphasized"
                     enabled="{= !!${switchKeyConfigModel>/selectedKeyConfig}}"
-                    press="onSwitchKeyConfigSubmitPress" />
+                    press="onSwitchKeyConfigSubmitPress">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="switchKeyConfig-submitButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
                 <Button text="{i18n>cancel}" type="Transparent"
-                    press="onSwitchKeyConfigCancelPress" />
+                    press="onSwitchKeyConfigCancelPress">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="switchKeyConfig-cancelButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
             </OverflowToolbar>
         </footer>
     </Dialog>

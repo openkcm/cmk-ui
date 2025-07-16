@@ -9,7 +9,7 @@ export default defineConfig({
   reporter: 'html',
   use: {
     trace: 'on-first-retry',
-    testIdAttribute: 'data-help-id'
+    testIdAttribute: 'data-testid'
   },
   expect: {
     timeout: 30000,

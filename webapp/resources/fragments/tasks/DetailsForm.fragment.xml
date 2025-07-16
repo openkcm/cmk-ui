@@ -21,18 +21,39 @@
                 <forms:formElements>
                     <forms:FormElement label="{i18n>uuid}">
                         <forms:fields>
-                            <Text text="{oneWay>/task/id}" />
+                            <Text text="{oneWay>/task/id}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="taskDetail-idText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>createdBy}">
                         <forms:fields>
-                            <Text text="{oneWay>/task/initiatorName}" />
+                            <Text text="{oneWay>/task/initiatorName}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="taskDetail-initiatorText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>approvers}">
                         <forms:fields>
                             <Text
-                                text="{parts: ['oneWay>/approvers'], formatter: '.parseApproverNamesWithDecisions'}" />
+                                text="{parts: ['oneWay>/approvers'], formatter: '.parseApproverNamesWithDecisions'}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="taskDetail-approversText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>status}">
@@ -42,13 +63,27 @@
                                 text="{parts: ['oneWay>/task/state'], formatter: '.getText'}"
                                 active="true"
                                 inverted="true"
-                                state="{parts: ['oneWay>/task/state'], formatter: 'commonFormatter.setTaskStatusIndicationState'}" />
+                                state="{parts: ['oneWay>/task/state'], formatter: 'commonFormatter.setTaskStatusIndicationState'}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="taskDetail-statusObjectStatus"
+                                        writeToDom="true" />
+                                </customData>
+                            </ObjectStatus>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>createdOn}">
                         <forms:fields>
                             <Text
-                                text="{path:'oneWay>/task/metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC" />
+                                text="{path:'oneWay>/task/metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="taskDetail-createdOnText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                 </forms:formElements>

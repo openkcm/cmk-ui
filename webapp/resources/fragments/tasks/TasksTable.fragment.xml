@@ -15,7 +15,14 @@
                     icon="sap-icon://sort"
                     press="onTaskTableSortPress"
                     class="sapUiSmallMarginEnd"
-                    type="Transparent" />
+                    type="Transparent">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="tasksTable-sortButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
             </OverflowToolbar>
         </headerToolbar>
         <columns>
@@ -37,17 +44,44 @@
                 <cells>
                     <ObjectIdentifier
                         title="{parts: ['oneWay>artifactType'], formatter: '.getText'}"
-                        text="{parts: ['oneWay>actionType'], formatter: '.getText'}"
-                    />
-                    <Text text="{oneWay>id}" />
+                        text="{parts: ['oneWay>actionType'], formatter: '.getText'}">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="tasksTable-taskObjectIdentifier"
+                                writeToDom="true" />
+                        </customData>
+                    </ObjectIdentifier>
+                    <Text text="{oneWay>id}">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="tasksTable-taskIdText"
+                                writeToDom="true" />
+                        </customData>
+                    </Text>
                     <Text
-                        text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC" />
+                        text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="tasksTable-createdOnText"
+                                writeToDom="true" />
+                        </customData>
+                    </Text>
                     <ObjectStatus
                         icon="{parts: ['oneWay>state'], formatter: 'commonFormatter.setTaskStatus'}"
                         text="{parts: ['oneWay>state'], formatter: '.getText'}"
                         active="true"
                         inverted="true"
-                        state="{parts: ['oneWay>state'], formatter: 'commonFormatter.setTaskStatusIndicationState'}" />
+                        state="{parts: ['oneWay>state'], formatter: 'commonFormatter.setTaskStatusIndicationState'}">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="tasksTable-statusObjectStatus"
+                                writeToDom="true" />
+                        </customData>
+                    </ObjectStatus>
                 </cells>
             </ColumnListItem>
         </items>

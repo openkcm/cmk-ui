@@ -15,10 +15,23 @@
                     <layoutData>
                         <OverflowToolbarLayoutData priority="NeverOverflow" />
                     </layoutData>
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="shellBar-sideNavigationToggleButton"
+                            writeToDom="true" />
+                    </customData>
                 </Button>
                 <Image height="1.5rem"
                     class="sapUiSmallMarginBegin"
-                    src="https://www.sap.com/dam/application/shared/logos/sap-logo-svg.svg" />
+                    src="https://www.sap.com/dam/application/shared/logos/sap-logo-svg.svg">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="shellBar-homeIcon"
+                            writeToDom="true" />
+                    </customData>
+                </Image>
                 <Title
                     text="{i18n>appTitle}"
                     level="H2" />
@@ -30,11 +43,23 @@
                             <MenuItem key="{oneWay>id}" text="{oneWay>id}" />
                         </Menu>
                     </menu>
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="shellBar-tenantMenuButton"
+                            writeToDom="true" />
+                    </customData>
                 </MenuButton>
                 <Avatar initials="KM" displaySize="XS" press="onUserNamePress">
                     <layoutData>
                         <OverflowToolbarLayoutData priority="NeverOverflow" />
                     </layoutData>
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="shellBar-avatar"
+                            writeToDom="true" />
+                    </customData>
                 </Avatar>
             </tnt:ToolHeader>
         </tnt:header>
@@ -48,21 +73,45 @@
                         text="{i18n>sideContentKeyConfiguration}"
                         icon="sap-icon://key"
                         key="keyConfigs">
+                        <tnt:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="sideContent-keyConfigsItem"
+                                writeToDom="true" />
+                        </tnt:customData>
                     </tnt:NavigationListItem>
                     <tnt:NavigationListItem
                         text="{i18n>sideContentSystems}"
                         icon="sap-icon://it-system"
                         key="systems">
+                        <tnt:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="sideContent-systemsItem"
+                                writeToDom="true" />
+                        </tnt:customData>
                     </tnt:NavigationListItem>
                     <tnt:NavigationListItem
                         text="{i18n>sideContentTasks}"
                         icon="sap-icon://task"
                         key="tasks">
+                        <tnt:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="sideContent-tasksItem"
+                                writeToDom="true" />
+                        </tnt:customData>
                     </tnt:NavigationListItem>
                     <tnt:NavigationListItem
                         text="{i18n>sideContentGroupManagement}"
                         icon="sap-icon://employee"
                         key="groups">
+                        <tnt:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="sideContent-groupsItem"
+                                writeToDom="true" />
+                        </tnt:customData>
                     </tnt:NavigationListItem>
                 </tnt:NavigationList>
                 <tnt:fixedItem>
@@ -72,6 +121,12 @@
                             icon="sap-icon://settings"
                             key="settings"
                             href="#/settings">
+                            <tnt:customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="sideContent-settingsItem"
+                                    writeToDom="true" />
+                            </tnt:customData>
                         </tnt:NavigationListItem>
                     </tnt:NavigationList>
                 </tnt:fixedItem>

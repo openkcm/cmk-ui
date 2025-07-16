@@ -20,20 +20,48 @@
                     <Button
                         icon="sap-icon://refresh"
                         type="Transparent"
-                        press="setKeyConfigs" />
+                        press="setKeyConfigs">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="keyConfigDashboard-refreshButton"
+                                writeToDom="true" />
+                        </customData>
+                    </Button>
                     <Button
                         icon="sap-icon://filter"
-                        type="Transparent" />
+                        type="Transparent">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="keyConfigDashboard-filterButton"
+                                writeToDom="true" />
+                        </customData>
+                    </Button>
                     <Button
                         icon="sap-icon://sort"
                         press="onKeyConfigDashboardSortPress"
                         class="sapUiSmallMarginEnd"
-                        type="Transparent" />
+                        type="Transparent">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="keyConfigDashboard-sortButton"
+                                writeToDom="true" />
+                        </customData>
+                    </Button>
                     <Button
                         icon="sap-icon://add"
                         type="Emphasized"
                         text="{i18n>createConfiguration}"
-                        press="onCreateConfigPress" />
+                        press="onCreateConfigPress">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="keyConfigDashboard-createButton"
+                                writeToDom="true" />
+                        </customData>
+                    </Button>
                 </f:actions>
             </f:DynamicPageTitle>
         </f:title>
@@ -44,10 +72,10 @@
                         fragmentName="kms.resources.fragments.keyConfigs.Dashboard"
                         type="XML" />
                     <kms:Pagination
-                            currentPage="{pagination>/currentPage}"
-                            totalPages="{pagination>/totalPages}"
-                            onPreviousPage="onPreviousPage"
-                            onNextPage="onNextPage" />
+                        currentPage="{pagination>/currentPage}"
+                        totalPages="{pagination>/totalPages}"
+                        onPreviousPage="onPreviousPage"
+                        onNextPage="onNextPage" />
                 </VBox>
                 <IllustratedMessage enableVerticalResponsiveness="false"
                     title="{i18n>noKeyConfigurations}"

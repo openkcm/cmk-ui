@@ -16,7 +16,8 @@
                 <breadcrumbs>
                     <m:Breadcrumbs currentLocationText="{oneWay>/keyConfig/name}">
                         <m:Link text=" {i18n>sideContentKeyConfiguration}"
-                            press=".onBreadCrumbLinkPress($event, 'keyConfigs')" />
+                            press=".onBreadCrumbLinkPress($event, 'keyConfigs')">
+                        </m:Link>
                     </m:Breadcrumbs>
                 </breadcrumbs>
                 <expandedHeading>
@@ -31,7 +32,14 @@
                         <m:Button icon="sap-icon://copy" type="Transparent"
                             class="sapUiTinyMarginBegin sapUiTinyMarginBottom"
                             dataHelp:textToCopy="{oneWay>/keyConfig/id}"
-                            press="onCopyToClipboardPress" />
+                            press="onCopyToClipboardPress">
+                            <m:customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="keyConfigDetail-copyIdButton"
+                                    writeToDom="true" />
+                            </m:customData>
+                        </m:Button>
                     </m:HBox>
                 </expandedContent>
                 <actions>
@@ -39,11 +47,25 @@
                         text="{i18n>delete}"
                         icon="sap-icon://delete"
                         type="Reject"
-                        press="deleteKeyConfig" />
+                        press="deleteKeyConfig">
+                        <m:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="keyConfigDetail-deleteButton"
+                                writeToDom="true" />
+                        </m:customData>
+                    </m:Button>
                     <m:Button
                         icon="sap-icon://refresh"
                         type="Transparent"
-                        press="getKeyConfigData" />
+                        press="getKeyConfigData">
+                        <m:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="keyConfigDetail-refreshButton"
+                                writeToDom="true" />
+                        </m:customData>
+                    </m:Button>
                 </actions>
             </ObjectPageDynamicHeaderTitle>
         </headerTitle>
@@ -75,10 +97,10 @@
                                     fragmentName="kms.resources.fragments.keys.KeysTable"
                                     type="XML" />
                                 <kms:Pagination
-                                        currentPage="{keysPagination>/currentPage}"
-                                        totalPages="{keysPagination>/totalPages}"
-                                        onPreviousPage="onKeysPreviousPage"
-                                        onNextPage="onKeysNextPage" />
+                                    currentPage="{keysPagination>/currentPage}"
+                                    totalPages="{keysPagination>/totalPages}"
+                                    onPreviousPage="onKeysPreviousPage"
+                                    onNextPage="onKeysNextPage" />
                             </m:VBox>
                             <m:VBox visible="{= ${oneWay>/keysCount} === 0 }">
                                 <core:Fragment
@@ -99,10 +121,10 @@
                                     fragmentName="kms.resources.fragments.systems.SystemsTable"
                                     type="XML" />
                                 <kms:Pagination
-                                        currentPage="{systemsPagination>/currentPage}"
-                                        totalPages="{systemsPagination>/totalPages}"
-                                        onPreviousPage="onSystemsPreviousPage"
-                                        onNextPage="onSystemsNextPage" />
+                                    currentPage="{systemsPagination>/currentPage}"
+                                    totalPages="{systemsPagination>/totalPages}"
+                                    onPreviousPage="onSystemsPreviousPage"
+                                    onNextPage="onSystemsNextPage" />
                             </m:VBox>
                             <m:VBox visible="{= ${oneWay>/systemsCount} === 0 }">
                                 <core:Fragment

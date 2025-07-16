@@ -14,7 +14,14 @@
                 <Title text="{i18n>details}" />
                 <ToolbarSpacer />
                 <Button icon="sap-icon://edit" text="{i18n>edit}" type="Ghost"
-                    press="onEditDetailsPress" />
+                    press="onEditDetailsPress">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="keyConfigDetail-editButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
             </OverflowToolbar>
         </forms:toolbar>
         <forms:formContainers>
@@ -22,17 +29,38 @@
                 <forms:formElements>
                     <forms:FormElement label="{i18n>name}">
                         <forms:fields>
-                            <Text text="{oneWay>/keyConfig/name}" />
+                            <Text text="{oneWay>/keyConfig/name}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyConfigDetail-nameText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>uuid}">
                         <forms:fields>
-                            <Text text="{oneWay>/keyConfig/id}" />
+                            <Text text="{oneWay>/keyConfig/id}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyConfigDetail-idText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>keyAdministrators}">
                         <forms:fields>
-                            <Text text="{oneWay>/keyConfig/adminGroupID}" />
+                            <Text text="{oneWay>/keyConfig/adminGroupID}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyConfigDetail-adminGroupText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>tags}">
@@ -42,18 +70,38 @@
                                 <tokens>
                                     <Token key="{oneWay>}" text="{oneWay>}" />
                                 </tokens>
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyConfigDetail-tagsMultiInput"
+                                        writeToDom="true" />
+                                </customData>
                             </MultiInput>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>createdBy}">
                         <forms:fields>
-                            <Text text="{oneWay>/keyConfig/metadata/creatorName}" />
+                            <Text text="{oneWay>/keyConfig/metadata/creatorName}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyConfigDetail-createdByText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>createdOn}">
                         <forms:fields>
                             <Text
-                                text="{path:'oneWay>/keyConfig/metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC" />
+                                text="{path:'oneWay>/keyConfig/metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyConfigDetail-createdOnText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
                         </forms:fields>
                     </forms:FormElement>
                 </forms:formElements>

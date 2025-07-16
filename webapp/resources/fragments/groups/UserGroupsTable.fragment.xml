@@ -28,21 +28,50 @@
             <ColumnListItem vAlign="Middle" type="Navigation" press="onUserPress">
                 <cells>
                     <VBox>
-                    <Input type="Text" value="{oneWay>name}" editable="true" visible="{= !!${oneWay>edit}}"></Input>
-                    <Text text="{oneWay>name}" visible="{= !${oneWay>edit}}"/>
+                        <Input type="Text" value="{oneWay>name}" editable="true"
+                            visible="{= !!${oneWay>edit}}">
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="userGroupsTable-nameInput"
+                                    writeToDom="true" />
+                            </customData>
+                        </Input>
+                        <Text text="{oneWay>name}" visible="{= !${oneWay>edit}}">
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="userGroupsTable-nameText"
+                                    writeToDom="true" />
+                            </customData>
+                        </Text>
                     </VBox>
                     <Text text="{path:'oneWay>role'}" />
                     <VBox>
-                        <MenuButton icon="sap-icon://action-settings" type="Transparent" visible="{= !${oneWay>edit}}">
+                        <MenuButton icon="sap-icon://action-settings" type="Transparent"
+                            visible="{= !${oneWay>edit}}">
                             <menu>
                                 <Menu class="sapUiSizeCompact">
                                     <MenuItem press="onKeyTableDeletePress" text="{i18n>delete}"
-                                        icon="sap-icon://delete" />
+                                        icon="sap-icon://delete">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="userGroupsTable-deleteButton"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </MenuItem>
                                     <!-- <MenuItem press="onIASsyncPress"
                                         text="IAS Sync"
                                         icon="sap-icon://log" /> -->
                                 </Menu>
                             </menu>
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="userGroupsTable-settingsButton"
+                                    writeToDom="true" />
+                            </customData>
                         </MenuButton>
                     </VBox>
                 </cells>

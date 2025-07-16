@@ -7,6 +7,7 @@ import Button from 'sap/m/Button';
 import RenderManager from 'sap/ui/core/RenderManager';
 import GridData from 'sap/ui/layout/GridData';
 import FilterBarItem from 'kms/control/FilterBarItem';
+import CustomData from 'sap/ui/core/CustomData';
 import type { MetadataOptions } from 'sap/ui/core/Element';
 
 /**
@@ -55,7 +56,16 @@ export default class FilterBar extends Control {
         render: (rm: RenderManager, control: FilterBar) => {
             rm.openStart('div', control);
             rm.openEnd();
-
+            const goButtonCustomData = new CustomData({
+                key: "testId",
+                value: "filterBar-goButton",
+                writeToDom: true
+            });
+            const resetButtonCustomData = new CustomData({
+                key: "testId",
+                value: "filterBar-resetButton",
+                writeToDom: true
+            });
             const toolbar = new HBox({
                 justifyContent: "End",
                 items: [
@@ -63,11 +73,11 @@ export default class FilterBar extends Control {
                         text: 'Go',
                         type: 'Emphasized',
                         press: () => control.fireEvent('search'),
-                    }).addStyleClass('sapUiTinyMargin'),
+                    }).addStyleClass('sapUiTinyMargin').addCustomData(goButtonCustomData),
                     new Button({
                         text: 'Reset',
                         press: () => control.fireEvent('reset'),
-                    }).addStyleClass('sapUiTinyMargin'),
+                    }).addStyleClass('sapUiTinyMargin').addCustomData(resetButtonCustomData),
                 ]
             });
 

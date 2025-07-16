@@ -31,15 +31,26 @@
                                 placeholder="{i18n>all}"
                                 items="{oneWay>/systems}">
                                 <core:Item key="{oneWay>region}" text="{oneWay>region}" />
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="systemsFilterBar-regionComboBox"
+                                        writeToDom="true" />
+                                </customData>
                             </MultiComboBox>
                         </kms:FilterBarItem>
                         <kms:FilterBarItem label="{i18n>sid}">
-
                             <MultiComboBox
                                 placeholder="{i18n>all}"
                                 name="{i18n>sid}"
                                 items="{oneWay>/systems}">
                                 <core:Item key="{oneWay>sid}" text="{oneWay>sid}" />
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="systemsFilterBar-sidComboBox"
+                                        writeToDom="true" />
+                                </customData>
                             </MultiComboBox>
                         </kms:FilterBarItem>
 
@@ -51,6 +62,12 @@
                                 items="{oneWay>/systems}">
                                 <core:Item key="{oneWay>systemRole}"
                                     text="{oneWay>systemRole}" />
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="systemsFilterBar-systemsRoleComboBox"
+                                        writeToDom="true" />
+                                </customData>
                             </MultiComboBox>
                         </kms:FilterBarItem>
                         <kms:FilterBarItem label="{i18n>keyConfiguration}">
@@ -62,6 +79,12 @@
                                 items="{oneWay>/systems}">
                                 <core:Item key="{oneWay>keyConfig}"
                                     text="{oneWay>keyConfig}" />
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="systemsFilterBar-keyConfigComboBox"
+                                        writeToDom="true" />
+                                </customData>
                             </MultiComboBox>
                         </kms:FilterBarItem>
                     </kms:FilterBar>

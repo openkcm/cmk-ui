@@ -47,7 +47,14 @@
                             <m:Button icon="sap-icon://copy" type="Transparent"
                                 class="sapUiTinyMarginBegin sapUiTinyMarginBottom"
                                 dataHelp:textToCopy="{oneWay>/selectedKey/id}"
-                                press="onCopyToClipboardPress" />
+                                press="onCopyToClipboardPress">
+                                <m:customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyConfigDetail-copyKeyIdButton"
+                                        writeToDom="true" />
+                                </m:customData>
+                            </m:Button>
                         </m:HBox>
                     </m:VBox>
                     <m:VBox visible="{= ${oneWay>/type} === 'system'}">
@@ -58,18 +65,39 @@
                             <m:Button icon="sap-icon://copy" type="Transparent"
                                 class="sapUiTinyMarginBegin sapUiTinyMarginBottom"
                                 dataHelp:textToCopy="{oneWay>/selectedSystem/id}"
-                                press="onCopyToClipboardPress" />
+                                press="onCopyToClipboardPress">
+                                <m:customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyConfigDetail-copySystemIdButton"
+                                        writeToDom="true" />
+                                </m:customData>
+                            </m:Button>
                         </m:HBox>
                     </m:VBox>
                 </expandedContent>
                 <actions>
                     <m:Button icon="sap-icon://refresh"
                         type="Transparent"
-                        press="onDetailsRefresh" />
+                        press="onDetailsRefresh">
+                        <m:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="keyConfigDetail-refreshButton"
+                                writeToDom="true" />
+                        </m:customData>
+                    </m:Button>
                     <m:Button
                         icon="sap-icon://decline"
                         type="Transparent"
-                        press="onDetailsClosePress" />
+                        press="onDetailsClosePress">
+                        <m:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="keyConfigDetail-closeButton"
+                                writeToDom="true" />
+                        </m:customData>
+                    </m:Button>
                 </actions>
             </ObjectPageDynamicHeaderTitle>
         </headerTitle>
