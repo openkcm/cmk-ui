@@ -6,13 +6,14 @@ export default (systemId, keyConfigurationID) => {
         const response = Array.from({ length: count }, () => (
             {
                 id: chance.guid(),
-                sid: chance.string({ length: 3, pool: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' }),
-                keyConfigurationID: keyConfigurationID ? keyConfigurationID : chance.guid(),
-                keyConfigurationName: "Key Config XYZ",
+                externalID: chance.string({ length: 3, pool: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' }),
+                keyConfigurationID: chance.guid(),
+                keyConfigurationName: `Key Config ${chance.state({ full: true })}`,
                 name: `System ${chance.animal()}`,
                 region: chance.pickone(['eu-central-1', 'us-east-1', 'us-west-2']),
-                systemRole: 'HEC_HANA',
-                status: chance.pickone(["CONNECTED", "DISCONNECTED"])
+                role: chance.pickone(["SAP Analytics Cloud", "SuccessFactors Learning", "SAP Ariba", "SAP Fieldglass", "SAP Concur"]),
+                status: chance.pickone(['CONNECTED, DISCONNECTED']),
+                type: "SYSTEM"
             }
         ));
         return {
@@ -25,14 +26,14 @@ export default (systemId, keyConfigurationID) => {
     } else if (systemId && !keyConfigurationID) {
         return {
             id: systemId,
-            sid: chance.string({ length: 3, pool: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' }),
+            externalID: chance.string({ length: 3, pool: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' }),
             keyConfigurationID: chance.guid(),
             keyConfigurationName: `Key Config ${chance.state({ full: true })}`,
             name: `System ${chance.animal()}`,
             region: chance.pickone(['eu-central-1', 'us-east-1', 'us-west-2']),
-            systemRole: chance.pickone(["SAP Analytics Cloud", "SuccessFactors Learning", "SAP Ariba", "SAP Fieldglass", "SAP Concur"]),
+            role: chance.pickone(["SAP Analytics Cloud", "SuccessFactors Learning", "SAP Ariba", "SAP Fieldglass", "SAP Concur"]),
             status: chance.pickone(['CONNECTED, DISCONNECTED']),
-            applicationRole: "HEC_HANA"
+            type: "SYSTEM"
         }
     } else {
         return generateSystems(chance.integer({ min: 1, max: 5 }));

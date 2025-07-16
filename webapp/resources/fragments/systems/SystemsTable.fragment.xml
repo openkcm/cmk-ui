@@ -1,8 +1,8 @@
 <core:FragmentDefinition xmlns="sap.m"
     xmlns:core="sap.ui.core"
     xmlns:tnt="sap.tnt"
-    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
-    <Hbox width="100%"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage', commonFormatter: 'kms/common/Formatters' }">
+    <HBox width="100%"
         justifyContent="End">
         <tnt:InfoLabel
             visible="{= !${oneWay>/keyConfig/canConnectSystems} &amp;&amp; !${oneWay>/isSytemsView}}"
@@ -11,7 +11,7 @@
             renderMode="Narrow"
             colorScheme="1"
         />
-    </Hbox>
+    </HBox>
     <Table
         id="systemsTable"
         inset="false"
@@ -48,6 +48,9 @@
                 <Text text="{i18n>identifier}" />
             </Column>
             <Column minScreenWidth="Tablet" demandPopin="true">
+                <Text text="{i18n>type}" />
+            </Column>
+            <Column minScreenWidth="Tablet" demandPopin="true">
                 <Text text="{i18n>systemsRole}" />
             </Column>
             <Column minScreenWidth="Tablet" demandPopin="true"
@@ -70,6 +73,7 @@
                 <cells>
                     <ObjectIdentifier title="{oneWay>name}" text="{oneWay>region}" />
                     <Text text="{oneWay>id}" />
+                    <Text text="{parts: ['oneWay>type'], formatter: 'commonFormatter.setSystemType'}" />
                     <Text text="{oneWay>systemRole}" />
                     <VBox visible="{= !${oneWay>/keyConfigDetail}}">
                         <ObjectStatus

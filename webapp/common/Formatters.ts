@@ -49,8 +49,18 @@ export default class Formatter {
             case TaskStates.EXPIRED:
             case TaskStates.REVOKED:
             case TaskStates.REJECTED:
-            case TaskStates.FAILED:
                 return "Indication11";
+        }
+    }
+
+    public static setSystemType(type: string): string {
+        switch (type) {
+            case 'SYSTEM':
+                return 'System';
+            case 'SUBACCOUNT':
+                return 'Subaccount';
+            default:
+                return '';
         }
     }
 }
