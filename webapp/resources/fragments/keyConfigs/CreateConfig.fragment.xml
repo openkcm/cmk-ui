@@ -18,11 +18,25 @@
                 <Label text="{i18n>name}:" required="true" />
                 <Input value="{model>/name}" valueState="{model>/nameValueState}"
                     valueLiveUpdate="true" liveChange="onConfigCreationNameChange"
-                    valueStateText="{model>/nameValueStateText}" />
+                    valueStateText="{model>/nameValueStateText}">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="createConfig-nameInput"
+                            writeToDom="true" />
+                    </customData>
+                </Input>
                 <Label text="{i18n>description}:"
                     class="sapUiTinyMarginTop" />
                 <TextArea value="{model>/description}" rows="4"
-                    width="100%" />
+                    width="100%">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="createConfig-descriptionText"
+                            writeToDom="true" />
+                    </customData>
+                </TextArea>
                 <Label text="{i18n>adminGroup}" required="true" class="sapUiTinyMarginTop" />
                 <Select
                     width="100%"
@@ -33,15 +47,35 @@
                     selectedKey="{model>/adminGroup}"
                     items="{model>/adminGroupList}">
                     <core:Item key="{model>key}" text="{model>text}" />
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="createConfig-adminGroupSelect"
+                            writeToDom="true" />
+                    </customData>
                 </Select>
             </VBox>
         </content>
         <beginButton>
             <Button text="{i18n>create}" press="onConfigCreationCreatePress" type="Emphasized"
-                enabled="{model>/createButtonEnabled}" />
+                enabled="{model>/createButtonEnabled}">
+                <customData>
+                    <core:CustomData
+                        key="testId"
+                        value="createConfig-createButton"
+                        writeToDom="true" />
+                </customData>
+            </Button>
         </beginButton>
         <endButton>
-            <Button text="{i18n>cancel}" press="onConfigCreationCancelPress" type="Transparent" />
+            <Button text="{i18n>cancel}" press="onConfigCreationCancelPress" type="Transparent">
+                <customData>
+                    <core:CustomData
+                        key="testId"
+                        value="createConfig-cancelButton"
+                        writeToDom="true" />
+                </customData>
+            </Button>
         </endButton>
     </Dialog>
 </core:FragmentDefinition>
