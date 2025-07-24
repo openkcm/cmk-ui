@@ -2,6 +2,8 @@ name: Helm workflow
   
 on:
   workflow_dispatch:
+  push:
+
 jobs:
   piper:
     permissions:
