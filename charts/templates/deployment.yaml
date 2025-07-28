@@ -32,6 +32,9 @@ spec:
       securityContext:
         {{- toYaml .Values.ui.podSecurityContext | nindent 8 }}
       containers:
+        {{- with .Values.extraContainers }}
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.ui.pod.securityContext | nindent 12 }}

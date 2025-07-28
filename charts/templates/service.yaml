@@ -5,12 +5,16 @@ metadata:
   labels:
     {{- include "ui.labels" . | nindent 4 }}
   namespace: {{ $.Values.namespace }}
+{{- with .Values.ui.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+{{- end }}
 spec:
   type: {{ .Values.ui.service.type }}
   ports:
     - port: {{ .Values.ui.service.port }}
-      targetPort: http
+      targetPort: {{ .Values.ui.service.targetPort }}
       protocol: TCP
-      name: http
+      name: {{ .Values.ui.service.name }}
   selector:
     {{- include "ui.selectorLabels" . | nindent 4 }}
