@@ -42,7 +42,7 @@ spec:
           imagePullPolicy: {{ .Values.ui.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.ui.service.port }}
+              containerPort: {{ .Values.ui.container.port }}
               protocol: TCP
           env:
             - name: DEBUG_MODE

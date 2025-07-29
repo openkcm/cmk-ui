@@ -65,6 +65,8 @@ ui:
   debugMode: false
   host: localhost
 
+  container:
+    port: 8080
   # This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
   service:
     # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
@@ -95,11 +97,11 @@ ui:
     #   registry: kms.common.repositories.cloud.sap
     #   repository: cmk
     # +docs:property
-    registry:
+    registry: kms.common.repositories.cloud.sap
 
     # The container image
     # +docs:property
-    repository:
+    repository: ui
 
     # Override the image tag to deploy by setting this variable.
     # If no value is set, the chart's appVersion is used.
