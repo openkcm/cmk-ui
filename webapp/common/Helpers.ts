@@ -1,5 +1,20 @@
 import { Button$PressEvent } from 'sap/m/Button';
 import MessageToast from 'sap/m/MessageToast';
+import MessageBox from "sap/m/MessageBox";
+import {AxiosError} from "axios";
+
+interface ErrorResponse {
+    error: {
+        message: string;
+        data: {
+            error: {
+                code: string,
+                id: string,
+                status: number
+            };
+        };
+    };
+}
 
 export async function copyToClipboard(event: Button$PressEvent): Promise<void> {
     const textToCopy = event.getSource().data('textToCopy') as string;
@@ -18,7 +33,7 @@ export function _isNameValid(name: string): boolean {
         return false;
     }
     return true;
-};
+}
 
 export function setNameValueState(name: string) : { valueState: string, valueStateText: string } {
     if (!_isNameValid(name) || !name) {
@@ -31,5 +46,56 @@ export function setNameValueState(name: string) : { valueState: string, valueSta
         valueState: 'None',
         valueStateText: ''
     };
+}
 
+export function convertDateToUTC(date : Date): string {
+    const dateObject = new Date(date);
+    return dateObject.toISOString().split('.')[0];
+}
+
+export function getErrorCode(error: AxiosError): string {
+    let errorCode : string = undefined;
+    if(error.message.includes('data') && error.message.includes('code')) {
+        const errorMessage = JSON.parse(error.message) as ErrorResponse;
+        errorCode = errorMessage?.error?.data?.error?.code;
+    }
+    return errorCode;
+}
+
+export function getErrorId(error: AxiosError): string {
+    let errorId : string = undefined;
+    if(error.message.includes('data') && error.message.includes('id')) {
+        const errorMessage = JSON.parse(error.message) as ErrorResponse;
+        errorId = errorMessage?.error?.data?.error?.id;
+    }
+    return errorId;
+}
+
+export function getErrorStatus(error: AxiosError): number {
+    let errorStatus = undefined;
+    if(error.message.includes('data') && error.message.includes('status')) {
+        const errorMessage = JSON.parse(error.message) as ErrorResponse;
+        errorStatus = errorMessage?.error?.data?.error?.status;
+    }
+    return errorStatus;
+}
+
+export function showErrorMessage(error: AxiosError, userMessage: string): void {
+    const errorId: string = getErrorId(error);
+    const statusCode = getErrorStatus(error);
+    const datetime = convertDateToUTC(new Date());
+
+    if (statusCode === 500) {
+        userMessage = 'An error has occurred. Please try again later or contact a system administrator and provide the following error details.';
+    }
+
+    MessageBox.error(userMessage, {
+        title: "Error",
+        details: "<p><strong>" + "Error Details:" + "</strong></p>" +
+            "<ul>" +
+            "<li><strong>" + "Error ID: " + "</strong>"+ ' ' + errorId + "</li>" +
+            "<li><strong>" + "Timestamp (UTC): " + "</strong>" + datetime + "</li>" +
+            "</ul>",
+        styleClass: 'sapUiUserSelectable'
+    });
 }

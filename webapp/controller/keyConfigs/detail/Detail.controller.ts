@@ -10,7 +10,7 @@ import ViewSettingsDialog from 'sap/m/ViewSettingsDialog';
 import Dialog from 'sap/m/Dialog';
 import MessageToast from 'sap/m/MessageToast';
 import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
-import { isUUIDValid, copyToClipboard } from 'kms/common/Helpers';
+import {isUUIDValid, copyToClipboard, showErrorMessage} from 'kms/common/Helpers';
 import EventBus from 'sap/ui/core/EventBus';
 import { Button$PressEvent } from 'sap/m/Button';
 import Filter from 'sap/ui/model/Filter';
@@ -22,6 +22,7 @@ import MultiInput, { MultiInput$TokenUpdateEvent } from 'sap/m/MultiInput';
 import Token from 'sap/m/Token';
 import { BYOKProviders, EventChannelIds, EventIDs, HYOKProviders, KeyCreationTypes } from 'kms/common/Enums';
 import KeyCreation from 'kms/component/KeyCreation';
+import {AxiosError} from "axios";
 
 interface KeyConfigPatchPayload {
     name: string;
@@ -211,7 +212,7 @@ export default class KeyConfigDetail extends BaseController {
             MessageToast.show(this.getText('systemsConnectedSuccessfully'));
         } catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorConnectingSystems'));
+            showErrorMessage(error as AxiosError, this.getText('errorConnectingSystems'));
         } finally {
             await this.getKeyConfigData();
             this.getView().setBusy(false);
@@ -240,7 +241,7 @@ export default class KeyConfigDetail extends BaseController {
             this.oneWayModel.setProperty('/tags', tags?.value);
         } catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorFetchingKeyConfigDetails'));
+            showErrorMessage(error as AxiosError, this.getText('errorFetchingKeyConfigDetails'));
         } finally {
             this.getView().setBusy(false);
         }
@@ -302,7 +303,7 @@ export default class KeyConfigDetail extends BaseController {
             return await this.api.get<KeyResponse>(`keys`, { keyConfigurationID: this.keyConfigId, $top: this.top, $skip: this.keysSkip });
         } catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorFetchingKeyDetails'));
+            showErrorMessage(error as AxiosError, this.getText('errorFetchingKeyDetails'));
         }
     }
     private async getConnectedSystems() {
@@ -310,7 +311,7 @@ export default class KeyConfigDetail extends BaseController {
             return await this.api.get<KeyResponse>(`systems`, { keyConfigurationID: this.keyConfigId, $top: this.top, $skip: this.systemsSkip });
         } catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorFetchingSystems'));
+            showErrorMessage(error as AxiosError, this.getText('errorFetchingSystems'));
         }
     }
     private async getAllSystems() {
@@ -318,7 +319,7 @@ export default class KeyConfigDetail extends BaseController {
             return await this.api.get<SystemsResponse>(`systems`);
         } catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorFetchingSystems'));
+            showErrorMessage(error as AxiosError, this.getText('errorFetchingSystems'));
         }
     }
     private async getTags() {
@@ -334,7 +335,7 @@ export default class KeyConfigDetail extends BaseController {
             return tags;
         } catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorFetchingTags'));
+            showErrorMessage(error as AxiosError, this.getText('errorFetchingTags'));
         }
     }
     public async onTagsUpdate(event: MultiInput$TokenUpdateEvent): Promise<void> {
@@ -356,7 +357,7 @@ export default class KeyConfigDetail extends BaseController {
             MessageToast.show(this.getText('tagsUpdatedSuccessfully'));
         } catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorUpdatingTags'));
+            showErrorMessage(error as AxiosError, this.getText('errorUpdatingTags'));
             const tags = await this.getTags();
             this.oneWayModel.setProperty('/tags', tags?.value || []);
         }
@@ -368,7 +369,7 @@ export default class KeyConfigDetail extends BaseController {
             return keyConfigs;
         } catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorPatchingKeyConfigDetails'));
+            showErrorMessage(error as AxiosError, this.getText('errorPatchingKeyConfigDetails'));
         }
     }
     public onEditDetailsPress(): void {
@@ -391,7 +392,7 @@ export default class KeyConfigDetail extends BaseController {
             await this.onCancelEditPress();
         } catch (error) {
             console.error('Error patching key config', error);
-            MessageBox.error(this.getText('errorPatchingKeyConfigDetails'));
+            showErrorMessage(error as AxiosError, this.getText('errorPatchingKeyConfigDetails'));
         } finally {
             this.getView().setBusy(false);
         }
@@ -533,7 +534,7 @@ export default class KeyConfigDetail extends BaseController {
             await this.getKeyConfigData();
         } catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorDisconnectingSystem'));
+            showErrorMessage(error as AxiosError, this.getText('errorDisconnectingSystem'));
         } finally {
             this.getView().setBusy(false);
         }
@@ -550,7 +551,7 @@ export default class KeyConfigDetail extends BaseController {
             await this.getKeyConfigData();
         } catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorDisablingKey'));
+            showErrorMessage(error as AxiosError, this.getText('errorDisablingKey'));
         } finally {
             this.getView().setBusy(false);
         }
@@ -566,7 +567,7 @@ export default class KeyConfigDetail extends BaseController {
             await this.getKeyConfigData();
         } catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorEnablingKey'));
+            showErrorMessage(error as AxiosError, this.getText('errorEnablingKey'));
         } finally {
             this.getView().setBusy(false);
         }
@@ -583,7 +584,7 @@ export default class KeyConfigDetail extends BaseController {
             await this.getKeyConfigData();
         } catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorDeletingKey'));
+            showErrorMessage(error as AxiosError, this.getText('errorDeletingKey'));
         } finally {
             this.getView().setBusy(false);
         }
@@ -602,7 +603,7 @@ export default class KeyConfigDetail extends BaseController {
             await this.getKeyConfigData();
         } catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorMakingKeyPrimary'));
+            showErrorMessage(error as AxiosError, this.getText('errorMakingKeyPrimary'));
         } finally {
             this.getView().setBusy(false);
         }
@@ -622,7 +623,7 @@ export default class KeyConfigDetail extends BaseController {
                         });
                     } catch (error) {
                         console.error(error);
-                        MessageBox.error(this.getText('errorDeletingKeyConfig'));
+                        showErrorMessage(error as AxiosError, this.getText('errorDeletingKeyConfig'));
                     } finally {
                         this.getView().setBusy(false);
                     }
@@ -637,7 +638,6 @@ export default class KeyConfigDetail extends BaseController {
         const filteredSystems = allSystems?.filter(system =>
             !connectedSystems?.some(connectedSystem => connectedSystem.id === system.id)
         );
-
         this.connectSystemModel.setProperty('/systemsList', filteredSystems);
     }
     public async onSwitchKeyConfigPress(event: Button$PressEvent): Promise<void> {
@@ -680,7 +680,7 @@ export default class KeyConfigDetail extends BaseController {
             MessageToast.show(this.getText('keyConfigConnectSystemSuccessfully'));
             this.onSwitchKeyConfigCancelPress();
         } catch (error) {
-            MessageBox.error(this.getText('keyConfigConnectSystemError'));
+            showErrorMessage(error as AxiosError, this.getText('keyConfigConnectSystemError'));
             console.error('Error creating key', error);
         } finally {
             await this.getKeyConfigData();

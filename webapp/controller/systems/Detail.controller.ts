@@ -6,12 +6,13 @@ import { System, KeyConfig } from "kms/common/Types";
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import { Button$PressEvent } from "sap/m/Button";
 import MessageBox from "sap/m/MessageBox";
-import { copyToClipboard } from "kms/common/Helpers";
+import { copyToClipboard, showErrorMessage } from "kms/common/Helpers";
 import EventBus from "sap/ui/core/EventBus";
 import MessageToast from "sap/m/MessageToast";
 import Dialog from "sap/m/Dialog";
 import Fragment from "sap/ui/core/Fragment";
 import { EventChannelIds, EventIDs } from "kms/common/Enums";
+import {AxiosError} from "axios";
 interface KeyConfigsResponse {
     value: KeyConfig[];
     count: number;
@@ -56,7 +57,7 @@ export default class Systems extends BaseController {
             }
         } catch (error) {
             console.error('Error fetching system details', error);
-            MessageBox.error(this.getText('errorFetchingSystemDetails'));
+            showErrorMessage(error as AxiosError, this.getText('errorFetchingSystemDetails'));
         } finally {
             this.getView().setBusy(false);
         }
@@ -80,7 +81,7 @@ export default class Systems extends BaseController {
             this.eventBus.publish(EventChannelIds.SYSTEMS, EventIDs.LOAD_SYSTEMS);
         } catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorDisconnectingSystem'));
+            showErrorMessage(error as AxiosError, this.getText('errorDisconnectingSystem'));
         } finally {
             this.getView().setBusy(false);
         }
@@ -125,7 +126,7 @@ export default class Systems extends BaseController {
             await this.getSystemDetails();
             this.eventBus.publish(EventChannelIds.SYSTEMS, EventIDs.LOAD_SYSTEMS);
         } catch (error) {
-            MessageBox.error(this.getText('keyConfigConnectSystemError'));
+            showErrorMessage(error as AxiosError, this.getText('keyConfigConnectSystemError'));
             console.error('Error creating key', error);
         } finally {
             this.getView().setBusy(false);

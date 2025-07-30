@@ -5,8 +5,8 @@ import Api from "kms/services/Api.service";
 import { Approver, Task } from "kms/common/Types";
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import { Button$PressEvent } from "sap/m/Button";
-import MessageBox from "sap/m/MessageBox";
-import { copyToClipboard } from "kms/common/Helpers";
+import {AxiosError} from "axios";
+import { copyToClipboard, showErrorMessage } from "kms/common/Helpers";
 import { EventChannelIds, EventIDs, TaskStates, TaskStateTransitionAction } from "kms/common/Enums";
 import MessageToast from "sap/m/MessageToast";
 import EventBus from "sap/ui/core/EventBus";
@@ -60,7 +60,6 @@ export default class Tasks extends BaseController {
             const task = await this.api.get<Task>(`workflows/${this.taskId}`);
             const approversData = await this.api.get<ApproversResponse>(`workflows/${this.taskId}/approvers`);
             if (task) {
-
                 this.oneWayModel.setProperty('/task', task);
                 this.oneWayModel.setProperty('/approvers', approversData?.value)
                 this.setTaskActionButtonData(task, approversData?.value);
@@ -70,7 +69,7 @@ export default class Tasks extends BaseController {
             }
         } catch (error) {
             console.error('Error fetching tasks details', error);
-            MessageBox.error(this.getText('errorFetchingTaskDetails'));
+            showErrorMessage(error as AxiosError, this.getText('errorFetchingTaskDetails'));
         } finally {
             this.getView().setBusy(false);
         }
@@ -80,18 +79,18 @@ export default class Tasks extends BaseController {
         let taskTransitionActions = [] as TaskTransitionActionsObj[];
         const approverIds = approvers?.map(approver => approver.id);
         //  const userId: string = approverIds[0]; //Temp Setting to test the Approver action items on tasks
-        const userId: string = task?.initiatorID;; //Temp Setting to test the Initiator action items on tasks
+        const userId: string = task?.initiatorID; //Temp Setting to test the Initiator action items on tasks
         const userIsTaskInitiator = userId === task?.initiatorID;
         const userIsTaskApprover = approverIds.includes(userId);
         if (userIsTaskInitiator) {
-            if (task.state === TaskStates.WAIT_APPROVAL) {
+            if (task?.state === TaskStates.WAIT_APPROVAL) {
                 taskTransitionActions = [
                     {
                         key: TaskStateTransitionAction.REVOKE,
                         text: this.getText('Revoke'),
                         buttonType: 'Reject',
                     }];
-            } else if (task.state === TaskStates.WAIT_CONFIRMATION) {
+            } else if (task?.state === TaskStates.WAIT_CONFIRMATION) {
                 taskTransitionActions = [
                     {
                         key: TaskStateTransitionAction.CONFIRM,
@@ -137,7 +136,7 @@ export default class Tasks extends BaseController {
             MessageToast.show(this.getText('taskActionSuccessful', this.getText(this.taskStateTransitionActionMessageParam[key]).toLowerCase()));
             this.navigateToTask();
         } catch (error) {
-            MessageBox.error(this.getText('errorGeneric'));
+            showErrorMessage(error as AxiosError, this.getText('errorGeneric'));
             console.error('Error while executing Task', error);
         } finally {
             this.getView().setBusy(false);
@@ -161,5 +160,4 @@ export default class Tasks extends BaseController {
             tenantId: this.tenantId
         });
     }
-
 }

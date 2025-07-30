@@ -1,7 +1,8 @@
 import { BYOKProviders, CloudProviders, HYOKProviders, KeyCreationTypes } from 'kms/common/Enums';
 import { MangedKeyPayload, HyokKeyPayload } from 'kms/common/Types';
 import BaseController from 'kms/controller/BaseController';
-
+import { showErrorMessage } from "kms/common/Helpers";
+import {AxiosError} from "axios";
 import Dialog from 'sap/m/Dialog';
 import MessageBox from 'sap/m/MessageBox';
 import NavContainer from 'sap/m/NavContainer';
@@ -75,17 +76,17 @@ export default class KeyCreation extends BaseController {
         }
 
         if (!this.keyCreatePopover) {
-            loadFragment().catch(err => {
-                console.error('Error loading key creation wizard fragment:', err);
-                MessageBox.error(this.BaseController.getText('errorLoadingKeyCreationWizard'));
+            loadFragment().catch(error => {
+                console.error('Error loading key creation wizard fragment:', error);
+                showErrorMessage(error as AxiosError, this.BaseController.getText('errorLoadingKeyCreationWizard'));
                 this.keyCreatePopover?.destroy();
                 this.keyCreatePopover = undefined;
             });
         } else {
             this.keyCreatePopover?.destroy();
-            loadFragment().catch(err => {
-                console.error('Error loading key creation wizard fragment:', err);
-                MessageBox.error(this.BaseController.getText('errorLoadingKeyCreationWizard'));
+            loadFragment().catch(error => {
+                console.error('Error loading key creation wizard fragment:', error);
+                showErrorMessage(error as AxiosError, this.BaseController.getText('errorLoadingKeyCreationWizard'));
                 this.keyCreatePopover?.destroy();
                 this.keyCreatePopover = undefined;
             });
@@ -273,7 +274,7 @@ export default class KeyCreation extends BaseController {
             this.keyCreatePopover = undefined;
             this.resetKeyCreationModel();
         } catch (error) {
-            MessageBox.error(this.BaseController.getText('errorAddingKey'));
+            showErrorMessage(error as AxiosError, this.BaseController.getText('errorAddingKey'));
             console.error('Error creating key', error);
         } finally {
             this.keyCreatePopover?.setBusy(false);

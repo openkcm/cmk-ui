@@ -6,6 +6,7 @@ import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
 import { Button$PressEvent } from 'sap/m/Button';
 import { KeyConfig } from 'kms/common/Types';
 import MessageBox from 'sap/m/MessageBox';
+import { showErrorMessage, getErrorCode } from 'kms/common/Helpers';
 import Fragment from 'sap/ui/core/Fragment';
 import ViewSettingsDialog from 'sap/m/ViewSettingsDialog';
 import Dialog from 'sap/m/Dialog';
@@ -99,7 +100,7 @@ export default class Keys extends BaseController {
             this.paginationModel.setProperty('/currentPage', this.currentPage);
         } catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorFetchingKeyConfigs'));
+            showErrorMessage(error as AxiosError, this.getText('errorFetchingKeyConfigs'));
         } finally {
             this.getView().setBusy(false);
         }
@@ -204,25 +205,16 @@ export default class Keys extends BaseController {
             MessageToast.show(this.getText('keyConfigCreated'));
         } catch (error) {
             console.error(error);
-            const apiError = error as AxiosError;
-            const errorMessage = JSON.parse(apiError.message) as {
-                error: {
-                    message: string;
-                    data: {
-                        error: {
-                            code: string;
-                        };
-                    };
-                };
-            };
 
-            const errorCode = errorMessage?.error?.data?.error?.code;
+            const errorCode: string = getErrorCode(error as AxiosError);
+            let errorMessage: string;
 
-            if (errorCode === 'UNIQUE_ERROR') {
-                MessageBox.error(this.getText('errorDuplicateKeyConfig'));
+            if (errorCode === this.Constants.API_ERROR_CODES.UNIQUE_ERROR) {
+                errorMessage = this.getText('errorDuplicateKeyConfig');
             } else {
-                MessageBox.error(this.getText('errorCreatingKeyConfig'));
+                errorMessage = this.getText('errorCreatingKeyConfig');
             }
+            showErrorMessage(error as AxiosError, errorMessage);
         } finally {
             this.getView().setBusy(false);
         }

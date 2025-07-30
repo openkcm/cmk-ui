@@ -3,7 +3,8 @@ import { Task } from "kms/common/Types";
 import BaseController from "kms/controller/BaseController";
 import Api from "kms/services/Api.service";
 import { ListItemBase$PressEvent } from "sap/m/ListItemBase";
-import MessageBox from "sap/m/MessageBox";
+import { showErrorMessage } from "kms/common/Helpers";
+import {AxiosError} from "axios";
 import EventBus from "sap/ui/core/EventBus";
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import BindingMode from 'sap/ui/model/BindingMode';
@@ -104,8 +105,8 @@ export default class Tasks extends BaseController {
             this.paginationModel.setProperty('/totalPages', Math.ceil(workflowTasks.count / this.top));
             this.paginationModel.setProperty('/currentPage', this.currentPage);
         } catch (error) {
-            console.error('Error fetching systems', error);
-            MessageBox.error(this.getText('errorFetchingTasks'));
+            console.error('Error fetching tasks', error);
+            showErrorMessage(error as AxiosError, this.getText('errorFetchingTasks'));
         } finally {
             this.getView().setBusy(false);
         }

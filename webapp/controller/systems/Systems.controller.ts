@@ -4,7 +4,8 @@ import JSONModel from "sap/ui/model/json/JSONModel";
 import Api from "kms/services/Api.service";
 import { System } from "kms/common/Types";
 import { KeyConfig } from 'kms/common/Types';
-import MessageBox from "sap/m/MessageBox";
+import { showErrorMessage } from "kms/common/Helpers";
+import {AxiosError} from "axios";
 import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
 import { Button$PressEvent } from 'sap/m/Button';
 import Dialog from 'sap/m/Dialog';
@@ -102,7 +103,7 @@ export default class Systems extends BaseController {
             this.paginationModel.setProperty('/currentPage', this.currentPage);
         } catch (error) {
             console.error('Error fetching systems', error);
-            MessageBox.error(this.getText('errorFetchingSystems'));
+            showErrorMessage(error as AxiosError, this.getText('errorFetchingSystems'));
         } finally {
             this.getView().setBusy(false);
         }
@@ -170,7 +171,7 @@ export default class Systems extends BaseController {
             this.connectTargetSystem = undefined;
             this.updateSystemsTable();
         } catch (error) {
-            MessageBox.error(this.getText('keyConfigConnectSystemError'));
+            showErrorMessage(error as AxiosError, this.getText('keyConfigConnectSystemError'));
             console.error(error);
         } finally {
             this.getView().setBusy(false);

@@ -4,6 +4,8 @@ import JSONModel from "sap/ui/model/json/JSONModel";
 import Api from "kms/services/Api.service";
 import { Group } from "kms/common/Types";
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
+import { showErrorMessage } from "kms/common/Helpers";
+import {AxiosError} from "axios";
 import MessageBox from "sap/m/MessageBox";
 import { Input$LiveChangeEvent } from 'sap/m/Input';
 import { TextArea$LiveChangeEvent } from 'sap/m/TextArea';
@@ -46,7 +48,7 @@ export default class GroupDetail extends BaseController {
             this.oneWayModel.setProperty('/groupData', group);
         } catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorFetchingUser'));
+            showErrorMessage(error as AxiosError, this.getText('errorFetchingUser'));
         } finally {
             this.getView().setBusy(false);
         }
@@ -94,12 +96,11 @@ export default class GroupDetail extends BaseController {
             await this.setUser();
         } catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorUpdatingGroup'));
+            showErrorMessage(error as AxiosError, this.getText('errorUpdatingGroup'));
         } finally {
             this.oneWayModel.setProperty('/editMode', false);
             this.getView().setBusy(false);
         }
-
     };
 
     public onCancel(): void {

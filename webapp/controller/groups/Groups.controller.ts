@@ -3,6 +3,8 @@ import JSONModel from 'sap/ui/model/json/JSONModel';
 import BindingMode from 'sap/ui/model/BindingMode';
 import Api from 'kms/services/Api.service';
 import { Groups } from 'kms/common/Types';
+import { showErrorMessage } from "kms/common/Helpers";
+import {AxiosError} from "axios";
 import MessageBox from 'sap/m/MessageBox';
 import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
@@ -98,7 +100,7 @@ export default class Group extends BaseController {
         } catch (error) {
             console.error(error);
             this.oneWayModel.setProperty('/groupsCount', 0);
-            MessageBox.error(this.getText('errorFetchingGroups'));
+            showErrorMessage(error as AxiosError, this.getText('errorFetchingGroups'));
         } finally {
             this.getView().setBusy(false);
         }
@@ -172,7 +174,7 @@ export default class Group extends BaseController {
             });
         } catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorCreatingGroup'));
+            showErrorMessage(error as AxiosError, this.getText('errorCreatingGroup'));
         } finally {
             this.getView().setBusy(false);
         }
@@ -217,7 +219,7 @@ export default class Group extends BaseController {
                         });
                     } catch (error) {
                         console.error(error);
-                        MessageBox.error(this.getText('errorDeletingGroup'));
+                        showErrorMessage(error as AxiosError, this.getText('errorDeletingGroup'));
                     } finally {
                         this.getRouter().navTo('groups', {
                             tenantId: this.tenantId

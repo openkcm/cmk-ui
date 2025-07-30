@@ -5,12 +5,12 @@ import Api from 'kms/services/Api.service';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import EventBus from 'sap/ui/core/EventBus';
 import { Key, KeyVersion } from 'kms/common/Types';
-import { isUUIDValid, copyToClipboard } from 'kms/common/Helpers';
-import MessageBox from 'sap/m/MessageBox';
+import { isUUIDValid, copyToClipboard, showErrorMessage } from 'kms/common/Helpers';
 import { Button$PressEvent } from 'sap/m/Button';
 import Formatter from 'kms/common/Formatters';
 import MessageToast from 'sap/m/MessageToast';
 import { EventChannelIds, EventIDs } from 'kms/common/Enums';
+import {AxiosError} from "axios";
 
 interface KeyPatchPayload {
     name: string;
@@ -95,7 +95,7 @@ export default class DetailPanel extends BaseController {
             }
         } catch (error) {
             console.error('Error fetching key details', error);
-            MessageBox.error(this.getText('errorFetchingKeyDetails'));
+            showErrorMessage(error as AxiosError, this.getText('errorFetchingKeyDetails'));
         } finally {
             this.getView().setBusy(false);
         }
@@ -113,7 +113,7 @@ export default class DetailPanel extends BaseController {
             }
         } catch (error) {
             console.error('Error fetching system details', error);
-            MessageBox.error(this.getText('errorFetchingSystemDetails'));
+            showErrorMessage(error as AxiosError, this.getText('errorFetchingSystemDetails'));
         } finally {
             this.getView().setBusy(false);
         }
@@ -134,7 +134,7 @@ export default class DetailPanel extends BaseController {
             });
         } catch (error) {
             console.error('Error rotating key', error);
-            MessageBox.error(this.getText('errorRotatingKey'));
+            showErrorMessage(error as AxiosError, this.getText('errorRotatingKey'));
         } finally {
             this.getView().setBusy(false);
         }
@@ -155,7 +155,7 @@ export default class DetailPanel extends BaseController {
             });
         } catch (error) {
             console.error('Error saving key details', error);
-            MessageBox.error(this.getText('errorSavingKeyDetails'));
+            showErrorMessage(error as AxiosError, this.getText('errorSavingKeyDetails'));
         } finally {
             this.getView().setBusy(false);
         }
