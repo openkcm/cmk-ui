@@ -1,7 +1,7 @@
 <core:FragmentDefinition xmlns="sap.m"
     xmlns:core="sap.ui.core"
     xmlns:tnt="sap.tnt"
-    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage', commonFormatter: 'kms/common/Formatters' }">
     <HBox width="100%"
         justifyContent="End">
         <tnt:InfoLabel
@@ -125,13 +125,13 @@
                     </Text>
                     <VBox visible="{= !${oneWay>/keyConfigDetail}}">
                         <ObjectStatus
-                            icon="sap-icon://sys-enter-2"
-                            text="{i18n>connected}"
+                            icon="{parts: ['oneWay>status'], formatter: 'commonFormatter.setSystemStatusIcon'}"
+                            text="{parts: ['oneWay>status'], formatter: '.getText'}"
                             active="true"
                             press="handleStatusPressed"
-                            visible="{= ${oneWay>status} === 'CONNECTED'}"
+                            visible="{= ${oneWay>status} !== 'DISCONNECTED'}"
                             inverted="true"
-                            state="Indication14">
+                            state="{parts: ['oneWay>status'], formatter: 'commonFormatter.setSystemStatusColor'}">
                             <customData>
                                 <core:CustomData
                                     key="testId"

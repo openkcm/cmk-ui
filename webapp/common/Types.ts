@@ -1,11 +1,15 @@
-import { ActionTypes, ArtifactTypes, KeyCreationTypes, KeyStates, TaskStates, TaskStatus } from "kms/common/Enums";
+import { ActionTypes, ArtifactTypes, KeyCreationTypes, KeyStates, TaskStates, TaskStatus, SystemStatus } from "kms/common/Enums";
 
 export interface System {
     id: string;
-    keyConfiguration: KeyConfig;
+    externalID: string;
+    region: string;
     name: string;
-    key: string;
-    connected: boolean;
+    type: string;
+    role: string;
+    roleID: string;
+    status: SystemStatus;
+    keyConfigurationName: string;
     keyConfigurationID: string;
 };
 export interface Groups {

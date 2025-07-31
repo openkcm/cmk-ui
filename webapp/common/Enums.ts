@@ -90,4 +90,11 @@ export enum HYOKProviders {
 export enum BYOKProviders {
 
 }
-export default { KeyStates, CloudProviders, KeyCreationTypes, KeyConfigDetailPanelTypes, TaskStatus, TaskStateTransitionAction, TaskStates, ActionTypes, ArtifactTypes, WorkflowActionTypes, TaskType, EventChannelIds, EventIDs, HYOKProviders, BYOKProviders };
+
+export enum SystemStatus {
+    CONNECTED = 'CONNECTED',
+    DISCONNECTED = 'DISCONNECTED',
+    PROCESSING = 'PROCESSING',
+    FAILED = 'FAILED'
+}
+export default { KeyStates, CloudProviders, KeyCreationTypes, KeyConfigDetailPanelTypes, TaskStatus, TaskStateTransitionAction, TaskStates, ActionTypes, ArtifactTypes, WorkflowActionTypes, TaskType, EventChannelIds, EventIDs, HYOKProviders, BYOKProviders, SystemStatus };
