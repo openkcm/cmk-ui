@@ -70,19 +70,19 @@
             },
             "routes": [
                 {
-                    "pattern": "tenant/{tenantId}/keyConfigs}",
+                    "pattern": "{tenantId}/keyConfigs}",
                     "name": "keyConfigs",
                     "target": "keyConfigs"
                 },
                 {
-                    "pattern": "tenant/{tenantId}/keyConfigs/{keyConfigId}:?query:",
+                    "pattern": "{tenantId}/keyConfigs/{keyConfigId}:?query:",
                     "name": "keyConfigDetail",
                     "target": [
                         "keyConfigDetail"
                     ]
                 },
                 {
-                    "pattern": "tenant/{tenantId}/keyConfigs/{keyConfigId}/{type}/{id}:?query:",
+                    "pattern": "{tenantId}/keyConfigs/{keyConfigId}/{type}/{id}:?query:",
                     "name": "keyConfigDetailPanel",
                     "target": [
                         "keyConfigDetail",
@@ -90,24 +90,24 @@
                     ]
                 },
                 {
-                    "pattern": "tenant/{tenantId}/systems",
+                    "pattern": "{tenantId}/systems",
                     "name": "systems",
                     "target": "systems"
                 },
                 {
-                    "pattern": "tenant/{tenantId}/tasks",
+                    "pattern": "{tenantId}/tasks",
                     "name": "tasks",
                     "target": "tasks"
                 },
                 {
-                    "pattern": "tenant/{tenantId}/tasks",
+                    "pattern": "{tenantId}/tasks",
                     "name": "tasks",
                     "target": [
                         "tasks"
                     ]
                 },
                 {
-                    "pattern": "tenant/{tenantId}/tasks/{taskId}",
+                    "pattern": "{tenantId}/tasks/{taskId}",
                     "name": "tasksDetail",
                     "target": [
                         "tasks",
@@ -115,12 +115,12 @@
                     ]
                 },
                 {
-                    "pattern": "tenant/{tenantId}/groups",
+                    "pattern": "{tenantId}/groups",
                     "name": "groups",
                     "target": "groups"
                 },
                 {
-                    "pattern": "tenant/{tenantId}/group/{groupId}",
+                    "pattern": "{tenantId}/group/{groupId}",
                     "name": "groupDetail",
                     "target": [
                         "groups",
@@ -128,19 +128,19 @@
                     ]
                 },
                 {
-                    "pattern": "tenant/{tenantId}/settings",
+                    "pattern": "{tenantId}/settings",
                     "name": "settings",
                     "target": "settings"
                 },
                 {
-                    "pattern": "tenant/{tenantId}/systems",
+                    "pattern": "{tenantId}/systems",
                     "name": "systems",
                     "target": [
                         "systems"
                     ]
                 },
                 {
-                    "pattern": "tenant/{tenantId}/systems/{systemId}",
+                    "pattern": "{tenantId}/systems/{systemId}",
                     "name": "systemsDetail",
                     "target": [
                         "systems",

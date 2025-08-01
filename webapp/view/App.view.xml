@@ -36,11 +36,11 @@
                     text="{i18n>appTitle}"
                     level="H2" />
                 <ToolbarSpacer />
-                <MenuButton text="{twoWay>/selectedTenant}" class="sapUiTinyMarginEnd">
+                <MenuButton text="{twoWay>/selectedTenantName}" class="sapUiTinyMarginEnd">
                     <menu>
                         <Menu items="{oneWay>/tenants}" itemSelected="onTenantChanged"
                             class="sapUiSizeCompact">
-                            <MenuItem key="{oneWay>id}" text="{oneWay>id}" />
+                            <MenuItem key="{oneWay>id}" text="{oneWay>name}" />
                         </Menu>
                     </menu>
                     <customData>

@@ -7,9 +7,20 @@ import { Avatar$PressEvent } from 'sap/m/Avatar';
 import { Router$RouteMatchedEvent } from 'sap/ui/core/routing/Router';
 import ToolPage from 'sap/tnt/ToolPage';
 import { Menu$ItemSelectedEvent } from 'sap/m/Menu';
+import Api from 'kms/services/Api.service';
+import MessageBox from 'sap/m/MessageBox';
+
+
+interface TenantsResponse {
+    value: { id: string; name?: string }[];
+    count: number;
+}
 
 export default class App extends BaseController {
     private userPopover: ResponsivePopover | undefined;
+    private api: Api;
+    private skip: number;
+    private top: number;
     private readonly oneWayModel = new JSONModel(
         {
             tenants: [
@@ -35,7 +46,12 @@ export default class App extends BaseController {
         this.setModel(this.oneWayModel, 'oneWay');
         this.setModel(this.twoWayModel, 'twoWay');
         this.twoWayModel.setProperty('/selectedKey', 'keyConfigs');
-        this.twoWayModel.setProperty('/selectedTenant', this.tenantId || 'tenant1');//temporary assignment, change this once the authorization is set.
+
+        this.api = new Api('');
+        this.setTenant().catch((error) => {
+            console.error(error);
+        });
+
         if (window.location.hash === '') {
             this.getRouter().navTo('keyConfigs', {
                 tenantId: this.twoWayModel.getProperty('/selectedTenant') as string
@@ -49,11 +65,17 @@ export default class App extends BaseController {
         const routeName = event.getParameter('name');
         const routeArgs = event.getParameter('arguments') as { tenantId: string };
         this.twoWayModel.setProperty('/selectedTenant', routeArgs?.tenantId);
+
+        const tenants = this.oneWayModel.getProperty('/tenants') as { id: string; name: string }[];
+        const selectedTenant = tenants.find(tenant => tenant.id === routeArgs?.tenantId);
+        this.twoWayModel.setProperty('/selectedTenantName', selectedTenant ? selectedTenant.name : '');
+
         if (routeName === 'keyConfigs') {
             this.toolPage.setSideExpanded(true);
         } else {
             this.toolPage.setSideExpanded(false);
         }
+
         switch (routeName) {
             case 'keyConfigs':
             case 'keyConfigDetail':
@@ -77,6 +99,21 @@ export default class App extends BaseController {
                 break;
             default:
                 this.twoWayModel.setProperty('/selectedKey', 'keyConfigs');
+        }
+    }
+
+    public async setTenant(): Promise<void> {
+        this.getView().setBusy(true);
+        try {
+            const tenants = await this.api.get('sys/tenants', { $top: this.top, $skip: this.skip });
+            const tenantsData = (tenants as TenantsResponse).value;
+            this.oneWayModel.setProperty('/tenants', tenantsData);
+            this.twoWayModel.setProperty('/selectedTenantName', tenantsData && tenantsData.length > 0 ? tenantsData[0].id : '');
+        } catch (error) {
+            console.error(error);
+            MessageBox.error(this.getText('errorFetchingKeyConfigs'));
+        } finally {
+            this.getView().setBusy(false);
         }
     }
 
@@ -112,7 +149,9 @@ export default class App extends BaseController {
     }
     public onTenantChanged(event: Menu$ItemSelectedEvent): void {
         const selectedTenant = event.getParameter('item').getKey();
+        const selectedTenantName = event.getParameter('item').getText();
         this.twoWayModel.setProperty('/selectedTenant', selectedTenant);
+        this.twoWayModel.setProperty('/selectedTenantName', selectedTenantName);
         this.navigateToSelectedPage();
     }
     private navigateToSelectedPage(): void {
