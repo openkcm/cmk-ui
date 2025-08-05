@@ -10,17 +10,9 @@ import { Menu$ItemSelectedEvent } from 'sap/m/Menu';
 import Api from 'kms/services/Api.service';
 import MessageBox from 'sap/m/MessageBox';
 
-
-interface TenantsResponse {
-    value: { id: string; name?: string }[];
-    count: number;
-}
-
 export default class App extends BaseController {
-    private userPopover: ResponsivePopover | undefined;
     private api: Api;
-    private skip: number;
-    private top: number;
+    private userPopover: ResponsivePopover | undefined;
     private readonly oneWayModel = new JSONModel(
         {
             tenants: [
@@ -47,11 +39,8 @@ export default class App extends BaseController {
         this.setModel(this.twoWayModel, 'twoWay');
         this.twoWayModel.setProperty('/selectedKey', 'keyConfigs');
 
-        this.api = new Api('');
-        this.setTenant().catch((error) => {
-            console.error(error);
-        });
-
+        this.api = Api.getInstance();
+        this.setTenantData();
         if (window.location.hash === '') {
             this.getRouter().navTo('keyConfigs', {
                 tenantId: this.twoWayModel.getProperty('/selectedTenant') as string
@@ -65,7 +54,12 @@ export default class App extends BaseController {
         const routeName = event.getParameter('name');
         const routeArgs = event.getParameter('arguments') as { tenantId: string };
         this.twoWayModel.setProperty('/selectedTenant', routeArgs?.tenantId);
-
+        try {
+            Api.updateTenantId(routeArgs?.tenantId);
+        } catch (error) {
+            console.error('Invalid tenant', error);
+            MessageBox.error(this.getText('invalidTenantError'));
+        }
         const tenants = this.oneWayModel.getProperty('/tenants') as { id: string; name: string }[];
         const selectedTenant = tenants.find(tenant => tenant.id === routeArgs?.tenantId);
         this.twoWayModel.setProperty('/selectedTenantName', selectedTenant ? selectedTenant.name : '');
@@ -102,18 +96,14 @@ export default class App extends BaseController {
         }
     }
 
-    public async setTenant(): Promise<void> {
-        this.getView().setBusy(true);
-        try {
-            const tenants = await this.api.get('sys/tenants', { $top: this.top, $skip: this.skip });
-            const tenantsData = (tenants as TenantsResponse).value;
-            this.oneWayModel.setProperty('/tenants', tenantsData);
-            this.twoWayModel.setProperty('/selectedTenantName', tenantsData && tenantsData.length > 0 ? tenantsData[0].id : '');
-        } catch (error) {
-            console.error(error);
-            MessageBox.error(this.getText('errorFetchingKeyConfigs'));
-        } finally {
-            this.getView().setBusy(false);
+    public setTenantData(): void {
+        const tenants = this.api.getTenantsList();
+        if (tenants && tenants.length > 0) {
+            this.oneWayModel.setProperty('/tenants', tenants);
+            this.twoWayModel.setProperty('/selectedTenant', tenants[0].id);
+            this.twoWayModel.setProperty('/selectedTenantName', tenants[0].name || '');
+        } else {
+            MessageBox.error(this.getText('errorNoTenantsFound'));
         }
     }
 
@@ -152,6 +142,8 @@ export default class App extends BaseController {
         const selectedTenantName = event.getParameter('item').getText();
         this.twoWayModel.setProperty('/selectedTenant', selectedTenant);
         this.twoWayModel.setProperty('/selectedTenantName', selectedTenantName);
+        this.api = Api.getInstance();
+        Api.updateTenantId(selectedTenant);
         this.navigateToSelectedPage();
     }
     private navigateToSelectedPage(): void {

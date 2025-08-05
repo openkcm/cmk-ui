@@ -17,15 +17,6 @@ builder:
     excludes:
       - "test/e2e/**"
   customTasks:
-    - name: ui5-tooling-stringreplace-task
-      afterTask: replaceVersion
-      configuration:
-        prefix: UI5_ENV
-        path: ./env/
-        separator: "."
-        files:
-          - "**/*.js"
-          - "**/*.xml"
     - name: ui5-tooling-modules-task
       afterTask: replaceVersion
       configuration:
@@ -54,13 +45,3 @@ server:
           - istanbul
     - name: ui5-middleware-livereload
       afterMiddleware: compression
-    - name: ui5-tooling-stringreplace-middleware
-      afterMiddleware: compression
-      configuration:
-        debug: true
-        prefix: UI5_ENV
-        path: ./env/
-        separator: "."
-        files:
-          - "**/*.js"
-          - "**/*.xml"

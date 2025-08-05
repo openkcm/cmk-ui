@@ -19,13 +19,10 @@
     "ui5-tooling-transpile": "^3.5.0"
   },
   "scripts": {
-    "start:mock": "UI5_ENV=mock ui5 serve -o index.html --port 8000",
-    "start:dev": "npx @ui5/ts-interface-generator && UI5_ENV=dev ui5 serve -o index.html --port 8081",
-    "start:prod": "npx @ui5/ts-interface-generator && UI5_ENV=prod ui5 serve -o index.html --port 8081",
-    "start": "ui5 serve -o index.html",
+    "start": "ui5 serve --port 8081",
+    "openchrome": "open -na \"Google Chrome\" \"http://localhost:8081/index.html\" --args --disable-web-security --no-default-browser-check --user-data-dir=\"/tmp/chrome-dev\"",
     "start:test": "ui5 serve --port 8000",
-    "build": "npx @ui5/ts-interface-generator && UI5_ENV=build ui5 build --all",
-    "build:prod": "npx @ui5/ts-interface-generator && UI5_ENV=prod ui5 build --all",
+    "build": "npx @ui5/ts-interface-generator && ui5 build --all",
     "lint-no-fix": "npx eslint --quiet \"./webapp/**/*.ts\"",
     "check-types": "tsc --noemit",
     "lint": "npx eslint --fix \"./webapp/**/*.ts\" && npm run check-types",

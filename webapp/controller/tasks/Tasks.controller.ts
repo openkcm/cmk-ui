@@ -46,7 +46,7 @@ export default class Tasks extends BaseController {
     public onRouteMatched(event: Route$PatternMatchedEvent): void {
         this.resetPagination();
         const routeArgs = event.getParameter('arguments') as { tenantId: string };
-        this.api = new Api(routeArgs?.tenantId);
+        this.api = Api.getInstance();
         this.tenantId = routeArgs?.tenantId;
         this.getTasks().catch((error) => {
             console.error(error);
@@ -81,7 +81,7 @@ export default class Tasks extends BaseController {
         this.skip += 10;
         await this.getTasks();
     }
-    private async onPreviousPage () {
+    private async onPreviousPage() {
         this.currentPage--;
         this.skip -= 10;
         await this.getTasks();
@@ -95,7 +95,7 @@ export default class Tasks extends BaseController {
     private async getTasks(): Promise<void> {
         this.getView().setBusy(true);
         try {
-            const workflowTasks = await this.api.get<WorkflowTasksResponse>('workflows', {$top: this.top, $skip: this.skip});
+            const workflowTasks = await this.api.get<WorkflowTasksResponse>('workflows', { $top: this.top, $skip: this.skip });
             if (!workflowTasks) {
                 return;
             }

@@ -5,7 +5,7 @@ import Api from "kms/services/Api.service";
 import { Group } from "kms/common/Types";
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import MessageBox from "sap/m/MessageBox";
-import {Input$LiveChangeEvent } from 'sap/m/Input';
+import { Input$LiveChangeEvent } from 'sap/m/Input';
 import { TextArea$LiveChangeEvent } from 'sap/m/TextArea';
 import { setNameValueState } from "kms/common/Helpers";
 
@@ -20,7 +20,7 @@ export default class GroupDetail extends BaseController {
     private groupId: string;
 
     private readonly oneWayModel = new JSONModel();
-    
+
     public onInit(): void {
         super.onInit();
         this.getRouter().getRoute('groupDetail').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
@@ -31,7 +31,7 @@ export default class GroupDetail extends BaseController {
 
     public onRouteMatched(event: Route$PatternMatchedEvent): void {
         const routeArgs = event.getParameter('arguments') as { tenantId: string, groupId?: string };
-        this.api = new Api(routeArgs?.tenantId);
+        this.api = Api.getInstance();
         this.tenantId = routeArgs?.tenantId;
         this.groupId = routeArgs.groupId;
         this.setUser().catch((error) => {

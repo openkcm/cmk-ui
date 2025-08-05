@@ -45,7 +45,7 @@ export default class Group extends BaseController {
     public onRouteMatched(event: Route$PatternMatchedEvent): void {
         this.resetPagination();
         const routeArgs = event.getParameter('arguments') as { tenantId: string };
-        this.api = new Api(routeArgs?.tenantId);
+        this.api = Api.getInstance();
         this.tenantId = routeArgs?.tenantId;
         this.setGroups().catch((error) => {
             console.error(error);
@@ -57,7 +57,7 @@ export default class Group extends BaseController {
         this.skip += 10;
         await this.setGroups();
     }
-    private async onPreviousPage () {
+    private async onPreviousPage() {
         this.currentPage--;
         this.skip -= 10;
         await this.setGroups();
@@ -71,7 +71,7 @@ export default class Group extends BaseController {
     private async setGroups(): Promise<void> {
         this.getView().setBusy(true);
         try {
-            const groups = await this.api.get<GroupsResponse>('groups', {$top: this.top, $skip: this.skip});
+            const groups = await this.api.get<GroupsResponse>('groups', { $top: this.top, $skip: this.skip });
             const groupsData = groups.value;
             this.oneWayModel.setProperty('/groupsData', groupsData);
             this.oneWayModel.setProperty('/groupsCount', groups.count || 0);

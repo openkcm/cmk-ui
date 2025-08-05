@@ -1,17 +1,23 @@
 import axios, { AxiosInstance, AxiosError, AxiosResponse } from 'axios';
+interface TenantsResponse {
+    value: { id: string; name?: string }[];
+    count: number;
+}
 export default class Api {
+    private static instance: Api;
     private readonly axiosInstance: AxiosInstance;
     private readonly setAxiosHeaderContentType: (contentType: string) => void;
     private readonly defaultContentType: string = 'application/json';
     private readonly mergePatchContentType: string = 'application/merge-patch+json';
+    private baseURL: string;
+    private tenants: TenantsResponse | undefined;
+    private tenantId: string | undefined;
+    private tenantName: string | undefined;
 
-    // Configured using UI5 middleware, see webapp/ui5.yaml and /env
-    private readonly baseURL: string = 'UI5_MIDDLEWARE_ENV_API_BASE_URL';
-
-
-    constructor(tenantId: string) {
+    constructor(baseUrl: string) {
+        this.baseURL = baseUrl;
         this.axiosInstance = axios.create({
-            baseURL: `${this.baseURL}/${tenantId}`,
+            baseURL: `${this.baseURL}/cmk/v1`,
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -21,7 +27,57 @@ export default class Api {
         };
 
     }
+    public static async init(baseUrl: string): Promise<void> {
+        if (!Api.instance) {
+            Api.instance = new Api(baseUrl);
+            await Api.instance.getAndSetTenants();
+        }
+    }
 
+    public static getInstance(): Api {
+        if (!Api.instance) {
+            throw new Error("API not initialized. Call Api.init() first.");
+        }
+        return Api.instance;
+    }
+
+    public static updateTenantId(tenantId: string): void {
+        if (!Api.instance) {
+            throw new Error("API not initialized. Call Api.init() first.");
+        }
+        const tenants = Api.instance.tenants?.value || [];
+        const tenantExists = tenants.some(tenant => tenant.id === tenantId);
+        if (!tenantExists) {
+            throw new Error(`Tenant with id ${tenantId} does not exist.`);
+        }
+        Api.instance.axiosInstance.defaults.baseURL = `${Api.instance.baseURL}/cmk/v1/${tenantId}`;
+    }
+    private async getAndSetTenants(): Promise<void> {
+        const tenantsResponse = await this.get<TenantsResponse>('sys/tenants', { $top: 1024, $skip: 0 });
+        this.tenants = tenantsResponse && tenantsResponse.value ? tenantsResponse : undefined;
+        if (this.tenants && this.tenants.value.length > 0) {
+            Api.instance.setTenantId(this.tenants.value[0].id);
+            Api.instance.setTenantName(this.tenants.value[0].name || '');
+        } else {
+            throw new Error("No tenants found");
+        }
+    }
+    public getTenantsList() {
+        return this.tenants.value;
+    }
+    public getTenantName(): string | undefined {
+        return this.tenantName;
+    }
+    public setTenantName(name: string): void {
+        this.tenantName = name;
+    }
+    public setTenantId(tenantId: string): void {
+        this.tenantId = tenantId;
+        Api.updateTenantId(tenantId);
+    }
+    public getTenantId(): string {
+        return this.tenantId;
+    }
     public async get<T>(endpoint: string, params?: Record<string, string | number | boolean>): Promise<T> {
         this.setAxiosHeaderContentType(this.defaultContentType);
         try {

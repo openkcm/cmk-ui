@@ -56,7 +56,7 @@ export default class Systems extends BaseController {
     public onRouteMatched(event: Route$PatternMatchedEvent): void {
         this.resetPagination();
         const routeArgs = event.getParameter('arguments') as { tenantId: string };
-        this.api = new Api(routeArgs?.tenantId);
+        this.api = Api.getInstance();
         this.tenantId = routeArgs?.tenantId;
         this.updateSystemsTable();
     };

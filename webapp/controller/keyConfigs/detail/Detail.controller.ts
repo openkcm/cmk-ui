@@ -130,7 +130,7 @@ export default class KeyConfigDetail extends BaseController {
         const queryParams = routeArgs['?query'] as { createKey?: string, keyType?: KeyCreationTypes, keySubtype?: HYOKProviders | BYOKProviders };
         this.keyConfigId = routeArgs.keyConfigId;
 
-        this.api = new Api(routeArgs?.tenantId);
+        this.api = Api.getInstance();
         this.tenantId = routeArgs?.tenantId;
 
         if (!isUUIDValid(this.keyConfigId)) {

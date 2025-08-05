@@ -36,7 +36,11 @@
                     text="{i18n>appTitle}"
                     level="H2" />
                 <ToolbarSpacer />
-                <MenuButton text="{twoWay>/selectedTenantName}" class="sapUiTinyMarginEnd">
+                <MenuButton
+                    text="{= ${twoWay>/selectedTenantName} ? ${twoWay>/selectedTenantName} : ${i18n>invalidTenant}}"
+                    type="{= ${twoWay>/selectedTenantName} ? 'Transparent' : 'Reject'}"
+                    icon="{= ${twoWay>/selectedTenantName} ? '' : 'sap-icon://warning'}"
+                    class="sapUiTinyMarginEnd">
                     <menu>
                         <Menu items="{oneWay>/tenants}" itemSelected="onTenantChanged"
                             class="sapUiSizeCompact">

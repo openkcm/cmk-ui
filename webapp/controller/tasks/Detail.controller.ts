@@ -47,7 +47,7 @@ export default class Tasks extends BaseController {
     public onRouteMatched(event: Route$PatternMatchedEvent): void {
         const routeArgs = event.getParameter('arguments') as { tenantId: string, taskId?: string };
         this.taskId = routeArgs.taskId;
-        this.api = new Api(routeArgs?.tenantId);
+        this.api = Api.getInstance();
         this.tenantId = routeArgs?.tenantId;
         this.eventBus.publish(EventChannelIds.TASKS, EventIDs.LOAD_TASKS, { tenantId: this.tenantId });
         this.getTaskDetails().catch((error) => {

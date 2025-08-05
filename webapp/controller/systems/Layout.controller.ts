@@ -20,7 +20,7 @@ export default class Systems extends BaseController {
     public onRouteMatched(event: Router$RouteMatchedEvent): void {
         const routeName = event.getParameter('name');
         const routeArgs = event.getParameter('arguments') as { tenantId: string };
-        this.api = new Api(routeArgs?.tenantId);
+        this.api = Api.getInstance();
         this.tenantId = routeArgs?.tenantId;
         if (routeName && typeof routeName === 'string') {
             if (routeName === 'systems') {

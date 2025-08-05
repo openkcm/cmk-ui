@@ -25,15 +25,7 @@ Using Visual Studio Code and enabling the following extensions is recommended:
 - `redhat.vscode-xml` (this is required so all XML files are formatted uniformly)
 
 ### Environment Setup
-If you want to connect a local UI instance to a remote backend, you must setup the respective `.env` files with the correct base URL. The `env` folder in the root directory will contain 4 env files.
-- `mock.env` (already setup)
-- `dev.env`
-- `staging.env`
-- `prod.env`
-3. In whichever file you want to use, add the following line:
-```bash
-stringreplace.UI5_MIDDLEWARE_ENV_API_BASE_URL = <URL_GOES_HERE>
-```
+The API base URL is set in `webapp/config/config.json`. Modify the `apiBaseUrl` value if required. The default value is set to `http://localhost:8080`.
 
 ### Local UI
 1. Install node
@@ -42,40 +34,16 @@ stringreplace.UI5_MIDDLEWARE_ENV_API_BASE_URL = <URL_GOES_HERE>
 ```bash
 npm install
 ```
-4. To start the local development server, you MUST run one of the following. Using a 3rd party webserver is NOT supported due to using UI5 middleware. If using the mock server, remember to start that separately [as shown here](https://github.tools.sap/kms/ui/edit/main/README.md#local-api):
-```bash
-npm run start:mock
-```
-```bash
-npm run start:dev
-```
-```bash
-npm run start:staging
-```
-```bash
-npm run start:prod
-```
-5. Application will start and be automatically opened in a browser on `localhost:8080` 
+4. To start the local development server, run `npm start`. Using a 3rd party webserver is NOT supported due to using UI5 middleware. If using the mock server, remember to start that separately [as shown here](https://github.tools.sap/kms/ui/edit/main/README.md#local-api):
+5. Application will start on port 8081
+6. If using a local CMK API instance and are using MacOS, run `npm run startchrome` to open a Chrome instance with web security turned off. Using a normal Chrome browser will result in CORS errors.
 
 ### Building for deployment
 1. Install dependencies
 ```bash
 npm install
 ```
-2. Setup the respective `.env` files in `/env` with the correct base URL. For example:
-```bash
-echo "stringreplace.UI5_MIDDLEWARE_ENV_API_BASE_URL = <URL_GOES_HERE>" >> env/dev.env
-```
-3. Build the project using one of the following depending on the environment you setup above:
-```bash
-npm run build:dev
-```
-```bash
-npm run build:staging
-```
-```bash
-npm run build:prod
-```
+2. Run `npm run build`
 4. Deploy from the `/dist` folder.
 
 ### Local API
@@ -85,13 +53,9 @@ npm run build:prod
 npm run serve
 ```
 
-## Testing
-
-TODO: add unit and automation test description
-
 ## Commits, Branching & Pull Requests
 ### Commit messages
-- Commit messages must follow the pattern - `<JIRA TICKET NUMBER>-<COMMIT DESCRIPTION>`
+- Commit messages must follow the pattern - `<JIRA TICKET NUMBER>: <COMMIT DESCRIPTION>`
 - Commit description must give a brief explanation of what is being achieved by the commit
 
 ## Docker

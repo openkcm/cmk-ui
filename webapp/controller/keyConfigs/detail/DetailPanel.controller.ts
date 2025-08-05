@@ -54,7 +54,7 @@ export default class DetailPanel extends BaseController {
         this.idType = routeArgs.type
         this.id = routeArgs.id;
         this.keyConfigId = routeArgs.keyConfigId;
-        this.api = new Api(routeArgs?.tenantId);
+        this.api = Api.getInstance();
         this.tenantId = routeArgs?.tenantId;
         this.oneWayModel.setProperty('/type', this.idType);
         this.oneWayModel.setProperty('/keyConfigDetail', true);

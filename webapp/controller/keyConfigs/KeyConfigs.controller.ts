@@ -13,7 +13,7 @@ import MessageToast from 'sap/m/MessageToast';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import { BYOKProviders, HYOKProviders } from 'kms/common/Enums';
 import { _isNameValid } from "kms/common/Helpers";
-import {AxiosError} from "axios";
+import { AxiosError } from "axios";
 
 interface KeyConfigsResponse {
     value: KeyConfig[];
@@ -55,7 +55,7 @@ export default class Keys extends BaseController {
     public onRouteMatched(event: Route$PatternMatchedEvent): void {
         this.resetPagination();
         const routeArgs = event.getParameter('arguments') as { tenantId: string };
-        this.api = new Api(routeArgs?.tenantId);
+        this.api = Api.getInstance();
         this.tenantId = routeArgs?.tenantId;
         this.setHyokProviders();
         this.setKeyConfigs().catch((error) => {

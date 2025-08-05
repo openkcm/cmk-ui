@@ -1,5 +1,8 @@
 import { ActionTypes, ArtifactTypes, KeyCreationTypes, KeyStates, TaskStates, TaskStatus, SystemStatus } from "kms/common/Enums";
 
+export interface Config {
+    apiBaseUrl: string;
+}
 export interface System {
     id: string;
     externalID: string;
