@@ -9,6 +9,7 @@ import ToolPage from 'sap/tnt/ToolPage';
 import { Menu$ItemSelectedEvent } from 'sap/m/Menu';
 import Api from 'kms/services/Api.service';
 import MessageBox from 'sap/m/MessageBox';
+import Component from 'kms/Component';
 
 export default class App extends BaseController {
     private api: Api;
@@ -33,6 +34,18 @@ export default class App extends BaseController {
     private toolPage: ToolPage | undefined;
 
     public onInit(): void {
+        void this.asyncOnInit();
+    }
+
+    public async asyncOnInit(): Promise<void> {
+        const component = this.getOwnerComponent() as Component
+        try {
+            await component.apiInitializedPromise;
+        } catch (error) {
+            console.error(error);
+            this.getView().setVisible(false);
+            return;
+        }
         super.onInit();
 
         this.setModel(this.oneWayModel, 'oneWay');

@@ -3,7 +3,6 @@ import IllustrationPool from 'sap/m/IllustrationPool';
 import Theming from 'sap/ui/core/Theming';
 import { loadConfig } from './utils/Config';
 import Api from './services/Api.service';
-import { Config } from './common/Types';
 import MessageBox from 'sap/m/MessageBox';
 /**
  * @namespace kms
@@ -13,35 +12,47 @@ export default class Component extends UIComponent {
         manifest: 'json',
         interfaces: ['sap.ui.core.IAsyncContentCreation']
     };
+    public apiInitializedPromise: Promise<void>;
 
     public init(): void {
+        void this.asyncInit();
+    }
+    private async asyncInit(): Promise<void> {
         super.init();
-        void loadConfig().then((config: Config) => {
-            Api.init(config.apiBaseUrl).catch((error) => {
+        this.apiInitializedPromise = (async () => {
+            try {
+                const config = await loadConfig();
+                await Api.init(config.apiBaseUrl);
+
+                this.getRouter().initialize();
+                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    Theming.setTheme('sap_horizon_dark');
+                }
+                this.watchForThemeChanges();
+                const tntSet = {
+                    setFamily: 'tnt',
+                    setURI: sap.ui.require.toUrl('sap/tnt/themes/base/illustrations')
+                };
+                IllustrationPool.registerIllustrationSet(tntSet, false, []);
+            } catch (error) {
                 const datetime = new Date().toISOString().split('.')[0];
                 MessageBox.error("Failed to initialize API service. Contact an administrator with the details below if the problem persists.", {
                     title: 'Initialization Error',
-                    details: "<p><strong>" + "Error Details:" + "</strong></p>" +
-                        "<ul>" +
-                        "<li><strong>" + "Error Message: " + "</strong>" + error + "</li>" +
-                        "<li><strong>" + "Timestamp (UTC): " + "</strong>" + datetime + "</li>" +
-                        "</ul>",
+                    details: `<p><strong>Error Details:</strong></p>
+                          <ul>
+                              <li><strong>Error Message: </strong>${JSON.stringify(error)}</li>
+                              <li><strong>Timestamp (UTC): </strong>${datetime}</li>
+                          </ul>`,
+                    actions: [MessageBox.Action.CLOSE],
+                    onClose: () => {
+                        location.reload();
+                    },
                     styleClass: 'sapUiUserSelectable'
                 });
-            });
-        });
-
-        this.getRouter().initialize();
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            Theming.setTheme('sap_horizon_dark');
-        }
-        this.watchForThemeChanges();
-        const tntSet = {
-            setFamily: 'tnt',
-            setURI: sap.ui.require.toUrl('sap/tnt/themes/base/illustrations')
-        };
-
-        IllustrationPool.registerIllustrationSet(tntSet, false, []);
+                throw error;
+            }
+        })();
+        await this.apiInitializedPromise;
     }
     private watchForThemeChanges() {
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
