@@ -12,11 +12,13 @@ export default class Component extends UIComponent {
         manifest: 'json',
         interfaces: ['sap.ui.core.IAsyncContentCreation']
     };
+
     public apiInitializedPromise: Promise<void>;
 
     public init(): void {
         void this.asyncInit();
     }
+
     private async asyncInit(): Promise<void> {
         super.init();
         this.apiInitializedPromise = (async () => {
@@ -34,9 +36,10 @@ export default class Component extends UIComponent {
                     setURI: sap.ui.require.toUrl('sap/tnt/themes/base/illustrations')
                 };
                 IllustrationPool.registerIllustrationSet(tntSet, false, []);
-            } catch (error) {
+            }
+            catch (error) {
                 const datetime = new Date().toISOString().split('.')[0];
-                MessageBox.error("Failed to initialize API service. Contact an administrator with the details below if the problem persists.", {
+                MessageBox.error('Failed to initialize API service. Contact an administrator with the details below if the problem persists.', {
                     title: 'Initialization Error',
                     details: `<p><strong>Error Details:</strong></p>
                           <ul>
@@ -54,12 +57,14 @@ export default class Component extends UIComponent {
         })();
         await this.apiInitializedPromise;
     }
+
     private watchForThemeChanges() {
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
             const newColorScheme = event.matches ? 'dark' : 'light';
             if (newColorScheme === 'dark') {
                 Theming.setTheme('sap_horizon_dark');
-            } else if (newColorScheme === 'light') {
+            }
+            else if (newColorScheme === 'light') {
                 Theming.setTheme('sap_horizon');
             }
         });

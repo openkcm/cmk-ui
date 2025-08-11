@@ -14,6 +14,9 @@ setup('Check environment variables', async ({ page }) => {
 });
 
 setup('Check if testIDs are set', async ({ page }) => {
+    if (!url) {
+        throw new Error('AUTOMATION_BASE_URL is not defined in the environment variables.');
+    }
     await page.goto(url);
     const homeIcon = page.getByTestId('shellBar-homeIcon');
     const avatar = page.getByTestId('shellBar-avatar');

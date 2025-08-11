@@ -2,7 +2,6 @@ import BaseController from './BaseController';
 import Fragment from 'sap/ui/core/Fragment';
 import JSONModel from 'sap/ui/model/json/JSONModel';
 import ResponsivePopover from 'sap/m/ResponsivePopover';
-import { NavigationList$ItemSelectEvent } from 'sap/tnt/NavigationList';
 import { Avatar$PressEvent } from 'sap/m/Avatar';
 import { Router$RouteMatchedEvent } from 'sap/ui/core/routing/Router';
 import ToolPage from 'sap/tnt/ToolPage';
@@ -18,19 +17,21 @@ export default class App extends BaseController {
         {
             tenants: [
                 {
-                    id: 'tenant1',
+                    id: 'tenant1'
                 },
                 {
-                    id: 'tenant2',
+                    id: 'tenant2'
                 }]
         }
     );
+
     private readonly twoWayModel = new JSONModel(
         {
             selectedKey: '',
             selectedTenant: ''
         }
     );
+
     private toolPage: ToolPage | undefined;
 
     public onInit(): void {
@@ -38,12 +39,13 @@ export default class App extends BaseController {
     }
 
     public async asyncOnInit(): Promise<void> {
-        const component = this.getOwnerComponent() as Component
+        const component = this.getOwnerComponent() as Component;
         try {
             await component.apiInitializedPromise;
-        } catch (error) {
+        }
+        catch (error) {
             console.error(error);
-            this.getView().setVisible(false);
+            this.getView()?.setVisible(false);
             return;
         }
         super.onInit();
@@ -69,18 +71,20 @@ export default class App extends BaseController {
         this.twoWayModel.setProperty('/selectedTenant', routeArgs?.tenantId);
         try {
             Api.updateTenantId(routeArgs?.tenantId);
-        } catch (error) {
+        }
+        catch (error) {
             console.error('Invalid tenant', error);
             MessageBox.error(this.getText('invalidTenantError'));
         }
-        const tenants = this.oneWayModel.getProperty('/tenants') as { id: string; name: string }[];
+        const tenants = this.oneWayModel.getProperty('/tenants') as { id: string, name: string }[];
         const selectedTenant = tenants.find(tenant => tenant.id === routeArgs?.tenantId);
         this.twoWayModel.setProperty('/selectedTenantName', selectedTenant ? selectedTenant.name : '');
 
         if (routeName === 'keyConfigs') {
-            this.toolPage.setSideExpanded(true);
-        } else {
-            this.toolPage.setSideExpanded(false);
+            this.toolPage?.setSideExpanded(true);
+        }
+        else {
+            this.toolPage?.setSideExpanded(false);
         }
 
         switch (routeName) {
@@ -115,13 +119,14 @@ export default class App extends BaseController {
             this.oneWayModel.setProperty('/tenants', tenants);
             this.twoWayModel.setProperty('/selectedTenant', tenants[0].id);
             this.twoWayModel.setProperty('/selectedTenantName', tenants[0].name || '');
-        } else {
+        }
+        else {
             MessageBox.error(this.getText('errorNoTenantsFound'));
         }
     }
 
     public onNavigationClick(): void {
-        this.navigateToSelectedPage()
+        this.navigateToSelectedPage();
     }
 
     public onSideNavButtonPress(): void {
@@ -132,7 +137,10 @@ export default class App extends BaseController {
     public async onUserNamePress(event: Avatar$PressEvent): Promise<void> {
         const button = event.getSource();
         const view = this.getView();
-
+        if (!view) {
+            console.error('View is undefined');
+            return;
+        }
         if (!this.userPopover) {
             const userFragment = await Fragment.load({
                 id: view.getId(),
@@ -142,23 +150,22 @@ export default class App extends BaseController {
             this.userPopover = userFragment as ResponsivePopover;
             view.addDependent(this.userPopover);
             this.userPopover.openBy(button);
-        } else {
+        }
+        else {
             this.userPopover.openBy(button);
         }
     }
-    public onUserInfoListSelect(event: NavigationList$ItemSelectEvent): void {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const item = event.getParameter('item').getKey();
-    }
+
     public onTenantChanged(event: Menu$ItemSelectedEvent): void {
-        const selectedTenant = event.getParameter('item').getKey();
-        const selectedTenantName = event.getParameter('item').getText();
+        const selectedTenant = event.getParameter('item')?.getKey();
+        const selectedTenantName = event.getParameter('item')?.getText();
         this.twoWayModel.setProperty('/selectedTenant', selectedTenant);
         this.twoWayModel.setProperty('/selectedTenantName', selectedTenantName);
         this.api = Api.getInstance();
-        Api.updateTenantId(selectedTenant);
+        Api.updateTenantId(selectedTenant || '');
         this.navigateToSelectedPage();
     }
+
     private navigateToSelectedPage(): void {
         const selectedKey = this.twoWayModel.getProperty('/selectedKey') as string;
         const selectedTenant = this.twoWayModel.getProperty('/selectedTenant') as string;

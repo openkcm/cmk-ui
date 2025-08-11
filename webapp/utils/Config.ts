@@ -8,13 +8,13 @@ export function loadConfig(): Promise<Config> {
     }
     if (configPromise === null) {
         configPromise = fetch('/config/config.json')
-            .then(response => {
+            .then((response) => {
                 if (!response.ok) {
                     throw new Error('Failed to load config.json');
                 }
                 return response.json();
             })
-            .then(json => {
+            .then((json) => {
                 configData = json as Config;
                 return configData;
             });

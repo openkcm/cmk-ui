@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-useless-constructor */
 import Control from 'sap/ui/core/Control';
 import HBox from 'sap/m/HBox';
 import VBox from 'sap/m/VBox';
 import Text from 'sap/m/Text';
 import Button from 'sap/m/Button';
-import CustomData from "sap/ui/core/CustomData";
+import CustomData from 'sap/ui/core/CustomData';
 import FlexItemData from 'sap/m/FlexItemData';
 import RenderManager from 'sap/ui/core/RenderManager';
 import type { MetadataOptions } from 'sap/ui/core/Element';
@@ -26,7 +27,8 @@ export default class Pagination extends Control {
             onNextPage: {},
             onPreviousPage: {}
         }
-    }
+    };
+
     renderer = {
         render: (rm: RenderManager, control: Pagination) => {
             rm.openStart('div', control);
@@ -34,13 +36,13 @@ export default class Pagination extends Control {
 
             const currentPage = control.getProperty('currentPage') as number;
             const previousButtonCustomData = new CustomData({
-                key: "testId",
-                value: "pagination-previousButton",
+                key: 'testId',
+                value: 'pagination-previousButton',
                 writeToDom: true
             });
             const nextButtonCustomData = new CustomData({
-                key: "testId",
-                value: "pagination-nextButton",
+                key: 'testId',
+                value: 'pagination-nextButton',
                 writeToDom: true
             });
             const paginationControls = new HBox({
@@ -51,21 +53,21 @@ export default class Pagination extends Control {
                         icon: 'sap-icon://navigation-left-arrow',
                         type: 'Transparent',
                         enabled: currentPage > 1,
-                        press: () => control._onPreviousPage(),
+                        press: () => { control._onPreviousPage(); }
                     }).addCustomData(previousButtonCustomData),
                     new Text({
-                        text: `Page ${currentPage} of ${control.getProperty('totalPages')}`
+                        text: `Page ${String(currentPage)} of ${String(control.getProperty('totalPages'))}`
                     }),
                     new Button({
                         icon: 'sap-icon://navigation-right-arrow',
                         type: 'Transparent',
                         enabled: currentPage < control.getProperty('totalPages'),
-                        press: () => control._onNextPage(),
-                    }).addCustomData(nextButtonCustomData),
+                        press: () => { control._onNextPage(); }
+                    }).addCustomData(nextButtonCustomData)
                 ],
                 layoutData: new FlexItemData({
-                    growFactor: 0,
-                }),
+                    growFactor: 0
+                })
             });
             const container = new VBox({
                 visible: control.getProperty('totalPages') > 1,
@@ -77,7 +79,7 @@ export default class Pagination extends Control {
 
             rm.renderControl(container);
             rm.close('div');
-        },
+        }
     };
 
     private _onPreviousPage(): void {

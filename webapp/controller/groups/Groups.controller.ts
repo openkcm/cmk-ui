@@ -3,27 +3,25 @@ import JSONModel from 'sap/ui/model/json/JSONModel';
 import BindingMode from 'sap/ui/model/BindingMode';
 import Api from 'kms/services/Api.service';
 import { Groups } from 'kms/common/Types';
-import { showErrorMessage } from "kms/common/Helpers";
-import {AxiosError} from "axios";
+import { showErrorMessage, setNameValueState } from 'kms/common/Helpers';
+import { AxiosError } from 'axios';
 import MessageBox from 'sap/m/MessageBox';
 import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import Dialog from 'sap/m/Dialog';
 import Fragment from 'sap/ui/core/Fragment';
 import MessageToast from 'sap/m/MessageToast';
-import { setNameValueState } from 'kms/common/Helpers';
-
-
 interface GroupsResponse {
-    value: Groups[];
-    count: number;
+    value: Groups[]
+    count: number
 }
 export default class Group extends BaseController {
     private api: Api;
     private readonly oneWayModel = new JSONModel({
         noTableDataText: 'noUserGroupsCreated',
-        noTableDataIllustrationType: 'tnt-NoUsers',
+        noTableDataIllustrationType: 'tnt-NoUsers'
     });
+
     private groupCreatePopover: Dialog | undefined;
     private readonly createGroupModel = new JSONModel({});
     id: string | number;
@@ -38,7 +36,9 @@ export default class Group extends BaseController {
         this.skip = 0;
         this.top = 10;
         this.currentPage = 1;
-        this.getRouter().getRoute('groups').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
+        this.getRouter()?.getRoute('groups')?.attachPatternMatched({}, (event: Route$PatternMatchedEvent) => {
+            this.onRouteMatched(event);
+        }, this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.setModel(this.oneWayModel, 'oneWay');
         this.setModel(this.paginationModel, 'pagination');
@@ -49,7 +49,7 @@ export default class Group extends BaseController {
         const routeArgs = event.getParameter('arguments') as { tenantId: string };
         this.api = Api.getInstance();
         this.tenantId = routeArgs?.tenantId;
-        this.setGroups().catch((error) => {
+        this.setGroups().catch((error: unknown) => {
             console.error(error);
         });
     };
@@ -59,11 +59,13 @@ export default class Group extends BaseController {
         this.skip += 10;
         await this.setGroups();
     }
+
     private async onPreviousPage() {
         this.currentPage--;
         this.skip -= 10;
         await this.setGroups();
     }
+
     private resetPagination(): void {
         this.currentPage = 1;
         this.skip = 0;
@@ -71,7 +73,7 @@ export default class Group extends BaseController {
     }
 
     private async setGroups(): Promise<void> {
-        this.getView().setBusy(true);
+        this.getView()?.setBusy(true);
         try {
             const groups = await this.api.get<GroupsResponse>('groups', { $top: this.top, $skip: this.skip });
             const groupsData = groups.value;
@@ -96,18 +98,23 @@ export default class Group extends BaseController {
                 adminGroupValueState: 'None' as string,
                 adminGroupValueStateText: '' as string
             }, true);
-
-        } catch (error) {
+        }
+        catch (error) {
             console.error(error);
             this.oneWayModel.setProperty('/groupsCount', 0);
             showErrorMessage(error as AxiosError, this.getText('errorFetchingGroups'));
-        } finally {
-            this.getView().setBusy(false);
+        }
+        finally {
+            this.getView()?.setBusy(false);
         }
     };
 
     public onUserPress(event: ListItemBase$PressEvent): void {
-        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const path = event.getSource()?.getBindingContext('oneWay')?.getPath();
+        if (!path) {
+            console.error('Binding context path is undefined');
+            return;
+        }
         const selectedGroup = this.oneWayModel.getProperty(path) as { id: string };
         this.groupId = selectedGroup.id;
         this.getRouter().navTo('groupDetail', {
@@ -127,6 +134,10 @@ export default class Group extends BaseController {
     public async onCreateGroupPress(): Promise<void> {
         const view = this.getView();
         const component = this.getOwnerComponent();
+        if (!view || !component) {
+            console.error('View or component is undefined');
+            return;
+        }
         if (!this.groupCreatePopover) {
             this.groupCreatePopover = await Fragment.load({
                 id: view.getId(),
@@ -137,16 +148,17 @@ export default class Group extends BaseController {
             this.groupCreatePopover.setModel(component.getModel('i18n'), 'i18n');
             this.groupCreatePopover.setModel(this.createGroupModel, 'model');
             this.groupCreatePopover.open();
-        } else {
+        }
+        else {
             this.groupCreatePopover.open();
         }
     };
 
     public async onGroupCreationCreatePress(): Promise<void> {
         interface GroupPostPayload {
-            name: string;
-            description: string;
-            role: string;
+            name: string
+            description: string
+            role: string
         }
 
         const name = this.createGroupModel.getProperty('/name') as string;
@@ -157,26 +169,28 @@ export default class Group extends BaseController {
             role: 'Tenant Administrator'
         } as GroupPostPayload;
 
-        this.getView().setBusy(true);
+        this.getView()?.setBusy(true);
         try {
-            const group = await this.api.post<GroupPostPayload, Groups>('groups', newGroup);
+            const group = await this.api.post<Groups>('groups', newGroup);
             MessageToast.show(this.getText('groupCreated'));
             this.groupCreatePopover?.close();
             this.groupCreatePopover?.destroy();
             this.groupCreatePopover = undefined;
             this.resetCreateConfigModel();
-            this.setGroups().catch((error) => {
+            this.setGroups().catch((error: unknown) => {
                 console.error(error);
             });
             this.getRouter().navTo('groupDetail', {
                 tenantId: this.tenantId,
                 groupId: group?.id
             });
-        } catch (error) {
+        }
+        catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorCreatingGroup'));
-        } finally {
-            this.getView().setBusy(false);
+        }
+        finally {
+            this.getView()?.setBusy(false);
         }
     };
 
@@ -202,7 +216,11 @@ export default class Group extends BaseController {
     }
 
     public onKeyTableDeletePress(event: ListItemBase$PressEvent): void {
-        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const path = event.getSource()?.getBindingContext('oneWay')?.getPath();
+        if (!path) {
+            console.error('Binding context path is undefined');
+            return;
+        }
         const selectedGroup = this.oneWayModel.getProperty(path) as { id: string };
         this.groupId = selectedGroup.id;
 
@@ -210,25 +228,26 @@ export default class Group extends BaseController {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
             onClose: async (action: unknown) => {
                 if (action === MessageBox.Action.YES) {
-                    this.getView().setBusy(true);
+                    this.getView()?.setBusy(true);
                     try {
                         await this.api.delete(`groups/${this.groupId}`);
                         MessageToast.show(this.getText('groupDeletedSuccessfully'));
-                        this.setGroups().catch((error) => {
+                        this.setGroups().catch((error: unknown) => {
                             console.error(error);
                         });
-                    } catch (error) {
+                    }
+                    catch (error) {
                         console.error(error);
                         showErrorMessage(error as AxiosError, this.getText('errorDeletingGroup'));
-                    } finally {
+                    }
+                    finally {
                         this.getRouter().navTo('groups', {
                             tenantId: this.tenantId
                         });
-                        this.getView().setBusy(false);
+                        this.getView()?.setBusy(false);
                     }
                 }
             }
         });
-
     }
 }

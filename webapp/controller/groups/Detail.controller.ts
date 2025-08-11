@@ -1,20 +1,17 @@
-import BaseController from "kms/controller/BaseController";
-import BindingMode from "sap/ui/model/BindingMode";
-import JSONModel from "sap/ui/model/json/JSONModel";
-import Api from "kms/services/Api.service";
-import { Group } from "kms/common/Types";
+import BaseController from 'kms/controller/BaseController';
+import BindingMode from 'sap/ui/model/BindingMode';
+import JSONModel from 'sap/ui/model/json/JSONModel';
+import Api from 'kms/services/Api.service';
+import { Group } from 'kms/common/Types';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
-import { showErrorMessage } from "kms/common/Helpers";
-import {AxiosError} from "axios";
-import MessageBox from "sap/m/MessageBox";
+import { showErrorMessage, setNameValueState } from 'kms/common/Helpers';
+import { AxiosError } from 'axios';
+import MessageBox from 'sap/m/MessageBox';
 import { Input$LiveChangeEvent } from 'sap/m/Input';
 import { TextArea$LiveChangeEvent } from 'sap/m/TextArea';
-import { setNameValueState } from "kms/common/Helpers";
-
-
 interface GroupResponse {
-    value: Group[];
-    count: number;
+    value: Group[]
+    count: number
 }
 
 export default class GroupDetail extends BaseController {
@@ -25,7 +22,9 @@ export default class GroupDetail extends BaseController {
 
     public onInit(): void {
         super.onInit();
-        this.getRouter().getRoute('groupDetail').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
+        this.getRouter()?.getRoute('groupDetail')?.attachPatternMatched({}, (event: Route$PatternMatchedEvent) => {
+            this.onRouteMatched(event);
+        }, this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.setModel(this.oneWayModel, 'oneWay');
         this.oneWayModel.setProperty('/groupValid', false);
@@ -35,22 +34,24 @@ export default class GroupDetail extends BaseController {
         const routeArgs = event.getParameter('arguments') as { tenantId: string, groupId?: string };
         this.api = Api.getInstance();
         this.tenantId = routeArgs?.tenantId;
-        this.groupId = routeArgs.groupId;
-        this.setUser().catch((error) => {
+        this.groupId = routeArgs.groupId || '';
+        this.setUser().catch((error: unknown) => {
             console.error(error);
         });
     };
 
     private async setUser(): Promise<void> {
-        this.getView().setBusy(true);
+        this.getView()?.setBusy(true);
         try {
-            const group = await this.api.get<GroupResponse[]>(`groups/${this.groupId}`)
+            const group = await this.api.get<GroupResponse[]>(`groups/${this.groupId}`);
             this.oneWayModel.setProperty('/groupData', group);
-        } catch (error) {
+        }
+        catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorFetchingUser'));
-        } finally {
-            this.getView().setBusy(false);
+        }
+        finally {
+            this.getView()?.setBusy(false);
         }
     };
 
@@ -63,7 +64,7 @@ export default class GroupDetail extends BaseController {
     };
 
     public onGroupNameChanged(event: Input$LiveChangeEvent): void {
-        const newGroupName = event.getParameter('value');
+        const newGroupName = event.getParameter('value') ?? '';
         const groupName = this.oneWayModel.getProperty('/groupData/name') as string;
         const { valueState, valueStateText } = setNameValueState(newGroupName);
         this.oneWayModel.setProperty('/groupNameValueState', valueState);
@@ -77,14 +78,15 @@ export default class GroupDetail extends BaseController {
         const groupDescription = this.oneWayModel.getProperty('/groupData/description') as string;
         if (newGroupDescription === groupDescription) {
             this.oneWayModel.setProperty('/groupValid', false);
-        } else {
+        }
+        else {
             this.oneWayModel.setProperty('/groupValid', true);
             this.oneWayModel.setProperty('/newGroupDescription', newGroupDescription);
         }
     };
 
     public async onGroupSavePress(): Promise<void> {
-        this.getView().setBusy(true);
+        this.getView()?.setBusy(true);
 
         const payload: Group = {
             name: this.oneWayModel.getProperty('/newGroupName') as string,
@@ -94,12 +96,14 @@ export default class GroupDetail extends BaseController {
             await this.api.patch(`groups/${this.groupId}`, payload);
             MessageBox.success(this.getText('groupUpdatedSuccessfully'));
             await this.setUser();
-        } catch (error) {
+        }
+        catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorUpdatingGroup'));
-        } finally {
+        }
+        finally {
             this.oneWayModel.setProperty('/editMode', false);
-            this.getView().setBusy(false);
+            this.getView()?.setBusy(false);
         }
     };
 

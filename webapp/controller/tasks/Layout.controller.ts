@@ -1,7 +1,7 @@
-import BaseController from "kms/controller/BaseController";
-import BindingMode from "sap/ui/model/BindingMode";
-import JSONModel from "sap/ui/model/json/JSONModel";
-import Api from "kms/services/Api.service";
+import BaseController from 'kms/controller/BaseController';
+import BindingMode from 'sap/ui/model/BindingMode';
+import JSONModel from 'sap/ui/model/json/JSONModel';
+import Api from 'kms/services/Api.service';
 import { Router$RouteMatchedEvent } from 'sap/ui/core/routing/Router';
 
 export default class Tasks extends BaseController {
@@ -25,7 +25,8 @@ export default class Tasks extends BaseController {
         if (routeName && typeof routeName === 'string') {
             if (routeName === 'tasks') {
                 this.oneWayModel.setProperty('/layout', 'OneColumn');
-            } else {
+            }
+            else {
                 this.oneWayModel.setProperty('/layout', 'TwoColumnsBeginExpanded');
             }
         }

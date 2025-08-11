@@ -21,7 +21,7 @@ export default class FilterBar extends Control {
         super(id, settings);
         this.layoutForm = new SimpleForm({
             editable: true,
-            layout: "ResponsiveGridLayout",
+            layout: 'ResponsiveGridLayout',
             columnsL: 4,
             columnsM: 3,
             labelSpanL: 0,
@@ -34,7 +34,7 @@ export default class FilterBar extends Control {
 
     static readonly metadata: MetadataOptions = {
         properties: {
-            title: { type: 'string', defaultValue: 'Filters' },
+            title: { type: 'string', defaultValue: 'Filters' }
         },
         aggregations: {
             filters: { type: 'sap.ui.core.Control', multiple: true },
@@ -48,7 +48,7 @@ export default class FilterBar extends Control {
             search: {},
             reset: {}
         }
-    }
+    };
 
     private layoutForm: SimpleForm;
 
@@ -57,46 +57,46 @@ export default class FilterBar extends Control {
             rm.openStart('div', control);
             rm.openEnd();
             const goButtonCustomData = new CustomData({
-                key: "testId",
-                value: "filterBar-goButton",
+                key: 'testId',
+                value: 'filterBar-goButton',
                 writeToDom: true
             });
             const resetButtonCustomData = new CustomData({
-                key: "testId",
-                value: "filterBar-resetButton",
+                key: 'testId',
+                value: 'filterBar-resetButton',
                 writeToDom: true
             });
             const toolbar = new HBox({
-                justifyContent: "End",
+                justifyContent: 'End',
                 items: [
                     new Button({
                         text: 'Go',
                         type: 'Emphasized',
-                        press: () => control.fireEvent('search'),
+                        press: () => control.fireEvent('search')
                     }).addStyleClass('sapUiTinyMargin').addCustomData(goButtonCustomData),
                     new Button({
                         text: 'Reset',
-                        press: () => control.fireEvent('reset'),
-                    }).addStyleClass('sapUiTinyMargin').addCustomData(resetButtonCustomData),
+                        press: () => control.fireEvent('reset')
+                    }).addStyleClass('sapUiTinyMargin').addCustomData(resetButtonCustomData)
                 ]
             });
 
             rm.renderControl(control.layoutForm);
             rm.renderControl(toolbar);
             rm.close('div');
-        },
+        }
     };
 
     onBeforeRendering(): void {
         const form = this.layoutForm;
         form.destroyContent();
 
-        const items = this.getAggregation("filters") as FilterBarItem[] || [];
+        const items = this.getAggregation('filters') as FilterBarItem[] || [];
 
         items.forEach((item) => {
             const clonedContent = item.getContent().clone();
             const label = new Label({
-                text: `${item.getProperty("label") as string}:`,
+                text: `${item.getProperty('label') as string}:`,
                 labelFor: clonedContent?.getId()
             });
 
@@ -105,7 +105,7 @@ export default class FilterBar extends Control {
             });
 
             container.setLayoutData(new GridData({
-                span: "L3 M4 S12"
+                span: 'L3 M4 S12'
             }));
 
             form.addContent(container);

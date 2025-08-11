@@ -18,7 +18,8 @@ export default class GroupsLayout extends BaseController {
         if (routeName && typeof routeName === 'string') {
             if (routeName === 'groups') {
                 this.oneWayModel.setProperty('/layout', 'OneColumn');
-            } else {
+            }
+            else {
                 this.oneWayModel.setProperty('/layout', 'TwoColumnsBeginExpanded');
             }
         }

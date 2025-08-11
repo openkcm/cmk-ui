@@ -1,6 +1,6 @@
 export enum KeyStates {
     ENABLED = 'ENABLED',
-    DISABLED = 'DISABLED',
+    DISABLED = 'DISABLED'
 }
 
 export enum CloudProviders {
@@ -84,7 +84,7 @@ export enum EventIDs {
 
 export enum HYOKProviders {
     AWS = 'AWS',
-    XYZ = 'XYZ',
+    XYZ = 'XYZ'
 }
 
 export enum BYOKProviders {

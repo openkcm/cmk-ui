@@ -10,7 +10,7 @@ import ViewSettingsDialog from 'sap/m/ViewSettingsDialog';
 import Dialog from 'sap/m/Dialog';
 import MessageToast from 'sap/m/MessageToast';
 import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
-import {isUUIDValid, copyToClipboard, showErrorMessage} from 'kms/common/Helpers';
+import { isUUIDValid, copyToClipboard, showErrorMessage } from 'kms/common/Helpers';
 import EventBus from 'sap/ui/core/EventBus';
 import { Button$PressEvent } from 'sap/m/Button';
 import Filter from 'sap/ui/model/Filter';
@@ -22,34 +22,38 @@ import MultiInput, { MultiInput$TokenUpdateEvent } from 'sap/m/MultiInput';
 import Token from 'sap/m/Token';
 import { BYOKProviders, EventChannelIds, EventIDs, HYOKProviders, KeyCreationTypes } from 'kms/common/Enums';
 import KeyCreation from 'kms/component/KeyCreation';
-import {AxiosError} from "axios";
+import { AxiosError } from 'axios';
 
 interface KeyConfigPatchPayload {
-    name: string;
+    name: string
 }
 interface KeyResponse {
-    value: Key[] | undefined;
-    count: number | undefined;
+    value: Key[] | undefined
+    count: number | undefined
 }
 
 interface SystemsResponse {
-    value: System[] | undefined;
-    count: number | undefined;
+    value: System[] | undefined
+    count: number | undefined
 }
 interface TagsResponse {
-    value: string[] | undefined;
-    count: number | undefined;
+    value: string[] | undefined
+    count: number | undefined
 }
 interface KeyPatchPayload {
-    name: string;
-    description: string;
-    enabled: boolean;
+    name: string
+    description: string
+    enabled: boolean
 }
 interface KeyConfigsResponse {
-    value: KeyConfig[];
-    count: number;
+    value: KeyConfig[]
+    count: number
 }
-
+interface KeyCreationParams {
+    keyConfigId: string
+    keyType: KeyCreationTypes
+    keySubtype: HYOKProviders | BYOKProviders
+}
 export default class KeyConfigDetail extends BaseController {
     private api: Api;
     private filterPopover: ViewSettingsDialog | undefined;
@@ -63,15 +67,18 @@ export default class KeyConfigDetail extends BaseController {
         keysTableUpdating: false as boolean,
         systemsTableUpdating: false as boolean
     });
+
     private readonly viewSettingModel = new JSONModel({
         sortColumns: [] as object[],
         sortValue: 'createdOn' as string,
         sortDesc: true as boolean,
-        currentTable: 'keys' as string,
+        currentTable: 'keys' as string
     });
+
     private readonly twoWayModel = new JSONModel({
         keyConfig: {} as KeyConfig
     });
+
     private keyConfigId: string;
     private readonly keyCreationModel = new JSONModel({});
     private readonly connectSystemModel = new JSONModel({});
@@ -95,8 +102,12 @@ export default class KeyConfigDetail extends BaseController {
         this.keysCurrentPage = 1;
         this.systemsCurrentPage = 1;
 
-        this.eventBus.subscribe(EventChannelIds.KEYCONFIG, EventIDs.LOAD_KEY_CONFIG_DETAILS, (channelId, eventId, data) => this.onDetailPanelRouteEventTriggered(channelId, eventId, data as { keyConfigId: string, tenantId: string }), this);
-        this.getRouter().getRoute('keyConfigDetail').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
+        this.eventBus.subscribe(EventChannelIds.KEYCONFIG, EventIDs.LOAD_KEY_CONFIG_DETAILS, (channelId, eventId, data) => {
+            this.onDetailPanelRouteEventTriggered(channelId as EventChannelIds, eventId as EventIDs, data as { keyConfigId: string, tenantId: string });
+        }, this);
+        this.getRouter().getRoute('keyConfigDetail')?.attachPatternMatched({}, (event: Route$PatternMatchedEvent) => {
+            this.onRouteMatched(event);
+        }, this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.twoWayModel.setDefaultBindingMode(BindingMode.TwoWay);
         this.viewSettingModel.setDefaultBindingMode(BindingMode.TwoWay);
@@ -108,7 +119,8 @@ export default class KeyConfigDetail extends BaseController {
         this.setModel(this.systemsPaginationModel, 'systemsPagination');
         this.setModel(this.keysPaginationModel, 'keysPagination');
     };
-    public onDetailPanelRouteEventTriggered(channelId: string, eventId: string, data: { keyConfigId: string, tenantId: string }): void {
+
+    public onDetailPanelRouteEventTriggered(channelId: EventChannelIds, eventId: EventIDs, data: { keyConfigId: string, tenantId: string }): void {
         this.oneWayModel.setProperty('/keyConfigDetail', true);
         if (channelId === EventChannelIds.KEYCONFIG && eventId === EventIDs.LOAD_KEY_CONFIG_DETAILS) {
             this.keyConfigId = data.keyConfigId;
@@ -116,20 +128,21 @@ export default class KeyConfigDetail extends BaseController {
                 this.tenantId = data.tenantId;
                 this.api = new Api(this.tenantId);
             }
-            this.getKeyConfigData().catch((error) => {
+            this.getKeyConfigData().catch((error: unknown) => {
                 console.error(error);
             });
         }
     }
+
     public onRouteMatched(event: Route$PatternMatchedEvent): void {
-        this.getView().setBusy(true);
+        this.getView()?.setBusy(true);
         this.resetPagination();
         const routeName = event.getParameter('name');
         this.oneWayModel.setProperty('/keyConfigDetail', routeName === 'keyConfigDetail');
         this.setHyokProviders();
-        const routeArgs = event.getParameter('arguments') as { tenantId: string, keyConfigId?: string, '?query': { createKey?: string, keyType?: KeyCreationTypes, keySubtype?: HYOKProviders | BYOKProviders } };
+        const routeArgs = event.getParameter('arguments') as { 'tenantId': string, 'keyConfigId'?: string, '?query': { createKey?: string, keyType?: KeyCreationTypes, keySubtype?: HYOKProviders | BYOKProviders } };
         const queryParams = routeArgs['?query'] as { createKey?: string, keyType?: KeyCreationTypes, keySubtype?: HYOKProviders | BYOKProviders };
-        this.keyConfigId = routeArgs.keyConfigId;
+        this.keyConfigId = routeArgs.keyConfigId || '';
 
         this.api = Api.getInstance();
         this.tenantId = routeArgs?.tenantId;
@@ -141,21 +154,25 @@ export default class KeyConfigDetail extends BaseController {
             });
             return;
         }
-        this.getKeyConfigData().catch((error) => {
+        this.getKeyConfigData().catch((error: unknown) => {
             console.error(error);
         });
 
         if (queryParams?.createKey === 'true') {
-            const type = queryParams?.keyType;
+            const type = queryParams?.keyType || KeyCreationTypes.SYSTEM_MANAGED;
             const subtype = queryParams?.keySubtype;
-            this.getView().setBusy(true);
+            this.getView()?.setBusy(true);
             this.handleCreateKeyRoute(type, subtype);
         }
     }
+
     public async onConnectSystemPress(): Promise<void> {
         const view = this.getView();
         const component = this.getOwnerComponent();
-
+        if (!view || !component) {
+            console.error('View or component is undefined');
+            return;
+        }
         if (!this.connectSystemPopover) {
             this.connectSystemPopover = await Fragment.load({
                 id: view.getId(),
@@ -166,37 +183,45 @@ export default class KeyConfigDetail extends BaseController {
             this.connectSystemPopover.setModel(component.getModel('i18n'), 'i18n');
             this.connectSystemPopover.setModel(this.connectSystemModel, 'model');
             this.connectSystemPopover.open();
-            this.resetConnectSystemModel()
-        } else {
+            this.resetConnectSystemModel();
+        }
+        else {
             this.connectSystemPopover.open();
-            this.resetConnectSystemModel()
+            this.resetConnectSystemModel();
         }
     }
+
     public handleCreateKeyRoute(keyType: KeyCreationTypes, keySubtype?: HYOKProviders | BYOKProviders): void {
         const component = this.getOwnerComponent();
-        const i18nModel = component.getModel('i18n')
+        const i18nModel = component?.getModel('i18n');
+        if (!i18nModel) {
+            console.error('i18n model is undefined');
+            return;
+        }
         const keyCreatePopover = new KeyCreation('keyCreatePopover');
         const keyParams = {
             keyConfigId: this.keyConfigId,
             keyType,
             keySubtype
-        }
+        } as KeyCreationParams;
         const createKey = async (payload: MangedKeyPayload | HyokKeyPayload) => {
             await this.api.post('keys', payload);
             MessageToast.show(this.getText('keyCreatedSuccessfully'));
-            this.getKeyConfigData().catch((error) => {
+            this.getKeyConfigData().catch((error: unknown) => {
                 console.error(error);
             });
-        }
+        };
         keyCreatePopover.openKeyCreationWizard(keyParams, i18nModel, this, createKey);
     }
+
     public onConnectSystemsCancelPress(): void {
         this.connectSystemPopover?.destroy();
         this.connectSystemPopover = undefined;
         this.resetConnectSystemModel();
     }
+
     public async onConnectSystemsConfirmPress(event: SelectDialog$ConfirmEvent): Promise<void> {
-        const systems = event.getParameter("selectedContexts") as Context[];
+        const systems = event.getParameter('selectedContexts') as Context[];
         const selectedSystemIds = systems.map(system => (system.getObject() as System).id);
         if (selectedSystemIds.length === 0) {
             MessageToast.show(this.getText('noChangesWereMade'));
@@ -205,20 +230,23 @@ export default class KeyConfigDetail extends BaseController {
         const patchPromises: Promise<void>[] = [];
         selectedSystemIds.forEach((systemId) => {
             patchPromises.push(this.api.patch(`systems/${systemId}/link`, { keyConfigurationID: this.keyConfigId }));
-        })
-        this.getView().setBusy(true);
+        });
+        this.getView()?.setBusy(true);
         try {
             await Promise.all(patchPromises);
             MessageToast.show(this.getText('systemsConnectedSuccessfully'));
-        } catch (error) {
+        }
+        catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorConnectingSystems'));
-        } finally {
+        }
+        finally {
             await this.getKeyConfigData();
-            this.getView().setBusy(false);
+            this.getView()?.setBusy(false);
             this.onConnectSystemsCancelPress();
         }
     }
+
     public onSearchConnectSystems(event: SelectDialog$LiveChangeEvent): void {
         const value = event.getParameter('value');
         const filter = new Filter('name', FilterOperator.Contains, value);
@@ -227,7 +255,7 @@ export default class KeyConfigDetail extends BaseController {
     }
 
     private async getKeyConfigData(): Promise<void> {
-        this.getView().setBusy(true);
+        this.getView()?.setBusy(true);
         try {
             const keyConfig = await this.api.get<KeyConfig>(`keyConfigurations/${this.keyConfigId}`);
             if (!keyConfig) {
@@ -239,34 +267,41 @@ export default class KeyConfigDetail extends BaseController {
             await this.updateSystemsTable();
             const tags = await this.getTags();
             this.oneWayModel.setProperty('/tags', tags?.value);
-        } catch (error) {
+        }
+        catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorFetchingKeyConfigDetails'));
-        } finally {
-            this.getView().setBusy(false);
+        }
+        finally {
+            this.getView()?.setBusy(false);
         }
     }
+
     //* We have two tables one for Keys and one for Systems, hence two sets of navigation functions *//
     private async onKeysNextPage() {
         this.keysCurrentPage++;
         this.keysSkip += 10;
         await this.updateKeysTable();
     }
+
     private async onKeysPreviousPage() {
         this.keysCurrentPage--;
         this.keysSkip -= 10;
         await this.updateKeysTable();
     }
+
     private async onSystemsNextPage() {
         this.systemsCurrentPage++;
         this.systemsSkip += 10;
         await this.updateSystemsTable();
     }
+
     private async onSystemsPreviousPage() {
         this.systemsCurrentPage--;
         this.systemsSkip -= 10;
         await this.updateSystemsTable();
     }
+
     private resetPagination(): void {
         this.keysCurrentPage = 1;
         this.keysSkip = 0;
@@ -281,11 +316,12 @@ export default class KeyConfigDetail extends BaseController {
         const keys = await this.getKeys();
         this.oneWayModel.setProperty('/keys', keys?.value);
         this.oneWayModel.setProperty('/keysCount', keys?.count || 0);
-        this.keysPaginationModel.setProperty('/totalPages', Math.ceil(keys.count / this.top));
+        this.keysPaginationModel.setProperty('/totalPages', Math.ceil((keys?.count ?? 0) / this.top));
         this.keysPaginationModel.setProperty('/currentPage', this.keysCurrentPage);
         this.oneWayModel.setProperty('/keysCount', keys?.count || 0);
         this.oneWayModel.setProperty('/keysTableUpdating', false);
     }
+
     private async updateSystemsTable() {
         this.oneWayModel.setProperty('/systemsTableUpdating', true);
         const allSystems = await this.getAllSystems();
@@ -293,35 +329,42 @@ export default class KeyConfigDetail extends BaseController {
         this.oneWayModel.setProperty('/allSystems', allSystems?.value);
         this.oneWayModel.setProperty('/systems', connectedSystems?.value);
         this.oneWayModel.setProperty('/systemsCount', connectedSystems?.count || 0);
-        this.systemsPaginationModel.setProperty('/totalPages', Math.ceil(connectedSystems.count / this.top));
+        this.systemsPaginationModel.setProperty('/totalPages', Math.ceil(connectedSystems?.count ?? 0 / this.top));
         this.systemsPaginationModel.setProperty('/currentPage', this.systemsCurrentPage);
         this.oneWayModel.setProperty('/allSystemsCount', allSystems?.count || 0);
         this.oneWayModel.setProperty('/systemsTableUpdating', false);
     }
+
     private async getKeys() {
         try {
-            return await this.api.get<KeyResponse>(`keys`, { keyConfigurationID: this.keyConfigId, $top: this.top, $skip: this.keysSkip });
-        } catch (error) {
+            return await this.api.get<KeyResponse>('keys', { keyConfigurationID: this.keyConfigId, $top: this.top, $skip: this.keysSkip });
+        }
+        catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorFetchingKeyDetails'));
         }
     }
+
     private async getConnectedSystems() {
         try {
-            return await this.api.get<KeyResponse>(`systems`, { keyConfigurationID: this.keyConfigId, $top: this.top, $skip: this.systemsSkip });
-        } catch (error) {
+            return await this.api.get<KeyResponse>('systems', { keyConfigurationID: this.keyConfigId, $top: this.top, $skip: this.systemsSkip });
+        }
+        catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorFetchingSystems'));
         }
     }
+
     private async getAllSystems() {
         try {
-            return await this.api.get<SystemsResponse>(`systems`);
-        } catch (error) {
+            return await this.api.get<SystemsResponse>('systems');
+        }
+        catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorFetchingSystems'));
         }
     }
+
     private async getTags() {
         try {
             const tags = await this.api.get<TagsResponse>(`keyConfigurations/${this.keyConfigId}/tags`);
@@ -333,11 +376,13 @@ export default class KeyConfigDetail extends BaseController {
             const tagsInput = this.byId('tagsMultiInput') as MultiInput;
             tagsInput.addValidator(fnValidator);
             return tags;
-        } catch (error) {
+        }
+        catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorFetchingTags'));
         }
     }
+
     public async onTagsUpdate(event: MultiInput$TokenUpdateEvent): Promise<void> {
         const tags = this.oneWayModel.getProperty('/tags') as [];
 
@@ -351,36 +396,42 @@ export default class KeyConfigDetail extends BaseController {
 
         const payload = {
             tags: updatedTags
-        }
+        };
         try {
             await this.api.put(`keyConfigurations/${this.keyConfigId}/tags`, payload);
             MessageToast.show(this.getText('tagsUpdatedSuccessfully'));
-        } catch (error) {
+        }
+        catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorUpdatingTags'));
             const tags = await this.getTags();
             this.oneWayModel.setProperty('/tags', tags?.value || []);
         }
     }
+
     private async patchKeyConfigData(keyConfig: KeyConfigPatchPayload) {
         try {
-            const keyConfigs = await this.api.patch<KeyConfigPatchPayload, KeyConfig>(`keyConfigurations/${this.keyConfigId}`, keyConfig);
+            const keyConfigs = await this.api.patch<KeyConfig>(`keyConfigurations/${this.keyConfigId}`, keyConfig);
             MessageToast.show(this.getText('keyConfigSaved'));
             return keyConfigs;
-        } catch (error) {
+        }
+        catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorPatchingKeyConfigDetails'));
         }
     }
+
     public onEditDetailsPress(): void {
         this.oneWayModel.setProperty('/edit', true);
     }
+
     public async onCancelEditPress(): Promise<void> {
         this.oneWayModel.setProperty('/edit', false);
         await this.getKeyConfigData();
     }
+
     public async onSaveKeyConfigPress(): Promise<void> {
-        this.getView().setBusy(true);
+        this.getView()?.setBusy(true);
         const keyConfig = this.twoWayModel.getProperty('/keyConfig') as KeyConfig;
         const payload = {
             name: keyConfig.name
@@ -390,13 +441,16 @@ export default class KeyConfigDetail extends BaseController {
             await this.patchKeyConfigData(payload);
             await this.getKeyConfigData();
             await this.onCancelEditPress();
-        } catch (error) {
+        }
+        catch (error) {
             console.error('Error patching key config', error);
             showErrorMessage(error as AxiosError, this.getText('errorPatchingKeyConfigDetails'));
-        } finally {
-            this.getView().setBusy(false);
+        }
+        finally {
+            this.getView()?.setBusy(false);
         }
     }
+
     public onTableSortApplyPress(): void {
         const currentTable = this.viewSettingModel.getProperty('/currentTable') as string;
         switch (currentTable) {
@@ -410,15 +464,22 @@ export default class KeyConfigDetail extends BaseController {
                 break;
         }
     }
+
     public onKeysTableSortApply(): void {
-        //@TODO Implement sorting for keys table when API is ready
+        // @TODO Implement sorting for keys table when API is ready
     }
+
     public onSystemsTableSortApply(): void {
-        //@TODO Implement sorting for systems table when API is ready
+        // @TODO Implement sorting for systems table when API is ready
     }
+
     public async onKeysTableSortPress(): Promise<void> {
         const view = this.getView();
         const component = this.getOwnerComponent();
+        if (!view || !component) {
+            console.error('View or component is undefined');
+            return;
+        }
         const columns = [
             { key: 'name', text: this.getText('name') },
             { key: 'createdOn', text: this.getText('createdOn') },
@@ -436,12 +497,18 @@ export default class KeyConfigDetail extends BaseController {
             this.filterPopover.setModel(component.getModel('i18n'), 'i18n');
             this.filterPopover.setModel(this.viewSettingModel, 'viewSettingModel');
             this.filterPopover.open();
-        } else {
+        }
+        else {
             this.filterPopover.open();
         }
     }
+
     public onKeyTableRowPress(event: ListItemBase$PressEvent): void {
-        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const path = event.getSource().getBindingContext('oneWay')?.getPath();
+        if (!path) {
+            console.error('Binding context path is undefined');
+            return;
+        }
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
         const keyId: string = selectedKey.id;
         this.getRouter().navTo('keyConfigDetailPanel', {
@@ -451,9 +518,14 @@ export default class KeyConfigDetail extends BaseController {
             type: this.Enums.KeyConfigDetailPanelTypes.KEY
         });
     }
+
     // eslint-disable-next-line @typescript-eslint/require-await
     public async onKeyTableMakePrimaryPress(event: Button$PressEvent): Promise<void> {
-        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const path = event.getSource().getBindingContext('oneWay')?.getPath();
+        if (!path) {
+            console.error('Binding context path is undefined');
+            return;
+        }
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
         MessageBox.confirm(this.getText('confirmMakePrimaryConfirmation'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
@@ -464,9 +536,14 @@ export default class KeyConfigDetail extends BaseController {
             }
         });
     }
+
     // eslint-disable-next-line @typescript-eslint/require-await
     public async onKeyTableDeletePress(event: Button$PressEvent): Promise<void> {
-        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const path = event.getSource().getBindingContext('oneWay')?.getPath();
+        if (!path) {
+            console.error('Binding context path is undefined');
+            return;
+        }
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
         MessageBox.confirm(this.getText('confirmKeyDeletion'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
@@ -477,9 +554,14 @@ export default class KeyConfigDetail extends BaseController {
             }
         });
     }
+
     // eslint-disable-next-line @typescript-eslint/require-await
     public async onKeyTableDisablePress(event: Button$PressEvent): Promise<void> {
-        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const path = event.getSource().getBindingContext('oneWay')?.getPath();
+        if (!path) {
+            console.error('Binding context path is undefined');
+            return;
+        }
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
         MessageBox.confirm(this.getText('confirmKeyDisable'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
@@ -490,9 +572,14 @@ export default class KeyConfigDetail extends BaseController {
             }
         });
     }
+
     // eslint-disable-next-line @typescript-eslint/require-await
     public async onKeyTableEnablePress(event: Button$PressEvent): Promise<void> {
-        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const path = event.getSource().getBindingContext('oneWay')?.getPath();
+        if (!path) {
+            console.error('Binding context path is undefined');
+            return;
+        }
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
         MessageBox.confirm(this.getText('confirmKeyEnable'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
@@ -503,8 +590,13 @@ export default class KeyConfigDetail extends BaseController {
             }
         });
     }
+
     public onSystemsTableDisconnectPress(event: Button$PressEvent): void {
-        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const path = event.getSource().getBindingContext('oneWay')?.getPath();
+        if (!path) {
+            console.error('Binding context path is undefined');
+            return;
+        }
         const selectedSystem = this.oneWayModel.getProperty(path) as System;
         MessageBox.confirm(this.getText('confirmDisconnectSystem'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
@@ -515,8 +607,13 @@ export default class KeyConfigDetail extends BaseController {
             }
         });
     }
+
     public onSystemPress(event: ListItemBase$PressEvent): void {
-        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const path = event.getSource().getBindingContext('oneWay')?.getPath();
+        if (!path) {
+            console.error('Binding context path is undefined');
+            return;
+        }
         const selectedSystem = this.oneWayModel.getProperty(path) as System;
         const systemId = selectedSystem.id;
         this.getRouter().navTo('keyConfigDetailPanel', {
@@ -526,54 +623,63 @@ export default class KeyConfigDetail extends BaseController {
             type: this.Enums.KeyConfigDetailPanelTypes.SYSTEM
         });
     };
+
     private async disconnectSystem(systemsID: string): Promise<void> {
-        this.getView().setBusy(true);
+        this.getView()?.setBusy(true);
         try {
             await this.api.delete(`systems/${systemsID}/link`);
             MessageToast.show(this.getText('systemDisconnectedSuccessfully'));
             await this.getKeyConfigData();
-        } catch (error) {
+        }
+        catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorDisconnectingSystem'));
-        } finally {
-            this.getView().setBusy(false);
+        }
+        finally {
+            this.getView()?.setBusy(false);
         }
     }
 
     private async disableKey(keyId: string): Promise<void> {
-        this.getView().setBusy(true);
+        this.getView()?.setBusy(true);
         const payload = {
             enabled: false
         } as KeyPatchPayload;
         try {
-            await this.api.patch<KeyPatchPayload, Key>(`keys/${keyId}`, payload);
+            await this.api.patch<Key>(`keys/${keyId}`, payload);
             MessageToast.show(this.getText('keyDisabledSuccessfully'));
             await this.getKeyConfigData();
-        } catch (error) {
+        }
+        catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorDisablingKey'));
-        } finally {
-            this.getView().setBusy(false);
+        }
+        finally {
+            this.getView()?.setBusy(false);
         }
     }
+
     private async enableKey(keyId: string): Promise<void> {
-        this.getView().setBusy(true);
+        this.getView()?.setBusy(true);
         const payload = {
             enabled: true
         } as KeyPatchPayload;
         try {
-            await this.api.patch<KeyPatchPayload, Key>(`keys/${keyId}`, payload);
+            await this.api.patch<Key>(`keys/${keyId}`, payload);
             MessageToast.show(this.getText('keyEnabledSuccessfully'));
             await this.getKeyConfigData();
-        } catch (error) {
+        }
+        catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorEnablingKey'));
-        } finally {
-            this.getView().setBusy(false);
+        }
+        finally {
+            this.getView()?.setBusy(false);
         }
     }
+
     private async deleteKey(keyId: string): Promise<void> {
-        this.getView().setBusy(true);
+        this.getView()?.setBusy(true);
         try {
             await this.api.delete(`keys/${keyId}`);
             MessageToast.show(this.getText('keyDeletedSuccessfully'));
@@ -582,56 +688,64 @@ export default class KeyConfigDetail extends BaseController {
                 keyConfigId: this.keyConfigId
             });
             await this.getKeyConfigData();
-        } catch (error) {
+        }
+        catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorDeletingKey'));
-        } finally {
-            this.getView().setBusy(false);
+        }
+        finally {
+            this.getView()?.setBusy(false);
         }
     }
+
     private async makeKeyPrimary(key: Key): Promise<void> {
-        this.getView().setBusy(true);
+        this.getView()?.setBusy(true);
         const payload = {
             name: key.name,
             description: key.description,
             enabled: key.enabled,
             isPrimary: true
-        }
+        };
         try {
             await this.api.patch(`keys/${key.id}`, payload);
             MessageToast.show(this.getText('keyMadePrimarySuccessfully'));
             await this.getKeyConfigData();
-        } catch (error) {
+        }
+        catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorMakingKeyPrimary'));
-        } finally {
-            this.getView().setBusy(false);
+        }
+        finally {
+            this.getView()?.setBusy(false);
         }
     }
+
     // eslint-disable-next-line @typescript-eslint/require-await
     public async deleteKeyConfig(): Promise<void> {
         MessageBox.confirm(this.getText('confirmKeyConfigDelete'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
             onClose: async (action: unknown) => {
                 if (action === MessageBox.Action.YES) {
-                    this.getView().setBusy(true);
+                    this.getView()?.setBusy(true);
                     try {
                         await this.api.delete(`keyConfigurations/${this.keyConfigId}`);
                         MessageToast.show(this.getText('keyConfigDeletedSuccessfully'));
                         this.getRouter().navTo('keyConfigs', {
                             tenantId: this.tenantId
                         });
-                    } catch (error) {
+                    }
+                    catch (error) {
                         console.error(error);
                         showErrorMessage(error as AxiosError, this.getText('errorDeletingKeyConfig'));
-                    } finally {
-                        this.getView().setBusy(false);
+                    }
+                    finally {
+                        this.getView()?.setBusy(false);
                     }
                 }
             }
         });
-
     }
+
     private resetConnectSystemModel() {
         const allSystems = this.oneWayModel.getProperty('/allSystems') as System[];
         const connectedSystems = this.oneWayModel.getProperty('/systems') as System[];
@@ -640,11 +754,17 @@ export default class KeyConfigDetail extends BaseController {
         );
         this.connectSystemModel.setProperty('/systemsList', filteredSystems);
     }
+
     public async onSwitchKeyConfigPress(event: Button$PressEvent): Promise<void> {
-        this.getView().setBusy(true);
-        const path = event.getSource().getBindingContext('oneWay').getPath();
-        const selectedSystem = this.oneWayModel.getProperty(path) as System;
+        this.getView()?.setBusy(true);
+        const path = event.getSource().getBindingContext('oneWay')?.getPath();
         const component = this.getOwnerComponent();
+        if (!path || !component) {
+            console.error('Path or component is undefined');
+            this.getView()?.setBusy(false);
+            return;
+        }
+        const selectedSystem = this.oneWayModel.getProperty(path) as System;
         const keyConfigs = await this.api.get<KeyConfigsResponse>('keyConfigurations', {});
         const filteredKeyConfigs = keyConfigs.value.filter(keyConfig => keyConfig.id !== this.keyConfigId);
         const connectedKeyConfig = this.oneWayModel.getProperty('/keyConfig') as KeyConfig;
@@ -661,38 +781,45 @@ export default class KeyConfigDetail extends BaseController {
             this.switchKeyConfigModel.setProperty('/KeyConfigList', filteredKeyConfigs);
             this.switchKeyConfigModel.setProperty('/connectedKeyConfig', connectedKeyConfig);
             this.switchKeyConfigDialog.open();
-            this.getView().setBusy(false);
-        } else {
+            this.getView()?.setBusy(false);
+        }
+        else {
             this.switchKeyConfigDialog.open();
-            this.getView().setBusy(false);
+            this.getView()?.setBusy(false);
         }
     }
+
     public onSwitchKeyConfigCancelPress(): void {
         this.switchKeyConfigDialog?.close();
         this.switchKeyConfigDialog?.destroy();
         this.switchKeyConfigDialog = undefined;
     }
+
     public async onSwitchKeyConfigSubmitPress(): Promise<void> {
         const systemId: string = this.switchKeyConfigModel.getProperty('/id') as string;
         const keyConfigId: string = this.switchKeyConfigModel.getProperty('/selectedKeyConfig') as string;
         try {
-            await this.api.patch(`systems/${systemId}/link`, { keyConfigurationID: keyConfigId })
+            await this.api.patch(`systems/${systemId}/link`, { keyConfigurationID: keyConfigId });
             MessageToast.show(this.getText('keyConfigConnectSystemSuccessfully'));
             this.onSwitchKeyConfigCancelPress();
-        } catch (error) {
+        }
+        catch (error) {
             showErrorMessage(error as AxiosError, this.getText('keyConfigConnectSystemError'));
             console.error('Error creating key', error);
-        } finally {
+        }
+        finally {
             await this.getKeyConfigData();
-            this.getView().setBusy(false);
+            this.getView()?.setBusy(false);
         }
     }
+
     public async onCopyToClipboardPress(event: Button$PressEvent): Promise<void> {
         await copyToClipboard(event);
     }
+
     private setHyokProviders(): void {
-        //@TODO Fetch the HYOK providers from the API when available
-        //For now, we are using a static list
+        // @TODO Fetch the HYOK providers from the API when available
+        // For now, we are using a static list
         const hyokProviders = [
             HYOKProviders.AWS,
             HYOKProviders.XYZ

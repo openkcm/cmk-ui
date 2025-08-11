@@ -1,8 +1,8 @@
 import { BYOKProviders, CloudProviders, HYOKProviders, KeyCreationTypes } from 'kms/common/Enums';
 import { MangedKeyPayload, HyokKeyPayload } from 'kms/common/Types';
 import BaseController from 'kms/controller/BaseController';
-import { showErrorMessage } from "kms/common/Helpers";
-import {AxiosError} from "axios";
+import { showErrorMessage } from 'kms/common/Helpers';
+import { AxiosError } from 'axios';
 import Dialog from 'sap/m/Dialog';
 import MessageBox from 'sap/m/MessageBox';
 import NavContainer from 'sap/m/NavContainer';
@@ -14,17 +14,13 @@ import Model from 'sap/ui/model/Model';
 import ResourceModel from 'sap/ui/model/resource/ResourceModel';
 
 interface KeyCreationParams {
-    keyConfigId: string,
-    keyType: KeyCreationTypes,
-    keySubtype: HYOKProviders | BYOKProviders | undefined,
+    keyConfigId: string
+    keyType: KeyCreationTypes
+    keySubtype: HYOKProviders | BYOKProviders
 }
-interface KeyCreateCallBackFn {
-    (payload: MangedKeyPayload | HyokKeyPayload): Promise<void>;
-}
-
+type KeyCreateCallBackFn = (payload: MangedKeyPayload | HyokKeyPayload) => Promise<void>;
 
 export default class KeyCreation extends BaseController {
-
     private readonly keyCreationModel = new JSONModel({});
     private keyCreatePopover: Dialog | undefined;
     private keyCreationNavContainer: NavContainer | undefined;
@@ -42,7 +38,6 @@ export default class KeyCreation extends BaseController {
     private keyConfigId: string;
     private onKeyCreateCallBackfnc: KeyCreateCallBackFn;
 
-
     public openKeyCreationWizard(keyCreationParams: KeyCreationParams, i18nModel: Model, BaseController: BaseController, onKeyCreateCallBackfnc: KeyCreateCallBackFn): void {
         this.type = keyCreationParams.keyType;
         this.subtype = keyCreationParams.keySubtype;
@@ -52,6 +47,7 @@ export default class KeyCreation extends BaseController {
         this.BaseController = BaseController;
         this.setKeyCreationWizard();
     }
+
     private setKeyCreationWizard(): void {
         const wizardView = this.getKeyCreationWizardView(this.type);
         const loadFragment = async (): Promise<void> => {
@@ -70,21 +66,21 @@ export default class KeyCreation extends BaseController {
 
             this.keyCreatePopover.setBusy(true);
             this.resetKeyCreationModel();
-            this.setKeyTypeWizard()
+            this.setKeyTypeWizard();
             this.keyCreatePopover.setBusy(false);
-
-        }
+        };
 
         if (!this.keyCreatePopover) {
-            loadFragment().catch(error => {
+            loadFragment().catch((error: unknown) => {
                 console.error('Error loading key creation wizard fragment:', error);
                 showErrorMessage(error as AxiosError, this.BaseController.getText('errorLoadingKeyCreationWizard'));
                 this.keyCreatePopover?.destroy();
                 this.keyCreatePopover = undefined;
             });
-        } else {
+        }
+        else {
             this.keyCreatePopover?.destroy();
-            loadFragment().catch(error => {
+            loadFragment().catch((error: unknown) => {
                 console.error('Error loading key creation wizard fragment:', error);
                 showErrorMessage(error as AxiosError, this.BaseController.getText('errorLoadingKeyCreationWizard'));
                 this.keyCreatePopover?.destroy();
@@ -92,21 +88,22 @@ export default class KeyCreation extends BaseController {
             });
         }
     }
+
     private setKeyTypeWizard(): void {
         switch (this.type) {
             case KeyCreationTypes.SYSTEM_MANAGED:
-                this.keyCreationWizard = Fragment.byId("keyCreatePopoverDialog", "keyCreationWizard") as Wizard;
-                this.keyCreationNavContainer = Fragment.byId("keyCreatePopoverDialog", "keyCreationNavContainer") as NavContainer;
-                this.keyCreationReviewPage = Fragment.byId("keyCreatePopoverDialog", "keyCreationReviewPage") as Page;
-                this.keyCreationWizardPage = Fragment.byId("keyCreatePopoverDialog", "keyCreationWizardPage") as Page;
+                this.keyCreationWizard = Fragment.byId('keyCreatePopoverDialog', 'keyCreationWizard') as Wizard;
+                this.keyCreationNavContainer = Fragment.byId('keyCreatePopoverDialog', 'keyCreationNavContainer') as NavContainer;
+                this.keyCreationReviewPage = Fragment.byId('keyCreatePopoverDialog', 'keyCreationReviewPage') as Page;
+                this.keyCreationWizardPage = Fragment.byId('keyCreatePopoverDialog', 'keyCreationWizardPage') as Page;
                 this.keyCreationNavContainer?.to(this.keyCreationWizardPage);
                 break;
             case KeyCreationTypes.HYOK:
                 if (this.subtype === HYOKProviders.AWS) {
-                    this.HYOKKeyCreationWizard = Fragment.byId("keyCreatePopoverDialog", "HYOKKeyCreationWizard") as Wizard;
-                    this.HYOKKeyCreationNavContainer = Fragment.byId("keyCreatePopoverDialog", "HYOKKeyCreationNavContainer") as NavContainer;
-                    this.HYOKKeyCreationReviewPage = Fragment.byId("keyCreatePopoverDialog", "HYOKKeyCreationReviewPage") as Page;
-                    this.HYOKKeyCreationWizardPage = Fragment.byId("keyCreatePopoverDialog", "HYOKKeyCreationWizardPage") as Page;
+                    this.HYOKKeyCreationWizard = Fragment.byId('keyCreatePopoverDialog', 'HYOKKeyCreationWizard') as Wizard;
+                    this.HYOKKeyCreationNavContainer = Fragment.byId('keyCreatePopoverDialog', 'HYOKKeyCreationNavContainer') as NavContainer;
+                    this.HYOKKeyCreationReviewPage = Fragment.byId('keyCreatePopoverDialog', 'HYOKKeyCreationReviewPage') as Page;
+                    this.HYOKKeyCreationWizardPage = Fragment.byId('keyCreatePopoverDialog', 'HYOKKeyCreationWizardPage') as Page;
                     this.HYOKKeyCreationNavContainer?.to(this.HYOKKeyCreationWizardPage);
                 }
                 break;
@@ -115,6 +112,7 @@ export default class KeyCreation extends BaseController {
                 break;
         }
     }
+
     private getKeyCreationWizardView(type: KeyCreationTypes): string {
         switch (type) {
             case KeyCreationTypes.SYSTEM_MANAGED:
@@ -127,9 +125,10 @@ export default class KeyCreation extends BaseController {
                 throw new Error('Invalid KeyCreationType');
         }
     }
+
     private resetKeyCreationModel() {
-        //@TODO:change the key model as per the selected key type and subtype
-        //To be part of the next PR
+        // @TODO:change the key model as per the selected key type and subtype
+        // To be part of the next PR
         this.keyCreationModel.setData({
             name: '' as string,
             keyType: this.type,
@@ -158,61 +157,76 @@ export default class KeyCreation extends BaseController {
             tags: [] as string[]
         }, true);
     }
+
     public onKeyCreateNameChanged(): void {
         const keyName = this.keyCreationModel.getProperty('/name') as string;
         if (!keyName || keyName.length < 2) {
             this.keyCreationModel.setProperty('/keyNameValueState', 'Error');
             this.keyCreationModel.setProperty('/keyNameValueStateText', this.BaseController.getText('keyNameRequired'));
             this.keyCreationModel.setProperty('/detailsStepValid', false);
-        } else {
+        }
+        else {
             this.keyCreationModel.setProperty('/keyNameValueState', 'None');
             this.keyCreationModel.setProperty('/keyNameValueStateText', '');
             this.keyCreationModel.setProperty('/detailsStepValid', true);
         }
     }
+
     public onKeyCreateRegionChanged(): void {
         const region = this.keyCreationModel.getProperty('/region') as string;
         if (region === '') {
             this.keyCreationModel.setProperty('/keyRegionStepValid', false);
-        } else {
+        }
+        else {
             const regionList = this.keyCreationModel.getProperty('/regionList') as { key: string, text: string, provider: string }[];
             const selectedRegion = regionList.find(item => item.key === region);
             this.keyCreationModel.setProperty('/provider', selectedRegion?.provider);
             this.keyCreationModel.setProperty('/keyRegionStepValid', true);
         }
     }
+
     public onKeyCreateARNChanged(): void {
         const keyARN = this.keyCreationModel.getProperty('/keyARN') as string;
         if (!keyARN || keyARN.length < 15) {
             this.keyCreationModel.setProperty('/keyARNValueState', 'Error');
             this.keyCreationModel.setProperty('/keyARNValueStateText', this.BaseController.getText('keyARNRequired'));
             this.keyCreationModel.setProperty('/keySourceStepValid', false);
-        } else {
+        }
+        else {
             this.keyCreationModel.setProperty('/keyARNValueState', 'None');
             this.keyCreationModel.setProperty('/keyARNValueStateText', '');
             this.keyCreationModel.setProperty('/keySourceStepValid', true);
         }
     }
+
     public onKeyCreationWizardComplete(): void {
         const detailsStepValid = this.keyCreationModel.getProperty('/detailsStepValid') as boolean;
         const keyRegionStepValid = this.keyCreationModel.getProperty('/keyRegionStepValid') as boolean;
         if (detailsStepValid && keyRegionStepValid) {
             this.keyCreationModel.setProperty('/createKeyEnabled', true);
-            this.keyCreationNavContainer?.to(this.keyCreationReviewPage);
-        } else {
+            if (this.keyCreationReviewPage) {
+                this.keyCreationNavContainer?.to(this.keyCreationReviewPage);
+            }
+        }
+        else {
             this.keyCreationModel.setProperty('/createKeyEnabled', false);
         }
     }
+
     public onHYOKKeyCreationWizardComplete(): void {
         const detailsStepValid = this.keyCreationModel.getProperty('/detailsStepValid') as boolean;
         const keySourceStepValid = this.keyCreationModel.getProperty('/keySourceStepValid') as boolean;
         if (detailsStepValid && keySourceStepValid) {
             this.keyCreationModel.setProperty('/createKeyEnabled', true);
-            this.HYOKKeyCreationNavContainer?.to(this.HYOKKeyCreationReviewPage);
-        } else {
+            if (this.HYOKKeyCreationReviewPage) {
+                this.HYOKKeyCreationNavContainer?.to(this.HYOKKeyCreationReviewPage);
+            }
+        }
+        else {
             this.keyCreationModel.setProperty('/createKeyEnabled', false);
         }
     }
+
     public onKeyCreationWizardCancelPress(): void {
         MessageBox.warning(this.BaseController.getText('confirmCancelKeyCreation'), {
             styleClass: 'sapUiSizeCompact',
@@ -228,6 +242,7 @@ export default class KeyCreation extends BaseController {
             }
         });
     }
+
     public onNavBackToStepPress(stepNumber: number): void {
         const fnAfterNavigate = () => {
             this.keyCreationWizard?.goToStep(this.keyCreationWizard?.getSteps()[stepNumber], true);
@@ -235,17 +250,23 @@ export default class KeyCreation extends BaseController {
 
             this.HYOKKeyCreationWizard?.goToStep(this.HYOKKeyCreationWizard?.getSteps()[stepNumber], true);
             this.HYOKKeyCreationNavContainer?.detachAfterNavigate(fnAfterNavigate);
-        }
+        };
         this.keyCreationNavContainer?.attachAfterNavigate(fnAfterNavigate);
-        this.keyCreationNavContainer?.backToPage(this.keyCreationWizardPage.getId());
+        const keyCreationWizardPageId = this.keyCreationWizardPage?.getId();
+        if (keyCreationWizardPageId) {
+            this.keyCreationNavContainer?.backToPage(keyCreationWizardPageId);
+        }
 
         this.HYOKKeyCreationNavContainer?.attachAfterNavigate(fnAfterNavigate);
-        this.HYOKKeyCreationNavContainer?.backToPage(this.HYOKKeyCreationWizardPage.getId());
+        const hyokKeyCreationWizardPageId = this.HYOKKeyCreationWizardPage?.getId();
+        if (hyokKeyCreationWizardPageId) {
+            this.HYOKKeyCreationNavContainer?.backToPage(hyokKeyCreationWizardPageId);
+        }
     }
 
     public async onKeyCreationWizardSubmitPress(): Promise<void> {
         let payload: MangedKeyPayload | HyokKeyPayload;
-        this.keyCreatePopover.setBusy(false);
+        this.keyCreatePopover?.setBusy(false);
         if (this.keyCreationModel.getProperty('/keyType') === KeyCreationTypes.SYSTEM_MANAGED) {
             payload = {
                 name: this.keyCreationModel.getProperty('/name') as string,
@@ -256,8 +277,9 @@ export default class KeyCreation extends BaseController {
                 region: this.keyCreationModel.getProperty('/region') as string,
                 provider: this.keyCreationModel.getProperty('/provider') as string,
                 enabled: this.keyCreationModel.getProperty('/enabled') as boolean
-            }
-        } else {
+            };
+        }
+        else {
             payload = {
                 name: this.keyCreationModel.getProperty('/name') as string,
                 keyConfigurationID: this.keyConfigId,
@@ -265,7 +287,7 @@ export default class KeyCreation extends BaseController {
                 description: this.keyCreationModel.getProperty('/description') as string,
                 enabled: this.keyCreationModel.getProperty('/enabled') as boolean,
                 nativeId: this.keyCreationModel.getProperty('/keyARN') as string
-            }
+            };
         }
         try {
             await this.onKeyCreateCallBackfnc(payload);
@@ -273,10 +295,12 @@ export default class KeyCreation extends BaseController {
             this.keyCreatePopover?.destroy();
             this.keyCreatePopover = undefined;
             this.resetKeyCreationModel();
-        } catch (error) {
+        }
+        catch (error) {
             showErrorMessage(error as AxiosError, this.BaseController.getText('errorAddingKey'));
             console.error('Error creating key', error);
-        } finally {
+        }
+        finally {
             this.keyCreatePopover?.setBusy(false);
         }
     }

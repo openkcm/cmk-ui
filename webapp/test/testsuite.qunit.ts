@@ -1,22 +1,22 @@
 export default {
-    name: "KMS Unit Test Suite",
+    name: 'KMS Unit Test Suite',
     defaults: {
-        page: "ui5://test-resources/kms/Test.qunit.html?testsuite={suite}&test={name}",
+        page: 'ui5://test-resources/kms/Test.qunit.html?testsuite={suite}&test={name}',
         qunit: {
             version: 2
         },
         ui5: {
-            theme: "sap_horizon"
+            theme: 'sap_horizon'
         },
         loader: {
             paths: {
-                "kms": "../"
+                kms: '../'
             }
         }
     },
     tests: {
-        "unit/unitTests": {
-            title: "Unit tests for KMS"
+        'unit/unitTests': {
+            title: 'Unit tests for KMS'
         }
     }
 };

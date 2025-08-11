@@ -1,19 +1,19 @@
 import { Button$PressEvent } from 'sap/m/Button';
 import MessageToast from 'sap/m/MessageToast';
-import MessageBox from "sap/m/MessageBox";
-import {AxiosError} from "axios";
+import MessageBox from 'sap/m/MessageBox';
+import { AxiosError } from 'axios';
 
 interface ErrorResponse {
     error: {
-        message: string;
+        message: string
         data: {
             error: {
-                code: string,
-                id: string,
+                code: string
+                id: string
                 status: number
-            };
-        };
-    };
+            }
+        }
+    }
 }
 
 export async function copyToClipboard(event: Button$PressEvent): Promise<void> {
@@ -35,7 +35,7 @@ export function _isNameValid(name: string): boolean {
     return true;
 }
 
-export function setNameValueState(name: string) : { valueState: string, valueStateText: string } {
+export function setNameValueState(name: string): { valueState: string, valueStateText: string } {
     if (!_isNameValid(name) || !name) {
         return {
             valueState: 'Error',
@@ -48,14 +48,14 @@ export function setNameValueState(name: string) : { valueState: string, valueSta
     };
 }
 
-export function convertDateToUTC(date : Date): string {
+export function convertDateToUTC(date: Date): string {
     const dateObject = new Date(date);
     return dateObject.toISOString().split('.')[0];
 }
 
 export function getErrorCode(error: AxiosError): string {
-    let errorCode : string = undefined;
-    if(error.message.includes('data') && error.message.includes('code')) {
+    let errorCode = '';
+    if (error.message.includes('data') && error.message.includes('code')) {
         const errorMessage = JSON.parse(error.message) as ErrorResponse;
         errorCode = errorMessage?.error?.data?.error?.code;
     }
@@ -63,17 +63,17 @@ export function getErrorCode(error: AxiosError): string {
 }
 
 export function getErrorId(error: AxiosError): string {
-    let errorId : string = undefined;
-    if(error.message.includes('data') && error.message.includes('id')) {
+    let errorId = '';
+    if (error.message.includes('data') && error.message.includes('id')) {
         const errorMessage = JSON.parse(error.message) as ErrorResponse;
         errorId = errorMessage?.error?.data?.error?.id;
     }
     return errorId;
 }
 
-export function getErrorStatus(error: AxiosError): number {
+export function getErrorStatus(error: AxiosError): number | undefined {
     let errorStatus = undefined;
-    if(error.message.includes('data') && error.message.includes('status')) {
+    if (error.message.includes('data') && error.message.includes('status')) {
         const errorMessage = JSON.parse(error.message) as ErrorResponse;
         errorStatus = errorMessage?.error?.data?.error?.status;
     }
@@ -90,12 +90,12 @@ export function showErrorMessage(error: AxiosError, userMessage: string): void {
     }
 
     MessageBox.error(userMessage, {
-        title: "Error",
-        details: "<p><strong>" + "Error Details:" + "</strong></p>" +
-            "<ul>" +
-            "<li><strong>" + "Error ID: " + "</strong>"+ ' ' + errorId + "</li>" +
-            "<li><strong>" + "Timestamp (UTC): " + "</strong>" + datetime + "</li>" +
-            "</ul>",
+        title: 'Error',
+        details: '<p><strong>' + 'Error Details:' + '</strong></p>'
+          + '<ul>'
+          + '<li><strong>' + 'Error ID: ' + '</strong>' + ' ' + errorId + '</li>'
+          + '<li><strong>' + 'Timestamp (UTC): ' + '</strong>' + datetime + '</li>'
+          + '</ul>',
         styleClass: 'sapUiUserSelectable'
     });
 }

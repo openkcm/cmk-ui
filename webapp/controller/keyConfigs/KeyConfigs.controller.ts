@@ -13,12 +13,12 @@ import Dialog from 'sap/m/Dialog';
 import MessageToast from 'sap/m/MessageToast';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import { BYOKProviders, HYOKProviders } from 'kms/common/Enums';
-import { _isNameValid } from "kms/common/Helpers";
-import { AxiosError } from "axios";
+import { _isNameValid } from 'kms/common/Helpers';
+import { AxiosError } from 'axios';
 
 interface KeyConfigsResponse {
-    value: KeyConfig[];
-    count: number;
+    value: KeyConfig[]
+    count: number
 }
 export default class Keys extends BaseController {
     private api: Api;
@@ -27,11 +27,13 @@ export default class Keys extends BaseController {
         configsCount: 0 as number,
         hyokProviders: [] as HYOKProviders[]
     });
+
     private readonly viewSettingModel = new JSONModel({
         sortColumns: [] as object[],
         sortValue: 'createdOn' as string,
         sortDesc: true as boolean
     });
+
     private sortPopover: ViewSettingsDialog | undefined;
     private readonly createConfigModel = new JSONModel({});
     private configCreatePopover: Dialog | undefined;
@@ -45,7 +47,9 @@ export default class Keys extends BaseController {
         this.skip = 0;
         this.top = 10;
         this.currentPage = 1;
-        this.getRouter().getRoute('keyConfigs').attachPatternMatched({}, (event: Route$PatternMatchedEvent) => this.onRouteMatched(event), this);
+        this.getRouter()?.getRoute('keyConfigs')?.attachPatternMatched({}, (event: Route$PatternMatchedEvent) => {
+            this.onRouteMatched(event);
+        }, this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.viewSettingModel.setDefaultBindingMode(BindingMode.TwoWay);
         this.setModel(this.oneWayModel, 'oneWay');
@@ -59,30 +63,33 @@ export default class Keys extends BaseController {
         this.api = Api.getInstance();
         this.tenantId = routeArgs?.tenantId;
         this.setHyokProviders();
-        this.setKeyConfigs().catch((error) => {
+        this.setKeyConfigs().catch((error: unknown) => {
             console.error(error);
         });
     };
 
     private setHyokProviders(): void {
-        //@TODO Fetch the HYOK providers from the API when available
-        //For now, we are using a static list
+        // @TODO Fetch the HYOK providers from the API when available
+        // For now, we are using a static list
         const hyokProviders = [
             HYOKProviders.AWS,
             HYOKProviders.XYZ
         ];
         this.oneWayModel.setProperty('/hyokProviders', hyokProviders);
     }
+
     private async onNextPage() {
         this.currentPage++;
         this.skip += 10;
         await this.setKeyConfigs();
     }
+
     private async onPreviousPage() {
         this.currentPage--;
         this.skip -= 10;
         await this.setKeyConfigs();
     }
+
     private resetPagination(): void {
         this.currentPage = 1;
         this.skip = 0;
@@ -90,7 +97,7 @@ export default class Keys extends BaseController {
     }
 
     private async setKeyConfigs(): Promise<void> {
-        this.getView().setBusy(true);
+        this.getView()?.setBusy(true);
         try {
             const keyConfigs = await this.api.get<KeyConfigsResponse>('keyConfigurations', { $top: this.top, $skip: this.skip });
             const keyConfigsData = keyConfigs.value;
@@ -98,16 +105,22 @@ export default class Keys extends BaseController {
             this.oneWayModel.setProperty('/configsCount', keyConfigs.count || 0);
             this.paginationModel.setProperty('/totalPages', Math.ceil(keyConfigs.count / this.top));
             this.paginationModel.setProperty('/currentPage', this.currentPage);
-        } catch (error) {
+        }
+        catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorFetchingKeyConfigs'));
-        } finally {
-            this.getView().setBusy(false);
+        }
+        finally {
+            this.getView()?.setBusy(false);
         }
     };
 
     public onConfigPress(event: ListItemBase$PressEvent): void {
-        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const path = event.getSource()?.getBindingContext('oneWay')?.getPath();
+        if (!path) {
+            console.error('Binding context path is undefined');
+            return;
+        }
         const selectedConfig = this.oneWayModel.getProperty(path) as KeyConfig;
         const keyConfigId: string = selectedConfig.id;
         this.getRouter().navTo('keyConfigDetail', {
@@ -119,6 +132,10 @@ export default class Keys extends BaseController {
     public async onKeyConfigDashboardSortPress(): Promise<void> {
         const view = this.getView();
         const component = this.getOwnerComponent();
+        if (!view || !component) {
+            console.error('View or component is undefined');
+            return;
+        }
         const columns = [
             { key: 'name', text: this.getText('name') },
             { key: 'createdOn', text: this.getText('createdOn') },
@@ -136,12 +153,18 @@ export default class Keys extends BaseController {
             this.sortPopover.setModel(component.getModel('i18n'), 'i18n');
             this.sortPopover.setModel(this.viewSettingModel, 'viewSettingModel');
             this.sortPopover.open();
-        } else {
+        }
+        else {
             this.sortPopover.open();
         }
     };
+
     public onKeyConfigDashboardCreateSAPKeyPress(event: Button$PressEvent, keyType: string, keySubtype?: HYOKProviders | BYOKProviders): void {
-        const path = event.getSource().getBindingContext('oneWay').getPath();
+        const path = event.getSource()?.getBindingContext('oneWay')?.getPath();
+        if (!path) {
+            console.error('Binding context path is undefined');
+            return;
+        }
         const selectedConfig = this.oneWayModel.getProperty(path) as KeyConfig;
         const keyConfigId: string = selectedConfig.id;
         this.getRouter().navTo('keyConfigDetail', {
@@ -150,13 +173,18 @@ export default class Keys extends BaseController {
             keyConfigId: keyConfigId
         });
     }
+
     public onTableSortApplyPress(): void {
-        //@TODO Implement sorting for key config dashboard when API is ready
+        // @TODO Implement sorting for key config dashboard when API is ready
     };
 
     public async onCreateConfigPress(): Promise<void> {
         const view = this.getView();
         const component = this.getOwnerComponent();
+        if (!view || !component) {
+            console.error('View or component is undefined');
+            return;
+        }
         if (!this.configCreatePopover) {
             this.configCreatePopover = await Fragment.load({
                 id: view.getId(),
@@ -168,16 +196,17 @@ export default class Keys extends BaseController {
             this.configCreatePopover.setModel(this.createConfigModel, 'model');
             this.resetCreateConfigModel();
             this.configCreatePopover.open();
-        } else {
+        }
+        else {
             this.configCreatePopover.open();
         }
     };
 
     public async onConfigCreationCreatePress(): Promise<void> {
         interface KeyConfigPostPayload {
-            name: string;
-            description: string;
-            adminGroupID: string;
+            name: string
+            description: string
+            adminGroupID: string
         }
 
         const name = this.createConfigModel.getProperty('/name') as string;
@@ -190,9 +219,9 @@ export default class Keys extends BaseController {
             adminGroupID: '9e04db3d-059d-49bf-9356-b9bc36453f99'
         } as KeyConfigPostPayload;
 
-        this.getView().setBusy(true);
+        this.getView()?.setBusy(true);
         try {
-            const keyConfig = await this.api.post<KeyConfigPostPayload, KeyConfig>('keyConfigurations', newConfig);
+            const keyConfig = await this.api.post<KeyConfig>('keyConfigurations', newConfig);
             MessageToast.show(this.getText('keyConfigCreated'));
             this.configCreatePopover?.close();
             this.configCreatePopover?.destroy();
@@ -203,7 +232,8 @@ export default class Keys extends BaseController {
                 keyConfigId: keyConfig?.id
             });
             MessageToast.show(this.getText('keyConfigCreated'));
-        } catch (error) {
+        }
+        catch (error) {
             console.error(error);
 
             const errorCode: string = getErrorCode(error as AxiosError);
@@ -211,12 +241,14 @@ export default class Keys extends BaseController {
 
             if (errorCode === this.Constants.API_ERROR_CODES.UNIQUE_ERROR) {
                 errorMessage = this.getText('errorDuplicateKeyConfig');
-            } else {
+            }
+            else {
                 errorMessage = this.getText('errorCreatingKeyConfig');
             }
             showErrorMessage(error as AxiosError, errorMessage);
-        } finally {
-            this.getView().setBusy(false);
+        }
+        finally {
+            this.getView()?.setBusy(false);
         }
     };
 
@@ -227,7 +259,8 @@ export default class Keys extends BaseController {
             this.createConfigModel.setProperty('/nameValueState', 'Error');
             this.createConfigModel.setProperty('/nameValueStateText', this.getText('nameRequired'));
             this.createConfigModel.setProperty('/createButtonEnabled', false);
-        } else {
+        }
+        else {
             this.createConfigModel.setProperty('/nameValueState', 'None');
             this.createConfigModel.setProperty('/nameValueStateText', '');
             this.createConfigModel.setProperty('/createButtonEnabled', this._isAdminGroupValid(adminGroup));
@@ -249,7 +282,8 @@ export default class Keys extends BaseController {
             this.createConfigModel.setProperty('/adminGroupValueState', 'Error');
             this.createConfigModel.setProperty('/adminGroupValueStateText', this.getText('adminGroupRequired'));
             this.createConfigModel.setProperty('/createButtonEnabled', false);
-        } else {
+        }
+        else {
             this.createConfigModel.setProperty('/adminGroupValueState', 'None');
             this.createConfigModel.setProperty('/adminGroupValueStateText', '');
             this.createConfigModel.setProperty('/createButtonEnabled', _isNameValid(name));

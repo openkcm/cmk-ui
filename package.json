@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.51.1",
+    "@stylistic/eslint-plugin": "^5.0.0",
     "@types/node": "^22.13.13",
     "@types/qunit": "^2.19.11",
     "@ui5/linter": "^1.0.2",
