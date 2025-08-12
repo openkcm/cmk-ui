@@ -1,4 +1,4 @@
-import { ActionTypes, ArtifactTypes, KeyCreationTypes, KeyStates, TaskStates, TaskStatus, SystemStatus } from 'kms/common/Enums';
+import { ActionTypes, ArtifactTypes, KeyCreationTypes, KeyStates, TaskStates, TaskStatus, SystemStatus, HYOKProviders, BYOKProviders } from 'kms/common/Enums';
 
 export interface Config {
     apiBaseUrl: string
@@ -47,12 +47,13 @@ export interface Key {
     description: string
     enabled: boolean
     isPrimary: boolean
-    state: string
+    state: KeyStates
     customerHeld: boolean
     nativeId: string
     algorithm: string
     provider: string
     region: string
+    type: KeyCreationTypes
     metadata: {
         createdBy: string
         createdAt: string
@@ -99,8 +100,6 @@ export interface Approver {
     name: string
     decision: TaskStatus.APPROVED | TaskStatus.REJECTED | TaskStatus.PENDING
 }
-
-// Change the types once the backlend schema is ready for HYOK
 export interface MangedKeyPayload {
     name: string
     keyConfigurationID: string
@@ -111,11 +110,40 @@ export interface MangedKeyPayload {
     provider: string
     enabled: boolean
 }
+export interface AWSAccessDetails {
+    roleArn: string
+    trustAnchorArn: string
+    profileArn: string
+};
+export interface AccessDetails {
+    management: AWSAccessDetails
+    crypto: Record<string, AWSAccessDetails>
+}
 export interface HyokKeyPayload {
     name: string
-    keyConfigurationID: string
-    type: KeyCreationTypes
-    description: string
-    enabled: boolean
     nativeId: string
+    type: KeyCreationTypes
+    keyConfigurationID: string
+    description?: string
+    enabled?: boolean
+    provider: HYOKProviders | BYOKProviders
+    accessDetails: AccessDetails
+}
+export interface AWScertificates {
+    name: string
+    rootCA: string
+    subject: string
+}
+export interface hyokAWSManagementCertInput {
+    trustAnchorARN: string | null
+    roleARN: string | null
+    rootCA: string | null
+}
+export interface hyokAWSCryptoCertInput {
+    availableCryptoCertsSelectionList?: AWScertificates[]
+    selectedCryptoRolesCertKeys?: string[]
+    selectedCryptoCerts?: AWScertificates[]
+    trustAnchorCryptoARN: string | null
+    roleCryptoARN: string | null
+    rootCryptoCA: string | null
 }

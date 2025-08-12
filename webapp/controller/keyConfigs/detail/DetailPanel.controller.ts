@@ -89,6 +89,7 @@ export default class DetailPanel extends BaseController {
             if (selectedKey) {
                 this.oneWayModel.setProperty('/selectedKey', selectedKey);
                 this.twoWayModel.setProperty('/selectedKey', selectedKey);
+                this.setKeyDetailsToModel(selectedKey);
                 this.oneWayModel.setProperty('/keyVersions', keyVersions?.value);
                 this.oneWayModel.setProperty('/keyVersionsCount', keyVersions?.count);
             }
@@ -108,6 +109,11 @@ export default class DetailPanel extends BaseController {
             this.getView()?.setBusy(false);
         }
     };
+
+    private setKeyDetailsToModel(key: Key): void {
+        this.twoWayModel.setProperty('/selectedKey/customerHeld', key?.type === this.Enums.KeyCreationTypes.HYOK);
+        this.twoWayModel.setProperty('/selectedKey/enabled', key?.state === this.Enums.KeyStates.ENABLED);
+    }
 
     private async getSystemDetails(): Promise<void> {
         try {

@@ -17,7 +17,6 @@ export function setTaskStatus(state: TaskStates): string {
             return 'sap-icon://question-mark';
     }
 }
-
 export function setTaskStatusIndicationState(state: TaskStates): string {
     switch (state) {
         case TaskStates.SUCCESSFUL:
@@ -31,10 +30,9 @@ export function setTaskStatusIndicationState(state: TaskStates): string {
         case TaskStates.REJECTED:
             return 'Indication11';
         default:
-            return 'Indication12';
+            return '';
     }
 }
-
 export function setSystemType(type: string): string {
     switch (type) {
         case 'SYSTEM':
@@ -70,4 +68,8 @@ export function setSystemStatusColor(status: string): string {
         default:
             return '';
     }
+}
+export function formatCert(rootCA: string, subject: string): string {
+    const cert = `Root CA:\n ${rootCA}\nSubject:\n${subject}`;
+    return cert;
 }

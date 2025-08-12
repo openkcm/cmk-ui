@@ -13,7 +13,9 @@
             <OverflowToolbar>
                 <Title text="{i18n>details}" />
                 <ToolbarSpacer />
+                <!-- TEMP: Edit button is hidden temporarily for HYOK key type -->
                 <Button icon="sap-icon://edit" text="{i18n>edit}" type="Ghost"
+                    visible="{= ${oneWay>/selectedKey/type}!== 'HYOK'}"
                     press="onEditDetailsPress">
                     <customData>
                         <core:CustomData
@@ -107,8 +109,8 @@
                             </Text>
                         </forms:fields>
                     </forms:FormElement>
-                    <forms:FormElement label="{i18n>nativeId}"
-                        visible="{= !!${oneWay>/customerHeld}}">
+                    <forms:FormElement label="{i18n>keyARN}"
+                        visible="{= !!${twoWay>/selectedKey/customerHeld}}">
                         <forms:fields>
                             <Text text="{oneWay>/selectedKey/nativeID}">
                                 <customData>
@@ -123,7 +125,7 @@
                     <forms:FormElement label="{i18n>customerHeld}">
                         <forms:fields>
                             <Text
-                                text="{= !!${oneWay>/selectedKey/customerHeld} ? ${i18n>yes} : ${i18n>no}}">
+                                text="{= !!${twoWay>/selectedKey/customerHeld} ? ${i18n>yes} : ${i18n>no}}">
                                 <customData>
                                     <core:CustomData
                                         key="testId"
@@ -133,7 +135,8 @@
                             </Text>
                         </forms:fields>
                     </forms:FormElement>
-                    <forms:FormElement label="{i18n>createdBy}">
+                    <forms:FormElement label="{i18n>createdBy}"
+                        visible="{= !!${oneWay>/selectedKey/metadata/createdBy}}">
                         <forms:fields>
                             <Text text="{oneWay>/selectedKey/metadata/createdBy}">
                                 <customData>

@@ -58,6 +58,7 @@ export enum ArtifactTypes {
     KEY_CONFIGURATION = 'KEY_CONFIGURATION',
     SYSTEM = 'SYSTEM'
 }
+
 export enum WorkflowActionTypes {
     KEYDELETE = 'KEYDELETE',
     KEYUPDATE = 'KEYUPDATE'
@@ -83,8 +84,7 @@ export enum EventIDs {
 }
 
 export enum HYOKProviders {
-    AWS = 'AWS',
-    XYZ = 'XYZ'
+    AWS = 'AWS'
 }
 
 export enum BYOKProviders {

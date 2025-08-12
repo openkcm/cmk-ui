@@ -19,7 +19,9 @@
                     text="{parts: ['i18n>versionsWithCount', 'oneWay>/keyVersionsCount'], formatter: 'formatMessage'}"
                     level="H2" />
                 <ToolbarSpacer />
-                <MenuButton text="{i18n>rotate}" icon="sap-icon://synchronize" type="Ghost">
+                <!-- Temp Rotate button visibility is temporarily hidden for HYOK -->
+                <MenuButton text="{i18n>rotate}" icon="sap-icon://synchronize" type="Ghost"
+                    visible="{= ${oneWay>/selectedKey/type} !== 'HYOK' }">
                     <menu>
                         <Menu class="sapUiSizeCompact">
                             <MenuItem text="{i18n>rotateNow}"

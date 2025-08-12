@@ -211,7 +211,7 @@ export default class KeyConfigDetail extends BaseController {
                 console.error(error);
             });
         };
-        keyCreatePopover.openKeyCreationWizard(keyParams, i18nModel, this, createKey);
+        keyCreatePopover.openKeyCreationWizard(keyParams, i18nModel, this, this.api, createKey);
     }
 
     public onConnectSystemsCancelPress(): void {
@@ -821,8 +821,7 @@ export default class KeyConfigDetail extends BaseController {
         // @TODO Fetch the HYOK providers from the API when available
         // For now, we are using a static list
         const hyokProviders = [
-            HYOKProviders.AWS,
-            HYOKProviders.XYZ
+            HYOKProviders.AWS
         ];
         this.oneWayModel.setProperty('/hyokProviders', hyokProviders);
     }

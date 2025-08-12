@@ -72,8 +72,7 @@ export default class Keys extends BaseController {
         // @TODO Fetch the HYOK providers from the API when available
         // For now, we are using a static list
         const hyokProviders = [
-            HYOKProviders.AWS,
-            HYOKProviders.XYZ
+            HYOKProviders.AWS
         ];
         this.oneWayModel.setProperty('/hyokProviders', hyokProviders);
     }

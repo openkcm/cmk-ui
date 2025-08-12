@@ -70,7 +70,7 @@
             },
             "routes": [
                 {
-                    "pattern": "{tenantId}/keyConfigs}",
+                    "pattern": "{tenantId}/keyConfigs",
                     "name": "keyConfigs",
                     "target": "keyConfigs"
                 },

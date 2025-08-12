@@ -9,6 +9,7 @@ import keyVersions from "./mockServer/mockdata/keyVersions.mjs";
 import tags from "./mockServer/mockdata/tags.mjs";
 import workflows from "./mockServer/mockdata/tasks.mjs";
 import approvers from "./mockServer/mockdata/approvers.mjs";
+import managementAndCryptoCerts from "./mockServer/mockdata/managementAndCryptoCerts.mjs";
 
 const app = express();
 app.use(cors());
@@ -108,5 +109,10 @@ app.post("/api/v1/tenant1/workflows/:taskId/state", (req, res) => {
     const state = req.body;
     res.status(200).json(state);
 });
+app.get("/api/v1/tenant1/keyConfigurations/:keyConfigurationID/certificates", (req, res) => {
+    const { keyConfigurationID } = req.params;
+    res.json(managementAndCryptoCerts(keyConfigurationID));
+});
+
 
 app.listen(3000, () => console.log("API Server running..."));
