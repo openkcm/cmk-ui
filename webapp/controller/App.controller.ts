@@ -54,9 +54,24 @@ export default class App extends BaseController {
         this.setModel(this.twoWayModel, 'twoWay');
         this.twoWayModel.setProperty('/selectedKey', 'keyConfigs');
 
+        // BEGIN KMS20-2751 TEMPORARY: Set the tenant from the URL
         this.api = Api.getInstance();
-        this.setTenantData();
-        if (window.location.hash === '') {
+        const currentUrl = window.location.hash;
+        const tenantIdMatch = /#\/([^/]+)/.exec(currentUrl);
+        if (tenantIdMatch) {
+            try {
+                Api.updateTenantId(tenantIdMatch[1]);
+            }
+            catch (error) {
+                console.error('Invalid tenant', error);
+                this.getView()?.setVisible(false);
+            }
+        }
+        this.setTenantData(tenantIdMatch ? tenantIdMatch[1] : undefined);
+        const urlAfterTenant = currentUrl.slice(1).split('/')[2];
+        // END KMS20-2751 TEMPORARY: Set the tenant from the URL
+
+        if (window.location.hash === '' || urlAfterTenant === '' || urlAfterTenant === undefined) {
             this.getRouter().navTo('keyConfigs', {
                 tenantId: this.twoWayModel.getProperty('/selectedTenant') as string
             });
@@ -113,12 +128,22 @@ export default class App extends BaseController {
         }
     }
 
-    public setTenantData(): void {
+    public setTenantData(tenantId?: string): void {
         const tenants = this.api.getTenantsList();
         if (tenants && tenants.length > 0) {
             this.oneWayModel.setProperty('/tenants', tenants);
-            this.twoWayModel.setProperty('/selectedTenant', tenants[0].id);
-            this.twoWayModel.setProperty('/selectedTenantName', tenants[0].name || '');
+            // KMS20-2751 TEMPORARY: Set the tenant from the URL
+            if (tenantId) {
+                this.twoWayModel.setProperty('/selectedTenant', tenantId);
+                const selectedTenant = tenants.find(tenant => tenant.id === tenantId);
+                this.twoWayModel.setProperty('/selectedTenantName', selectedTenant ? selectedTenant.name : '');
+            }
+            else {
+                MessageBox.error(this.getText('errorNoTenantSelected'));
+                this.getView()?.setVisible(false);
+            }
+            // KMS20-2751 TEMPORARY: this.twoWayModel.setProperty('/selectedTenant', tenants[0].id);
+            // KMS20-2751 TEMPORARY: this.twoWayModel.setProperty('/selectedTenantName', tenants[0].name || '');
         }
         else {
             MessageBox.error(this.getText('errorNoTenantsFound'));
