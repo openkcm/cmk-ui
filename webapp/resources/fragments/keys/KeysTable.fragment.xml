@@ -25,7 +25,8 @@
                     <menu>
                         <Menu class="sapUiSizeCompact">
                             <MenuItem text="{i18n>sapManaged}"
-                                press=".handleCreateKeyRoute('SYSTEM_MANAGED')">
+                                press=".handleCreateKeyRoute('SYSTEM_MANAGED')"
+                                visible="{= !!${oneWay>/keystoreSettings/default/allowManaged} }">
                                 <customData>
                                     <core:CustomData
                                         key="testId"
@@ -33,7 +34,8 @@
                                         writeToDom="true" />
                                 </customData>
                             </MenuItem>
-                            <MenuItem text="{i18n>hyok}">
+                            <MenuItem text="{i18n>hyok}"
+                                visible="{= !!${oneWay>/keystoreSettings/hyok/allow} }">
                                 <items>
                                     <MenuItemGroup
                                         items="{oneWay>/hyokProviders}"

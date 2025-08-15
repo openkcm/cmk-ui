@@ -21,7 +21,7 @@
                     <Label text="{oneWay>id}" />
                 </VBox>
                 <HBox justifyContent="SpaceBetween"
-                    class="sapUiSmallMarginBegin sapUiSmallMarginTop sapUiSmallMarginEnd"
+                    class="sapUiSmallMarginBegin sapUiSmallMarginTop sapUiSmallMarginEnd sapUiSmallMarginBottom"
                     width="100%">
                     <VBox width="50%">
                         <Label text="{i18n>keys}:" />
@@ -58,7 +58,8 @@
                         inverted="true"
                         state="Indication13" />
                 </VBox>
-                <HBox justifyContent="Center" alignItems="Center"
+                <!-- TEMP: HIDE THIS BUTTON SECTION -->
+                <!-- <HBox justifyContent="Center" alignItems="Center"
                     backgroundDesign="Solid"
                     visible="{= !${oneWay>primaryKey}}"
                     height="110px"
@@ -83,7 +84,7 @@
                             </Menu>
                         </menu>
                     </MenuButton>
-                </HBox>
+                </HBox> -->
             </VBox>
         </f:GridListItem>
     </f:GridContainer>

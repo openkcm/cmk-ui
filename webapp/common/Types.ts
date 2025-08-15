@@ -147,3 +147,14 @@ export interface hyokAWSCryptoCertInput {
     roleCryptoARN: string | null
     rootCryptoCA: string | null
 }
+export interface KeystoreResponse {
+    default: {
+        allowManaged: boolean
+        allowBYOK: boolean
+        supportedRegions: string[]
+    }
+    hyok: {
+        allow: boolean
+        providers: HYOKProviders[]
+    }
+}

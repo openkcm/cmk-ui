@@ -1,7 +1,7 @@
 import BaseController from 'kms/controller/BaseController';
 import JSONModel from 'sap/ui/model/json/JSONModel';
 import BindingMode from 'sap/ui/model/BindingMode';
-import { KeyConfig, Key, System, MangedKeyPayload, HyokKeyPayload } from 'kms/common/Types';
+import { KeyConfig, Key, System, MangedKeyPayload, HyokKeyPayload, KeystoreResponse } from 'kms/common/Types';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import Api from 'kms/services/Api.service';
 import MessageBox from 'sap/m/MessageBox';
@@ -314,6 +314,8 @@ export default class KeyConfigDetail extends BaseController {
     private async updateKeysTable() {
         this.oneWayModel.setProperty('/keysTableUpdating', true);
         const keys = await this.getKeys();
+        const keystoreSettings = await this.getkeystoreSettings();
+        this.oneWayModel.setProperty('/keystoreSettings', keystoreSettings);
         this.oneWayModel.setProperty('/keys', keys?.value);
         this.oneWayModel.setProperty('/keysCount', keys?.count || 0);
         this.keysPaginationModel.setProperty('/totalPages', Math.ceil((keys?.count ?? 0) / this.top));
@@ -342,6 +344,16 @@ export default class KeyConfigDetail extends BaseController {
         catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorFetchingKeyDetails'));
+        }
+    }
+
+    private async getkeystoreSettings() {
+        try {
+            return await this.api.get<KeystoreResponse>('tenants/keystores');
+        }
+        catch (error) {
+            console.error(error);
+            showErrorMessage(error as AxiosError, this.getText('errorFetchingKeystoreDetails'));
         }
     }
 

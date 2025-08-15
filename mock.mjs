@@ -113,6 +113,9 @@ app.get("/api/v1/tenant1/keyConfigurations/:keyConfigurationID/certificates", (r
     const { keyConfigurationID } = req.params;
     res.json(managementAndCryptoCerts(keyConfigurationID));
 });
+app.get("/api/v1/tenant1/tenants/keystores", (req, res) => {
+    res.json(generateKeyStores());
+});
 
 
 app.listen(3000, () => console.log("API Server running..."));

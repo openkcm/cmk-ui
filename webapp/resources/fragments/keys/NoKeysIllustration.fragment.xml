@@ -20,8 +20,10 @@
                     <menu>
                         <Menu class="sapUiSizeCompact">
                             <MenuItem text="{i18n>sapManaged}"
-                                press=".handleCreateKeyRoute('SYSTEM_MANAGED')" />
-                            <MenuItem text="{i18n>hyok}">
+                                press=".handleCreateKeyRoute('SYSTEM_MANAGED')"
+                                visible="{= !!${oneWay>/keystoreSettings/default/allowManaged} }" />
+                            <MenuItem text="{i18n>hyok}"
+                                visible="{= !!${oneWay>/keystoreSettings/hyok/allow} }">
                                 <items>
                                     <MenuItemGroup
                                         items="{oneWay>/hyokProviders}"
