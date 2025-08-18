@@ -125,8 +125,10 @@
                     </ObjectPageSubSection>
                 </subSections>
             </ObjectPageSection>
+            <!-- TEMP: versions section is temporarily hidden for HYOK as there is not concept
+            proof for HYOK rotation yet -->
             <ObjectPageSection titleUppercase="false" id="detailPanelObjectPageSectionVersions"
-                visible="{= ${oneWay>/type} === 'key'}"
+                visible="{= ${oneWay>/type} === 'key' &amp;&amp; ${oneWay>/selectedKey/type} !== 'HYOK' }"
                 title="{i18n>versions}"
                 showTitle="false">
                 <subSections>
