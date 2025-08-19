@@ -342,6 +342,7 @@ export default class KeyCreation extends BaseController {
     // this should be refactored later when crypto certs grouping is supported
     // this is only for AWS HYOK
     public addARNs(): void {
+        this.HYOKKeyCreationWizard?.setBusy(true);
         let hyokAWSCryptoCertObj = this.keyCreationModel.getProperty('/hyokAWSCryptoCertObj') as hyokAWSCryptoCertInput[] || [];
         const selectedCryptoRolesCertKeys = this.keyCreationModel.getProperty('/selectedCryptoRolesCertKeys') as string[];
         const allCryptoCerts = this.keyCreationModel.getProperty('/cryptoRolesCerts') as AWScertificates[];
@@ -358,14 +359,15 @@ export default class KeyCreation extends BaseController {
         // diable the add more crypto certs button if all crypto certs are selected
         const allCryptoCertsSelected = availableCryptoCertsSelectionList.length === 0;
         this.keyCreationModel.setProperty('/allowAddMoreCryptoCert', !allCryptoCertsSelected);
+        this.HYOKKeyCreationWizard?.setBusy(false);
     }
 
     public setManagementCertStepValidation(): void {
         const hyokAWSManagementCertObj = this.keyCreationModel.getProperty('/hyokAWSManagementCertObj') as hyokAWSManagementCertInput;
         const managementRolesComplete
             = (hyokAWSManagementCertObj?.trustAnchorARN ?? '').length > 0
-              && (hyokAWSManagementCertObj?.roleARN ?? '').length > 0
-              && (hyokAWSManagementCertObj?.rootCA ?? '').length > 0;
+            && (hyokAWSManagementCertObj?.roleARN ?? '').length > 0
+            && (hyokAWSManagementCertObj?.rootCA ?? '').length > 0;
         this.keyCreationModel.setProperty('/hyokManagementRoleStepValid', managementRolesComplete);
     }
 

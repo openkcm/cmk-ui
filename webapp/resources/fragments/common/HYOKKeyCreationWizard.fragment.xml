@@ -151,7 +151,7 @@
                                             </items>
                                         </VBox>
 
-                                        <VBox>
+                                        <VBox visible="{= !!${model>/allowAddMoreCryptoCert}}">
                                             <Text text="{i18n>addCertARNs}" />
                                             <HBox width="100%"
                                                 class="sapUiMarginTop"
@@ -163,17 +163,13 @@
                                                     }"
                                                     selectedKeys="{model>/selectedCryptoRolesCertKeys}"
                                                     showSelectAll="false"
+                                                    selectionFinish="addARNs"
                                                     width="25rem">
-
                                                     <core:Item
                                                         key="{model>name}"
-                                                        text="{parts: ['model>rootCA', 'model>subject'], formatter: 'commonFormatter.formatCert'}"
-                                                    >
+                                                        text="{parts: ['model>rootCA', 'model>subject'], formatter: 'commonFormatter.formatCert'}">
                                                     </core:Item>
                                                 </MultiComboBox>
-                                                <Button text="{i18n>addARNs}"
-                                                    enabled="{= ${model>/selectedCryptoRolesCertKeys}.length > 0 &amp;&amp; ${model>/allowAddMoreCryptoCert} }"
-                                                    press="addARNs" />
                                             </HBox>
                                         </VBox>
                                     </WizardStep>
