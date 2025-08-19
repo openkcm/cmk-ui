@@ -15,9 +15,15 @@ import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import { BYOKProviders, HYOKProviders } from 'kms/common/Enums';
 import { _isNameValid } from 'kms/common/Helpers';
 import { AxiosError } from 'axios';
+import { Groups } from 'kms/common/Types';
 
 interface KeyConfigsResponse {
     value: KeyConfig[]
+    count: number
+}
+
+interface GroupsResponse {
+    value: Groups[]
     count: number
 }
 export default class Keys extends BaseController {
@@ -77,13 +83,13 @@ export default class Keys extends BaseController {
         this.oneWayModel.setProperty('/hyokProviders', hyokProviders);
     }
 
-    private async onNextPage() {
+    private async onNextPage(): Promise<void> {
         this.currentPage++;
         this.skip += 10;
         await this.setKeyConfigs();
     }
 
-    private async onPreviousPage() {
+    private async onPreviousPage(): Promise<void> {
         this.currentPage--;
         this.skip -= 10;
         await this.setKeyConfigs();
@@ -180,6 +186,15 @@ export default class Keys extends BaseController {
     public async onCreateConfigPress(): Promise<void> {
         const view = this.getView();
         const component = this.getOwnerComponent();
+        try {
+            await this.getGroups();
+            const groupsData: Groups[] = this.oneWayModel.getProperty('/groupsData') as Groups[] || [];
+            groupsData.unshift({ id: '', name: this.getText('selectAdminGroup'), groups: [], edit: false });
+            this.createConfigModel.setProperty('/adminGroupList', groupsData);
+        }
+        catch (error) {
+            console.error(error);
+        }
         if (!view || !component) {
             console.error('View or component is undefined');
             return;
@@ -201,6 +216,22 @@ export default class Keys extends BaseController {
         }
     };
 
+    private async getGroups(): Promise<void> {
+        this.getView()?.setBusy(true);
+        try {
+            const groups = await this.api.get<GroupsResponse>('groups', { $top: this.top, $skip: this.skip });
+            const groupsData = groups.value;
+            this.oneWayModel.setProperty('/groupsData', groupsData);
+        }
+        catch (error) {
+            console.error(error);
+            showErrorMessage(error as AxiosError, this.getText('errorFetchingGroups'));
+        }
+        finally {
+            this.getView()?.setBusy(false);
+        }
+    };
+
     public async onConfigCreationCreatePress(): Promise<void> {
         interface KeyConfigPostPayload {
             name: string
@@ -210,12 +241,11 @@ export default class Keys extends BaseController {
 
         const name = this.createConfigModel.getProperty('/name') as string;
         const description = this.createConfigModel.getProperty('/description') as string;
-        // @TODO Temporary until backend implements user management
-        // const adminGroup = this.createConfigModel.getProperty('/adminGroup') as string;
+        const adminGroup = this.createConfigModel.getProperty('/adminGroup') as string;
         const newConfig = {
             name: name,
             description: description,
-            adminGroupID: '9e04db3d-059d-49bf-9356-b9bc36453f99'
+            adminGroupID: adminGroup
         } as KeyConfigPostPayload;
 
         this.getView()?.setBusy(true);
@@ -294,20 +324,7 @@ export default class Keys extends BaseController {
             name: '' as string,
             description: '' as string,
             adminGroup: '' as string,
-            adminGroupList: [
-                {
-                    key: '',
-                    text: this.getText('selectAdminGroup')
-                },
-                {
-                    key: 'adminGroup1',
-                    text: 'Admin Group 1'
-                },
-                {
-                    key: 'adminGroup2',
-                    text: 'Admin Group 2'
-                }
-            ] as object[],
+            adminGroupList: [{ id: '', name: this.getText('selectAdminGroup') }] as Groups[], // Add default group
             createButtonEnabled: false as boolean,
             nameValueState: 'None' as string,
             nameValueStateText: '' as string,

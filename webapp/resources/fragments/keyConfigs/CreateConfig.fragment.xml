@@ -46,7 +46,7 @@
                     forceSelection="true"
                     selectedKey="{model>/adminGroup}"
                     items="{model>/adminGroupList}">
-                    <core:Item key="{model>key}" text="{model>text}" />
+                    <core:Item key="{model>id}" text="{model>name}" />
                     <customData>
                         <core:CustomData
                             key="testId"

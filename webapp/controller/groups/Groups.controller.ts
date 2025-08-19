@@ -89,7 +89,7 @@ export default class Group extends BaseController {
                 adminGroupList: [
                     {
                         key: '',
-                        text: 'Tenant Administrator'
+                        text: 'Key Administrator'
                     }
                 ],
                 createButtonEnabled: false as boolean,
@@ -166,7 +166,7 @@ export default class Group extends BaseController {
         const newGroup = {
             name: name,
             description: description,
-            role: 'Tenant Administrator'
+            role: 'Key Administrator'
         } as GroupPostPayload;
 
         this.getView()?.setBusy(true);
