@@ -43,8 +43,7 @@ export function setSystemType(type: string): string {
             return '';
     }
 }
-
-export function setSystemStatusIcon(status: SystemStatus): string {
+export function setSystemStatusIcon(status: SystemStatus | undefined): string | null {
     switch (status) {
         case SystemStatus.CONNECTED:
             return 'sap-icon://sys-enter-2';
@@ -53,20 +52,19 @@ export function setSystemStatusIcon(status: SystemStatus): string {
         case SystemStatus.FAILED:
             return 'sap-icon://message-error';
         default:
-            return '';
+            return null;
     }
 }
-
-export function setSystemStatusColor(status: string): string {
+export function setSystemStatusColor(status: SystemStatus | undefined): string | null {
     switch (status) {
-        case 'CONNECTED':
+        case SystemStatus.CONNECTED:
             return 'Indication14';
-        case 'PROCESSING':
+        case SystemStatus.PROCESSING:
             return 'Indication15';
-        case 'FAILED':
+        case SystemStatus.FAILED:
             return 'Indication11';
         default:
-            return '';
+            return null;
     }
 }
 export function formatCert(rootCA: string, subject: string): string {

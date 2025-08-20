@@ -72,13 +72,9 @@
             <Column minScreenWidth="Tablet" demandPopin="true">
                 <Text text="{i18n>systemsRole}" />
             </Column>
-            <Column minScreenWidth="Tablet" demandPopin="true"
-                visible="{= !${oneWay>/keyConfigDetail}}">
-                <Text text="{i18n>keyConfiguration}" />
-            </Column>
-            <Column minScreenWidth="Tablet" demandPopin="true"
-                visible="{= !!${oneWay>/keyConfigDetail}}">
-                <Text text="{i18n>state}" />
+            <Column minScreenWidth="Tablet" demandPopin="true">
+                <Text
+                    text="{= !!${oneWay>/keyConfigDetail} ? ${i18n>state} : ${i18n>keyConfiguration}}" />
             </Column>
             <Column minScreenWidth="Tablet" demandPopin="true"
                 visible="{= !!${oneWay>/keyConfigDetail}}" hAlign="End"
@@ -98,7 +94,7 @@
                                 writeToDom="true" />
                         </customData>
                     </ObjectIdentifier>
-                    <Text text="{oneWay>id}">
+                    <Text text="{oneWay>externalID}">
                         <customData>
                             <core:CustomData
                                 key="testId"
@@ -123,7 +119,7 @@
                                 writeToDom="true" />
                         </customData>
                     </Text>
-                    <VBox visible="{= !${oneWay>/keyConfigDetail}}">
+                    <VBox>
                         <ObjectStatus
                             icon="{parts: ['oneWay>status'], formatter: 'commonFormatter.setSystemStatusIcon'}"
                             text="{parts: ['oneWay>status'], formatter: '.getText'}"
@@ -151,16 +147,7 @@
                             </customData>
                         </Button>
                     </VBox>
-                    <VBox justifyContent="Center">
-                        <tnt:InfoLabel
-                            visible="{= ${oneWay>status} === 'CONNECTED'}"
-                            text="{i18n>connected}"
-                            colorScheme="8" />
-                        <tnt:InfoLabel
-                            visible="{= ${oneWay>status} === 'DISCONNECTED'}"
-                            text="{i18n>disconnected}"
-                            colorScheme="2" />
-                    </VBox>
+
                     <VBox alignContent="Center"
                         justifyContent="Start">
                         <MenuButton icon="sap-icon://action-settings" type="Transparent">

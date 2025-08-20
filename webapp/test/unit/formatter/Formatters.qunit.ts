@@ -17,22 +17,22 @@ QUnit.test('The setSystemStatusIcon method with a FAILED state', function (asser
 });
 QUnit.test('The setSystemStatusIcon method with an unknown state', function (assert) {
     const result = Formatters.setSystemStatusIcon('UNKNOWN' as SystemStatus);
-    assert.strictEqual(result, '', 'The icon for an unknown state is empty');
+    assert.strictEqual(result, null, 'The icon for an unknown state is empty');
 });
 
 QUnit.test('The setSystemStatusColor method with a CONNECTED state', function (assert) {
-    const result = Formatters.setSystemStatusColor('CONNECTED');
+    const result = Formatters.setSystemStatusColor(SystemStatus.CONNECTED);
     assert.strictEqual(result, 'Indication14', 'The color for CONNECTED state is correct');
 });
 QUnit.test('The setSystemStatusColor method with a PROCESSING state', function (assert) {
-    const result = Formatters.setSystemStatusColor('PROCESSING');
+    const result = Formatters.setSystemStatusColor(SystemStatus.PROCESSING);
     assert.strictEqual(result, 'Indication15', 'The color for PROCESSING state is correct');
 });
 QUnit.test('The setSystemStatusColor method with a FAILED state', function (assert) {
-    const result = Formatters.setSystemStatusColor('FAILED');
+    const result = Formatters.setSystemStatusColor(SystemStatus.FAILED);
     assert.strictEqual(result, 'Indication11', 'The color for FAILED state is correct');
 });
 QUnit.test('The setSystemStatusColor method with an unknown state', function (assert) {
-    const result = Formatters.setSystemStatusColor('UNKNOWN');
-    assert.strictEqual(result, '', 'The color for an unknown state is empty');
+    const result = Formatters.setSystemStatusColor('UNKNOWN' as SystemStatus);
+    assert.strictEqual(result, null, 'The color for an unknown state is empty');
 });
