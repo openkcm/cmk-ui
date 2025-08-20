@@ -166,7 +166,7 @@ export default class Group extends BaseController {
         const newGroup = {
             name: name,
             description: description,
-            role: 'Key Administrator'
+            role: 'KEY_ADMINISTRATOR'
         } as GroupPostPayload;
 
         this.getView()?.setBusy(true);
