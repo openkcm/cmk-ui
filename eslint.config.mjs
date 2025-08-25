@@ -36,6 +36,7 @@ export default tseslint.config(
       "node_modules/**/*",
       "coverage/**/*",
       "report/**/*",
+      "webapp/control/**/*.gen.d.ts"
     ],
   },
 );
