@@ -314,6 +314,7 @@ export default class KeyCreation extends BaseController {
         payload = {
             name: this.keyCreationModel.getProperty('/keyName') as string,
             nativeId: this.keyCreationModel.getProperty('/keyARN') as string,
+            description: this.keyCreationModel.getProperty('/description') as string,
             type: this.type,
             keyConfigurationID: this.keyConfigId,
             provider: this.subtype,
@@ -326,7 +327,6 @@ export default class KeyCreation extends BaseController {
                 crypto: this.getCryptoPayload()
 
             }
-
         };
         return payload;
     }

@@ -45,6 +45,17 @@
                                                 class="sapUiSmallMarginTop" />
                                             <Input value="{model>/keyARN}"
                                                 valueLiveUpdate="true" />
+                                            <Label text="{i18n>keyDescription}:"
+                                                class="sapUiTinyMarginTop" />
+                                            <TextArea value="{model>/description}" rows="4"
+                                                width="100%">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="hyok-keyCreationWizard-descriptionInput"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </TextArea>
                                         </VBox>
                                     </WizardStep>
                                     <WizardStep id="HYOKManagementRoleStep"
@@ -205,6 +216,18 @@
                                             <Label text="{i18n>keyARN}" />
                                             <Input value="{model>/keyARN}"
                                                 editable="false" />
+                                            <Label text="{i18n>keyDescription}:"
+                                                class="sapUiTinyMarginTop" />
+                                            <TextArea editable="false" value="{model>/description}"
+                                                rows="4"
+                                                width="100%">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="hyok-keyCreationWizard-descriptionText"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </TextArea>
                                         </form:content>
                                     </form:SimpleForm>
 
