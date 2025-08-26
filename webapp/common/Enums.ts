@@ -98,4 +98,9 @@ export enum SystemStatus {
     FAILED = 'FAILED'
 }
 
-export default { KeyStates, CloudProviders, KeyCreationTypes, KeyConfigDetailPanelTypes, TaskStatus, TaskStateTransitionAction, TaskStates, ActionTypes, ArtifactTypes, WorkflowActionTypes, TaskType, EventChannelIds, EventIDs, HYOKProviders, BYOKProviders, SystemStatus };
+export enum SystemType {
+    SYSTEM = 'SYSTEM',
+    SUBACCOUNT = 'SUBACCOUNT'
+}
+
+export default { KeyStates, CloudProviders, KeyCreationTypes, KeyConfigDetailPanelTypes, TaskStatus, TaskStateTransitionAction, TaskStates, ActionTypes, ArtifactTypes, WorkflowActionTypes, TaskType, EventChannelIds, EventIDs, HYOKProviders, BYOKProviders, SystemStatus, SystemType };

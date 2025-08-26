@@ -4,6 +4,8 @@ import Theming from 'sap/ui/core/Theming';
 import { loadConfig } from './utils/Config';
 import Api from './services/Api.service';
 import MessageBox from 'sap/m/MessageBox';
+import ResourceModel from 'sap/ui/model/resource/ResourceModel';
+import Core from 'sap/ui/core/Core';
 /**
  * @namespace kms
  */
@@ -21,6 +23,15 @@ export default class Component extends UIComponent {
 
     private async asyncInit(): Promise<void> {
         super.init();
+
+        const i18nModel = new ResourceModel({
+            bundleName: 'kms.i18n.i18n'
+        });
+        this.setModel(i18nModel, 'i18n');
+        // The method below is deprecated but there is no acceptable alternative to set a global model, so this is needed for now
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        Core.setModel(i18nModel, 'i18n');
+
         this.apiInitializedPromise = (async () => {
             try {
                 const config = await loadConfig();

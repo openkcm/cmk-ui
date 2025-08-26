@@ -1,4 +1,5 @@
-import { TaskStates, SystemStatus } from './Enums';
+import { TaskStates, SystemStatus, SystemType } from './Enums';
+import { getText } from 'kms/common/Helpers';
 
 export function setTaskStatus(state: TaskStates): string {
     switch (state) {
@@ -33,12 +34,12 @@ export function setTaskStatusIndicationState(state: TaskStates): string {
             return '';
     }
 }
-export function setSystemType(type: string): string {
+export function setSystemType(type: SystemType): string {
     switch (type) {
-        case 'SYSTEM':
-            return 'System';
-        case 'SUBACCOUNT':
-            return 'Subaccount';
+        case SystemType.SYSTEM:
+            return getText('SYSTEM');
+        case SystemType.SUBACCOUNT:
+            return getText('subaccount');
         default:
             return '';
     }
