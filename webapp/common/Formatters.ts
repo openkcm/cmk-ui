@@ -81,7 +81,6 @@ export function formatCert(rootCA: string, subject: string): string {
     const cert = `Root CA:\n ${rootCA}\nSubject:\n${subject}`;
     return cert;
 }
-
 export function setGroupRole(role: GroupRoles): string {
     switch (role) {
         case GroupRoles.KEY_ADMINISTRATOR:

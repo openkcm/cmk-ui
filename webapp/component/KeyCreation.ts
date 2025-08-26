@@ -14,6 +14,7 @@ import Fragment from 'sap/ui/core/Fragment';
 import JSONModel from 'sap/ui/model/json/JSONModel';
 import Model from 'sap/ui/model/Model';
 import ResourceModel from 'sap/ui/model/resource/ResourceModel';
+import { Button$PressEvent } from 'sap/m/Button';
 
 interface KeyCreationParams {
     keyConfigId: string
@@ -363,6 +364,32 @@ export default class KeyCreation extends BaseController {
         const allCryptoCertsSelected = availableCryptoCertsSelectionList.length === 0;
         this.keyCreationModel.setProperty('/allowAddMoreCryptoCert', !allCryptoCertsSelected);
         this.HYOKKeyCreationWizard?.setBusy(false);
+    }
+
+    public onRemoveCryptoCert(event: Button$PressEvent): void {
+        const path = event.getSource().getBindingContext('model')?.getPath();
+        if (!path) {
+            console.error('Error removing selected crpyto cert ARNs: Invalid binding context path');
+            showErrorMessage(new AxiosError('Invalid binding context path'), this.parentController.getText('errorGeneric'));
+            return;
+        }
+        const segments = path.split('/');
+        const lastSegment = segments[segments.length - 1];
+        const index = parseInt(lastSegment, 10);
+
+        // Remove item at 'index' from 'hyokAWSCryptoCertObj'
+        const hyokAWSCryptoCertObj = this.keyCreationModel.getProperty('/hyokAWSCryptoCertObj') as hyokAWSCryptoCertInput[];
+        const removedCerts = hyokAWSCryptoCertObj[index].selectedCryptoCerts as AWScertificates[] | [];
+        const newArray = hyokAWSCryptoCertObj.filter((_, i) => i !== index);
+        this.keyCreationModel.setProperty('/hyokAWSCryptoCertObj', newArray);
+
+        // Add certs back to availableCryptoCertsSelectionList
+        let availableCryptoCertsSelectionList = this.keyCreationModel.getProperty('/availableCryptoCertsSelectionList') as AWScertificates[] || [];
+        availableCryptoCertsSelectionList = [...availableCryptoCertsSelectionList, ...removedCerts];
+        this.keyCreationModel.setProperty('/availableCryptoCertsSelectionList', availableCryptoCertsSelectionList);
+        if (availableCryptoCertsSelectionList.length > 0) {
+            this.keyCreationModel.setProperty('/allowAddMoreCryptoCert', true);
+        }
     }
 
     public setManagementCertStepValidation(): void {

@@ -140,7 +140,6 @@ export interface hyokAWSManagementCertInput {
     rootCA: string | null
 }
 export interface hyokAWSCryptoCertInput {
-    availableCryptoCertsSelectionList?: AWScertificates[]
     selectedCryptoRolesCertKeys?: string[]
     selectedCryptoCerts?: AWScertificates[]
     trustAnchorCryptoARN: string | null
