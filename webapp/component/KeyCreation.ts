@@ -345,6 +345,13 @@ export default class KeyCreation extends BaseController {
         this.HYOKKeyCreationWizard?.setBusy(true);
         let hyokAWSCryptoCertObj = this.keyCreationModel.getProperty('/hyokAWSCryptoCertObj') as hyokAWSCryptoCertInput[] || [];
         const selectedCryptoRolesCertKeys = this.keyCreationModel.getProperty('/selectedCryptoRolesCertKeys') as string[];
+
+        // EDGE CASE: if no certs are selected (can happen if the user clcks outside the scope of the listed items), return
+        if (selectedCryptoRolesCertKeys.length === 0) {
+            this.HYOKKeyCreationWizard?.setBusy(false);
+            return;
+        }
+
         const allCryptoCerts = this.keyCreationModel.getProperty('/cryptoRolesCerts') as AWScertificates[];
         const selectedCryptoCerts = allCryptoCerts.filter((cert: AWScertificates) => selectedCryptoRolesCertKeys.includes(cert.name));
 
