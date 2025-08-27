@@ -43,6 +43,15 @@ export function setSystemType(type: string): string {
             return '';
     }
 }
+export function setSystemRole(role?: string, roleID?: string): string {
+    if (role && roleID) {
+        return `${roleID} - ${role}`;
+    }
+    if (roleID) {
+        return roleID;
+    }
+    return role || '';
+}
 export function setSystemStatusIcon(status: SystemStatus | undefined): string | null {
     switch (status) {
         case SystemStatus.CONNECTED:

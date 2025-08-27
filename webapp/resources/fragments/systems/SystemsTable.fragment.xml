@@ -111,7 +111,7 @@
                                 writeToDom="true" />
                         </customData>
                     </Text>
-                    <Text text="{oneWay>systemRole}">
+                    <Text text="{parts: ['oneWay>role', 'oneWay>roleID'], formatter: 'commonFormatter.setSystemRole'}">
                         <customData>
                             <core:CustomData
                                 key="testId"
