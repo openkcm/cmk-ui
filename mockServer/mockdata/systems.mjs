@@ -1,7 +1,7 @@
 import Chance from "chance";
 const chance = new Chance();
 export default (systemId, keyConfigurationID) => {
-    const states = ['CONNECTED', 'PENDING', 'AWAITING_APPROVAL'];
+    const states = ['CONNECTED', 'PROCESSING', 'FAILED', 'DISCONNECTED'];
     const generateSystems = (count, keyConfigurationID) => {
         const response = Array.from({ length: count }, () => (
             {
@@ -12,7 +12,7 @@ export default (systemId, keyConfigurationID) => {
                 name: `System ${chance.animal()}`,
                 region: chance.pickone(['eu-central-1', 'us-east-1', 'us-west-2']),
                 role: chance.pickone(["SAP Analytics Cloud", "SuccessFactors Learning", "SAP Ariba", "SAP Fieldglass", "SAP Concur"]),
-                status: chance.pickone(['CONNECTED, DISCONNECTED']),
+                status: chance.pickone(states),
                 type: "SYSTEM"
             }
         ));
@@ -32,7 +32,7 @@ export default (systemId, keyConfigurationID) => {
             name: `System ${chance.animal()}`,
             region: chance.pickone(['eu-central-1', 'us-east-1', 'us-west-2']),
             role: chance.pickone(["SAP Analytics Cloud", "SuccessFactors Learning", "SAP Ariba", "SAP Fieldglass", "SAP Concur"]),
-            status: chance.pickone(['CONNECTED, DISCONNECTED']),
+            status: chance.pickone(states),
             type: "SYSTEM"
         }
     } else {
