@@ -5,6 +5,8 @@
     <Table
         id="userGroupsTable"
         inset="false"
+        contextualWidth="Auto"
+        popinLayout="GridSmall"
         items="{oneWay>/groupsData}">
         <headerToolbar>
             <OverflowToolbar>
@@ -15,13 +17,16 @@
         </headerToolbar>
         <columns>
             <Column minScreenWidth="Tablet" demandPopin="true">
-                <Text text="{i18n>name}" />
+                <Text text="{i18n>name}" wrapping="false" />
             </Column>
             <Column minScreenWidth="Tablet" demandPopin="true">
-                <Text text="{i18n>systemsRole}" />
+                <Text text="{i18n>systemsRole}" wrapping="false" />
             </Column>
             <Column minScreenWidth="Tablet" demandPopin="true">
-                <Text text="{i18n>actions}" />
+                <Text text="{i18n>iamId}" wrapping="false" />
+            </Column>
+            <Column minScreenWidth="Large" hAlign="End" vAlign="Middle" demandPopin="true">
+                <Text text="{i18n>actions}" wrapping="false" />
             </Column>
         </columns>
         <items>
@@ -46,7 +51,8 @@
                             </customData>
                         </Text>
                     </VBox>
-                    <Text text="{parts: ['oneWay>role'], formatter: 'commonFormatter.setGroupRole'}"/>
+                    <Text text="{parts: ['oneWay>role'], formatter: 'commonFormatter.setGroupRole'}" />
+                    <Text text="{path:'oneWay>iamIdentifier'}" />
                     <VBox>
                         <MenuButton icon="sap-icon://action-settings" type="Transparent"
                             visible="{= !${oneWay>edit}}">
