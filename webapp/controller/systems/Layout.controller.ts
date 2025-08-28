@@ -4,6 +4,9 @@ import JSONModel from 'sap/ui/model/json/JSONModel';
 import Api from 'kms/services/Api.service';
 import { Router$RouteMatchedEvent } from 'sap/ui/core/routing/Router';
 
+/**
+ * @namespace kms
+ */
 export default class Systems extends BaseController {
     private api: Api;
 

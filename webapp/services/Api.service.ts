@@ -3,6 +3,9 @@ interface TenantsResponse {
     value: { id: string, name?: string }[]
     count: number
 }
+/**
+ * @namespace kms
+ */
 export default class Api {
     private static instance: Api;
     private readonly axiosInstance: AxiosInstance;

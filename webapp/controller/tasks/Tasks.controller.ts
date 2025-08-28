@@ -14,6 +14,9 @@ interface WorkflowTasksResponse {
     count: number
 }
 
+/**
+ * @namespace kms
+ */
 export default class Tasks extends BaseController {
     private api: Api;
     private eventBus = EventBus.getInstance();

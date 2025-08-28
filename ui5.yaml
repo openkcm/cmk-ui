@@ -4,7 +4,7 @@ metadata:
 type: application
 framework:
   name: OpenUI5
-  version: "1.136.0"
+  version: "1.139.0"
   libraries:
     - name: sap.m
     - name: sap.tnt
@@ -29,19 +29,5 @@ server:
       afterMiddleware: compression
     - name: ui5-tooling-transpile-middleware
       afterMiddleware: compression
-      configuration:
-        debug: true
-        babelConfig:
-          sourceMaps: true
-          ignore:
-          - "**/*.d.ts"
-          presets:
-          - - "@babel/preset-env"
-            - targets: defaults
-          - - transform-ui5
-            - overridesToOverride: true
-          - "@babel/preset-typescript"
-          plugins:
-          - istanbul
     - name: ui5-middleware-livereload
       afterMiddleware: compression

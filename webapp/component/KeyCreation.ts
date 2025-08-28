@@ -32,6 +32,9 @@ interface HYOKAWScertificates {
     }
 }
 
+/**
+ * @namespace kms
+ */
 export default class KeyCreation extends BaseController {
     private readonly keyCreationModel = new JSONModel({}); // This model should be initialized with the correct structure based on the key creation wizard requirements (for managed key, HYOK and BYOK)
     private api: Api;

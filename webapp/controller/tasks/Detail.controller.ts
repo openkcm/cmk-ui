@@ -21,6 +21,9 @@ interface TaskTransitionActionsObj {
     buttonType: 'Accept' | 'Reject'
 }
 
+/**
+ * @namespace kms
+ */
 export default class Tasks extends BaseController {
     private api: Api;
     private taskId: string;

@@ -22,6 +22,9 @@ interface KeyVersionResponse {
     count: number | undefined
 }
 
+/**
+ * @namespace kms
+ */
 export default class DetailPanel extends BaseController {
     public formatter: typeof Formatter = Formatter;
     private api: Api;

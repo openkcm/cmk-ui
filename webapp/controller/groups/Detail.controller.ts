@@ -14,6 +14,9 @@ interface GroupResponse {
     count: number
 }
 
+/**
+ * @namespace kms
+ */
 export default class GroupDetail extends BaseController {
     private api: Api;
     private groupId: string;

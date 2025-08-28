@@ -9,7 +9,10 @@ import { Menu$ItemSelectedEvent } from 'sap/m/Menu';
 import Api from 'kms/services/Api.service';
 import MessageBox from 'sap/m/MessageBox';
 import Component from 'kms/Component';
-
+import MenuItem from 'sap/m/MenuItem';
+/**
+ * @namespace kms
+ */
 export default class App extends BaseController {
     private api: Api;
     private userPopover: ResponsivePopover | undefined;
@@ -182,13 +185,16 @@ export default class App extends BaseController {
     }
 
     public onTenantChanged(event: Menu$ItemSelectedEvent): void {
-        const selectedTenant = event.getParameter('item')?.getKey();
-        const selectedTenantName = event.getParameter('item')?.getText();
-        this.twoWayModel.setProperty('/selectedTenant', selectedTenant);
-        this.twoWayModel.setProperty('/selectedTenantName', selectedTenantName);
-        this.api = Api.getInstance();
-        Api.updateTenantId(selectedTenant || '');
-        this.navigateToSelectedPage();
+        const item = event.getParameter('item');
+        if (item instanceof MenuItem) {
+            const selectedTenant = item.getKey();
+            const selectedTenantName = item.getText();
+            this.twoWayModel.setProperty('/selectedTenant', selectedTenant);
+            this.twoWayModel.setProperty('/selectedTenantName', selectedTenantName);
+            this.api = Api.getInstance();
+            Api.updateTenantId(selectedTenant || '');
+            this.navigateToSelectedPage();
+        }
     }
 
     private navigateToSelectedPage(): void {

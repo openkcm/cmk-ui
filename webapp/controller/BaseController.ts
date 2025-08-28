@@ -6,6 +6,9 @@ import Model from 'sap/ui/model/Model';
 import Router from 'sap/ui/core/routing/Router';
 import { Link$PressEvent } from 'sap/m/Link';
 import { getText } from 'kms/common/Helpers';
+/**
+ * @namespace kms
+ */
 export default class BaseController extends Controller {
     public Enums: typeof Enums;
     public Constants: typeof Constants;

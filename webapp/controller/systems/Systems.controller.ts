@@ -24,6 +24,9 @@ interface KeyConfigsResponse {
     value: KeyConfig[]
     count: number
 }
+/**
+ * @namespace kms
+ */
 export default class Systems extends BaseController {
     private api: Api;
     private connectTargetSystem: Dialog | undefined;

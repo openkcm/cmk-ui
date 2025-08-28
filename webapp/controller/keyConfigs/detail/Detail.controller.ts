@@ -54,6 +54,9 @@ interface KeyCreationParams {
     keyType: KeyCreationTypes
     keySubtype: HYOKProviders | BYOKProviders
 }
+/**
+ * @namespace kms
+ */
 export default class KeyConfigDetail extends BaseController {
     private api: Api;
     private filterPopover: ViewSettingsDialog | undefined;

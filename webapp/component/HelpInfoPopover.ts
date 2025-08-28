@@ -5,6 +5,9 @@ import Popover from 'sap/m/Popover';
 import Fragment from 'sap/ui/core/Fragment';
 import JSONModel from 'sap/ui/model/json/JSONModel';
 
+/**
+ * @namespace kms
+ */
 export default class HelpInfoPopover extends BaseController {
     private readonly helpInfoModel = new JSONModel({});
     private helpInfoPopover: Popover | undefined;

@@ -26,6 +26,9 @@ interface GroupsResponse {
     value: Groups[]
     count: number
 }
+/**
+ * @namespace kms
+ */
 export default class Keys extends BaseController {
     private api: Api;
     private readonly oneWayModel = new JSONModel({

@@ -3,6 +3,9 @@ import BindingMode from 'sap/ui/model/BindingMode';
 import JSONModel from 'sap/ui/model/json/JSONModel';
 import { Router$RouteMatchedEvent } from 'sap/ui/core/routing/Router';
 
+/**
+ * @namespace kms
+ */
 export default class KeyConfigDetailLayout extends BaseController {
     private readonly oneWayModel = new JSONModel({});
 
