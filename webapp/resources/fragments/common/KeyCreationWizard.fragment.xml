@@ -81,6 +81,24 @@
                                             </customData>
                                         </Select>
                                     </WizardStep>
+                                    <WizardStep id="keyTypeStep"
+                                        validated="{model>/keyTypeStepValid}"
+                                        title="{i18n>keyType}"
+                                        activate="">
+                                        <SegmentedButton selectedKey="{model>/algorithm}">
+                                            <customData>
+                                                <core:CustomData
+                                                    key="testId"
+                                                    value="keyCreationWizard-typeButton"
+                                                    writeToDom="true" />
+                                            </customData>
+                                            <items>
+                                                <SegmentedButtonItem text="AES-256" key="AES256" />
+                                                <SegmentedButtonItem text="RSA-3072" key="RSA3072" />
+                                                <SegmentedButtonItem text="RSA-4096" key="RSA4096" />
+                                            </items>
+                                    </SegmentedButton>
+                                </WizardStep>
                                 </Wizard>
                             </content>
                         </Page>
@@ -178,6 +196,8 @@
                                             <Toolbar>
                                                 <Title text="3. {i18n>keyType}" />
                                                 <ToolbarSpacer />
+                                                <Button press=".onNavBackToStepPress(2)"
+                                                    text="{i18n>edit}" />
                                             </Toolbar>
                                         </form:toolbar>
                                         <form:content>

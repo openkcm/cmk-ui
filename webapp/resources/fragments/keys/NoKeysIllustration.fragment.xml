@@ -22,6 +22,16 @@
                             <MenuItem text="{i18n>sapManaged}"
                                 press=".handleCreateKeyRoute('SYSTEM_MANAGED')"
                                 visible="{= !!${oneWay>/keystoreSettings/default/allowManaged} }" />
+                            <MenuItem text="{i18n>byok}"
+                                press=".handleCreateKeyRoute('BYOK')"
+                                visible="{= !!${oneWay>/keystoreSettings/default/allowManaged} }">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keysTable-createByokKey"
+                                        writeToDom="true" />
+                                </customData>
+                            </MenuItem>
                             <MenuItem text="{i18n>hyok}"
                                 visible="{= !!${oneWay>/keystoreSettings/hyok/allow} }">
                                 <items>

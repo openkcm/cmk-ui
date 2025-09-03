@@ -108,6 +108,7 @@ export default class KeyCreation extends BaseController {
     private setKeyTypeWizard(): void {
         switch (this.type) {
             case KeyCreationTypes.SYSTEM_MANAGED:
+            case KeyCreationTypes.BYOK:
                 this.keyCreationWizard = Fragment.byId('keyCreatePopoverDialog', 'keyCreationWizard') as Wizard;
                 this.keyCreationNavContainer = Fragment.byId('keyCreatePopoverDialog', 'keyCreationNavContainer') as NavContainer;
                 this.keyCreationReviewPage = Fragment.byId('keyCreatePopoverDialog', 'keyCreationReviewPage') as Page;
@@ -123,20 +124,16 @@ export default class KeyCreation extends BaseController {
                     this.HYOKKeyCreationNavContainer?.to(this.HYOKKeyCreationWizardPage);
                 }
                 break;
-            case KeyCreationTypes.BYOK:
-                // For BYOK, we can add similar logic when needed
-                break;
         }
     }
 
     private getKeyCreationWizardView(type: KeyCreationTypes): string {
         switch (type) {
             case KeyCreationTypes.SYSTEM_MANAGED:
+            case KeyCreationTypes.BYOK:
                 return 'kms.resources.fragments.common.KeyCreationWizard';
             case KeyCreationTypes.HYOK:
                 return 'kms.resources.fragments.common.HYOKKeyCreationWizard';
-            case KeyCreationTypes.BYOK:
-                return 'kms.resources.fragments.common.BYOKKeyCreationWizard';
             default:
                 throw new Error('Invalid KeyCreationType');
         }
@@ -145,6 +142,7 @@ export default class KeyCreation extends BaseController {
     private resetKeyCreationModel() {
         switch (this.type) {
             case KeyCreationTypes.SYSTEM_MANAGED:
+            case KeyCreationTypes.BYOK:
                 this.keyCreationModel.setData({
                     name: '' as string,
                     description: '' as string,
@@ -185,9 +183,6 @@ export default class KeyCreation extends BaseController {
                     this.closeKeyCreationWizard();
                     console.error('Error fetching HYOK AWS certificates:', err);
                 });
-                break;
-            case KeyCreationTypes.BYOK:
-                // For BYOK, we can add similar logic when needed
                 break;
         }
     }
@@ -272,13 +267,11 @@ export default class KeyCreation extends BaseController {
         this.keyCreatePopover?.setBusy(false);
         switch (this.type) {
             case KeyCreationTypes.SYSTEM_MANAGED:
+            case KeyCreationTypes.BYOK:
                 payload = this.getManagedKeyCreationPayload();
                 break;
             case KeyCreationTypes.HYOK:
                 payload = this.getHYOKAWSKeyCreationPayload();
-                break;
-            case KeyCreationTypes.BYOK:
-                // For BYOK, we can add similar logic when needed
                 break;
         }
 

@@ -23,6 +23,7 @@ import Token from 'sap/m/Token';
 import { BYOKProviders, EventChannelIds, EventIDs, HYOKProviders, KeyCreationTypes } from 'kms/common/Enums';
 import KeyCreation from 'kms/component/KeyCreation';
 import { AxiosError } from 'axios';
+import { zipSync, strToU8 } from 'fflate';
 
 interface KeyConfigPatchPayload {
     name: string
@@ -87,7 +88,9 @@ export default class KeyConfigDetail extends BaseController {
     private readonly connectSystemModel = new JSONModel({});
     private connectSystemPopover: Dialog | undefined;
     private readonly switchKeyConfigModel = new JSONModel({});
+    private readonly importKeyModel = new JSONModel({});
     private switchKeyConfigDialog: Dialog | undefined;
+    private importKeyDialog: Dialog | undefined;
     private eventBus = EventBus.getInstance();
     private top: number;
     private keysSkip: number;
@@ -178,7 +181,7 @@ export default class KeyConfigDetail extends BaseController {
         }
         if (!this.connectSystemPopover) {
             this.connectSystemPopover = await Fragment.load({
-                id: view.getId(),
+                id: view?.getId() || '',
                 name: 'kms.resources.fragments.common.ConnectSystems',
                 controller: this
             }) as Dialog;
@@ -504,7 +507,7 @@ export default class KeyConfigDetail extends BaseController {
         this.viewSettingModel.setProperty('/currentTable', 'keys');
         if (!this.filterPopover) {
             this.filterPopover = await Fragment.load({
-                id: view.getId(),
+                id: view?.getId() || '',
                 name: 'kms.resources.fragments.common.TableSorter',
                 controller: this
             }) as ViewSettingsDialog;
@@ -550,6 +553,118 @@ export default class KeyConfigDetail extends BaseController {
                 }
             }
         });
+    }
+
+    public async onBYOKDownloadPress(event: Button$PressEvent) {
+        const path = event?.getSource()?.getBindingContext('oneWay')?.getPath();
+        if (!path) {
+            console.error('Binding context path is undefined');
+            return;
+        }
+        const selectedKey = this.oneWayModel.getProperty(path) as Key;
+        await this.downloadBYOKkey(selectedKey);
+    }
+
+    public async onBYOKImportPress(event: Button$PressEvent): Promise<void> {
+        this.getView()?.setBusy(true);
+        const path = event?.getSource()?.getBindingContext('oneWay')?.getPath();
+        if (!path) {
+            console.error('Binding context path is undefined');
+            return;
+        }
+        const component = this.getOwnerComponent();
+        const selectedKey = this.oneWayModel.getProperty(path) as Key;
+        const importParams = await this.getWrappingParams(selectedKey);
+
+        this.oneWayModel.setProperty('/selectedKey', selectedKey);
+        const view = this.getView();
+
+        if (!this.importKeyDialog) {
+            this.importKeyDialog = await Fragment.load({
+                id: view?.getId(),
+                name: 'kms.resources.fragments.common.ImportKey',
+                controller: this
+            }) as Dialog;
+            this.importKeyDialog.addStyleClass('sapUiSizeCompact');
+            if (component) {
+                this.importKeyDialog.setModel(component.getModel('i18n'), 'i18n');
+            }
+            else {
+                console.error('Component is undefined');
+            }
+            this.importKeyModel.setData(selectedKey);
+            this.importKeyDialog.setModel(this.importKeyModel, 'importKeyModel');
+            this.importKeyModel.setProperty('/wrappingAlgorithm', importParams.wrappingAlgorithm);
+            this.resetImportKeyModel();
+            this.importKeyDialog.open();
+            this.getView()?.setBusy(false);
+        }
+        else {
+            this.importKeyDialog.open();
+            this.getView()?.setBusy(false);
+        }
+    }
+
+    public resetImportKeyModel(): void {
+        this.importKeyModel.setData({
+            keyMaterial: '' as string
+        }, true);
+    };
+
+    public onMaterialUpload(event: { getParameter: (param: string) => File[] }): void {
+        const file = event?.getParameter('files')?.[0];
+
+        if (file && window.FileReader) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const keyMaterial = e.target?.result as string;
+                const key = this._parsePEMKey(keyMaterial);
+                this.importKeyModel.setProperty('/keyMaterial', key);
+            };
+            reader.onerror = (e) => {
+                console.error('Error reading file:', e);
+                MessageBox.error(this.getText('errorReadingFile'));
+            };
+            reader.readAsText(file);
+        }
+        else {
+            console.error('No file selected or FileReader not supported.');
+            MessageBox.error(this.getText('errorNoFileSelected'));
+        }
+    }
+
+    public _parsePEMKey(keyMaterial: string): string {
+        // Removes key armor (if present).
+        keyMaterial = keyMaterial.replace(/^(.*)-----BEGIN.*$/m, '');
+        keyMaterial = keyMaterial.replace(/^(.*)-----END.*$/m, '');
+        // Removes line breaks spaces from base64 encoding
+        return keyMaterial.replace(/(\r\n|\n|\r)/gm, ' ').replace(/\s/g, '');
+    }
+
+    public async onImportKeySubmitPress(): Promise<void> {
+        const selectedKey = this.oneWayModel.getProperty('/selectedKey') as Key;
+        const keyMaterial = this.importKeyModel.getProperty('/keyMaterial') as string;
+        const payload = {
+            wrappedKeyMaterial: keyMaterial
+        };
+        try {
+            await this.api.post(`keys/${selectedKey.id}/importKeyMaterial`, payload);
+            MessageToast.show(this.getText('keyImportedSuccessfully'));
+        }
+        catch (error) {
+            console.error(error);
+            MessageBox.error(this.getText('errorImportingKey'));
+        }
+        finally {
+            this.onImportKeyCancelPress();
+            await this.getKeyConfigData();
+        }
+    }
+
+    public onImportKeyCancelPress(): void {
+        this.importKeyDialog?.close();
+        this.importKeyDialog?.destroy();
+        this.importKeyDialog = undefined;
     }
 
     // eslint-disable-next-line @typescript-eslint/require-await
@@ -711,6 +826,60 @@ export default class KeyConfigDetail extends BaseController {
         finally {
             this.getView()?.setBusy(false);
         }
+    }
+
+    private async downloadBYOKkey(key: Key): Promise<void> {
+        this.getView()?.setBusy(true);
+        try {
+            const importParams = await this.getWrappingParams(key);
+            this._downloadPublicKeyFile({
+                publicKey: importParams.publicKey,
+                wrappingAlgorithm: importParams.wrappingAlgorithm as { name: string, hashFunction: string }
+            }, key);
+            MessageToast.show(this.getText('keyDownloadedSuccessfully'));
+        }
+        catch (error) {
+            console.error(error);
+            MessageBox.error(this.getText('errorDownloadingKey'));
+        }
+        finally {
+            this.getView()?.setBusy(false);
+        }
+    }
+
+    private _downloadPublicKeyFile(content: { publicKey: string, wrappingAlgorithm: { name: string, hashFunction: string } }, key: Key): void {
+        const keyId = key.id || 'unknown';
+        const keyType = key.algorithm || 'unknown';
+
+        const wrappingAlgorithmText
+            = `KeyID: ${keyId}
+            Wrapping Key Size: ${keyType}
+            Wrapping Algorithm: ${content.wrappingAlgorithm.name}
+            Hash Algorithm: ${content.wrappingAlgorithm.hashFunction}`;
+
+        const files: Record<string, Uint8Array> = {
+            'publickey.pem': strToU8(content.publicKey),
+            'README.txt': strToU8(wrappingAlgorithmText)
+        };
+
+        try {
+            const zipData = zipSync(files);
+            const blob = new Blob([new Uint8Array(zipData)], { type: 'application/zip' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `WrappingPublicKeyFor-${keyId}.zip`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+        catch (error) {
+            console.error('Error generating ZIP file:', error);
+            MessageBox.error(this.getText('errorGeneratingZipFile'));
+        }
+    }
+
+    private async getWrappingParams(key: Key): Promise<{ publicKey: string, wrappingAlgorithm: object }> {
+        const importParams = await this.api.get<{ publicKey: string, wrappingAlgorithm: object }>(`keys/${key.id}/importParams`);
+        return importParams;
     }
 
     private async makeKeyPrimary(key: Key): Promise<void> {

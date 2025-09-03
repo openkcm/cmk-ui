@@ -34,6 +34,16 @@
                                         writeToDom="true" />
                                 </customData>
                             </MenuItem>
+                            <MenuItem text="{i18n>byok}"
+                                visible="{= !!${oneWay>/keystoreSettings/default/allowManaged} }"
+                                press=".handleCreateKeyRoute('BYOK')">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keysTable-createByokKey"
+                                        writeToDom="true" />
+                                </customData>
+                            </MenuItem>
                             <MenuItem text="{i18n>hyok}"
                                 visible="{= !!${oneWay>/keystoreSettings/hyok/allow} }">
                                 <items>
@@ -157,6 +167,10 @@
                             visible="{= ${oneWay>state} === 'DISABLED' }"
                             text="{i18n>disabled}"
                             colorScheme="2" />
+                        <tnt:InfoLabel
+                            visible="{= ${oneWay>state} === 'PENDING_IMPORT' }"
+                            text="{i18n>pendingImport}"
+                            colorScheme="6" />
                     </VBox>
                     <VBox alignContent="Center"
                         justifyContent="Start">
@@ -205,6 +219,24 @@
                                                 writeToDom="true" />
                                         </customData>
                                     </MenuItem>
+                                    <MenuItem press="onBYOKDownloadPress" text="{i18n>download}"
+                                        visible="{= ${oneWay>type} === 'BYOK' }"
+                                        icon="sap-icon://download" />
+                                    <customData>
+                                        <core:CustomData
+                                            key="testId"
+                                            value="keysTable-downloadMenuItem"
+                                            writeToDom="true" />
+                                    </customData>
+                                    <MenuItem press="onBYOKImportPress" text="{i18n>import}"
+                                        visible="{= ${oneWay>state} === 'PENDING_IMPORT' }"
+                                        icon="sap-icon://key" />
+                                    <customData>
+                                        <core:CustomData
+                                            key="testId"
+                                            value="keysTable-importMenuItem"
+                                            writeToDom="true" />
+                                    </customData>
                                 </Menu>
                             </menu>
                             <customData>
