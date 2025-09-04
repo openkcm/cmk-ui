@@ -378,7 +378,7 @@
                                             <VBox items="{model>/hyokAWSCryptoCertObj}">
 
                                                 <VBox width="100%" class="sapUiSmallMarginBottom">
-                                                    <Label text="{i18n>hyokCryptoCertTitle}:" />
+                                                    <Label text="{i18n>cryptoCerts}:" />
                                                     <List
                                                         items="{model>selectedCryptoRolesCertKeys}">
                                                         <StandardListItem

@@ -96,7 +96,6 @@ export function setGroupRole(role: GroupRoles): string {
             return role;
     }
 }
-
 export function setKeyStateText(state: string): string {
     switch (state as KeyStates) {
         case KeyStates.DISABLED:
@@ -115,7 +114,6 @@ export function setKeyStateText(state: string): string {
             return state;
     }
 }
-
 export function setKeyStateColor(state: string): int {
     switch (state as KeyStates) {
         case KeyStates.DISABLED:

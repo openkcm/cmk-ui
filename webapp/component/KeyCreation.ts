@@ -1,10 +1,9 @@
 import { BYOKProviders, CloudProviders, HYOKProviders, KeyCreationTypes } from 'kms/common/Enums';
-import { MangedKeyPayload, HyokKeyPayload, AWScertificates, hyokAWSCryptoCertInput, hyokAWSManagementCertInput, AWSAccessDetails } from 'kms/common/Types';
+import { MangedKeyPayload } from 'kms/common/Types';
 import { showErrorMessage } from 'kms/common/Helpers';
 import { AxiosError } from 'axios';
 import BaseController from 'kms/controller/BaseController';
 import KeyConfigDetail from 'kms/controller/keyConfigs/detail/Detail.controller';
-import Api from 'kms/services/Api.service';
 import Dialog from 'sap/m/Dialog';
 import MessageBox from 'sap/m/MessageBox';
 import NavContainer from 'sap/m/NavContainer';
@@ -12,64 +11,39 @@ import Page from 'sap/m/Page';
 import Wizard from 'sap/m/Wizard';
 import Fragment from 'sap/ui/core/Fragment';
 import JSONModel from 'sap/ui/model/json/JSONModel';
-import Model from 'sap/ui/model/Model';
-import ResourceModel from 'sap/ui/model/resource/ResourceModel';
-import { Button$PressEvent } from 'sap/m/Button';
 
 interface KeyCreationParams {
     keyConfigId: string
     keyType: KeyCreationTypes
-    keySubtype: HYOKProviders | BYOKProviders
+    keySubtype: BYOKProviders | HYOKProviders
 }
-type KeyCreateCallBackFn = (payload: MangedKeyPayload | HyokKeyPayload) => Promise<void>;
-interface HYOKAWScertificates {
-    tenantDefault: {
-        count: number
-        value: AWScertificates[]
-    }
-    crypto: {
-        count: number
-        value: AWScertificates[]
-    }
-}
+type KeyCreateCallBackFn = (payload: MangedKeyPayload) => Promise<void>;
 
 /**
  * @namespace kms
  */
 export default class KeyCreation extends BaseController {
-    private readonly keyCreationModel = new JSONModel({}); // This model should be initialized with the correct structure based on the key creation wizard requirements (for managed key, HYOK and BYOK)
-    private api: Api;
+    private readonly keyCreationModel = new JSONModel({});
     private keyCreatePopover: Dialog | undefined;
     private keyCreationNavContainer: NavContainer | undefined;
-    private HYOKKeyCreationNavContainer: NavContainer | undefined;
     private keyCreationWizard: Wizard | undefined;
-    private HYOKKeyCreationWizard: Wizard | undefined;
     private keyCreationWizardPage: Page | undefined;
-    private HYOKKeyCreationWizardPage: Page | undefined;
     private keyCreationReviewPage: Page | undefined;
-    private HYOKKeyCreationReviewPage: Page | undefined;
-    private i18nModel: ResourceModel;
     private parentController: KeyConfigDetail;
     private type: KeyCreationTypes;
-    private subtype: HYOKProviders | BYOKProviders;
     private keyConfigId: string;
     private onKeyCreateCallBackfnc: KeyCreateCallBackFn;
-    private managementDefaultModel: hyokAWSManagementCertInput = { trustAnchorARN: null, roleARN: null, rootCA: null };
-    private cryptoDefaultModel: hyokAWSCryptoCertInput = { trustAnchorCryptoARN: null, roleCryptoARN: null, rootCryptoCA: null, selectedCryptoRolesCertKeys: [], selectedCryptoCerts: [] };
 
-    public openKeyCreationWizard(keyCreationParams: KeyCreationParams, i18nModel: Model, parentController: KeyConfigDetail, api: Api, onKeyCreateCallBackfnc: KeyCreateCallBackFn): void {
+    public openKeyCreationWizard(keyCreationParams: KeyCreationParams, parentController: KeyConfigDetail, onKeyCreateCallBackfnc: KeyCreateCallBackFn): void {
         this.type = keyCreationParams.keyType;
-        this.api = api;
-        this.subtype = keyCreationParams.keySubtype;
         this.keyConfigId = keyCreationParams.keyConfigId;
         this.onKeyCreateCallBackfnc = onKeyCreateCallBackfnc;
-        this.i18nModel = i18nModel as ResourceModel;
         this.parentController = parentController;
         this.setKeyCreationWizard();
     }
 
     private setKeyCreationWizard(): void {
-        const wizardView = this.getKeyCreationWizardView(this.type);
+        const wizardView = 'kms.resources.fragments.common.KeyCreationWizard';
         const loadFragment = async (): Promise<void> => {
             this.keyCreatePopover = await Fragment.load({
                 // DO NOT change this id else Fragment.byId("keyCreatePopoverDialog",.... would stop working.
@@ -80,7 +54,6 @@ export default class KeyCreation extends BaseController {
             }) as Dialog;
 
             this.keyCreatePopover.addStyleClass('sapUiSizeCompact');
-            this.keyCreatePopover.setModel(this.i18nModel, 'i18n');
             this.keyCreatePopover.setModel(this.keyCreationModel, 'model');
             this.keyCreatePopover.open();
             this.setKeyTypeWizard();
@@ -107,85 +80,32 @@ export default class KeyCreation extends BaseController {
     }
 
     private setKeyTypeWizard(): void {
-        switch (this.type) {
-            case KeyCreationTypes.SYSTEM_MANAGED:
-            case KeyCreationTypes.BYOK:
-                this.keyCreationWizard = Fragment.byId('keyCreatePopoverDialog', 'keyCreationWizard') as Wizard;
-                this.keyCreationNavContainer = Fragment.byId('keyCreatePopoverDialog', 'keyCreationNavContainer') as NavContainer;
-                this.keyCreationReviewPage = Fragment.byId('keyCreatePopoverDialog', 'keyCreationReviewPage') as Page;
-                this.keyCreationWizardPage = Fragment.byId('keyCreatePopoverDialog', 'keyCreationWizardPage') as Page;
-                this.keyCreationNavContainer?.to(this.keyCreationWizardPage);
-                break;
-            case KeyCreationTypes.HYOK:
-                if (this.subtype === HYOKProviders.AWS) {
-                    this.HYOKKeyCreationWizard = Fragment.byId('keyCreatePopoverDialog', 'HYOKKeyCreationWizard') as Wizard;
-                    this.HYOKKeyCreationNavContainer = Fragment.byId('keyCreatePopoverDialog', 'HYOKKeyCreationNavContainer') as NavContainer;
-                    this.HYOKKeyCreationReviewPage = Fragment.byId('keyCreatePopoverDialog', 'HYOKKeyCreationReviewPage') as Page;
-                    this.HYOKKeyCreationWizardPage = Fragment.byId('keyCreatePopoverDialog', 'HYOKKeyCreationWizardPage') as Page;
-                    this.HYOKKeyCreationNavContainer?.to(this.HYOKKeyCreationWizardPage);
-                }
-                break;
-        }
-    }
-
-    private getKeyCreationWizardView(type: KeyCreationTypes): string {
-        switch (type) {
-            case KeyCreationTypes.SYSTEM_MANAGED:
-            case KeyCreationTypes.BYOK:
-                return 'kms.resources.fragments.common.KeyCreationWizard';
-            case KeyCreationTypes.HYOK:
-                return 'kms.resources.fragments.common.HYOKKeyCreationWizard';
-            default:
-                throw new Error('Invalid KeyCreationType');
-        }
+        this.keyCreationWizard = Fragment.byId('keyCreatePopoverDialog', 'keyCreationWizard') as Wizard;
+        this.keyCreationNavContainer = Fragment.byId('keyCreatePopoverDialog', 'keyCreationNavContainer') as NavContainer;
+        this.keyCreationReviewPage = Fragment.byId('keyCreatePopoverDialog', 'keyCreationReviewPage') as Page;
+        this.keyCreationWizardPage = Fragment.byId('keyCreatePopoverDialog', 'keyCreationWizardPage') as Page;
+        this.keyCreationNavContainer?.to(this.keyCreationWizardPage);
     }
 
     private resetKeyCreationModel() {
-        switch (this.type) {
-            case KeyCreationTypes.SYSTEM_MANAGED:
-            case KeyCreationTypes.BYOK:
-                this.keyCreationModel.setData({
-                    name: '' as string,
-                    description: '' as string,
-                    algorithm: 'AES256' as string,
-                    region: '' as string,
-                    regionList: [
-                        { key: '', text: 'Select Region', provider: CloudProviders.AWS },
-                        { key: 'us-east-1', text: 'US East (N. Virginia)', provider: CloudProviders.AWS },
-                        { key: 'us-east-2', text: 'US East (Ohio)', provider: CloudProviders.AWS },
-                        { key: 'us-west-1', text: 'US West (N. California)', provider: CloudProviders.AWS },
-                        { key: 'us-west-2', text: 'US West (Oregon)', provider: CloudProviders.AWS }
-                    ] as object[],
-                    detailsStepValid: false as boolean,
-                    keyRegionStepValid: false as boolean,
-                    keyNameValueState: 'None' as string,
-                    keyNameValueStateText: '' as string,
-                    createKeyEnabled: false as boolean,
-                    tags: [] as string[] // is this needed?
-                }, true);
-                break;
-            case KeyCreationTypes.HYOK:
-                this.getHYOKAWSCertificates().then((certs: { hyokAWSManagementCerts: AWScertificates[], cryptoRolesCerts: AWScertificates[] }) => {
-                    this.keyCreationModel.setData({
-                        keyARN: '' as string,
-                        keyName: '' as string,
-                        hyokManagementRoleStepValid: false as boolean,
-                        managementRolesCerts: certs?.hyokAWSManagementCerts,
-                        cryptoRolesCerts: certs?.cryptoRolesCerts,
-                        availableCryptoCertsSelectionList: certs?.cryptoRolesCerts,
-                        hyokAWSManagementCertObj: this.managementDefaultModel,
-                        hyokAWSCryptoCertObj: null as hyokAWSCryptoCertInput[] | null,
-                        selectedCryptoRolesCertKeys: [] as string[],
-                        selectedCryptoCertItems: [] as AWScertificates[],
-                        allowAddMoreCryptoCert: true as boolean
-                    }, true);
-                }).catch((err: unknown) => {
-                    showErrorMessage(err as AxiosError, this.parentController.getText('errorFetchingHYOKAWSCertificates'));
-                    this.closeKeyCreationWizard();
-                    console.error('Error fetching HYOK AWS certificates:', err);
-                });
-                break;
-        }
+        this.keyCreationModel.setData({
+            name: '' as string,
+            description: '' as string,
+            algorithm: 'AES256' as string,
+            region: '' as string,
+            regionList: [
+                { key: '', text: 'Select Region', provider: CloudProviders.AWS },
+                { key: 'us-east-1', text: 'US East (N. Virginia)', provider: CloudProviders.AWS },
+                { key: 'us-east-2', text: 'US East (Ohio)', provider: CloudProviders.AWS },
+                { key: 'us-west-1', text: 'US West (N. California)', provider: CloudProviders.AWS },
+                { key: 'us-west-2', text: 'US West (Oregon)', provider: CloudProviders.AWS }
+            ] as object[],
+            detailsStepValid: false as boolean,
+            keyRegionStepValid: false as boolean,
+            keyNameValueState: 'None' as string,
+            keyNameValueStateText: '' as string,
+            createKeyEnabled: false as boolean
+        }, true);
     }
 
     public onKeyCreateNameChanged(): void {
@@ -238,35 +158,18 @@ export default class KeyCreation extends BaseController {
         const fnAfterNavigate = () => {
             this.keyCreationWizard?.goToStep(this.keyCreationWizard?.getSteps()[stepNumber], true);
             this.keyCreationNavContainer?.detachAfterNavigate(fnAfterNavigate);
-
-            this.HYOKKeyCreationWizard?.goToStep(this.HYOKKeyCreationWizard?.getSteps()[stepNumber], true);
-            this.HYOKKeyCreationNavContainer?.detachAfterNavigate(fnAfterNavigate);
         };
         this.keyCreationNavContainer?.attachAfterNavigate(fnAfterNavigate);
         const keyCreationWizardPageId = this.keyCreationWizardPage?.getId();
         if (keyCreationWizardPageId) {
             this.keyCreationNavContainer?.backToPage(keyCreationWizardPageId);
         }
-
-        this.HYOKKeyCreationNavContainer?.attachAfterNavigate(fnAfterNavigate);
-        const hyokKeyCreationWizardPageId = this.HYOKKeyCreationWizardPage?.getId();
-        if (hyokKeyCreationWizardPageId) {
-            this.HYOKKeyCreationNavContainer?.backToPage(hyokKeyCreationWizardPageId);
-        }
     }
 
     public async onKeyCreationWizardSubmitPress(): Promise<void> {
-        let payload: MangedKeyPayload | HyokKeyPayload = {} as (MangedKeyPayload | HyokKeyPayload);
+        let payload: MangedKeyPayload = {} as (MangedKeyPayload);
         this.keyCreatePopover?.setBusy(false);
-        switch (this.type) {
-            case KeyCreationTypes.SYSTEM_MANAGED:
-            case KeyCreationTypes.BYOK:
-                payload = this.getManagedKeyCreationPayload();
-                break;
-            case KeyCreationTypes.HYOK:
-                payload = this.getHYOKAWSKeyCreationPayload();
-                break;
-        }
+        payload = this.getManagedKeyCreationPayload();
 
         try {
             await this.onKeyCreateCallBackfnc(payload);
@@ -297,132 +200,9 @@ export default class KeyCreation extends BaseController {
         return payload;
     }
 
-    public getHYOKAWSKeyCreationPayload(): HyokKeyPayload {
-        const payload = {
-            name: this.keyCreationModel.getProperty('/keyName') as string,
-            nativeId: this.keyCreationModel.getProperty('/keyARN') as string,
-            description: this.keyCreationModel.getProperty('/description') as string,
-            type: this.type,
-            keyConfigurationID: this.keyConfigId,
-            provider: this.subtype,
-            accessDetails: {
-                management: {
-                    roleArn: this.keyCreationModel.getProperty('/hyokAWSManagementCertObj/roleARN') as string,
-                    trustAnchorArn: this.keyCreationModel.getProperty('/hyokAWSManagementCertObj/trustAnchorARN') as string,
-                    profileArn: this.keyCreationModel.getProperty('/hyokAWSManagementCertObj/rootCA') as string
-                },
-                crypto: this.getCryptoPayload()
-
-            }
-        } as HyokKeyPayload;
-        return payload;
-    }
-
-    public finishAndReviewHYOKKeyCreation(): void {
-        if (this.HYOKKeyCreationNavContainer && this.HYOKKeyCreationReviewPage) {
-            this.HYOKKeyCreationNavContainer.to(this.HYOKKeyCreationReviewPage);
-        }
-        this.keyCreationModel.setProperty('/reviewMode', true);
-    }
-
-    // this is not the ideal way to add the ARNs to the crypto certs
-    // this should be refactored later when crypto certs grouping is supported
-    // this is only for AWS HYOK
-    public addARNs(): void {
-        this.HYOKKeyCreationWizard?.setBusy(true);
-        let hyokAWSCryptoCertObj = this.keyCreationModel.getProperty('/hyokAWSCryptoCertObj') as hyokAWSCryptoCertInput[] || [];
-        const selectedCryptoRolesCertKeys = this.keyCreationModel.getProperty('/selectedCryptoRolesCertKeys') as string[];
-
-        // EDGE CASE: if no certs are selected (can happen if the user clcks outside the scope of the listed items), return
-        if (selectedCryptoRolesCertKeys.length === 0) {
-            this.HYOKKeyCreationWizard?.setBusy(false);
-            return;
-        }
-
-        const allCryptoCerts = this.keyCreationModel.getProperty('/cryptoRolesCerts') as AWScertificates[];
-        const selectedCryptoCerts = allCryptoCerts.filter((cert: AWScertificates) => selectedCryptoRolesCertKeys.includes(cert.name));
-
-        hyokAWSCryptoCertObj = [...hyokAWSCryptoCertObj, { ...this.cryptoDefaultModel, selectedCryptoRolesCertKeys, selectedCryptoCerts }];
-        this.keyCreationModel.setProperty('/hyokAWSCryptoCertObj', hyokAWSCryptoCertObj);
-        let availableCryptoCertsSelectionList = this.keyCreationModel.getProperty('/availableCryptoCertsSelectionList') as AWScertificates[];
-        availableCryptoCertsSelectionList = availableCryptoCertsSelectionList.filter(cert => !selectedCryptoRolesCertKeys.includes(cert.name));
-
-        this.keyCreationModel.setProperty('/availableCryptoCertsSelectionList', availableCryptoCertsSelectionList);
-        // clear the selectedCryptoRolesCertKeys
-        this.keyCreationModel.setProperty('/selectedCryptoRolesCertKeys', []);
-        // diable the add more crypto certs button if all crypto certs are selected
-        const allCryptoCertsSelected = availableCryptoCertsSelectionList.length === 0;
-        this.keyCreationModel.setProperty('/allowAddMoreCryptoCert', !allCryptoCertsSelected);
-        this.HYOKKeyCreationWizard?.setBusy(false);
-    }
-
-    public onRemoveCryptoCert(event: Button$PressEvent): void {
-        const path = event.getSource().getBindingContext('model')?.getPath();
-        if (!path) {
-            console.error('Error removing selected crpyto cert ARNs: Invalid binding context path');
-            showErrorMessage(new AxiosError('Invalid binding context path'), this.parentController.getText('errorGeneric'));
-            return;
-        }
-        const segments = path.split('/');
-        const lastSegment = segments[segments.length - 1];
-        const index = parseInt(lastSegment, 10);
-
-        // Remove item at 'index' from 'hyokAWSCryptoCertObj'
-        const hyokAWSCryptoCertObj = this.keyCreationModel.getProperty('/hyokAWSCryptoCertObj') as hyokAWSCryptoCertInput[];
-        const removedCerts = hyokAWSCryptoCertObj[index].selectedCryptoCerts as AWScertificates[] | [];
-        const newArray = hyokAWSCryptoCertObj.filter((_, i) => i !== index);
-        this.keyCreationModel.setProperty('/hyokAWSCryptoCertObj', newArray);
-
-        // Add certs back to availableCryptoCertsSelectionList
-        let availableCryptoCertsSelectionList = this.keyCreationModel.getProperty('/availableCryptoCertsSelectionList') as AWScertificates[] || [];
-        availableCryptoCertsSelectionList = [...availableCryptoCertsSelectionList, ...removedCerts];
-        this.keyCreationModel.setProperty('/availableCryptoCertsSelectionList', availableCryptoCertsSelectionList);
-        if (availableCryptoCertsSelectionList.length > 0) {
-            this.keyCreationModel.setProperty('/allowAddMoreCryptoCert', true);
-        }
-    }
-
-    public setManagementCertStepValidation(): void {
-        const hyokAWSManagementCertObj = this.keyCreationModel.getProperty('/hyokAWSManagementCertObj') as hyokAWSManagementCertInput;
-        const managementRolesComplete
-            = (hyokAWSManagementCertObj?.trustAnchorARN ?? '').length > 0
-              && (hyokAWSManagementCertObj?.roleARN ?? '').length > 0
-              && (hyokAWSManagementCertObj?.rootCA ?? '').length > 0;
-        this.keyCreationModel.setProperty('/hyokManagementRoleStepValid', managementRolesComplete);
-    }
-
-    private async getHYOKAWSCertificates(): Promise<{ hyokAWSManagementCerts: AWScertificates[], cryptoRolesCerts: AWScertificates[] }> {
-        const hyokAWScertificates = await this.api.get<HYOKAWScertificates>(`keyConfigurations/${this.keyConfigId}/certificates`);
-        const certs = {
-            hyokAWSManagementCerts: hyokAWScertificates?.tenantDefault?.value,
-            cryptoRolesCerts: hyokAWScertificates?.crypto?.value
-        };
-        return certs;
-    }
-
     private closeKeyCreationWizard(): void {
         this.keyCreatePopover?.close();
         this.keyCreatePopover?.destroy();
         this.keyCreatePopover = undefined;
-    }
-
-    private getCryptoPayload(): Record<string, AWSAccessDetails> {
-        let cryptoPayload = {};
-        const hyokAWSCryptoCertObj = this.keyCreationModel.getProperty('/hyokAWSCryptoCertObj') as hyokAWSCryptoCertInput[];
-
-        if (!hyokAWSCryptoCertObj || hyokAWSCryptoCertObj?.length === 0) {
-            return cryptoPayload;
-        }
-        hyokAWSCryptoCertObj?.forEach((cryptoCert: hyokAWSCryptoCertInput) => {
-            if (cryptoCert.roleCryptoARN === null || cryptoCert.trustAnchorCryptoARN === null || cryptoCert.rootCryptoCA === null || cryptoCert?.selectedCryptoRolesCertKeys?.length === 0) {
-                return;
-            }
-            (cryptoCert?.selectedCryptoRolesCertKeys ?? []).forEach((certKey: string) => {
-                cryptoPayload = {
-                    ...cryptoPayload, [certKey]: { roleArn: cryptoCert.roleCryptoARN, trustAnchorArn: cryptoCert.trustAnchorCryptoARN, profileArn: cryptoCert.rootCryptoCA }
-                };
-            });
-        });
-        return cryptoPayload;
     }
 }

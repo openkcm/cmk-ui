@@ -22,6 +22,7 @@ import MultiInput, { MultiInput$TokenUpdateEvent } from 'sap/m/MultiInput';
 import Token from 'sap/m/Token';
 import { BYOKProviders, EventChannelIds, EventIDs, HYOKProviders, KeyCreationTypes } from 'kms/common/Enums';
 import KeyCreation from 'kms/component/KeyCreation';
+import HyokKeyRegistration from 'kms/component/HyokKeyCreation';
 import { AxiosError } from 'axios';
 import { zipSync, strToU8 } from 'fflate';
 
@@ -207,7 +208,7 @@ export default class KeyConfigDetail extends BaseController {
             console.error('i18n model is undefined');
             return;
         }
-        const keyCreatePopover = new KeyCreation('keyCreatePopover');
+
         const keyParams = {
             keyConfigId: this.keyConfigId,
             keyType,
@@ -220,7 +221,23 @@ export default class KeyConfigDetail extends BaseController {
                 console.error(error);
             });
         };
-        keyCreatePopover.openKeyCreationWizard(keyParams, i18nModel, this, this.api, createKey);
+        switch (keyType) {
+            case KeyCreationTypes.SYSTEM_MANAGED:
+            case KeyCreationTypes.BYOK: {
+                const keyCreatePopover = new KeyCreation('keyCreatePopover');
+                keyCreatePopover.openKeyCreationWizard(keyParams, this, createKey);
+                break;
+            }
+            case KeyCreationTypes.HYOK: {
+                const keyCreatePopover = new HyokKeyRegistration('hyokRegistrationPopover');
+                keyCreatePopover.openHyokKeyCreationWizard(keyParams, this, this.api, createKey);
+                break;
+            }
+            default: {
+                console.error('Invalid key type');
+                return;
+            }
+        }
     }
 
     public onConnectSystemsCancelPress(): void {
