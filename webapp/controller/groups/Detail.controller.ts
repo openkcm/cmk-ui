@@ -99,6 +99,9 @@ export default class GroupDetail extends BaseController {
             await this.api.patch(`groups/${this.groupId}`, payload);
             MessageBox.success(this.getText('groupUpdatedSuccessfully'));
             await this.setUser();
+            this.getRouter().navTo('groups', {
+                tenantId: this.tenantId
+            });
         }
         catch (error) {
             console.error(error);
@@ -107,6 +110,11 @@ export default class GroupDetail extends BaseController {
         finally {
             this.oneWayModel.setProperty('/editMode', false);
             this.getView()?.setBusy(false);
+
+            this.getRouter().navTo('groupDetail', {
+                tenantId: this.tenantId,
+                groupId: this.groupId
+            });
         }
     };
 

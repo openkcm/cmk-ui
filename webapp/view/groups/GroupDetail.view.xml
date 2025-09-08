@@ -1,6 +1,6 @@
 <mvc:View controllerName="kms.controller.groups.Detail" xmlns:f="sap.f"
           xmlns:m="sap.m" xmlns="sap.uxap" xmlns:core="sap.ui.core"
-          core:require="{ formatMessage: 'sap/base/strings/formatMessage' }"
+          core:require="{ formatMessage: 'sap/base/strings/formatMessage', commonFormatter: 'kms/common/Formatters' }"
           xmlns:mvc="sap.ui.core.mvc"
           xmlns:layout="sap.ui.layout"
           xmlns:forms="sap.ui.layout.form">
@@ -65,7 +65,7 @@
                                                 </forms:FormElement>
                                                 <forms:FormElement label="{i18n>systemsRole}">
                                                     <forms:fields>
-                                                        <m:Text text="{oneWay>/groupData/role}" />
+                                                        <m:Text text="{parts: ['oneWay>/groupData/role'], formatter: 'commonFormatter.setGroupRole'}"/>
                                                     </forms:fields>
                                                 </forms:FormElement>
                                             </forms:formElements>
@@ -94,7 +94,7 @@
                                                 </forms:FormElement>
                                                 <forms:FormElement label="{i18n>systemsRole}">
                                                     <forms:fields>
-                                                        <m:Text text="{oneWay>/groupData/role}" />
+                                                        <m:Text text="{parts: ['oneWay>/groupData/role'], formatter: 'commonFormatter.setGroupRole'}"/>
                                                     </forms:fields>
                                                 </forms:FormElement>
                                             </forms:formElements>

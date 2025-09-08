@@ -1,4 +1,4 @@
-import { TaskStates, SystemStatus, SystemType } from './Enums';
+import { TaskStates, SystemStatus, SystemType, GroupRoles } from './Enums';
 import { getText } from 'kms/common/Helpers';
 
 export function setTaskStatus(state: TaskStates): string {
@@ -80,4 +80,15 @@ export function setSystemStatusColor(status: SystemStatus | undefined): string |
 export function formatCert(rootCA: string, subject: string): string {
     const cert = `Root CA:\n ${rootCA}\nSubject:\n${subject}`;
     return cert;
+}
+
+export function setGroupRole(role: GroupRoles): string {
+    switch (role) {
+        case GroupRoles.KEY_ADMINISTRATOR:
+            return getText('keyAdministrator');
+        case GroupRoles.TENANT_ADMINISTRATOR:
+            return getText('tenantAdministrator');
+        default:
+            return '';
+    }
 }

@@ -1,7 +1,7 @@
 <core:FragmentDefinition xmlns="sap.m"
     xmlns:core="sap.ui.core"
     xmlns:tnt="sap.tnt"
-    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage', commonFormatter: 'kms/common/Formatters' }">
     <Table
         id="userGroupsTable"
         inset="false"
@@ -46,7 +46,7 @@
                             </customData>
                         </Text>
                     </VBox>
-                    <Text text="{path:'oneWay>role'}" />
+                    <Text text="{parts: ['oneWay>role'], formatter: 'commonFormatter.setGroupRole'}"/>
                     <VBox>
                         <MenuButton icon="sap-icon://action-settings" type="Transparent"
                             visible="{= !${oneWay>edit}}">

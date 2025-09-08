@@ -103,4 +103,9 @@ export enum SystemType {
     SUBACCOUNT = 'SUBACCOUNT'
 }
 
-export default { KeyStates, CloudProviders, KeyCreationTypes, KeyConfigDetailPanelTypes, TaskStatus, TaskStateTransitionAction, TaskStates, ActionTypes, ArtifactTypes, WorkflowActionTypes, TaskType, EventChannelIds, EventIDs, HYOKProviders, BYOKProviders, SystemStatus, SystemType };
+export enum GroupRoles {
+    KEY_ADMINISTRATOR = 'KEY_ADMINISTRATOR',
+    TENANT_ADMINISTRATOR = 'TENANT_ADMINISTRATOR'
+}
+
+export default { KeyStates, CloudProviders, KeyCreationTypes, KeyConfigDetailPanelTypes, TaskStatus, TaskStateTransitionAction, TaskStates, ActionTypes, ArtifactTypes, WorkflowActionTypes, TaskType, EventChannelIds, EventIDs, HYOKProviders, BYOKProviders, SystemStatus, SystemType, GroupRoles };
