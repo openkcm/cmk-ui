@@ -1,7 +1,7 @@
 <core:FragmentDefinition xmlns="sap.m"
     xmlns:core="sap.ui.core"
     xmlns:tnt="sap.tnt"
-    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage', commonFormatter: 'kms/common/Formatters' }">
     <Table
         noDataText=" "
         items="{
@@ -114,8 +114,8 @@
                 <Text text="{i18n>createdOn}" wrapping="false" />
             </Column>
             <Column
-                hAlign="Middle"
-                vAlign="Begin"
+                vAlign="Middle"
+                hAlign="Begin"
                 minScreenWidth="Large"
                 demandPopin="true"
                 visible="{= ${oneWay>/keys}.length > 0 }">
@@ -134,16 +134,14 @@
             <ColumnListItem vAlign="Middle" type="Navigation" press="onKeyTableRowPress">
                 <cells>
                     <VBox justifyContent="Center" alignContent="Center">
-                        <HBox alignItems="End" justifyContent="Start">
-                            <Text text="{oneWay>name}" wrapping="false" />
-                            <tnt:InfoLabel
-                                icon="sap-icon://favorite"
-                                visible="{= !!${oneWay>isPrimary}}"
-                                class="sapUiTinyMarginBegin"
-                                text="{i18n>primary}"
-                                displayOnly="true"
-                                colorScheme="5" />
-                        </HBox>
+                        <Text text="{oneWay>name}" wrapping="false" />
+                        <tnt:InfoLabel
+                            icon="sap-icon://favorite"
+                            visible="{= !!${oneWay>isPrimary}}"
+                            class="sapUiTinyMarginBottom"
+                            text="{i18n>primary}"
+                            displayOnly="true"
+                            colorScheme="5" />
                         <Label text="{oneWay>provider} • {oneWay>region}">
                             <customData>
                                 <core:CustomData
@@ -165,17 +163,8 @@
                     </Text>
                     <VBox justifyContent="Center">
                         <tnt:InfoLabel
-                            visible="{= ${oneWay>state} === 'ENABLED' }"
-                            text="{i18n>enabled}"
-                            colorScheme="8" />
-                        <tnt:InfoLabel
-                            visible="{= ${oneWay>state} === 'DISABLED' }"
-                            text="{i18n>disabled}"
-                            colorScheme="2" />
-                        <tnt:InfoLabel
-                            visible="{= ${oneWay>state} === 'PENDING_IMPORT' }"
-                            text="{i18n>pendingImport}"
-                            colorScheme="6" />
+                            text="{parts: ['oneWay>state'], formatter: 'commonFormatter.setKeyStateText'}"
+                            colorScheme="{parts: ['oneWay>state'], formatter: 'commonFormatter.setKeyStateColor'}" />
                     </VBox>
                     <VBox alignContent="Center"
                         justifyContent="Start">

@@ -1,6 +1,10 @@
 export enum KeyStates {
     ENABLED = 'ENABLED',
-    DISABLED = 'DISABLED'
+    DISABLED = 'DISABLED',
+    PENDING_DELETION = 'PENDING_DELETION',
+    PENDING_IMPORT = 'PENDING_IMPORT',
+    DELETED = 'DELETED',
+    UNKNOWN = 'UNKNOWN'
 }
 
 export enum CloudProviders {

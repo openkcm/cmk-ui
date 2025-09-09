@@ -63,7 +63,7 @@ export default (keyID) => {
             }
         }
     } else {
-        const keys = generateKeys(chance.integer({ min: 2, max: 7 }));
+        const keys = generateKeys(chance.integer({ min: 2, max: 15 }));
         const enabledKeyIndex = chance.integer({ min: 0, max: keys.value.length - 1 });
         keys.value.forEach((key, index) => {
             key.enabled = index === enabledKeyIndex;

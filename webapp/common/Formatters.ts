@@ -1,4 +1,4 @@
-import { TaskStates, SystemStatus, SystemType, GroupRoles } from './Enums';
+import { TaskStates, SystemStatus, SystemType, GroupRoles, KeyStates } from './Enums';
 import { getText } from 'kms/common/Helpers';
 
 export function setTaskStatus(state: TaskStates): string {
@@ -89,5 +89,42 @@ export function setGroupRole(role: GroupRoles): string {
             return getText('tenantAdministrator');
         default:
             return '';
+    }
+}
+
+export function setKeyStateText(state: string): string {
+    switch (state as KeyStates) {
+        case KeyStates.DISABLED:
+            return getText('disabled');
+        case KeyStates.ENABLED:
+            return getText('enabled');
+        case KeyStates.PENDING_DELETION:
+            return getText('pendingDeletion');
+        case KeyStates.PENDING_IMPORT:
+            return getText('pendingImport');
+        case KeyStates.DELETED:
+            return getText('deleted');
+        case KeyStates.UNKNOWN:
+            return getText('unknown');
+        default:
+            return state;
+    }
+}
+
+export function setKeyStateColor(state: string): int {
+    switch (state as KeyStates) {
+        case KeyStates.DISABLED:
+            return 2;
+        case KeyStates.ENABLED:
+            return 8;
+        case KeyStates.PENDING_DELETION:
+        case KeyStates.DELETED:
+            return 5;
+        case KeyStates.PENDING_IMPORT:
+            return 6;
+        case KeyStates.UNKNOWN:
+            return 10;
+        default:
+            return 10;
     }
 }
