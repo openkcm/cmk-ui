@@ -204,15 +204,7 @@ export default class KeyCreation extends BaseController {
 
     public onKeyCreateRegionChanged(): void {
         const region = this.keyCreationModel.getProperty('/region') as string;
-        if (region === '') {
-            this.keyCreationModel.setProperty('/keyRegionStepValid', false);
-        }
-        else {
-            const regionList = this.keyCreationModel.getProperty('/regionList') as { key: string, text: string, provider: string }[];
-            const selectedRegion = regionList.find(item => item.key === region);
-            this.keyCreationModel.setProperty('/provider', selectedRegion?.provider);
-            this.keyCreationModel.setProperty('/keyRegionStepValid', true);
-        }
+        this.keyCreationModel.setProperty('/keyRegionStepValid', region.length > 0);
     }
 
     public onKeyCreationWizardComplete(): void {
@@ -300,15 +292,13 @@ export default class KeyCreation extends BaseController {
             description: this.keyCreationModel.getProperty('/description') as string,
             algorithm: this.keyCreationModel.getProperty('/algorithm') as string,
             region: this.keyCreationModel.getProperty('/region') as string,
-            provider: this.keyCreationModel.getProperty('/provider') as string,
             enabled: this.keyCreationModel.getProperty('/enabled') as boolean
         };
         return payload;
     }
 
     public getHYOKAWSKeyCreationPayload(): HyokKeyPayload {
-        let payload = {} as HyokKeyPayload;
-        payload = {
+        const payload = {
             name: this.keyCreationModel.getProperty('/keyName') as string,
             nativeId: this.keyCreationModel.getProperty('/keyARN') as string,
             description: this.keyCreationModel.getProperty('/description') as string,
@@ -324,7 +314,7 @@ export default class KeyCreation extends BaseController {
                 crypto: this.getCryptoPayload()
 
             }
-        };
+        } as HyokKeyPayload;
         return payload;
     }
 
