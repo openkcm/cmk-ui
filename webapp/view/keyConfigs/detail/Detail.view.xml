@@ -86,6 +86,12 @@
                         </m:VBox>
                     </ObjectPageSubSection>
                 </subSections>
+                <customData>
+                    <core:CustomData
+                        key="testId"
+                        value="keyconfig-details-section"
+                        writeToDom="true" />
+                </customData>
             </ObjectPageSection>
             <ObjectPageSection titleUppercase="false" id="keysObjectPageSection" title="{i18n>keys}"
                 showTitle="false">
@@ -110,6 +116,12 @@
                         </m:VBox>
                     </ObjectPageSubSection>
                 </subSections>
+                <customData>
+                    <core:CustomData
+                        key="testId"
+                        value="keyconfig-keys-section"
+                        writeToDom="true" />
+                </customData>
             </ObjectPageSection>
             <ObjectPageSection titleUppercase="false" id="systemsObjectPageSection"
                 title="{i18n>connectedSystems}" showTitle="false">
@@ -134,6 +146,12 @@
                         </m:VBox>
                     </ObjectPageSubSection>
                 </subSections>
+                <customData>
+                    <core:CustomData
+                        key="testId"
+                        value="keyconfig-systems-section"
+                        writeToDom="true" />
+                </customData>
             </ObjectPageSection>
         </sections>
     </ObjectPageLayout>

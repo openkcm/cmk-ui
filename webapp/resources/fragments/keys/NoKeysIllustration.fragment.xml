@@ -21,7 +21,14 @@
                         <Menu class="sapUiSizeCompact">
                             <MenuItem text="{i18n>sapManaged}"
                                 press=".handleCreateKeyRoute('SYSTEM_MANAGED')"
-                                visible="{= !!${oneWay>/keystoreSettings/default/allowManaged} }" />
+                                visible="{= !!${oneWay>/keystoreSettings/default/allowManaged} }">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keysTable-createManagedKey"
+                                        writeToDom="true" />
+                                </customData>
+                            </MenuItem>
                             <MenuItem text="{i18n>byok}"
                                 press=".handleCreateKeyRoute('BYOK')"
                                 visible="{= !!${oneWay>/keystoreSettings/default/allowManaged} }">
@@ -44,9 +51,21 @@
                                         </items>
                                     </MenuItemGroup>
                                 </items>
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keysTable-createHyokKey"
+                                        writeToDom="true" />
+                                </customData>
                             </MenuItem>
                         </Menu>
                     </menu>
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="keysTable-addKey"
+                            writeToDom="true" />
+                    </customData>
                 </MenuButton>
             </OverflowToolbar>
         </forms:toolbar>
