@@ -1,8 +1,10 @@
 import UIComponent from 'sap/ui/core/UIComponent';
 import IllustrationPool from 'sap/m/IllustrationPool';
 import Theming from 'sap/ui/core/Theming';
-import { loadConfig } from './utils/Config';
+import { loadConfig, loadYAMLConfig } from './utils/Config';
+import * as yaml from 'js-yaml';
 import Api from './services/Api.service';
+import Ora from './services/Ora.service';
 import MessageBox from 'sap/m/MessageBox';
 import ResourceModel from 'sap/ui/model/resource/ResourceModel';
 import Core from 'sap/ui/core/Core';
@@ -36,6 +38,9 @@ export default class Component extends UIComponent {
             try {
                 const config = await loadConfig();
                 await Api.init(config.apiBaseUrl);
+                const yamlText = await loadYAMLConfig();
+                const doc = yaml.load(yamlText);
+                Ora.init(doc as object);
 
                 this.getRouter().initialize();
                 if (window.matchMedia('(prefers-color-scheme: dark)').matches) {

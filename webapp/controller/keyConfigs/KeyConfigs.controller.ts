@@ -218,7 +218,7 @@ export default class Keys extends BaseController {
                 MessageBox.information(this.getText('noAdminGroupsMessage'), {
                     actions: [this.getText('manageGroups'), MessageBox.Action.CLOSE],
                     emphasizedAction: this.getText('manageGroups'),
-                    onClose: (action: string) => {
+                    onClose: (action: string | null) => {
                         if (action === this.getText('manageGroups')) {
                             this.getRouter().navTo('groups', {
                                 tenantId: this.tenantId

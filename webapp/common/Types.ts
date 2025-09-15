@@ -12,20 +12,42 @@ export interface System {
     status: SystemStatus
     keyConfigurationName: string
     keyConfigurationID: string
-};
+}
+export interface SystemConfig {
+    system: {
+        identifier: {
+            displayName: 'GTID'
+        }
+        region: {
+            displayName: 'Region'
+        }
+        type: {
+            displayName: 'Type'
+        }
+        externalName: {
+            displayName: 'Name'
+        }
+        roleName: {
+            displayName: 'Role'
+        }
+        roleID: {
+            displayName: 'RoleID'
+        }
+    }
+}
 export interface Groups {
     id: string
     groups: Groups[]
     name: string
     edit: boolean
-};
+}
 export interface Group {
     name: string
     description: string
     id: string
     iamIdentifier: string
     role: string
-};
+}
 export interface KeyConfig {
     name: string
     id: string
@@ -66,7 +88,7 @@ export interface Key {
         totalVersions: number
         primaryVersion: number
     }
-};
+}
 export interface KeyVersion {
     version: number
     state: KeyStates
@@ -75,13 +97,12 @@ export interface KeyVersion {
         createdAt: string
         updatedAt: string
     }
-};
+}
 export interface Label {
     id: string
     name: string
     value: string
-};
-
+}
 export interface Task {
     id: string
     initiatorID: string
@@ -97,7 +118,6 @@ export interface Task {
         updatedAt: string
     }
 }
-
 export interface Approver {
     id: string
     name: string
@@ -116,7 +136,7 @@ export interface AWSAccessDetails {
     roleArn: string
     trustAnchorArn: string
     profileArn: string
-};
+}
 export interface AccessDetails {
     management: AWSAccessDetails
     crypto: Record<string, AWSAccessDetails>

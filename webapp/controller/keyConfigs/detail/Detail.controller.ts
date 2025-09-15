@@ -584,6 +584,7 @@ export default class KeyConfigDetail extends BaseController {
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
         MessageBox.confirm(this.getText('confirmMakePrimaryConfirmation'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onClose: async (action: unknown) => {
                 if (action === MessageBox.Action.YES) {
                     await this.makeKeyPrimary(selectedKey);
@@ -720,6 +721,7 @@ export default class KeyConfigDetail extends BaseController {
         }
         MessageBox.confirm(this.getText('confirmKeyDeletion'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onClose: async (action: unknown) => {
                 if (action === MessageBox.Action.YES) {
                     await this.deleteKey(selectedKey.id);
@@ -738,6 +740,7 @@ export default class KeyConfigDetail extends BaseController {
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
         MessageBox.confirm(this.getText('confirmKeyDisable'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onClose: async (action: unknown) => {
                 if (action === MessageBox.Action.YES) {
                     await this.disableKey(selectedKey.id);
@@ -756,6 +759,7 @@ export default class KeyConfigDetail extends BaseController {
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
         MessageBox.confirm(this.getText('confirmKeyEnable'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onClose: async (action: unknown) => {
                 if (action === MessageBox.Action.YES) {
                     await this.enableKey(selectedKey.id);
@@ -773,6 +777,7 @@ export default class KeyConfigDetail extends BaseController {
         const selectedSystem = this.oneWayModel.getProperty(path) as System;
         MessageBox.confirm(this.getText('confirmDisconnectSystem'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onClose: async (action: unknown) => {
                 if (action === MessageBox.Action.YES) {
                     await this.disconnectSystem(selectedSystem.id);
@@ -955,6 +960,7 @@ export default class KeyConfigDetail extends BaseController {
         }
         MessageBox.confirm(this.getText('confirmKeyConfigDelete'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onClose: async (action: unknown) => {
                 if (action === MessageBox.Action.YES) {
                     this.getView()?.setBusy(true);

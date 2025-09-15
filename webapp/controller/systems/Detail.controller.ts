@@ -76,6 +76,7 @@ export default class Systems extends BaseController {
     public onSystemDisconnectPress(): void {
         MessageBox.confirm(this.getText('confirmDisconnectSystem'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onClose: async (action: unknown) => {
                 if (action === MessageBox.Action.YES) {
                     await this.disconnectSystem(this.id);

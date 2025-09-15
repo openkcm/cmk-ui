@@ -244,6 +244,7 @@ export default class Group extends BaseController {
 
         MessageBox.confirm(this.getText('confirmGroupDelete'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onClose: async (action: unknown) => {
                 if (action === MessageBox.Action.YES) {
                     this.getView()?.setBusy(true);
