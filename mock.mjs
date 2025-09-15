@@ -21,6 +21,11 @@ app.get("/cmk/v1/sys/tenants", (req, res) => {
     res.json(genereateTenants());
 });
 
+app.post("/cmk/v1/tenant1-id/keyConfigurations", (req, res) => {
+    const newKeyConfig = { ...req.body, id: "config-" + Math.floor(Math.random() * 10000) };
+    res.status(201).json(newKeyConfig);
+});
+
 app.get("/cmk/v1/tenant1-id/keyConfigurations/:id?", (req, res) => {
     const { id } = req.params;
     res.json(keyConfig(id));
