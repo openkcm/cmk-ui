@@ -22,12 +22,16 @@ export interface Groups {
 export interface Group {
     name: string
     description: string
+    id: string
+    iamIdentifier: string
+    role: string
 };
 export interface KeyConfig {
     name: string
     id: string
     description: string
     adminGroupID: string
+    adminGroup?: Group
     canConnectSystems: boolean
     metadata: {
         creatorID: string
@@ -37,7 +41,7 @@ export interface KeyConfig {
         totalKeys: number
         totalSystems: number
     }
-    primaryKey?: Key
+    primaryKeyID?: string
 }
 export interface Key {
     id: string

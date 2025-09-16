@@ -1,9 +1,12 @@
 <core:FragmentDefinition xmlns="sap.m"
     xmlns:core="sap.ui.core"
-    xmlns:f="sap.f">
-    <f:GridContainer class="sapUiSmallMargin" items="{oneWay>/configs}">
+    xmlns:f="sap.f"
+    xmlns:tnt="sap.tnt"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    <f:GridContainer class="sapUiSmallMargin" snapToRow="true" inlineBlockLayout="true"
+        items="{oneWay>/configs}">
         <f:layout>
-            <f:GridContainerSettings rowSize="84px" columnSize="84px" gap="8px" />
+            <f:GridContainerSettings gap="8px" />
         </f:layout>
         <f:GridListItem press="onConfigPress"
             type="Active">
@@ -11,80 +14,141 @@
                 <f:GridContainerItemLayoutData columns="4" />
             </f:layoutData>
             <VBox
-                width="100%"
+                height="100%"
                 class="sapUiContentPadding"
                 justifyContent="SpaceBetween">
                 <VBox justifyContent="SpaceBetween"
                     class="sapUiSmallMarginBegin sapUiSmallMarginTop sapUiSmallMarginEnd"
                     width="100%">
-                    <Title text="{oneWay>name}" />
+                    <Title text="{oneWay>name}" titleStyle="H4" level="H4" />
                     <Label text="{oneWay>id}" />
                 </VBox>
-                <HBox justifyContent="SpaceBetween"
-                    class="sapUiSmallMarginBegin sapUiSmallMarginTop sapUiSmallMarginEnd sapUiSmallMarginBottom"
-                    width="100%">
-                    <VBox width="50%">
-                        <Label text="{i18n>keys}:" />
-                        <Text text="{oneWay>metadata/totalKeys}" />
-                    </VBox>
-                    <VBox width="50%">
-                        <Label text="Systems:" />
-                        <Text text="{oneWay>metadata/totalSystems}" />
-                    </VBox>
+                <HBox>
+                    <HBox justifyContent="SpaceBetween" alignItems="Center"
+                        class="sapUiSmallMarginBegin sapUiTinyMarginTop sapUiSmallMarginEnd">
+                        <Avatar displaySize="XS" displayShape="Square" src="sap-icon://employee"
+                            backgroundColor="Accent8" />
+                        <Title text="{i18n>group}" wrapping="true" textAlign="Right"
+                            width="100%" class="sapUiTinyMarginBegin" />
+                    </HBox>
+                    <HBox class="sapUiSmallMarginBegin sapUiTinyMarginTop sapUiSmallMarginEnd"
+                        alignItems="Center"
+                        justifyContent="End">
+                        <Text text="{oneWay>adminGroup/name}"
+                            wrapping="false" />
+                        <layoutData>
+                            <FlexItemData growFactor="1" />
+                        </layoutData>
+                    </HBox>
                 </HBox>
-                <VBox justifyContent="SpaceBetween"
-                    backgroundDesign="Solid"
-                    height="110px"
-                    visible="{= !!${oneWay>primaryKey}}"
-                    class="gray-background-color rounded-box sapUiSmallMargin">
-                    <Title text="{i18n>primaryKey}:" titleStyle="H6"
-                        class="sapUiTinyMarginBegin sapUiTinyMarginTop" />
-                    <Label design="Bold" text="{oneWay>primaryKey/name}"
-                        class="sapUiTinyMarginBegin" />
-                    <Label text="{oneWay>primaryKey/provider} • {oneWay>primaryKey/region}"
-                        class="sapUiTinyMarginBegin" />
-                    <ObjectStatus
-                        visible="{= ${oneWay>primaryKey/state} === 'ENABLED'}"
-                        icon="sap-icon://sys-enter-2"
-                        text="{i18n>active}"
-                        class="sapUiTinyMargin"
-                        inverted="true"
-                        state="Indication14" />
-                    <ObjectStatus
-                        visible="{= ${oneWay>primaryKey/state} === 'DISABLED'}"
-                        icon="sap-icon://warning"
-                        text="{i18n>disabled}"
-                        class="sapUiTinyMargin"
-                        inverted="true"
-                        state="Indication13" />
-                </VBox>
-                <!-- TEMP: HIDE THIS BUTTON SECTION -->
-                <!-- <HBox justifyContent="Center" alignItems="Center"
-                    backgroundDesign="Solid"
-                    visible="{= !${oneWay>primaryKey}}"
-                    height="110px"
-                    class="outlined-dotted-box-rounded-corners sapUiSmallMargin">
-                    <MenuButton text="{i18n>addKey}" icon="sap-icon://add">
-                        <menu>
-                            <Menu class="sapUiSizeCompact">
-                                <MenuItem text="{i18n>sapManaged}"
-                                    press=".onKeyConfigDashboardCreateSAPKeyPress($event, 'SYSTEM_MANAGED')" />
-                                <MenuItem text="{i18n>hyok}">
-                                    <items>
-                                        <MenuItemGroup
-                                            items="{oneWay>/hyokProviders}"
-                                            itemSelectionMode="None">
-                                            <items>
-                                                <MenuItem text="{oneWay>}"
-                                                    press=".onKeyConfigDashboardCreateSAPKeyPress($event, 'HYOK', ${oneWay>})" />
-                                            </items>
-                                        </MenuItemGroup>
-                                    </items>
-                                </MenuItem>
-                            </Menu>
-                        </menu>
-                    </MenuButton>
-                </HBox> -->
+                <HBox>
+                    <HBox justifyContent="SpaceBetween" alignItems="Center"
+                        class="sapUiSmallMarginBegin sapUiTinyMarginTop sapUiSmallMarginEnd">
+                        <Avatar displaySize="XS" displayShape="Square" src="sap-icon://key"
+                            backgroundColor="Accent7" />
+                        <Title
+                            text="{parts: ['i18n>keysWithCount', 'oneWay>metadata/totalKeys'], formatter: 'formatMessage'}"
+                            wrapping="true" textAlign="Right"
+                            width="100%"
+                            class="sapUiTinyMarginBegin" />
+                    </HBox>
+                    <HBox class="sapUiSmallMarginBegin sapUiTinyMarginTop sapUiSmallMarginEnd"
+                        alignItems="Center"
+                        justifyContent="End">
+                        <tnt:InfoLabel
+                            icon="sap-icon://favorite"
+                            visible="{= !!${oneWay>primaryKeyID}}"
+                            text="{i18n>primaryKeyCreated}"
+                            displayOnly="true"
+                            colorScheme="5" />
+                        <MenuButton text="{i18n>add}" icon="sap-icon://add" type="Ghost"
+                            visible="{= !!${oneWay>primaryKeyId}}">
+                            <menu>
+                                <Menu class="sapUiSizeCompact">
+                                    <MenuItem text="{i18n>sapManaged}"
+                                        press=".onKeyConfigDashboardCreateSAPKeyPress($event, 'SYSTEM_MANAGED', ${oneWay>})"
+                                        visible="{= !!${oneWay>/keystoreSettings/default/allowManaged} }">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="keyConfigDashboard-createManagedKey"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </MenuItem>
+                                    <MenuItem text="{i18n>byok}"
+                                        visible="{= !!${oneWay>/keystoreSettings/default/allowManaged} }"
+                                        press=".onKeyConfigDashboardCreateSAPKeyPress($event, 'BYOK', ${oneWay>})">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="keysTable-createByokKey"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </MenuItem>
+                                    <MenuItem text="{i18n>hyok}"
+                                        visible="{= !!${oneWay>/keystoreSettings/hyok/allow} }">
+                                        <items>
+                                            <!-- The parent oneway model is not accessible if this
+                                            is pulled from the 'hyokProviders' array, so hardcoding
+                                            for now. -->
+                                            <MenuItem
+                                                text="AWS"
+                                                press=".onKeyConfigDashboardCreateSAPKeyPress($event, 'HYOK', 'AWS')" />
+                                        </items>
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="keysTable-createHyokKey"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </MenuItem>
+                                </Menu>
+                            </menu>
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="keysTable-addKey"
+                                    writeToDom="true" />
+                            </customData>
+                        </MenuButton>
+                        <layoutData>
+                            <FlexItemData growFactor="1" />
+                        </layoutData>
+                    </HBox>
+                </HBox>
+                <HBox>
+                    <HBox justifyContent="SpaceBetween" alignItems="Center"
+                        alignContent="Center"
+                        class="sapUiSmallMarginBegin sapUiTinyMarginTop sapUiTinyMarginBottom sapUiSmallMarginEnd">
+                        <Avatar displaySize="XS" displayShape="Square"
+                            src="sap-icon://it-system" />
+                        <Title
+                            text="{parts: ['i18n>systemsWithCount', 'oneWay>metadata/totalSystems'], formatter: 'formatMessage'}"
+                            wrapping="true" textAlign="Right"
+                            width="100%"
+                            class="sapUiTinyMarginBegin" />
+                    </HBox>
+                    <HBox class="sapUiSmallMarginEnd" alignItems="Center"
+                        justifyContent="End">
+                        <Button text="{i18n>connect}"
+                            enabled="{= !!${oneWay>primaryKeyID}}"
+                            press="onTargetConnectSystemPress"
+                            icon="sap-icon://chain-link">
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="keyConfigDashboard-connectSystemButton"
+                                    writeToDom="true" />
+                            </customData>
+                        </Button>
+                        <layoutData>
+                            <FlexItemData growFactor="1" />
+                        </layoutData>
+                    </HBox>
+                </HBox>
+                <layoutData>
+                    <FlexItemData growFactor="1" shrinkFactor="0" />
+                </layoutData>
             </VBox>
         </f:GridListItem>
     </f:GridContainer>

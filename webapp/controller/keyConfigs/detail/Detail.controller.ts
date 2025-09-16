@@ -143,8 +143,8 @@ export default class KeyConfigDetail extends BaseController {
         const routeName = event.getParameter('name');
         this.oneWayModel.setProperty('/keyConfigDetail', routeName === 'keyConfigDetail');
         this.setHyokProviders();
-        const routeArgs = event.getParameter('arguments') as { 'tenantId': string, 'keyConfigId'?: string, '?query': { createKey?: string, keyType?: KeyCreationTypes, keySubtype?: HYOKProviders | BYOKProviders } };
-        const queryParams = routeArgs['?query'] as { createKey?: string, keyType?: KeyCreationTypes, keySubtype?: HYOKProviders | BYOKProviders };
+        const routeArgs = event.getParameter('arguments') as { 'tenantId': string, 'keyConfigId'?: string, '?query': { connectSystem?: string, createKey?: string, keyType?: KeyCreationTypes, keySubtype?: HYOKProviders | BYOKProviders } };
+        const queryParams = routeArgs['?query'] as { connectSystem?: string, createKey?: string, keyType?: KeyCreationTypes, keySubtype?: HYOKProviders | BYOKProviders };
         this.keyConfigId = routeArgs.keyConfigId || '';
 
         this.api = Api.getInstance();
@@ -166,6 +166,12 @@ export default class KeyConfigDetail extends BaseController {
             const subtype = queryParams?.keySubtype;
             this.getView()?.setBusy(true);
             this.handleCreateKeyRoute(type, subtype);
+        }
+        else if (queryParams?.connectSystem === 'true') {
+            this.getView()?.setBusy(true);
+            this.onConnectSystemPress().catch((error: unknown) => {
+                console.error(error);
+            });
         }
     }
 
@@ -334,7 +340,7 @@ export default class KeyConfigDetail extends BaseController {
         this.oneWayModel.setProperty('/allSystems', allSystems?.value);
         this.oneWayModel.setProperty('/systems', connectedSystems?.value);
         this.oneWayModel.setProperty('/systemsCount', connectedSystems?.count || 0);
-        this.systemsPaginationModel.setProperty('/totalPages', Math.ceil(connectedSystems?.count ?? 0 / this.top));
+        this.systemsPaginationModel.setProperty('/totalPages', Math.ceil((connectedSystems?.count ?? 0) / this.top));
         this.systemsPaginationModel.setProperty('/currentPage', this.systemsCurrentPage);
         this.oneWayModel.setProperty('/allSystemsCount', allSystems?.count || 0);
         this.oneWayModel.setProperty('/systemsTableUpdating', false);

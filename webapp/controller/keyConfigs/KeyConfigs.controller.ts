@@ -4,19 +4,16 @@ import BindingMode from 'sap/ui/model/BindingMode';
 import Api from 'kms/services/Api.service';
 import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
 import { Button$PressEvent } from 'sap/m/Button';
-import { KeyConfig } from 'kms/common/Types';
+import { KeyConfig, Groups, KeystoreResponse } from 'kms/common/Types';
 import MessageBox from 'sap/m/MessageBox';
-import { showErrorMessage, getErrorCode } from 'kms/common/Helpers';
+import { showErrorMessage, getErrorCode, _isNameValid } from 'kms/common/Helpers';
 import Fragment from 'sap/ui/core/Fragment';
 import ViewSettingsDialog from 'sap/m/ViewSettingsDialog';
 import Dialog from 'sap/m/Dialog';
 import MessageToast from 'sap/m/MessageToast';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import { BYOKProviders, HYOKProviders } from 'kms/common/Enums';
-import { _isNameValid } from 'kms/common/Helpers';
 import { AxiosError } from 'axios';
-import { Groups } from 'kms/common/Types';
-
 interface KeyConfigsResponse {
     value: KeyConfig[]
     count: number
@@ -107,8 +104,13 @@ export default class Keys extends BaseController {
     private async setKeyConfigs(): Promise<void> {
         this.getView()?.setBusy(true);
         try {
-            const keyConfigs = await this.api.get<KeyConfigsResponse>('keyConfigurations', { $top: this.top, $skip: this.skip });
+            const keyConfigs = await this.api.get<KeyConfigsResponse>('keyConfigurations', { $top: this.top, $skip: this.skip, expandGroup: true });
             const keyConfigsData = keyConfigs.value;
+            keyConfigsData.forEach((config) => {
+                config.primaryKeyID = '4556cadf-4c8b-4ecd-a754-dedda1086198';
+            });
+            const keystoreSettings = await this.getkeystoreSettings();
+            this.oneWayModel.setProperty('/keystoreSettings', keystoreSettings);
             this.oneWayModel.setProperty('/configs', keyConfigsData);
             this.oneWayModel.setProperty('/configsCount', keyConfigs.count || 0);
             this.paginationModel.setProperty('/totalPages', Math.ceil(keyConfigs.count / this.top));
@@ -177,6 +179,21 @@ export default class Keys extends BaseController {
         const keyConfigId: string = selectedConfig.id;
         this.getRouter().navTo('keyConfigDetail', {
             query: { createKey: true, keyType, keySubtype },
+            tenantId: this.tenantId,
+            keyConfigId: keyConfigId
+        });
+    }
+
+    public onTargetConnectSystemPress(event: Button$PressEvent): void {
+        const path = event.getSource()?.getBindingContext('oneWay')?.getPath();
+        if (!path) {
+            console.error('Binding context path is undefined');
+            return;
+        }
+        const selectedConfig = this.oneWayModel.getProperty(path) as KeyConfig;
+        const keyConfigId: string = selectedConfig.id;
+        this.getRouter().navTo('keyConfigDetail', {
+            query: { connectSystem: true },
             tenantId: this.tenantId,
             keyConfigId: keyConfigId
         });
@@ -351,4 +368,14 @@ export default class Keys extends BaseController {
             }
         });
     };
+
+    private async getkeystoreSettings(): Promise<KeystoreResponse | undefined> {
+        try {
+            return await this.api.get<KeystoreResponse>('tenants/keystores');
+        }
+        catch (error) {
+            console.error(error);
+            showErrorMessage(error as AxiosError, this.getText('errorFetchingKeystoreDetails'));
+        }
+    }
 }

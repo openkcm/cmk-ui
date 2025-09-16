@@ -15,6 +15,10 @@ interface GroupResponse {
     value: Group[]
     count: number
 }
+interface GroupPayload {
+    name: string
+    description: string
+}
 
 /**
  * @namespace kms
@@ -95,7 +99,7 @@ export default class GroupDetail extends BaseController {
     public async onGroupSavePress(): Promise<void> {
         this.getView()?.setBusy(true);
 
-        const payload: Group = {
+        const payload: GroupPayload = {
             name: this.oneWayModel.getProperty('/newGroupName') as string,
             description: this.oneWayModel.getProperty('/newGroupDescription') as string
         };

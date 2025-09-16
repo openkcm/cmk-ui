@@ -21,7 +21,7 @@
   },
   "scripts": {
     "start": "ui5 serve --port 8081",
-    "openchrome": "open -na \"Google Chrome\" \"http://localhost:8081/index.html\" --args --disable-web-security --no-default-browser-check --user-data-dir=\"/tmp/chrome-dev\"",
+    "openchrome": "open -na \"Google Chrome\" \"http://localhost:8081/index.html#/tenant1-id/keyConfigs\" --args --disable-web-security --no-default-browser-check --user-data-dir=\"/tmp/chrome-dev\"",
     "start:test": "ui5 serve --port 8000",
     "build": "npx @ui5/ts-interface-generator && ui5 build --all",
     "lint-no-fix": "npx eslint --quiet",
@@ -35,7 +35,7 @@
   "devDependencies": {
     "@playwright/test": "^1.55.0",
     "@stylistic/eslint-plugin": "^5.3.1",
-    "@types/node": "^22.18.3",
+    "@types/node": "^22.18.5",
     "@types/qunit": "^2.19.13",
     "@ui5/linter": "^1.20.0",
     "@ui5/middleware-code-coverage": "^2.0.1",

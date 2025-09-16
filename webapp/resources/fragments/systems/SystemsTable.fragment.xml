@@ -112,7 +112,7 @@
                         </customData>
                     </Text>
                     <Text
-                        text="{parts: ['oneWay>properties/Role', 'oneWay>properties/RoleID'], formatter: 'commonFormatter.setSystemRole'}">
+                        text="{parts: ['oneWay>properties/systemrole', 'oneWay>properties/systemroleiD'], formatter: 'commonFormatter.setSystemRole'}">
                         <customData>
                             <core:CustomData
                                 key="testId"
@@ -136,7 +136,7 @@
                                     writeToDom="true" />
                             </customData>
                         </ObjectStatus>
-                        <Button text="Connect"
+                        <Button text="{i18n>connect}"
                             press="onTargetConnectSystemPress"
                             visible="{= ${oneWay>status} === 'DISCONNECTED'}"
                             icon="sap-icon://add">
