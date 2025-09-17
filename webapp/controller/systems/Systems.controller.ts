@@ -2,8 +2,7 @@ import BaseController from 'kms/controller/BaseController';
 import BindingMode from 'sap/ui/model/BindingMode';
 import JSONModel from 'sap/ui/model/json/JSONModel';
 import Api from 'kms/services/Api.service';
-import { System } from 'kms/common/Types';
-import { KeyConfig } from 'kms/common/Types';
+import { System, KeyConfig } from 'kms/common/Types';
 import { showErrorMessage } from 'kms/common/Helpers';
 import { AxiosError } from 'axios';
 import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
@@ -16,7 +15,7 @@ import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import { EventChannelIds, EventIDs } from 'kms/common/Enums';
 
 interface SystemsResponse {
-    value: Systems[]
+    value: System[]
     count: number
 }
 
@@ -41,6 +40,19 @@ export default class Systems extends BaseController {
         systemsTableUpdating: false as boolean
     });
 
+    private readonly filterModel = new JSONModel({
+        regions: [] as { key: string, text: string }[],
+        types: [
+            { key: 'all', text: this.getText('all') },
+            { key: 'SUBACCOUNT', text: this.getText('subaccount') },
+            { key: 'SYSTEM', text: this.getText('SYSTEM') }
+        ] as { key: string, text: string }[],
+        keyConfigs: [] as { key: string, text: string }[],
+        selectedRegion: 'all' as string,
+        selectedType: 'all' as string,
+        selectedKeyConfig: 'all' as string
+    });
+
     private eventBus = EventBus.getInstance();
     private skip: number;
     private top: number;
@@ -61,6 +73,7 @@ export default class Systems extends BaseController {
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.setModel(this.oneWayModel, 'oneWay');
         this.setModel(this.paginationModel, 'pagination');
+        this.setModel(this.filterModel, 'filterModel');
     };
 
     public onRouteMatched(event: Route$PatternMatchedEvent): void {
@@ -77,9 +90,9 @@ export default class Systems extends BaseController {
         }
     }
 
-    private updateSystemsTable(): void {
+    private updateSystemsTable(filter = false): void {
         this.oneWayModel.setProperty('/systemsTableUpdating', true);
-        this.getSystems().catch((error: unknown) => {
+        this.getSystems(filter).catch((error: unknown) => {
             console.error(error);
         }).finally(() => {
             this.oneWayModel.setProperty('/systemsTableUpdating', false);
@@ -104,15 +117,31 @@ export default class Systems extends BaseController {
         this.paginationModel.setProperty('/currentPage', this.currentPage);
     }
 
-    private async getSystems(): Promise<void> {
+    private async getSystems(filter = false): Promise<void> {
         this.getView()?.setBusy(true);
         try {
-            const systems = await this.api.get<SystemsResponse>('systems', { $top: this.top, $skip: this.skip });
+            let systems;
+            if (filter) {
+                const selectedRegion = this.filterModel.getProperty('/selectedRegion') as string;
+                const selectedType = this.filterModel.getProperty('/selectedType') as string;
+                const selectedKeyConfig = this.filterModel.getProperty('/selectedKeyConfig') as string;
+                const params: Record<string, string | number | boolean> = { $top: this.top, $skip: this.skip };
+                if (selectedRegion !== 'all') params.region = selectedRegion;
+                if (selectedType !== 'all') params.type = selectedType;
+                if (selectedKeyConfig !== 'all') params.keyConfigurationID = selectedKeyConfig;
+                systems = await this.api.get<SystemsResponse>('systems', params);
+            }
+            else {
+                systems = await this.api.get<SystemsResponse>('systems', { $top: this.top, $skip: this.skip });
+            }
             if (!systems) {
                 return;
             }
             this.oneWayModel.setProperty('/systems', systems.value);
             this.oneWayModel.setProperty('/systemsCount', systems.count || 0);
+            if (!filter) {
+                this.setFilterData(systems.value);
+            }
             this.paginationModel.setProperty('/totalPages', Math.ceil(systems.count / this.top));
             this.paginationModel.setProperty('/currentPage', this.currentPage);
         }
@@ -124,6 +153,42 @@ export default class Systems extends BaseController {
             this.getView()?.setBusy(false);
         }
     };
+
+    private setFilterData(systems: System[]): void {
+        this.filterModel.setProperty(
+            '/keyConfigs',
+            [
+                { key: 'all', text: this.getText('all') },
+                ...systems.map((system: System) => ({
+                    key: system.keyConfigurationID,
+                    text: system.keyConfigurationName
+                }))
+            ]
+        );
+        const regions = [
+            { key: 'all', text: this.getText('all') },
+            ...Array.from(new Set(systems.map((system: System) => system.region)))
+                .filter(region => region)
+                .map(region => ({
+                    key: region,
+                    text: region
+                }))
+        ];
+        this.filterModel.setProperty('/regions', regions);
+    }
+
+    public onResetFilters(): void {
+        this.filterModel.setProperty('/selectedRegion', 'all');
+        this.filterModel.setProperty('/selectedType', 'all');
+        this.filterModel.setProperty('/selectedKeyConfig', 'all');
+        this.resetPagination();
+        this.updateSystemsTable();
+    };
+
+    public applyFilters(): void {
+        this.resetPagination();
+        this.updateSystemsTable(true);
+    }
 
     public onSystemPress(event: ListItemBase$PressEvent): void {
         const path = event.getSource().getBindingContext('oneWay')?.getPath();

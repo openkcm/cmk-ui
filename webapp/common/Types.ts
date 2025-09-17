@@ -5,12 +5,10 @@ export interface Config {
 }
 export interface System {
     id: string
-    externalID: string
+    identifier: string
     region: string
-    name: string
     type: string
-    role: string
-    roleID: string
+    properties?: object
     status: SystemStatus
     keyConfigurationName: string
     keyConfigurationID: string

@@ -22,70 +22,59 @@
         <f:header>
             <f:DynamicPageHeader>
                 <f:content>
-                    <kms:FilterBar id="systemsFilterBar" search="getSystems"
-                        reset="onReset">
+                    <kms:FilterBar id="systemsFilterBar" search="applyFilters"
+                        reset="onResetFilters">
                         <kms:FilterBarItem label="{i18n>region}">
-                            <MultiComboBox
+                            <ComboBox
                                 name="{i18n>region}"
-                                selectionChange=".onSelectionChange"
+                                width="100%"
+                                selectionChange="applyFilters"
                                 placeholder="{i18n>all}"
-                                items="{oneWay>/systems}">
-                                <core:Item key="{oneWay>region}" text="{oneWay>region}" />
+                                selectedKey="{filterModel>/selectedRegion}"
+                                items="{filterModel>/regions}">
+                                <core:Item key="{filterModel>key}" text="{filterModel>text}" />
                                 <customData>
                                     <core:CustomData
                                         key="testId"
                                         value="systemsFilterBar-regionComboBox"
                                         writeToDom="true" />
                                 </customData>
-                            </MultiComboBox>
+                            </ComboBox>
                         </kms:FilterBarItem>
-                        <kms:FilterBarItem label="{i18n>sid}">
-                            <MultiComboBox
+                        <kms:FilterBarItem label="{i18n>type}">
+                            <ComboBox
+                                width="100%"
+                                selectedKey="{filterModel>/selectedType}"
+                                selectionChange="applyFilters"
                                 placeholder="{i18n>all}"
-                                name="{i18n>sid}"
-                                items="{oneWay>/systems}">
-                                <core:Item key="{oneWay>sid}" text="{oneWay>sid}" />
+                                items="{filterModel>/types}"
+                                name="{i18n>type}">
+                                <core:Item key="{filterModel>key}" text="{filterModel>text}" />
                                 <customData>
                                     <core:CustomData
                                         key="testId"
-                                        value="systemsFilterBar-sidComboBox"
+                                        value="systemsFilterBar-typeComboBox"
                                         writeToDom="true" />
                                 </customData>
-                            </MultiComboBox>
-                        </kms:FilterBarItem>
-
-                        <kms:FilterBarItem label="{i18n>systemsRole}">
-                            <MultiComboBox
-                                placeholder="{i18n>all}"
-                                name="{i18n>systemsRole}"
-                                selectionChange=".onSelectionChange"
-                                items="{oneWay>/systems}">
-                                <core:Item key="{oneWay>systemRole}"
-                                    text="{oneWay>systemRole}" />
-                                <customData>
-                                    <core:CustomData
-                                        key="testId"
-                                        value="systemsFilterBar-systemsRoleComboBox"
-                                        writeToDom="true" />
-                                </customData>
-                            </MultiComboBox>
+                            </ComboBox>
                         </kms:FilterBarItem>
                         <kms:FilterBarItem label="{i18n>keyConfiguration}">
-
-                            <MultiComboBox
+                            <ComboBox
+                                width="100%"
                                 placeholder="{i18n>all}"
+                                selectedKey="{filterModel>/selectedKeyConfig}"
                                 name="{i18n>keyConfiguration}"
-                                selectionChange=".onSelectionChange"
-                                items="{oneWay>/systems}">
-                                <core:Item key="{oneWay>keyConfig}"
-                                    text="{oneWay>keyConfig}" />
+                                selectionChange="applyFilters"
+                                items="{filterModel>/keyConfigs}">
+                                <core:Item key="{filterModel>key}" text="{filterModel>text}" />
+
                                 <customData>
                                     <core:CustomData
                                         key="testId"
                                         value="systemsFilterBar-keyConfigComboBox"
                                         writeToDom="true" />
                                 </customData>
-                            </MultiComboBox>
+                            </ComboBox>
                         </kms:FilterBarItem>
                     </kms:FilterBar>
                 </f:content>

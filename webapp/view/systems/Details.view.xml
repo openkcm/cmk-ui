@@ -5,17 +5,17 @@
         <headerTitle>
             <ObjectPageDynamicHeaderTitle>
                 <expandedHeading>
-                    <m:Title text="{oneWay>/selectedSystem/name}" wrapping="true" />
+                    <m:Title text="{oneWay>/selectedSystem/properties/Name}" wrapping="true" />
                 </expandedHeading>
                 <expandedContent>
                     <m:VBox>
                         <m:Label
                             text="{oneWay>/selectedSystem/region}" />
                         <m:HBox justifyContent="Start" alignContent="Center" alignItems="Center">
-                            <m:Label text="{oneWay>/selectedSystem/id}" />
+                            <m:Label text="{oneWay>/selectedSystem/identifier}" />
                             <m:Button icon="sap-icon://copy" type="Transparent"
                                 class="sapUiTinyMarginBegin sapUiTinyMarginBottom"
-                                dataHelp:textToCopy="{oneWay>/selectedSystem/id}"
+                                dataHelp:textToCopy="{oneWay>/selectedSystem/identifier}"
                                 press="onCopyToClipboardPress" />
                         </m:HBox>
                     </m:VBox>
