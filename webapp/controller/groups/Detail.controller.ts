@@ -9,6 +9,8 @@ import { AxiosError } from 'axios';
 import MessageBox from 'sap/m/MessageBox';
 import { Input$LiveChangeEvent } from 'sap/m/Input';
 import { TextArea$LiveChangeEvent } from 'sap/m/TextArea';
+import { EventChannelIds, EventIDs } from 'kms/common/Enums';
+import EventBus from 'sap/ui/core/EventBus';
 interface GroupResponse {
     value: Group[]
     count: number
@@ -22,6 +24,7 @@ export default class GroupDetail extends BaseController {
     private groupId: string;
 
     private readonly oneWayModel = new JSONModel();
+    private eventBus = EventBus.getInstance();
 
     public onInit(): void {
         super.onInit();
@@ -41,6 +44,7 @@ export default class GroupDetail extends BaseController {
         this.setUser().catch((error: unknown) => {
             console.error(error);
         });
+        this.eventBus.publish(EventChannelIds.GROUPS, EventIDs.LOAD_GROUPS, { groupId: this.groupId, tenantId: this.tenantId });
     };
 
     private async setUser(): Promise<void> {
@@ -110,7 +114,6 @@ export default class GroupDetail extends BaseController {
         finally {
             this.oneWayModel.setProperty('/editMode', false);
             this.getView()?.setBusy(false);
-
             this.getRouter().navTo('groupDetail', {
                 tenantId: this.tenantId,
                 groupId: this.groupId

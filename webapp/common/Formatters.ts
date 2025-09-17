@@ -87,8 +87,10 @@ export function setGroupRole(role: GroupRoles): string {
             return getText('keyAdministrator');
         case GroupRoles.TENANT_ADMINISTRATOR:
             return getText('tenantAdministrator');
+        case GroupRoles.TENANT_AUDITOR:
+            return getText('tenantAuditor');
         default:
-            return '';
+            return role;
     }
 }
 

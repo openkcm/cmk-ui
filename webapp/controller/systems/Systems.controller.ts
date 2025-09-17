@@ -86,6 +86,7 @@ export default class Systems extends BaseController {
 
     public onSystemRouteEventTriggered(channelId: EventChannelIds, eventId: EventIDs): void {
         if (channelId === EventChannelIds.SYSTEMS && eventId === EventIDs.LOAD_SYSTEMS) {
+            this.api = Api.getInstance();
             this.updateSystemsTable();
         }
     }

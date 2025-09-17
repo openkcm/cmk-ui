@@ -78,13 +78,15 @@ export enum TaskType {
 export enum EventChannelIds {
     TASKS = 'TASKS',
     SYSTEMS = 'SYSTEMS',
-    KEYCONFIG = 'KEYCONFIG'
+    KEYCONFIG = 'KEYCONFIG',
+    GROUPS = 'GROUPS'
 }
 
 export enum EventIDs {
     LOAD_TASKS = 'LOAD_TASKS',
     LOAD_SYSTEMS = 'LOAD_SYSTEMS',
-    LOAD_KEY_CONFIG_DETAILS = 'LOAD_KEY_CONFIG_DETAILS'
+    LOAD_KEY_CONFIG_DETAILS = 'LOAD_KEY_CONFIG_DETAILS',
+    LOAD_GROUPS = 'LOAD_GROUPS'
 }
 
 export enum HYOKProviders {
@@ -109,7 +111,8 @@ export enum SystemType {
 
 export enum GroupRoles {
     KEY_ADMINISTRATOR = 'KEY_ADMINISTRATOR',
-    TENANT_ADMINISTRATOR = 'TENANT_ADMINISTRATOR'
+    TENANT_ADMINISTRATOR = 'TENANT_ADMINISTRATOR',
+    TENANT_AUDITOR = 'TENANT_AUDITOR'
 }
 
 export default { KeyStates, CloudProviders, KeyCreationTypes, KeyConfigDetailPanelTypes, TaskStatus, TaskStateTransitionAction, TaskStates, ActionTypes, ArtifactTypes, WorkflowActionTypes, TaskType, EventChannelIds, EventIDs, HYOKProviders, BYOKProviders, SystemStatus, SystemType, GroupRoles };

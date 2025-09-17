@@ -11,6 +11,8 @@ import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import Dialog from 'sap/m/Dialog';
 import Fragment from 'sap/ui/core/Fragment';
 import MessageToast from 'sap/m/MessageToast';
+import { EventChannelIds, EventIDs } from 'kms/common/Enums';
+import EventBus from 'sap/ui/core/EventBus';
 interface GroupsResponse {
     value: Groups[]
     count: number
@@ -33,6 +35,7 @@ export default class Group extends BaseController {
     private top: number;
     private currentPage: number;
     private readonly paginationModel = new JSONModel({});
+    private eventBus = EventBus.getInstance();
 
     public onInit(): void {
         super.onInit();
@@ -41,6 +44,9 @@ export default class Group extends BaseController {
         this.currentPage = 1;
         this.getRouter()?.getRoute('groups')?.attachPatternMatched({}, (event: Route$PatternMatchedEvent) => {
             this.onRouteMatched(event);
+        }, this);
+        this.eventBus.subscribe(EventChannelIds.GROUPS, EventIDs.LOAD_GROUPS, (channelId, eventId) => {
+            this.onGroupRouteEventTriggered(channelId as EventChannelIds, eventId as EventIDs);
         }, this);
         this.oneWayModel.setDefaultBindingMode(BindingMode.OneWay);
         this.setModel(this.oneWayModel, 'oneWay');
@@ -56,6 +62,15 @@ export default class Group extends BaseController {
             console.error(error);
         });
     };
+
+    public onGroupRouteEventTriggered(channelId: EventChannelIds, eventId: EventIDs): void {
+        if (channelId === EventChannelIds.GROUPS && eventId === EventIDs.LOAD_GROUPS) {
+            this.api = Api.getInstance();
+        }
+        this.setGroups().catch((error: unknown) => {
+            console.error(error);
+        });
+    }
 
     private async onNextPage() {
         this.currentPage++;

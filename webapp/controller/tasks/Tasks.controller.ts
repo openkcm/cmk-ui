@@ -64,10 +64,7 @@ export default class Tasks extends BaseController {
         // One pagination is ready, pagination info also needs to be sent as param to the callback function
         if (channelId === EventChannelIds.TASKS && eventId === EventIDs.LOAD_TASKS) {
             this.tenantId = data.tenantId;
-            if (!this.api || this.tenantId !== data.tenantId) {
-                this.tenantId = data.tenantId;
-                this.api = new Api(this.tenantId);
-            }
+            this.api = new Api(this.tenantId);
             this.getTasks().catch((error: unknown) => {
                 console.error(error);
             });

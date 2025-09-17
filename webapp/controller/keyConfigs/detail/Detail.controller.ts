@@ -130,10 +130,7 @@ export default class KeyConfigDetail extends BaseController {
         this.oneWayModel.setProperty('/keyConfigDetail', true);
         if (channelId === EventChannelIds.KEYCONFIG && eventId === EventIDs.LOAD_KEY_CONFIG_DETAILS) {
             this.keyConfigId = data.keyConfigId;
-            if (!this.api || this.tenantId !== data.tenantId) {
-                this.tenantId = data.tenantId;
-                this.api = new Api(this.tenantId);
-            }
+            this.api = Api.getInstance();
             this.getKeyConfigData().catch((error: unknown) => {
                 console.error(error);
             });
