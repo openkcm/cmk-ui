@@ -11,7 +11,7 @@ interface ErrorResponse {
         data: {
             error: {
                 code: string
-                id: string
+                requestID: string
                 status: number
             }
         }
@@ -86,11 +86,11 @@ export function getErrorCode(error: AxiosError): string {
     return errorCode;
 }
 
-export function getErrorId(error: AxiosError): string {
+export function getRequestId(error: AxiosError): string {
     let errorId = '';
-    if (error.message.includes('data') && error.message.includes('id')) {
+    if (error.message.includes('data') && error.message.includes('requestID')) {
         const errorMessage = JSON.parse(error.message) as ErrorResponse;
-        errorId = errorMessage?.error?.data?.error?.id;
+        errorId = errorMessage?.error?.data?.error?.requestID;
     }
     return errorId;
 }
@@ -105,7 +105,7 @@ export function getErrorStatus(error: AxiosError): number | undefined {
 }
 
 export function showErrorMessage(error: AxiosError, userMessage: string): void {
-    const errorId: string = getErrorId(error);
+    const requestID: string = getRequestId(error);
     const statusCode = getErrorStatus(error);
     const datetime = convertDateToUTC(new Date());
 
@@ -116,10 +116,10 @@ export function showErrorMessage(error: AxiosError, userMessage: string): void {
     MessageBox.error(userMessage, {
         title: 'Error',
         details: '<p><strong>' + 'Error Details:' + '</strong></p>'
-          + '<ul>'
-          + '<li><strong>' + 'Error ID: ' + '</strong>' + ' ' + errorId + '</li>'
-          + '<li><strong>' + 'Timestamp (UTC): ' + '</strong>' + datetime + '</li>'
-          + '</ul>',
+            + '<ul>'
+            + '<li><strong>' + 'Request ID: ' + '</strong>' + ' ' + requestID + '</li>'
+            + '<li><strong>' + 'Timestamp (UTC): ' + '</strong>' + datetime + '</li>'
+            + '</ul>',
         styleClass: 'sapUiUserSelectable'
     });
 }
