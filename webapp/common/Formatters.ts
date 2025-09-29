@@ -1,4 +1,5 @@
-import { TaskStates, SystemStatus, SystemType, GroupRoles, KeyStates } from './Enums';
+import { ValueState, IndicationColor } from 'sap/ui/core/library';
+import { TaskStates, SystemStatus, SystemType, GroupRoles, KeyStates, StateColors } from './Enums';
 import { getText } from 'kms/common/Helpers';
 
 export function setTaskStatus(state: TaskStates): string {
@@ -18,20 +19,22 @@ export function setTaskStatus(state: TaskStates): string {
             return 'sap-icon://question-mark';
     }
 }
-export function setTaskStatusIndicationState(state: TaskStates): string {
+export function setTaskStatusIndicationState(state: TaskStates): ValueState | IndicationColor {
     switch (state) {
         case TaskStates.SUCCESSFUL:
-            return 'Indication14';
+            return StateColors.GREEN;
         case TaskStates.WAIT_APPROVAL:
         case TaskStates.WAIT_CONFIRMATION:
         case TaskStates.INITIAL:
-            return 'Indication15';
+            return StateColors.BLUE;
         case TaskStates.EXPIRED:
         case TaskStates.REVOKED:
         case TaskStates.REJECTED:
-            return 'Indication11';
+            return StateColors.RED;
         default:
-            return '';
+            // Important: Do not return null or undefined or '' as it will break the UI5 control
+            // the return value (to set state value of XML ObjectStatus) mustbe  value of the enums sap.ui.core.ValueState or sap.ui.core.IndicationColor
+            return StateColors.YELLOW;
     }
 }
 export function setSystemType(type: SystemType): string {

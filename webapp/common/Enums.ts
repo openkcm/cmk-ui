@@ -1,3 +1,5 @@
+import { IndicationColor } from 'sap/ui/core/library';
+
 export enum KeyStates {
     ENABLED = 'ENABLED',
     DISABLED = 'DISABLED',
@@ -114,5 +116,14 @@ export enum GroupRoles {
     TENANT_ADMINISTRATOR = 'TENANT_ADMINISTRATOR',
     TENANT_AUDITOR = 'TENANT_AUDITOR'
 }
+
+export const StateColors = {
+    GREEN: IndicationColor.Indication14,
+    BLUE: IndicationColor.Indication15,
+    RED: IndicationColor.Indication11,
+    YELLOW: IndicationColor.Indication13,
+    PURPLE: IndicationColor.Indication17,
+    GRAY: IndicationColor.Indication20
+};
 
 export default { KeyStates, CloudProviders, KeyCreationTypes, KeyConfigDetailPanelTypes, TaskStatus, TaskStateTransitionAction, TaskStates, ActionTypes, ArtifactTypes, WorkflowActionTypes, TaskType, EventChannelIds, EventIDs, HYOKProviders, BYOKProviders, SystemStatus, SystemType, GroupRoles };
