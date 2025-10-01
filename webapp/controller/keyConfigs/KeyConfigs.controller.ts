@@ -206,19 +206,36 @@ export default class Keys extends BaseController {
     public async onCreateConfigPress(): Promise<void> {
         const view = this.getView();
         const component = this.getOwnerComponent();
+        if (!view || !component) {
+            console.error('View or component is undefined');
+            return;
+        }
         try {
             await this.getGroups();
             const groupsData: Groups[] = this.oneWayModel.getProperty('/groupsData') as Groups[] || [];
+
+            if (groupsData.length === 0) {
+                MessageBox.information(this.getText('noAdminGroupsMessage'), {
+                    actions: [this.getText('manageGroups'), MessageBox.Action.CLOSE],
+                    emphasizedAction: this.getText('manageGroups'),
+                    onClose: (action: string) => {
+                        if (action === this.getText('manageGroups')) {
+                            this.getRouter().navTo('groups', {
+                                tenantId: this.tenantId
+                            });
+                        }
+                    }
+                });
+                return;
+            }
+
             groupsData.unshift({ id: '', name: this.getText('selectAdminGroup'), groups: [], edit: false });
             this.createConfigModel.setProperty('/adminGroupList', groupsData);
         }
         catch (error) {
             console.error(error);
         }
-        if (!view || !component) {
-            console.error('View or component is undefined');
-            return;
-        }
+
         if (!this.configCreatePopover) {
             this.configCreatePopover = await Fragment.load({
                 id: view.getId(),
