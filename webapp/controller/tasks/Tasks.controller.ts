@@ -29,7 +29,7 @@ export default class Tasks extends BaseController {
         tasksStatusItems: ['all', ...Object.values(TaskStates).filter(type => type !== TaskStates.INITIAL && type !== TaskStates.EXECUTING)] as TaskStates[] | 'all'[],
         taskTypes: ['all', ...Object.values(TaskType)] as TaskType[] | 'all'[],
         noTableDataText: 'NoTasksAvailable',
-        noTableDataIllustrationType: 'sapIllus-NoTasks_v1',
+        noTableDataIllustrationType: 'sapIllus-NoActivities',
         workflowTasks: [] as WorkflowTasksResponse[],
         workflowTasksCount: 0 as number
     });

@@ -5,7 +5,9 @@
     core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
     <IllustratedMessage
         enableVerticalResponsiveness="false"
+        enableDefaultTitleAndDescription="false"
         title="{parts: ['oneWay>/noTableDataText'], formatter: '.getText'}"
         illustrationType="{oneWay>/noTableDataIllustrationType}"
-        illustrationSize="Dialog" />
+        description=""
+        illustrationSize="Scene" />
 </core:FragmentDefinition>

@@ -79,9 +79,9 @@
                 </VBox>
                 <IllustratedMessage enableVerticalResponsiveness="false"
                     title="{i18n>noKeyConfigurations}"
-                    description="{i18n>createKeyConfigurationHint}"
+                    enableDefaultTitleAndDescription="false"
                     visible="{= ${oneWay>/configs}.length === 0 }"
-                    illustrationType="tnt-NoApplications"
+                    illustrationType="sapIllus-PageNotFound"
                     illustrationSize="Scene">
                 </IllustratedMessage>
             </VBox>

@@ -36,7 +36,7 @@ export default class Systems extends BaseController {
         systemsCount: 0 as number,
         isSytemsView: true as boolean,
         noTableDataText: 'noSystemsAvailable',
-        noTableDataIllustrationType: 'tnt-NoApplications',
+        noTableDataIllustrationType: 'sapIllus-NoColumnsSet',
         systemsTableUpdating: false as boolean
     });
 

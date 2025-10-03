@@ -119,6 +119,7 @@ export function showErrorMessage(error: AxiosError, userMessage: string): void {
             + '<ul>'
             + '<li><strong>' + 'Request ID: ' + '</strong>' + ' ' + requestID + '</li>'
             + '<li><strong>' + 'Timestamp (UTC): ' + '</strong>' + datetime + '</li>'
+            + '<li><strong>' + 'Support Page: ' + '</strong>' + "<a href='https://support.sap.com/'>https://support.sap.com<a/>" + '</li>'
             + '</ul>',
         styleClass: 'sapUiUserSelectable'
     });

@@ -6,7 +6,7 @@
     <f:GridContainer class="sapUiSmallMargin" snapToRow="true" inlineBlockLayout="true"
         items="{oneWay>/configs}">
         <f:layout>
-            <f:GridContainerSettings gap="8px" />
+            <f:GridContainerSettings gap="16px" />
         </f:layout>
         <f:GridListItem press="onConfigPress"
             type="Active">

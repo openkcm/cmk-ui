@@ -71,7 +71,7 @@
         </headerTitle>
         <sections>
             <ObjectPageSection titleUppercase="false" id="detailsObjectPageSection"
-                title="{i18n>details}">
+                title="{i18n>details}" showTitle="false">
                 <subSections>
                     <ObjectPageSubSection>
                         <m:VBox visible="{= !${oneWay>/edit}}">

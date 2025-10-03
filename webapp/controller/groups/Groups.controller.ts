@@ -24,7 +24,7 @@ export default class Group extends BaseController {
     private api: Api;
     private readonly oneWayModel = new JSONModel({
         noTableDataText: 'noUserGroupsCreated',
-        noTableDataIllustrationType: 'tnt-NoUsers'
+        noTableDataIllustrationType: 'sapIllus-NoData'
     });
 
     private groupCreatePopover: Dialog | undefined;

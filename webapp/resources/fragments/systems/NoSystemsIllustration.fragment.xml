@@ -33,7 +33,7 @@
         enableVerticalResponsiveness="false"
         title="{= ${oneWay>/keyConfig/canConnectSystems}? ${i18n>noSystems}: ${i18n>connectSystemsDisabled} }"
         description="{= ${oneWay>/keyConfig/canConnectSystems}? ${i18n>connectSystemHint}: ${i18n>connectSystemDisabledTooltip} }"
-        illustrationType="tnt-NoApplications"
+        illustrationType="sapIllus-NoColumnsSet"
         illustrationSize="Dialog" />
 
 </core:FragmentDefinition>
