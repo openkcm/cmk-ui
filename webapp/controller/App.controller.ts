@@ -52,6 +52,7 @@ export default class App extends BaseController {
             return;
         }
         super.onInit();
+        this.toolPage = this.byId('kmsApp') as ToolPage;
 
         this.setModel(this.oneWayModel, 'oneWay');
         this.setModel(this.twoWayModel, 'twoWay');
@@ -79,7 +80,6 @@ export default class App extends BaseController {
                 tenantId: this.twoWayModel.getProperty('/selectedTenant') as string
             });
         }
-        this.toolPage = this.byId('kmsApp') as ToolPage;
         this.getRouter().attachRouteMatched(this.onRouteChange.bind(this));
     }
 
@@ -97,13 +97,6 @@ export default class App extends BaseController {
         const tenants = this.oneWayModel.getProperty('/tenants') as { id: string, name: string }[];
         const selectedTenant = tenants.find(tenant => tenant.id === routeArgs?.tenantId);
         this.twoWayModel.setProperty('/selectedTenantName', selectedTenant ? selectedTenant.name : '');
-
-        if (routeName === 'keyConfigs') {
-            this.toolPage?.setSideExpanded(true);
-        }
-        else {
-            this.toolPage?.setSideExpanded(false);
-        }
 
         switch (routeName) {
             case 'keyConfigs':
@@ -158,8 +151,7 @@ export default class App extends BaseController {
     }
 
     public onSideNavButtonPress(): void {
-        const toolPage = this.byId('kmsApp') as ToolPage;
-        toolPage.setSideExpanded(!toolPage.getSideExpanded());
+        this.toolPage?.setSideExpanded(!this.toolPage.getSideExpanded());
     }
 
     public async onUserNamePress(event: Avatar$PressEvent): Promise<void> {

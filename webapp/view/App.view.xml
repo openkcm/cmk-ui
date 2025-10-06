@@ -70,7 +70,6 @@
         </tnt:header>
         <tnt:sideContent>
             <tnt:SideNavigation
-                expanded="{= ${twoWay>/selectedKey} === 'keyConfigs'}"
                 selectedKey="{twoWay>/selectedKey}"
                 itemSelect="onNavigationClick">
                 <tnt:NavigationList>
