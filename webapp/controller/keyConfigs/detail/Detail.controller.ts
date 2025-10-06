@@ -678,6 +678,12 @@ export default class KeyConfigDetail extends BaseController {
             return;
         }
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
+        if (selectedKey?.isPrimary) {
+            if (this.oneWayModel.getProperty('/systemsCount') > 0) {
+                MessageBox.error(this.getText('errorDeletingPrimaryKeyWithSystems'));
+                return;
+            }
+        }
         MessageBox.confirm(this.getText('confirmKeyDeletion'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
             onClose: async (action: unknown) => {
@@ -909,6 +915,10 @@ export default class KeyConfigDetail extends BaseController {
 
     // eslint-disable-next-line @typescript-eslint/require-await
     public async deleteKeyConfig(): Promise<void> {
+        if (this.oneWayModel.getProperty('/systemsCount') > 0) {
+            MessageBox.error(this.getText('errorDeletingKeyConfigWithSystems'));
+            return;
+        }
         MessageBox.confirm(this.getText('confirmKeyConfigDelete'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
             onClose: async (action: unknown) => {
