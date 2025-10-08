@@ -30,6 +30,7 @@ steps:
     versioningType: cloud_noTag
   kanikoExecute:
     containerImageName: ui
+    dockerConfigFileVaultSecretName: GROUP-SECRETS/docker-config
   sapCallStagingService:
     profile: group-7718-default
     url: https://staging.repositories.cloud.sap/stage/api

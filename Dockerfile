@@ -1,4 +1,4 @@
-FROM node:22-alpine AS build
+FROM crimson-prod.common.repositories.cloud.sap/node:22.2.0 AS build
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ RUN npm run build
 
 RUN npm prune --production
 
-FROM nginx:stable-alpine AS production
+FROM crimson-prod.common.repositories.cloud.sap/nginx:1.29.1-alpine3.22-slim AS production
 
 RUN rm -rf /usr/share/nginx/html/*
 
