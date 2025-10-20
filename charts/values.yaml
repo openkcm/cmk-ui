@@ -147,6 +147,5 @@ ui:
 imagePullSecrets:
   - name: "registry-access"
 
-namespace: ui
 
 extraContainers: []
