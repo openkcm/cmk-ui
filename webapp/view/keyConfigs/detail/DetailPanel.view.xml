@@ -125,6 +125,34 @@
                     </ObjectPageSubSection>
                 </subSections>
             </ObjectPageSection>
+            <ObjectPageSection titleUppercase="false" id="hyokManagementDetailsSection"
+                visible="{= ${oneWay>/type} === 'key' &amp;&amp; ${oneWay>/selectedKey/type} === 'HYOK' }"
+                title="{i18n>managementRole}"
+                showTitle="false">
+                <subSections>
+                    <ObjectPageSubSection>
+                        <m:VBox items="{twoWay>/selectedKey/accessDetails/managementARNsArray}">
+                            <core:Fragment
+                                fragmentName="kms.resources.fragments.keys.HyokManagementRoleDetailsForm"
+                                type="XML" />
+                        </m:VBox>
+                    </ObjectPageSubSection>
+                </subSections>
+            </ObjectPageSection>
+            <ObjectPageSection titleUppercase="false" id="hyokCryptoDetailsSection"
+                visible="{= ${oneWay>/type} === 'key' &amp;&amp; ${oneWay>/selectedKey/type} === 'HYOK' }"
+                title="{i18n>cryptoRole}"
+                showTitle="false">
+                <subSections>
+                    <ObjectPageSubSection>
+                        <m:VBox items="{twoWay>/selectedKey/accessDetails/cryptoARNsArray}">
+                            <core:Fragment
+                                fragmentName="kms.resources.fragments.keys.HyokCryptoRoleDetailsForm"
+                                type="XML" />
+                        </m:VBox>
+                    </ObjectPageSubSection>
+                </subSections>
+            </ObjectPageSection>
             <!-- TEMP: versions section is temporarily hidden for HYOK as there is not concept
             proof for HYOK rotation yet -->
             <ObjectPageSection titleUppercase="false" id="detailPanelObjectPageSectionVersions"

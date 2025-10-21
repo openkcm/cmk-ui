@@ -1,0 +1,42 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout"
+    xmlns:forms="sap.ui.layout.form">
+    <forms:Form width="100%">
+        <forms:layout>
+            <forms:ColumnLayout
+                columnsM="1"
+                columnsL="1"
+                columnsXL="1" />
+        </forms:layout>
+        <forms:toolbar>
+            <OverflowToolbar>
+                <Title text="{i18n>managementRole}" />
+            </OverflowToolbar>
+        </forms:toolbar>
+        <forms:formContainers>
+            <forms:FormContainer>
+                <forms:formElements>
+                    <forms:FormElement label="{i18n>trustAnchorARN}">
+                        <forms:fields>
+                            <Text text="{twoWay>value/trustAnchorArn}" wrapping="true">
+                            </Text>
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>roleARN}">
+                        <forms:fields>
+                            <Text text="{twoWay>value/roleArn}" wrapping="true">
+                            </Text>
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>profileARN}">
+                        <forms:fields>
+                            <Text text="{twoWay>value/profileArn}" wrapping="true">
+                            </Text>
+                        </forms:fields>
+                    </forms:FormElement>
+                </forms:formElements>
+            </forms:FormContainer>
+        </forms:formContainers>
+    </forms:Form>
+</core:FragmentDefinition>

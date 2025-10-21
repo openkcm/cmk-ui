@@ -4,7 +4,7 @@ import BindingMode from 'sap/ui/model/BindingMode';
 import Api from 'kms/services/Api.service';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import EventBus from 'sap/ui/core/EventBus';
-import { Key, KeyVersion } from 'kms/common/Types';
+import { AWSAccessDetails, Key, KeyVersion } from 'kms/common/Types';
 import { isUUIDValid, copyToClipboard, showErrorMessage } from 'kms/common/Helpers';
 import { Button$PressEvent } from 'sap/m/Button';
 import * as Formatter from 'kms/common/Formatters';
@@ -116,6 +116,21 @@ export default class DetailPanel extends BaseController {
     private setKeyDetailsToModel(key: Key): void {
         this.twoWayModel.setProperty('/selectedKey/customerHeld', key?.type === this.Enums.KeyCreationTypes.HYOK);
         this.twoWayModel.setProperty('/selectedKey/enabled', key?.state === this.Enums.KeyStates.ENABLED);
+        const managementARNs = key?.accessDetails?.management;
+        const cryptoARNs = key?.accessDetails?.crypto;
+        let managementARNsArray: { key: string, value: AWSAccessDetails }[] = [];
+        let cryptoARNsArray: { key: string, value: AWSAccessDetails }[] = [];
+        if (managementARNs) {
+            managementARNsArray = [{ key: 'management', value: managementARNs }];
+            this.twoWayModel.setProperty('/selectedKey/accessDetails/managementARNsArray', managementARNsArray);
+        }
+        if (cryptoARNs) {
+            Object.entries(cryptoARNs).forEach(([key, value]) => {
+                cryptoARNsArray = [...cryptoARNsArray, { key: key, value: value }];
+            });
+
+            this.twoWayModel.setProperty('/selectedKey/accessDetails/cryptoARNsArray', cryptoARNsArray);
+        }
     }
 
     private async getSystemDetails(): Promise<void> {

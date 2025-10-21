@@ -56,6 +56,7 @@ export interface Key {
     provider: string
     region: string
     type: KeyCreationTypes
+    accessDetails?: AccessDetails
     metadata: {
         createdBy: string
         createdAt: string
