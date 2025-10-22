@@ -1,0 +1,158 @@
+<mvc:View
+    controllerName="kms.controller.keyConfigs.detail.Detail"
+    xmlns="sap.uxap"
+    xmlns:layout="sap.ui.layout"
+    xmlns:m="sap.m"
+    xmlns:tnt="sap.tnt"
+    xmlns:forms="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:kms="kms.control"
+    xmlns:dataHelp="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    <ObjectPageLayout>
+        <headerTitle>
+            <ObjectPageDynamicHeaderTitle>
+                <breadcrumbs>
+                    <m:Breadcrumbs currentLocationText="{oneWay>/keyConfig/name}">
+                        <m:Link text=" {i18n>sideContentKeyConfiguration}"
+                            press=".onBreadCrumbLinkPress($event, 'keyConfigs')">
+                        </m:Link>
+                    </m:Breadcrumbs>
+                </breadcrumbs>
+                <expandedHeading>
+                    <m:Title text="{oneWay>/keyConfig/name}" />
+                </expandedHeading>
+                <snappedHeading>
+                    <m:Title text="{oneWay>/keyConfig/name}" />
+                </snappedHeading>
+                <expandedContent>
+                    <m:HBox justifyContent="Start" alignContent="Center" alignItems="Center">
+                        <m:Label text="{oneWay>/keyConfig/id}" />
+                        <m:Button icon="sap-icon://copy" type="Transparent"
+                            class="sapUiTinyMarginBegin sapUiTinyMarginBottom"
+                            dataHelp:textToCopy="{oneWay>/keyConfig/id}"
+                            press="onCopyToClipboardPress">
+                            <m:customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="keyConfigDetail-copyIdButton"
+                                    writeToDom="true" />
+                            </m:customData>
+                        </m:Button>
+                    </m:HBox>
+                </expandedContent>
+                <actions>
+                    <m:Button
+                        text="{i18n>delete}"
+                        icon="sap-icon://delete"
+                        type="Reject"
+                        press="deleteKeyConfig">
+                        <m:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="keyConfigDetail-deleteButton"
+                                writeToDom="true" />
+                        </m:customData>
+                    </m:Button>
+                    <m:Button
+                        icon="sap-icon://refresh"
+                        type="Transparent"
+                        press="getKeyConfigData">
+                        <m:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="keyConfigDetail-refreshButton"
+                                writeToDom="true" />
+                        </m:customData>
+                    </m:Button>
+                </actions>
+            </ObjectPageDynamicHeaderTitle>
+        </headerTitle>
+        <sections>
+            <ObjectPageSection titleUppercase="false" id="detailsObjectPageSection"
+                title="{i18n>details}" showTitle="false">
+                <subSections>
+                    <ObjectPageSubSection>
+                        <m:VBox visible="{= !${oneWay>/edit}}">
+                            <core:Fragment
+                                fragmentName="kms.resources.fragments.keyConfigs.DetailsForm"
+                                type="XML" />
+                        </m:VBox>
+                        <m:VBox visible="{= !!${oneWay>/edit}}">
+                            <core:Fragment
+                                fragmentName="kms.resources.fragments.keyConfigs.DetailsFormEditable"
+                                type="XML" />
+                        </m:VBox>
+                    </ObjectPageSubSection>
+                </subSections>
+                <customData>
+                    <core:CustomData
+                        key="testId"
+                        value="keyconfig-details-section"
+                        writeToDom="true" />
+                </customData>
+            </ObjectPageSection>
+            <ObjectPageSection titleUppercase="false" id="keysObjectPageSection" title="{i18n>keys}"
+                showTitle="false">
+                <subSections>
+                    <ObjectPageSubSection>
+                        <m:VBox>
+                            <m:VBox visible="{= ${oneWay>/keysCount} > 0 }">
+                                <core:Fragment
+                                    fragmentName="kms.resources.fragments.keys.KeysTable"
+                                    type="XML" />
+                                <kms:Pagination
+                                    currentPage="{keysPagination>/currentPage}"
+                                    totalPages="{keysPagination>/totalPages}"
+                                    onPreviousPage="onKeysPreviousPage"
+                                    onNextPage="onKeysNextPage" />
+                            </m:VBox>
+                            <m:VBox visible="{= ${oneWay>/keysCount} === 0 }">
+                                <core:Fragment
+                                    fragmentName="kms.resources.fragments.keys.NoKeysIllustration"
+                                    type="XML" />
+                            </m:VBox>
+                        </m:VBox>
+                    </ObjectPageSubSection>
+                </subSections>
+                <customData>
+                    <core:CustomData
+                        key="testId"
+                        value="keyconfig-keys-section"
+                        writeToDom="true" />
+                </customData>
+            </ObjectPageSection>
+            <ObjectPageSection titleUppercase="false" id="systemsObjectPageSection"
+                title="{i18n>connectedSystems}" showTitle="false">
+                <subSections>
+                    <ObjectPageSubSection>
+                        <m:VBox>
+                            <m:VBox visible="{= ${oneWay>/systemsCount} > 0 }">
+                                <core:Fragment
+                                    fragmentName="kms.resources.fragments.systems.SystemsTable"
+                                    type="XML" />
+                                <kms:Pagination
+                                    currentPage="{systemsPagination>/currentPage}"
+                                    totalPages="{systemsPagination>/totalPages}"
+                                    onPreviousPage="onSystemsPreviousPage"
+                                    onNextPage="onSystemsNextPage" />
+                            </m:VBox>
+                            <m:VBox visible="{= ${oneWay>/systemsCount} === 0 }">
+                                <core:Fragment
+                                    fragmentName="kms.resources.fragments.systems.NoSystemsIllustration"
+                                    type="XML" />
+                            </m:VBox>
+                        </m:VBox>
+                    </ObjectPageSubSection>
+                </subSections>
+                <customData>
+                    <core:CustomData
+                        key="testId"
+                        value="keyconfig-systems-section"
+                        writeToDom="true" />
+                </customData>
+            </ObjectPageSection>
+        </sections>
+    </ObjectPageLayout>
+</mvc:View>

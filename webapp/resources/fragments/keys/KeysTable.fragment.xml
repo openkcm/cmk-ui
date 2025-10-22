@@ -1,0 +1,248 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:tnt="sap.tnt"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage', commonFormatter: 'kms/common/Formatters' }">
+    <Table
+        noDataText=" "
+        items="{
+                    path: 'oneWay>/keys',
+                    sorter: {
+                        path: 'isPrimary',
+                        descending: true
+                    }
+                }"
+        contextualWidth="Auto"
+        busy="{oneWay>/keysTableUpdating}"
+        popinLayout="GridSmall">
+        <headerToolbar>
+            <OverflowToolbar>
+                <Title
+                    text="{parts: ['i18n>keysWithCount', 'oneWay>/keysCount'], formatter: 'formatMessage'}"
+                    level="H2" />
+                <ToolbarSpacer />
+                <MenuButton text="{i18n>add}" icon="sap-icon://add" type="Ghost">
+                    <menu>
+                        <Menu class="sapUiSizeCompact">
+                            <MenuItem text="{i18n>sapManaged}"
+                                press=".handleCreateKeyRoute('SYSTEM_MANAGED')"
+                                visible="{= !!${oneWay>/keystoreSettings/default/allowManaged} }">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keysTable-createManagedKey"
+                                        writeToDom="true" />
+                                </customData>
+                            </MenuItem>
+                            <MenuItem text="{i18n>byok}"
+                                visible="{= !!${oneWay>/keystoreSettings/default/allowManaged} }"
+                                press=".handleCreateKeyRoute('BYOK')">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keysTable-createByokKey"
+                                        writeToDom="true" />
+                                </customData>
+                            </MenuItem>
+                            <MenuItem text="{i18n>hyok}"
+                                visible="{= !!${oneWay>/keystoreSettings/hyok/allow} }">
+                                <items>
+                                    <MenuItemGroup
+                                        items="{oneWay>/hyokProviders}"
+                                        itemSelectionMode="None">
+                                        <items>
+                                            <MenuItem text="{oneWay>}"
+                                                press=".handleCreateKeyRoute('HYOK', ${oneWay>})" />
+                                        </items>
+                                    </MenuItemGroup>
+                                </items>
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keysTable-createHyokKey"
+                                        writeToDom="true" />
+                                </customData>
+                            </MenuItem>
+                        </Menu>
+                    </menu>
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="keysTable-addKey"
+                            writeToDom="true" />
+                    </customData>
+                </MenuButton>
+                <Button
+                    icon="sap-icon://filter"
+                    press="onKeysTableFilterPress"
+                    type="Transparent">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="keysTable-filterButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
+                <Button
+                    icon="sap-icon://sort"
+                    press="onKeysTableSortPress"
+                    class="sapUiSmallMarginEnd"
+                    type="Transparent">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="keysTable-sortButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
+            </OverflowToolbar>
+        </headerToolbar>
+        <columns>
+            <Column
+                vAlign="Middle"
+                hAlign="Begin"
+                minScreenWidth="Large"
+                demandPopin="false"
+                visible="{= ${oneWay>/keys}.length > 0 }">
+                <Text text="{i18n>name}" />
+            </Column>
+            <Column
+                vAlign="Middle"
+                hAlign="Begin"
+                minScreenWidth="Large"
+                demandPopin="true"
+                visible="{= ${oneWay>/keys}.length > 0 }">
+                <Text text="{i18n>createdOn}" wrapping="false" />
+            </Column>
+            <Column
+                vAlign="Middle"
+                hAlign="Begin"
+                minScreenWidth="Large"
+                demandPopin="true"
+                visible="{= ${oneWay>/keys}.length > 0 }">
+                <Text text="{i18n>state}" wrapping="false" />
+            </Column>
+            <Column
+                hAlign="End"
+                vAlign="Middle"
+                minScreenWidth="Large"
+                demandPopin="true"
+                visible="{= ${oneWay>/keys}.length > 0 }">
+                <Text text="{i18n>actions}" wrapping="false" />
+            </Column>
+        </columns>
+        <items>
+            <ColumnListItem vAlign="Middle" type="Navigation" press="onKeyTableRowPress">
+                <cells>
+                    <VBox justifyContent="Center" alignContent="Center">
+                        <Text text="{oneWay>name}" wrapping="false" />
+                        <tnt:InfoLabel
+                            icon="sap-icon://favorite"
+                            visible="{= !!${oneWay>isPrimary}}"
+                            class="sapUiTinyMarginBottom"
+                            text="{i18n>primary}"
+                            displayOnly="true"
+                            colorScheme="5" />
+                        <Label text="{oneWay>provider} • {oneWay>region}">
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="keysTable-regionLabel"
+                                    writeToDom="true" />
+                            </customData>
+                        </Label>
+                    </VBox>
+                    <Text
+                        text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC"
+                        wrapping="false">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="keysTable-createdOnText"
+                                writeToDom="true" />
+                        </customData>
+                    </Text>
+                    <VBox justifyContent="Center">
+                        <tnt:InfoLabel
+                            text="{parts: ['oneWay>state'], formatter: 'commonFormatter.setKeyStateText'}"
+                            colorScheme="{parts: ['oneWay>state'], formatter: 'commonFormatter.setKeyStateColor'}" />
+                    </VBox>
+                    <VBox alignContent="Center"
+                        justifyContent="Start">
+                        <MenuButton icon="sap-icon://action-settings" type="Transparent">
+                            <menu>
+                                <Menu class="sapUiSizeCompact">
+                                    <MenuItem press="onKeyTableMakePrimaryPress"
+                                        text="{i18n>makePrimary}"
+                                        visible="{= !${oneWay>isPrimary}}"
+                                        icon="sap-icon://favorite">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="keysTable-makePrimaryMenuItem"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </MenuItem>
+                                    <MenuItem press="onKeyTableEnablePress"
+                                        text="{i18n>enable}"
+                                        visible="{= ${oneWay>state} === 'DISABLED'}"
+                                        icon="sap-icon://log">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="keysTable-enableMenuItem"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </MenuItem>
+                                    <MenuItem press="onKeyTableDisablePress"
+                                        text="{i18n>disable}"
+                                        visible="{= ${oneWay>state} === 'ENABLED'}"
+                                        icon="sap-icon://log">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="keysTable-disableMenuItem"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </MenuItem>
+                                    <MenuItem press="onKeyTableDeletePress" text="{i18n>delete}"
+                                        icon="sap-icon://delete">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="keysTable-deleteMenuItem"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </MenuItem>
+                                    <MenuItem press="onBYOKDownloadPress" text="{i18n>download}"
+                                        visible="{= ${oneWay>type} === 'BYOK' }"
+                                        icon="sap-icon://download" />
+                                    <customData>
+                                        <core:CustomData
+                                            key="testId"
+                                            value="keysTable-downloadMenuItem"
+                                            writeToDom="true" />
+                                    </customData>
+                                    <MenuItem press="onBYOKImportPress" text="{i18n>import}"
+                                        visible="{= ${oneWay>state} === 'PENDING_IMPORT' }"
+                                        icon="sap-icon://key" />
+                                    <customData>
+                                        <core:CustomData
+                                            key="testId"
+                                            value="keysTable-importMenuItem"
+                                            writeToDom="true" />
+                                    </customData>
+                                </Menu>
+                            </menu>
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="keysTable-actionsMenuButton"
+                                    writeToDom="true" />
+                            </customData>
+                        </MenuButton>
+                    </VBox>
+                </cells>
+            </ColumnListItem>
+        </items>
+    </Table>
+</core:FragmentDefinition>

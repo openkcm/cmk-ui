@@ -1,0 +1,39 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:tnt="sap.tnt"
+    xmlns:forms="sap.ui.layout.form"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    <forms:Form width="100%" editable="true">
+        <forms:layout>
+            <forms:ColumnLayout
+                columnsM="2"
+                columnsL="3"
+                columnsXL="3" />
+        </forms:layout>
+        <forms:toolbar>
+            <OverflowToolbar>
+                <Title
+                    text="{parts: ['i18n>systemsWithCount', 'oneWay>/systemsCount'], formatter: 'formatMessage'}"
+                    level="H2" />
+                <ToolbarSpacer />
+                <Button text="{i18n>connect}" icon="sap-icon://chain-link" type="Ghost"
+                    enabled="{= ${oneWay>/keyConfig/canConnectSystems}}"
+                    press="onConnectSystemPress">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="nosystemsTable-connectButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
+            </OverflowToolbar>
+        </forms:toolbar>
+    </forms:Form>
+    <IllustratedMessage
+        enableVerticalResponsiveness="false"
+        title="{= ${oneWay>/keyConfig/canConnectSystems}? ${i18n>noSystems}: ${i18n>connectSystemsDisabled} }"
+        description="{= ${oneWay>/keyConfig/canConnectSystems}? ${i18n>connectSystemHint}: ${i18n>connectSystemDisabledTooltip} }"
+        illustrationType="sapIllus-NoColumnsSet"
+        illustrationSize="Dialog" />
+
+</core:FragmentDefinition>

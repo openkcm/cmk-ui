@@ -1,0 +1,35 @@
+{
+	"compilerOptions": {
+		"target": "es2023",
+		"module": "es2022",
+		"moduleResolution": "node",
+		"skipLibCheck": true,
+		"allowJs": true,
+		"strict": true,
+		"noImplicitAny": true,
+		"strictNullChecks": true,
+		"strictPropertyInitialization": false,
+		"rootDir": "./",
+		"types": [
+			"@openui5/types",
+			"@types/qunit",
+			"node"
+		],
+		"paths": {
+			"kms/*": [
+				"./webapp/*"
+			],
+			"unit/*": [
+				"./webapp/test/unit/*"
+			],
+		}
+	},
+	"exclude": [
+		"./mockServer/**/*",
+		"./webapp/coverage/**/*"
+	],
+	"include": [
+		"./webapp/**/*",
+		"tests/**/*.ts"
+	]
+}

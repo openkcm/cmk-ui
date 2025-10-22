@@ -1,0 +1,55 @@
+<mvc:View controllerName="kms.controller.systems.Detail"
+    xmlns:m="sap.m" xmlns="sap.uxap" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core"
+    xmlns:dataHelp="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
+    <ObjectPageLayout showTitleInHeaderContent="true" upperCaseAnchorBar="false">
+        <headerTitle>
+            <ObjectPageDynamicHeaderTitle>
+                <expandedHeading>
+                    <m:Title text="{oneWay>/selectedSystem/properties/Name}" wrapping="true" />
+                </expandedHeading>
+                <expandedContent>
+                    <m:VBox>
+                        <m:Label
+                            text="{oneWay>/selectedSystem/region}" />
+                        <m:HBox justifyContent="Start" alignContent="Center" alignItems="Center">
+                            <m:Label text="{oneWay>/selectedSystem/identifier}" />
+                            <m:Button icon="sap-icon://copy" type="Transparent"
+                                class="sapUiTinyMarginBegin sapUiTinyMarginBottom"
+                                dataHelp:textToCopy="{oneWay>/selectedSystem/identifier}"
+                                press="onCopyToClipboardPress" />
+                        </m:HBox>
+                    </m:VBox>
+                </expandedContent>
+                <actions>
+                    <m:ToolbarSpacer></m:ToolbarSpacer>
+                    <ObjectPageHeaderActionButton text="{i18n>switchKeyConfiguration}"
+                        visible="{= !!${oneWay>/selectedSystem/keyConfigurationID}}"
+                        press="onSwitchKeyConfigPress"
+                        hideText="false" />
+                    <ObjectPageHeaderActionButton text="{i18n>disconnect}" hideText="false"
+                        visible="{= !!${oneWay>/selectedSystem/keyConfigurationID}}"
+                        press="onSystemDisconnectPress"
+                        type="Reject" />
+                </actions>
+                <navigationActions>
+                    <m:OverflowToolbarButton type="Transparent" icon="sap-icon://decline"
+                        press="onCancel" tooltip="Close" />
+                </navigationActions>
+            </ObjectPageDynamicHeaderTitle>
+        </headerTitle>
+        <sections>
+            <ObjectPageSection titleUppercase="false" id="systemsObjectPageSectionDetails"
+                title="{i18n>details}" showTitle="false">
+                <subSections>
+                    <ObjectPageSubSection>
+                        <m:VBox>
+                            <core:Fragment
+                                fragmentName="kms.resources.fragments.systems.DetailsForm"
+                                type="XML" />
+                        </m:VBox>
+                    </ObjectPageSubSection>
+                </subSections>
+            </ObjectPageSection>
+        </sections>
+    </ObjectPageLayout>
+</mvc:View>

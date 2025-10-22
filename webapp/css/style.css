@@ -1,0 +1,23 @@
+.gray-background-color {
+    @media (prefers-color-scheme: light) {
+        background-color: #f5f6f7 !important;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        background-color: #12171c !important;
+    }
+}
+
+.outlined-dotted-box-rounded-corners {
+    border: 1px dashed #ccc;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.rounded-box {
+    border-radius: 15px;
+}
+
+.icon-size {
+    font-size: 2rem;
+}

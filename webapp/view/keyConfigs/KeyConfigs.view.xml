@@ -1,0 +1,90 @@
+<mvc:View
+    controllerName="kms.controller.keyConfigs.KeyConfigs"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core"
+    xmlns:kms="kms.control"
+    xmlns:mvc="sap.ui.core.mvc"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    <f:DynamicPage>
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title
+                        text="{parts: ['i18n>keyConfigurationWithCount', 'oneWay>/configsCount'], formatter: 'formatMessage'}" />
+                </f:heading>
+                <f:snappedTitleOnMobile>
+                    <Title text="{i18n>sideContentKeyConfiguration}" />
+                </f:snappedTitleOnMobile>
+                <f:actions>
+                    <Button
+                        icon="sap-icon://refresh"
+                        type="Transparent"
+                        press="setKeyConfigs">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="keyConfigDashboard-refreshButton"
+                                writeToDom="true" />
+                        </customData>
+                    </Button>
+                    <Button
+                        icon="sap-icon://filter"
+                        type="Transparent">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="keyConfigDashboard-filterButton"
+                                writeToDom="true" />
+                        </customData>
+                    </Button>
+                    <Button
+                        icon="sap-icon://sort"
+                        press="onKeyConfigDashboardSortPress"
+                        class="sapUiSmallMarginEnd"
+                        type="Transparent">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="keyConfigDashboard-sortButton"
+                                writeToDom="true" />
+                        </customData>
+                    </Button>
+                    <Button
+                        icon="sap-icon://add"
+                        type="Emphasized"
+                        text="{i18n>createConfiguration}"
+                        press="onCreateConfigPress">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="keyConfigDashboard-createButton"
+                                writeToDom="true" />
+                        </customData>
+                    </Button>
+                </f:actions>
+            </f:DynamicPageTitle>
+        </f:title>
+        <f:content>
+            <VBox height="100%">
+                <VBox visible="{= ${oneWay>/configs}.length !== 0 }">
+                    <core:Fragment
+                        fragmentName="kms.resources.fragments.keyConfigs.Dashboard"
+                        type="XML" />
+                    <kms:Pagination
+                        currentPage="{pagination>/currentPage}"
+                        totalPages="{pagination>/totalPages}"
+                        onPreviousPage="onPreviousPage"
+                        onNextPage="onNextPage" />
+                </VBox>
+                <IllustratedMessage enableVerticalResponsiveness="false"
+                    title="{i18n>noKeyConfigurations}"
+                    enableDefaultTitleAndDescription="false"
+                    visible="{= ${oneWay>/configs}.length === 0 }"
+                    illustrationType="sapIllus-PageNotFound"
+                    illustrationSize="Scene">
+                </IllustratedMessage>
+            </VBox>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

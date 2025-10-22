@@ -1,0 +1,105 @@
+<mvc:View
+    controllerName="kms.controller.systems.Systems"
+    xmlns="sap.m"
+    xmlns:table="sap.ui.table"
+    xmlns:core="sap.ui.core"
+    xmlns:m="sap.m"
+    xmlns:f="sap.f"
+    xmlns:kms="kms.control"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }"
+    xmlns:mvc="sap.ui.core.mvc">
+    <f:DynamicPage>
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="{i18n>sideContentSystems}" />
+                </f:heading>
+                <f:snappedTitleOnMobile>
+                    <Title text="{i18n>sideContentSystems}" />
+                </f:snappedTitleOnMobile>
+            </f:DynamicPageTitle>
+        </f:title>
+        <f:header>
+            <f:DynamicPageHeader>
+                <f:content>
+                    <kms:FilterBar id="systemsFilterBar" search="applyFilters"
+                        reset="onResetFilters">
+                        <kms:FilterBarItem label="{i18n>region}">
+                            <ComboBox
+                                name="{i18n>region}"
+                                width="100%"
+                                selectionChange="applyFilters"
+                                placeholder="{i18n>all}"
+                                selectedKey="{filterModel>/selectedRegion}"
+                                items="{filterModel>/regions}">
+                                <core:Item key="{filterModel>key}" text="{filterModel>text}" />
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="systemsFilterBar-regionComboBox"
+                                        writeToDom="true" />
+                                </customData>
+                            </ComboBox>
+                        </kms:FilterBarItem>
+                        <kms:FilterBarItem label="{i18n>type}">
+                            <ComboBox
+                                width="100%"
+                                selectedKey="{filterModel>/selectedType}"
+                                selectionChange="applyFilters"
+                                placeholder="{i18n>all}"
+                                items="{filterModel>/types}"
+                                name="{i18n>type}">
+                                <core:Item key="{filterModel>key}" text="{filterModel>text}" />
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="systemsFilterBar-typeComboBox"
+                                        writeToDom="true" />
+                                </customData>
+                            </ComboBox>
+                        </kms:FilterBarItem>
+                        <kms:FilterBarItem label="{i18n>keyConfiguration}">
+                            <ComboBox
+                                width="100%"
+                                placeholder="{i18n>all}"
+                                selectedKey="{filterModel>/selectedKeyConfig}"
+                                name="{i18n>keyConfiguration}"
+                                selectionChange="applyFilters"
+                                items="{filterModel>/keyConfigs}">
+                                <core:Item key="{filterModel>key}" text="{filterModel>text}" />
+
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="systemsFilterBar-keyConfigComboBox"
+                                        writeToDom="true" />
+                                </customData>
+                            </ComboBox>
+                        </kms:FilterBarItem>
+                    </kms:FilterBar>
+                </f:content>
+            </f:DynamicPageHeader>
+        </f:header>
+        <f:content>
+            <m:VBox>
+                <Panel visible="{= ${oneWay>/systems}.length > 0 }">
+                    <m:VBox>
+                        <core:Fragment
+                            fragmentName="kms.resources.fragments.systems.SystemsTable"
+                            type="XML" />
+                        <kms:Pagination
+                            currentPage="{pagination>/currentPage}"
+                            totalPages="{pagination>/totalPages}"
+                            onPreviousPage="onPreviousPage"
+                            onNextPage="onNextPage" />
+                    </m:VBox>
+                </Panel>
+                <m:VBox visible="{= ${oneWay>/systems}.length === 0 }">
+                    <core:Fragment
+                        fragmentName="kms.resources.fragments.common.NoDataTableIllustration"
+                        type="XML" />
+                </m:VBox>
+            </m:VBox>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

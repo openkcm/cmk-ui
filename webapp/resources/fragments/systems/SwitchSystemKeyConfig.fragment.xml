@@ -1,0 +1,107 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core">
+    <Dialog
+        id="switchSystemDialog"
+        contentHeight="35rem"
+        contentWidth="30rem"
+        class="sapUiContentPadding"
+        title="{i18n>switchKeyConfiguration}">
+        <content>
+            <VBox
+                width="100%"
+                class="sapUiContentPadding">
+                <MessageStrip
+                    text="{i18n>connnectSystemMessageStrip}"
+                    showIcon="true"
+                    showCloseButton="false"
+                    class="sapUiMediumMarginBottom">
+                </MessageStrip>
+                <Label text="{i18n>currentKeyConfiguration}:" class="sapUiTinyMarginBottom" />
+                <VBox justifyContent="SpaceBetween"
+                    backgroundDesign="Solid"
+                    class="gray-background-color rounded-box">
+                    <Title text="{switchKeyConfigModel>/connectedKeyConfig/name}" titleStyle="H5"
+                        class="sapUiSmallMarginBegin sapUiSmallMarginTop" />
+                    <Label text="{switchKeyConfigModel>/connectedKeyConfig/id}"
+                        class="sapUiSmallMarginBegin" />
+                    <VBox class="sapUiSmallMarginBegin sapUiSmallMarginTop sapUiSmallMarginBottom">
+                        <Label text="{i18n>description}:" />
+                        <TextArea value="{switchKeyConfigModel>/connectedKeyConfig/description}"
+                            width="95%"
+                            editable="false">
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="switchKeyConfig-descriptionText"
+                                    writeToDom="true" />
+                            </customData>
+                        </TextArea>
+                    </VBox>
+                </VBox>
+                <HBox justifyContent="Center" alignContent="Center"
+                    class="sapUiSmallMarginTop sapUiSmallMarginBottom">
+                    <core:Icon
+                        src="sap-icon://arrow-bottom"
+                        class="icon-size">
+                    </core:Icon>
+                </HBox>
+                <VBox justifyContent="SpaceBetween"
+                    backgroundDesign="Solid"
+                    class="gray-background-color rounded-box">
+                    <VBox class="sapUiSmallMargin">
+                        <MessageStrip
+                            text="{i18n>noOtherKeyConfigurations}"
+                            showIcon="true"
+                            visible="{= ${switchKeyConfigModel>/KeyConfigList}.length === 0 }"
+                            type="Warning"
+                            showCloseButton="false"
+                            class="sapUiMediumMarginBottom">
+                        </MessageStrip>
+                        <Label text="{i18n>newTargetKeyConfiguration}:" />
+                        <ComboBox
+                            width="100%"
+                            enabled="{= ${switchKeyConfigModel>/KeyConfigList}.length > 0 }"
+                            selectedKey="{switchKeyConfigModel>/selectedKeyConfig}"
+                            items="{switchKeyConfigModel>/KeyConfigList}">
+                            <core:Item key="{switchKeyConfigModel>id}"
+                                text="{switchKeyConfigModel>name}" />
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="switchKeyConfig-selectKeyConfigComboBox"
+                                    writeToDom="true" />
+                            </customData>
+                        </ComboBox>
+                    </VBox>
+                </VBox>
+            </VBox>
+        </content>
+        <footer>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <Button text="{i18n>sendForApproval}" icon="sap-icon://paper-plane"
+                    type="Emphasized"
+                    enabled="{= !!${switchKeyConfigModel>/selectedKeyConfig}}"
+                    press="onSwitchKeyConfigSubmitPress">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="switchKeyConfig-submitButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
+                <Button text="{i18n>cancel}" type="Transparent"
+                    press="onSwitchKeyConfigCancelPress">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="switchKeyConfig-cancelButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
+            </OverflowToolbar>
+        </footer>
+    </Dialog>
+</core:FragmentDefinition>

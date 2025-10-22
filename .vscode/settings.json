@@ -1,0 +1,24 @@
+{
+    "sonarlint.connectedMode.project": {
+        "connectionId": "https-sonar-tools-sap-",
+        "projectKey": "KMS20-ui"
+    },
+    "editor.language.brackets": [
+        [
+            "(",
+            ")"
+        ],
+        [
+            "{",
+            "}"
+        ],
+        [
+            "[",
+            "]"
+        ],
+        [
+            "<",
+            ">"
+        ]
+    ],
+}

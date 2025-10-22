@@ -1,0 +1,20 @@
+<mvc:View
+    controllerName="kms.controller.Settings"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:mvc="sap.ui.core.mvc">
+    <f:DynamicPage>
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="{i18n>sideContentSettings}" />
+                </f:heading>
+                <f:snappedTitleOnMobile>
+                    <Title text="{i18n>sideContentSettings}" />
+                </f:snappedTitleOnMobile>
+            </f:DynamicPageTitle>
+        </f:title>
+        <f:content>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

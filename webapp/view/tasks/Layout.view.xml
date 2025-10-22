@@ -1,0 +1,4 @@
+<mvc:View xmlns="sap.f" xmlns:mvc="sap.ui.core.mvc" height="100%"
+    controllerName="kms.controller.tasks.Layout">
+    <FlexibleColumnLayout id="tasksLayout" layout="{oneWay>/layout}" backgroundDesign="Solid" />
+</mvc:View>

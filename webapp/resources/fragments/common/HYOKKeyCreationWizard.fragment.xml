@@ -1,0 +1,431 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:u="sap.ui.unified"
+    xmlns:layout="sap.ui.layout"
+    core:require="{commonFormatter: 'kms/common/Formatters' }">
+    <Dialog
+        escapeHandler=".onKeyCreationWizardCancelPress"
+        showHeader="false"
+        verticalScrolling="false"
+        contentHeight="80%"
+        contentWidth="40%">
+        <f:DynamicPage
+            stickySubheaderProvider="keyCreationWizard"
+            toggleHeaderOnTitleClick="false"
+            class="sapUiNoContentPadding"
+            showFooter="true">
+            <f:title>
+                <f:DynamicPageTitle>
+                    <f:heading>
+                        <Title text="{i18n>HYOKKeyCreationWizard}" />
+                    </f:heading>
+                </f:DynamicPageTitle>
+            </f:title>
+            <f:content>
+                <NavContainer id="HYOKKeyCreationNavContainer">
+                    <pages>
+                        <Page id="HYOKKeyCreationWizardPage" showHeader="false">
+                            <content>
+                                <Wizard id="HYOKKeyCreationWizard"
+                                    class="sapUiResponsivePadding--header sapUiResponsivePadding--content"
+                                    complete="finishAndReviewHYOKKeyCreation"
+                                >
+                                    <WizardStep id="HYOKKeyARNStep"
+                                        title="{i18n>keyDetails}"
+                                        validated="{= ${model>/keyARN}.length > 0  &amp;&amp; ${model>/keyName}.length > 0 }"
+                                        activate="">
+                                        <VBox width="100%">
+                                            <Label text="{i18n>keyName}:" required="true" />
+                                            <Input value="{model>/keyName}"
+                                                valueLiveUpdate="true">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="hyokName-Input"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </Input>
+                                            <Label text="{i18n>keyARN}:" required="true"
+                                                class="sapUiSmallMarginTop" />
+                                            <Input value="{model>/keyARN}"
+                                                valueLiveUpdate="true">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="hyokArn-Input"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </Input>
+                                            <Label text="{i18n>keyDescription}:"
+                                                class="sapUiTinyMarginTop" />
+                                            <TextArea value="{model>/description}" rows="4"
+                                                width="100%">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="hyok-keyCreationWizard-descriptionInput"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </TextArea>
+                                        </VBox>
+                                    </WizardStep>
+                                    <WizardStep id="HYOKManagementRoleStep"
+                                        validated="{model>/hyokManagementRoleStepValid}"
+                                        activate=""
+                                        title="{i18n>managementRole}">
+                                        <VBox width="100%">
+                                            <VBox width="100%" items="{model>/managementRolesCerts}">
+                                                <VBox width="100%" class="sapUiSmallMarginBottom">
+                                                    <Label text='{i18n>name}:' />
+                                                    <Text
+                                                        text="{model>name}"
+                                                        wrapping="true" />
+                                                    <Label text='{i18n>rootCALabel}:'
+                                                        class="sapUiTinyMarginTop" />
+                                                    <Text
+                                                        text="{model>rootCA}"
+                                                        wrapping="true" />
+                                                    <Label text='{i18n>subject}:'
+                                                        class="sapUiTinyMarginTop" />
+                                                    <Text
+                                                        text="{model>subject}"
+                                                        wrapping="true" />
+                                                </VBox>
+                                            </VBox>
+                                            <Label
+                                                class="sapUiTinyMarginTop"
+                                                text="{i18n>trustAnchorARN}:"
+                                                required="true" />
+                                            <Input
+                                                value="{model>/hyokAWSManagementCertObj/trustAnchorARN}"
+                                                liveChange="setManagementCertStepValidation"
+                                                valueLiveUpdate="true">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="hyokAWSManagementCertTrustAnchorARN-Input"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </Input>
+                                            <Label
+                                                class="sapUiTinyMarginTop"
+                                                text="{i18n>roleARN}:"
+                                                required="true" />
+                                            <Input value="{model>/hyokAWSManagementCertObj/roleARN}"
+                                                liveChange="setManagementCertStepValidation"
+                                                valueLiveUpdate="true">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="hyokAWSManagementCertRoleARN-Input"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </Input>
+                                            <Label
+                                                class="sapUiTinyMarginTop"
+                                                text="{i18n>profileARN}:"
+                                                required="true" />
+                                            <Input value="{model>/hyokAWSManagementCertObj/rootCA}"
+                                                liveChange="setManagementCertStepValidation"
+                                                valueLiveUpdate="true">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="hyokAWSManagementCertRootCA-Input"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </Input>
+                                        </VBox>
+                                    </WizardStep>
+                                    <WizardStep id="HYOKCryptoRoleStep"
+                                        validated="{model>/hyokCryptoRoleStepValid}"
+                                        activate="onhyokCryptoRoleStepActivated"
+                                        title="{i18n>cryptoRole}">
+                                        <VBox items="{model>/hyokAWSCryptoCertObj}"
+                                            class="sapUiMarginBottom">
+                                            <items>
+                                                <HBox>
+                                                    <VBox width="100%">
+                                                        <VBox width="100%"
+                                                            items="{model>selectedCryptoCerts}"
+                                                            class="sapUiSmallMarginTop">
+                                                            <items>
+                                                                <VBox width="100%"
+                                                                    class="sapUiSmallMarginBottom">
+                                                                    <Label text='{i18n>name}:' />
+                                                                    <Text
+                                                                        text="{model>name}"
+                                                                        wrapping="true" />
+                                                                    <Label
+                                                                        text='{i18n>rootCALabel}:'
+                                                                        class="sapUiTinyMarginTop" />
+                                                                    <Text
+                                                                        text="{model>rootCA}"
+                                                                        wrapping="true" />
+                                                                    <Label text='{i18n>subject}:'
+                                                                        class="sapUiTinyMarginTop" />
+                                                                    <Text
+                                                                        text="{model>subject}"
+                                                                        wrapping="true" />
+                                                                </VBox>
+                                                            </items>
+
+                                                        </VBox>
+                                                        <VBox class="sapUiLargeMarginBottom">
+                                                            <Label
+                                                                class="sapUiTinyMarginTop"
+                                                                text="{i18n>trustAnchorARN}:" />
+                                                            <Input
+                                                                value="{model>trustAnchorCryptoARN}"
+                                                            >
+                                                                <customData>
+                                                                    <core:CustomData
+                                                                        key="testId"
+                                                                        value="{= ${trustAnchorCryptoARN}- ${trustAnchorCryptoARN-Input}}"
+                                                                        writeToDom="true" />
+                                                                </customData>
+                                                            </Input>
+                                                            <Label
+                                                                class="sapUiTinyMarginTop"
+                                                                text="{i18n>roleARN}:" />
+                                                            <Input
+                                                                value="{model>roleCryptoARN}">
+                                                                <customData>
+                                                                    <core:CustomData
+                                                                        key="testId"
+                                                                        value="{= ${roleCryptoARN}-${roleCryptoARN-Input}}"
+                                                                        writeToDom="true" />
+                                                                </customData>
+                                                            </Input>
+                                                            <Label
+                                                                class="sapUiTinyMarginTop"
+                                                                text="{i18n>profileARN}:" />
+                                                            <Input
+                                                                value="{model>rootCryptoCA}">
+                                                                <customData>
+                                                                    <core:CustomData
+                                                                        key="testId"
+                                                                        value="{= ${rootCryptoCA}-${rootCryptoCA-Input}}"
+                                                                        writeToDom="true" />
+                                                                </customData>
+                                                            </Input>
+                                                        </VBox>
+
+                                                    </VBox>
+                                                    <Button
+                                                        icon="sap-icon://decline"
+                                                        press="onRemoveCryptoCert">
+                                                        <customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="cryptoSelectedcerts-removeButton"
+                                                                writeToDom="true" />
+                                                        </customData>
+                                                    </Button>
+                                                </HBox>
+                                            </items>
+
+                                        </VBox>
+                                        <VBox visible="{= !!${model>/allowAddMoreCryptoCert}}">
+                                            <Text text="{i18n>addCertARNs}" />
+                                            <HBox width="100%"
+                                                class="sapUiMarginTop"
+                                                alighnItems="Center"
+                                                justifyContent="SpaceBetween">
+                                                <MultiComboBox
+                                                    items="{
+                                                        path: 'model>/availableCryptoCertsSelectionList'
+                                                    }"
+                                                    selectedKeys="{model>/selectedCryptoRolesCertKeys}"
+                                                    showSelectAll="false"
+                                                    selectionFinish="addARNs"
+                                                    width="25rem">
+                                                    <core:Item
+                                                        key="{model>name}"
+                                                        text="{model>name}">
+                                                    </core:Item>
+                                                </MultiComboBox>
+                                            </HBox>
+                                        </VBox>
+                                    </WizardStep>
+                                </Wizard>
+                            </content>
+                        </Page>
+                        <Page id="HYOKKeyCreationReviewPage" showHeader="false">
+                            <content>
+                                <VBox class="sapUiSmallMargin">
+                                    <form:SimpleForm
+                                        class="sapUiSmallMarginBottom"
+                                        editable="false"
+                                        layout="ResponsiveGridLayout">
+                                        <form:toolbar>
+                                            <Toolbar>
+                                                <Title text="1. {i18n>keyDetails}" />
+                                                <ToolbarSpacer />
+                                                <Button press=".onNavBackToStepPress(0)"
+                                                    text="{i18n>edit}">
+                                                    <customData>
+                                                        <core:CustomData
+                                                            key="testId"
+                                                            value="HYOKKeyCreationWizard-editDetailsButton"
+                                                            writeToDom="true" />
+                                                    </customData>
+                                                </Button>
+                                            </Toolbar>
+                                        </form:toolbar>
+                                        <form:content>
+                                            <Label text="{i18n>keyName}" />
+                                            <Input value="{model>/keyName}"
+                                                editable="false" />
+                                            <Label text="{i18n>keyARN}" />
+                                            <Input value="{model>/keyARN}"
+                                                editable="false" />
+                                            <Label text="{i18n>keyDescription}:"
+                                                class="sapUiTinyMarginTop" />
+                                            <TextArea editable="false" value="{model>/description}"
+                                                rows="4"
+                                                width="100%">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="hyok-keyCreationWizard-descriptionText"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </TextArea>
+                                        </form:content>
+                                    </form:SimpleForm>
+
+                                    <form:SimpleForm
+                                        class="sapUiSmallMarginBottom"
+                                        editable="false"
+                                        layout="ResponsiveGridLayout">
+                                        <form:toolbar>
+                                            <Toolbar>
+                                                <Title text="2. {i18n>managementRole}" />
+                                                <ToolbarSpacer />
+                                                <Button press=".onNavBackToStepPress(1)"
+                                                    text="{i18n>edit}">
+                                                    <customData>
+                                                        <core:CustomData
+                                                            key="testId"
+                                                            value="HYOKKeyCreationWizard-editKeySourceButton"
+                                                            writeToDom="true" />
+                                                    </customData>
+                                                </Button>
+                                            </Toolbar>
+                                        </form:toolbar>
+                                        <form:content>
+                                            <VBox width="100%">
+                                                <Label text="{i18n>hyokManagementCertTitle}:" />
+                                                <VBox width="100%"
+                                                    items="{model>/managementRolesCerts}">
+                                                    <VBox width="100%"
+                                                        class="sapUiSmallMarginBottom">
+                                                        <Label text='{i18n>name}:' />
+                                                        <Text
+                                                            text="{model>name}"
+                                                            wrapping="true" />
+                                                        <Label text='{i18n>rootCALabel}:'
+                                                            class="sapUiTinyMarginTop" />
+                                                        <Text
+                                                            text="{model>rootCA}"
+                                                            wrapping="true" />
+                                                        <Label text='{i18n>subject}:'
+                                                            class="sapUiTinyMarginTop" />
+                                                        <Text
+                                                            text="{model>subject}"
+                                                            wrapping="true" />
+                                                    </VBox>
+                                                </VBox>
+                                                <Label
+                                                    class="sapUiTinyMarginTop"
+                                                    text="{i18n>trustAnchorARN}:" />
+                                                <Input
+                                                    value="{model>/hyokAWSManagementCertObj/trustAnchorARN}"
+                                                    editable='false' />
+                                                <Label
+                                                    class="sapUiTinyMarginTop"
+                                                    text="{i18n>roleARN}:" />
+                                                <Input
+                                                    value="{model>/hyokAWSManagementCertObj/roleARN}"
+                                                    editable='false' />
+                                                <Label
+                                                    class="sapUiTinyMarginTop"
+                                                    text="{i18n>profileARN}:" />
+                                                <Input
+                                                    value="{model>/hyokAWSManagementCertObj/rootCA}"
+                                                    editable='false' />
+
+                                            </VBox>
+                                        </form:content>
+                                    </form:SimpleForm>
+                                    <form:SimpleForm
+                                        class="sapUiSmallMarginBottom"
+                                        editable="false"
+                                        layout="ResponsiveGridLayout">
+                                        <form:toolbar>
+                                            <Toolbar>
+                                                <Title text="3. {i18n>cryptoRole}" />
+                                                <ToolbarSpacer />
+                                                <Button press=".onNavBackToStepPress(2)"
+                                                    text="{i18n>edit}" />
+                                            </Toolbar>
+                                        </form:toolbar>
+                                        <form:content>
+                                            <VBox items="{model>/hyokAWSCryptoCertObj}">
+
+                                                <VBox width="100%" class="sapUiSmallMarginBottom">
+                                                    <Label text="{i18n>cryptoCerts}:" />
+                                                    <List
+                                                        items="{model>selectedCryptoRolesCertKeys}">
+                                                        <StandardListItem
+                                                            title="{model>}" />
+                                                    </List>
+                                                    <Label
+                                                        class="sapUiTinyMarginTop"
+                                                        text="{i18n>trustAnchorARN}:" />
+                                                    <Input value="{model>trustAnchorCryptoARN}"
+                                                        editable='false' />
+                                                    <Label
+                                                        class="sapUiTinyMarginTop"
+                                                        text="{i18n>roleARN}:" />
+                                                    <Input value="{model>roleCryptoARN}"
+                                                        editable='false' />
+                                                    <Label
+                                                        class="sapUiTinyMarginTop"
+                                                        text="{i18n>profileARN}:" />
+                                                    <Input value="{model>rootCryptoCA}"
+                                                        editable='false' />
+                                                </VBox>
+                                            </VBox>
+                                        </form:content>
+                                    </form:SimpleForm>
+                                </VBox>
+                            </content>
+                        </Page>
+                    </pages>
+                </NavContainer>
+            </f:content>
+            <f:footer>
+                <OverflowToolbar>
+                    <ToolbarSpacer />
+                    <Button text="{i18n>addKey}" type="Emphasized"
+                        visible="{= !!${model>/reviewMode}}"
+                        press="onKeyCreationWizardSubmitPress" />
+                    <Button text="{i18n>cancel}" type="Transparent"
+                        press="onKeyCreationWizardCancelPress">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="HYOKKeyCreationWizard-cancelButton"
+                                writeToDom="true" />
+                        </customData>
+                    </Button>
+                </OverflowToolbar>
+            </f:footer>
+        </f:DynamicPage>
+    </Dialog>
+</core:FragmentDefinition>

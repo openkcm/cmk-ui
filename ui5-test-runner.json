@@ -1,0 +1,7 @@
+{
+    "port": 8085,
+    "coverage": true,
+    "screenshot": false,
+    "browser-retry": 60,
+    "url": "http://localhost:8000/test/testsuite.qunit.html"
+}

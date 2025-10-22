@@ -1,0 +1,83 @@
+<mvc:View
+    controllerName="kms.controller.tasks.Tasks"
+    xmlns:f="sap.f"
+    xmlns="sap.m"
+    xmlns:m="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:kms="kms.control"
+    xmlns:mvc="sap.ui.core.mvc">
+    <f:DynamicPage>
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="{i18n>sideContentTasks}" />
+                </f:heading>
+                <f:snappedTitleOnMobile>
+                    <Title text="{i18n>sideContentTasks}" />
+                </f:snappedTitleOnMobile>
+            </f:DynamicPageTitle>
+        </f:title>
+        <f:header>
+            <f:DynamicPageHeader>
+                <f:content>
+                    <kms:FilterBar id="tasksFilterBar" search="getTasks"
+                        reset="onReset">
+                        <kms:FilterBarItem label="{i18n>status}">
+                            <MultiComboBox
+                                name="{i18n>status}"
+                                selectionChange=".ontaskStatusFilterSelect"
+                                placeholder="{i18n>all}"
+                                items="{oneWay>/tasksStatusItems}">
+                                <core:Item key="{oneWay>}"
+                                    text="{parts: ['oneWay>'], formatter: '.getText'}" />
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="tasksFilterBar-statusComboBox"
+                                        writeToDom="true" />
+                                </customData>
+                            </MultiComboBox>
+                        </kms:FilterBarItem>
+                        <kms:FilterBarItem label="{i18n>workflowType}">
+                            <MultiComboBox
+                                name="{i18n>taskType}"
+                                selectionChange=".ontaskStatusFilterSelect"
+                                placeholder="{i18n>all}"
+                                items="{oneWay>/taskTypes}">
+                                <core:Item key="{oneWay>}"
+                                    text="{parts: ['oneWay>'], formatter: '.getText'}" />
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="tasksFilterBar-taskTypeComboBox"
+                                        writeToDom="true" />
+                                </customData>
+                            </MultiComboBox>
+                        </kms:FilterBarItem>
+                    </kms:FilterBar>
+                </f:content>
+            </f:DynamicPageHeader>
+        </f:header>
+        <f:content>
+            <m:VBox>
+                <Panel visible="{= ${oneWay>/workflowTasks}.length > 0 }">
+                    <m:VBox>
+                        <core:Fragment
+                            fragmentName="kms.resources.fragments.tasks.TasksTable"
+                            type="XML" />
+                        <kms:Pagination
+                            currentPage="{pagination>/currentPage}"
+                            totalPages="{pagination>/totalPages}"
+                            onPreviousPage="onPreviousPage"
+                            onNextPage="onNextPage" />
+                    </m:VBox>
+                </Panel>
+                <m:VBox visible="{= ${oneWay>/workflowTasks}.length === 0 }">
+                    <core:Fragment
+                        fragmentName="kms.resources.fragments.common.NoDataTableIllustration"
+                        type="XML" />
+                </m:VBox>
+            </m:VBox>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

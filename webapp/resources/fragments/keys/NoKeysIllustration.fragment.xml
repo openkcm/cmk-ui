@@ -1,0 +1,79 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:tnt="sap.tnt"
+    xmlns:forms="sap.ui.layout.form"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    <forms:Form width="100%" editable="true">
+        <forms:layout>
+            <forms:ColumnLayout
+                columnsM="2"
+                columnsL="3"
+                columnsXL="3" />
+        </forms:layout>
+        <forms:toolbar>
+            <OverflowToolbar>
+                <Title
+                    text="{parts: ['i18n>keysWithCount', 'oneWay>/keysCount'], formatter: 'formatMessage'}"
+                    level="H2" />
+                <ToolbarSpacer />
+                <MenuButton text="{i18n>add}" icon="sap-icon://add" type="Ghost">
+                    <menu>
+                        <Menu class="sapUiSizeCompact">
+                            <MenuItem text="{i18n>sapManaged}"
+                                press=".handleCreateKeyRoute('SYSTEM_MANAGED')"
+                                visible="{= !!${oneWay>/keystoreSettings/default/allowManaged} }">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keysTable-createManagedKey"
+                                        writeToDom="true" />
+                                </customData>
+                            </MenuItem>
+                            <MenuItem text="{i18n>byok}"
+                                press=".handleCreateKeyRoute('BYOK')"
+                                visible="{= !!${oneWay>/keystoreSettings/default/allowManaged} }">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keysTable-createByokKey"
+                                        writeToDom="true" />
+                                </customData>
+                            </MenuItem>
+                            <MenuItem text="{i18n>hyok}"
+                                visible="{= !!${oneWay>/keystoreSettings/hyok/allow} }">
+                                <items>
+                                    <MenuItemGroup
+                                        items="{oneWay>/hyokProviders}"
+                                        itemSelectionMode="None">
+                                        <items>
+                                            <MenuItem text="{oneWay>}"
+                                                press=".handleCreateKeyRoute('HYOK', ${oneWay>})" />
+                                        </items>
+                                    </MenuItemGroup>
+                                </items>
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keysTable-createHyokKey"
+                                        writeToDom="true" />
+                                </customData>
+                            </MenuItem>
+                        </Menu>
+                    </menu>
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="keysTable-addKey"
+                            writeToDom="true" />
+                    </customData>
+                </MenuButton>
+            </OverflowToolbar>
+        </forms:toolbar>
+    </forms:Form>
+    <IllustratedMessage
+        enableVerticalResponsiveness="false"
+        title="{i18n>noKeys}"
+        description="{i18n>createKeyHint}"
+        illustrationType="sapIllus-NoFilterResults"
+        illustrationSize="Dialog" />
+</core:FragmentDefinition>

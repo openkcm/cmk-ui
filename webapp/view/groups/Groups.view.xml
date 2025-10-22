@@ -1,0 +1,53 @@
+<mvc:View
+    controllerName="kms.controller.groups.Groups"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns:kms="kms.control"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    <f:DynamicPage>
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="{i18n>sideContentGroupManagement}" />
+                </f:heading>
+                <f:snappedTitleOnMobile>
+                    <Title text="{i18n>sideContentGroupManagement}" />
+                </f:snappedTitleOnMobile>
+                <f:actions>
+                    <Button
+                        icon="sap-icon://refresh"
+                        type="Transparent"
+                        press="setGroups" />
+                    <Button
+                        icon="sap-icon://add"
+                        type="Emphasized"
+                        text="{i18n>createGroup}"
+                        press="onCreateGroupPress" />
+                </f:actions>
+            </f:DynamicPageTitle>
+        </f:title>
+        <f:content>
+            <VBox>
+                <Panel visible="{= ${oneWay>/groupsCount} > 0 }">
+                    <VBox>
+                        <core:Fragment
+                            fragmentName="kms.resources.fragments.groups.UserGroupsTable"
+                            type="XML" />
+                        <kms:Pagination
+                                currentPage="{pagination>/currentPage}"
+                                totalPages="{pagination>/totalPages}"
+                                onPreviousPage="onPreviousPage"
+                                onNextPage="onNextPage" />
+                    </VBox>
+                </Panel>
+                <VBox visible="{= ${oneWay>/groupsCount} === 0 }">
+                    <core:Fragment
+                        fragmentName="kms.resources.fragments.common.NoDataTableIllustration"
+                        type="XML" />
+                </VBox>
+            </VBox>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

@@ -1,0 +1,70 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:u="sap.ui.unified"
+    xmlns:core="sap.ui.core">
+    <Dialog
+        id="ImportKeySelectDialog"
+        title="{i18n>importKey}"
+        contentWidth="30rem"
+        >
+        <form:SimpleForm editable="true" layout="ResponsiveGridLayout" columnsM="1" columnsL="2"
+            columnsXL="2" breakpointL="1270">
+                <VBox justifyContent="SpaceBetween" class="sapUiSmallMarginBottom">
+                    <Text text="{i18n>wrappingAlgorithm}" class="sapUiTinyMarginBottom"/>
+                    <HBox class="sapUiSmallMarginBegin">
+                        <Label text="{i18n>name}:" class="sapUiTinyMarginTop" />
+                        <Text text="{importKeyModel>/wrappingAlgorithm/name}" class="sapUiTinyMarginBegin"/>
+                    </HBox>
+                    <HBox class="sapUiSmallMarginBegin">
+                        <Label text="{i18n>hashFunction}:" class="sapUiTinyMarginTop"/>
+                        <Text text="{importKeyModel>/wrappingAlgorithm/hashFunction}" class="sapUiTinyMarginBegin"/>
+                    </HBox>
+                </VBox>
+            <VBox justifyContent="SpaceBetween" width="100%">
+                <u:FileUploader buttonText="{i18n>browse}" width="100%"
+                            sameFilenameAllowed='true'
+                            maximumFileSize="1" uploadUrl="" 
+                            placeholder="{i18n>uploadMaterial}"
+                            change="onMaterialUpload"/>
+                <TextArea value="{importKeyModel>/keyMaterial}" valueLiveUpdate="true"  width="100%"
+                        placeholder="{i18n>pasteMaterial}"
+                        rows="7">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="importKey-marterialInput"
+                                writeToDom="true" />
+                        </customData>
+                </TextArea>
+            </VBox>
+        </form:SimpleForm>
+        <footer>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <Button text="{i18n>import}"
+                    type="Emphasized"
+                    enabled="{= ${importKeyModel>/keyMaterial} ? true : false }"
+                    press="onImportKeySubmitPress">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="importKey-importButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
+                <Button text="{i18n>cancel}" type="Transparent"
+                    press="onImportKeyCancelPress">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="importKey-cancelButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
+            </OverflowToolbar>
+        </footer>
+
+    </Dialog>
+</core:FragmentDefinition>

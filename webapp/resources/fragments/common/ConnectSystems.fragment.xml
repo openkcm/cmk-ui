@@ -1,0 +1,22 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <SelectDialog
+        id="connectSystemDialogs"
+        contentHeight="35rem"
+        contentWidth="30rem"
+        noDataText="{i18n>noSystemsAvailable}"
+        title="{i18n>connectSystems}"
+        liveChange="onSearchConnectSystems"
+        confirmButtonText="{i18n>connect}"
+        multiSelect="true"
+        confirm="onConnectSystemsConfirmPress"
+        cancel="onConnectSystemsCancelPress"
+        items="{model>/systemsList}">
+        <StandardListItem
+            title="{model>name}"
+            description="{model>region}"
+            selected="{model>connected}"
+            type="Active" />
+    </SelectDialog>
+</core:FragmentDefinition>

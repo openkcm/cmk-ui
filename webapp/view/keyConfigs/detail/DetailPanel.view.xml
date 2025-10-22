@@ -1,0 +1,146 @@
+<mvc:View
+    controllerName="kms.controller.keyConfigs.detail.DetailPanel"
+    xmlns="sap.uxap"
+    xmlns:layout="sap.ui.layout"
+    xmlns:m="sap.m"
+    xmlns:tnt="sap.tnt"
+    xmlns:forms="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:dataHelp="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    <ObjectPageLayout>
+        <headerTitle>
+            <ObjectPageDynamicHeaderTitle>
+                <expandedHeading>
+                    <m:HBox alignContent="Center" alignItems="Center">
+                        <m:Title
+                            text="{= ${oneWay>/type} === 'key' ? ${oneWay>/selectedKey/name} : ${oneWay>/selectedSystem/name}}" />
+                        <tnt:InfoLabel
+                            icon="sap-icon://favorite"
+                            visible="{= !!${oneWay>/selectedKey/isPrimary}}"
+                            class="sapUiTinyMarginBegin"
+                            text="{i18n>primary}"
+                            displayOnly="true"
+                            colorScheme="5" />
+                    </m:HBox>
+                </expandedHeading>
+                <snappedHeading>
+                    <m:HBox alignContent="Center" alignItems="Center">
+                        <m:Title
+                            text="{= ${oneWay>/type} === 'key' ? ${oneWay>/selectedKey/name} : ${oneWay>/selectedSystem/name}}" />
+                        <tnt:InfoLabel
+                            icon="sap-icon://favorite"
+                            visible="{= !!${oneWay>/selectedKey/isPrimary}}"
+                            class="sapUiTinyMarginBegin"
+                            text="{i18n>primary}"
+                            displayOnly="true"
+                            colorScheme="5" />
+                    </m:HBox>
+                </snappedHeading>
+                <expandedContent>
+                    <m:VBox visible="{= ${oneWay>/type} === 'key'}">
+                        <m:Label
+                            text="{oneWay>/selectedKey/provider} • {oneWay>/selectedKey/region}" />
+                        <m:HBox justifyContent="Start" alignContent="Center" alignItems="Center">
+                            <m:Label text="{oneWay>/selectedKey/id}" />
+                            <m:Button icon="sap-icon://copy" type="Transparent"
+                                class="sapUiTinyMarginBegin sapUiTinyMarginBottom"
+                                dataHelp:textToCopy="{oneWay>/selectedKey/id}"
+                                press="onCopyToClipboardPress">
+                                <m:customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyConfigDetail-copyKeyIdButton"
+                                        writeToDom="true" />
+                                </m:customData>
+                            </m:Button>
+                        </m:HBox>
+                    </m:VBox>
+                    <m:VBox visible="{= ${oneWay>/type} === 'system'}">
+                        <m:Label
+                            text="{oneWay>/selectedSystem/region}" />
+                        <m:HBox justifyContent="Start" alignContent="Center" alignItems="Center">
+                            <m:Label text="{oneWay>/selectedSystem/id}" />
+                            <m:Button icon="sap-icon://copy" type="Transparent"
+                                class="sapUiTinyMarginBegin sapUiTinyMarginBottom"
+                                dataHelp:textToCopy="{oneWay>/selectedSystem/id}"
+                                press="onCopyToClipboardPress">
+                                <m:customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyConfigDetail-copySystemIdButton"
+                                        writeToDom="true" />
+                                </m:customData>
+                            </m:Button>
+                        </m:HBox>
+                    </m:VBox>
+                </expandedContent>
+                <actions>
+                    <m:Button icon="sap-icon://refresh"
+                        type="Transparent"
+                        press="onDetailsRefresh">
+                        <m:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="keyConfigDetail-refreshButton"
+                                writeToDom="true" />
+                        </m:customData>
+                    </m:Button>
+                    <m:Button
+                        icon="sap-icon://decline"
+                        type="Transparent"
+                        press="onDetailsClosePress">
+                        <m:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="keyConfigDetail-closeButton"
+                                writeToDom="true" />
+                        </m:customData>
+                    </m:Button>
+                </actions>
+            </ObjectPageDynamicHeaderTitle>
+        </headerTitle>
+        <sections>
+            <ObjectPageSection titleUppercase="false" id="detailPanelObjectPageSectionDetails"
+                title="{i18n>details}" showTitle="false">
+                <subSections>
+                    <ObjectPageSubSection>
+                        <m:VBox visible="{= !${oneWay>/edit} &amp;&amp; ${oneWay>/type} === 'key'}">
+                            <core:Fragment
+                                fragmentName="kms.resources.fragments.keys.DetailsForm"
+                                type="XML" />
+                        </m:VBox>
+                        <m:VBox
+                            visible="{= !${oneWay>/edit} &amp;&amp; ${oneWay>/type} === 'system'}">
+                            <core:Fragment
+                                fragmentName="kms.resources.fragments.systems.DetailsForm"
+                                type="XML" />
+                        </m:VBox>
+                        <m:VBox visible="{= !!${oneWay>/edit} &amp;&amp; ${oneWay>/type} === 'key'}">
+                            <core:Fragment
+                                fragmentName="kms.resources.fragments.keys.DetailsFormEditable"
+                                type="XML" />
+                        </m:VBox>
+                    </ObjectPageSubSection>
+                </subSections>
+            </ObjectPageSection>
+            <!-- TEMP: versions section is temporarily hidden for HYOK as there is not concept
+            proof for HYOK rotation yet -->
+            <ObjectPageSection titleUppercase="false" id="detailPanelObjectPageSectionVersions"
+                visible="{= ${oneWay>/type} === 'key' &amp;&amp; ${oneWay>/selectedKey/type} !== 'HYOK' }"
+                title="{i18n>versions}"
+                showTitle="false">
+                <subSections>
+                    <ObjectPageSubSection>
+                        <m:VBox>
+                            <core:Fragment
+                                fragmentName="kms.resources.fragments.keys.VersionsTable"
+                                type="XML" />
+                        </m:VBox>
+                    </ObjectPageSubSection>
+                </subSections>
+            </ObjectPageSection>
+        </sections>
+    </ObjectPageLayout>
+</mvc:View>

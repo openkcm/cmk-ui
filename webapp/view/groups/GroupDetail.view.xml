@@ -1,0 +1,127 @@
+<mvc:View controllerName="kms.controller.groups.Detail" xmlns:f="sap.f"
+    xmlns:m="sap.m" xmlns="sap.uxap" xmlns:core="sap.ui.core"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage', commonFormatter: 'kms/common/Formatters' }"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:layout="sap.ui.layout"
+    xmlns:forms="sap.ui.layout.form">
+    <ObjectPageLayout showTitleInHeaderContent="true" upperCaseAnchorBar="false">
+        <headerTitle>
+            <ObjectPageDynamicHeaderTitle>
+                <expandedHeading>
+                    <m:Title text="{oneWay>/groupData/name}" wrapping="true" />
+                </expandedHeading>
+                <navigationActions>
+                    <m:OverflowToolbarButton type="Transparent" icon="sap-icon://decline"
+                        press="onCancel" tooltip="Close" />
+                </navigationActions>
+            </ObjectPageDynamicHeaderTitle>
+        </headerTitle>
+
+        <sections>
+            <ObjectPageSection titleUppercase="false"
+                title="{i18n>details}" showTitle="false">
+                <subSections>
+                    <ObjectPageSubSection>
+                        <m:VBox>
+                            <forms:Form width="100%">
+                                <forms:layout>
+                                    <forms:ColumnLayout
+                                        columnsM="1" />
+                                </forms:layout>
+                                <forms:toolbar>
+                                    <m:OverflowToolbar>
+                                        <m:Title text="{i18n>details}" />
+                                        <m:ToolbarSpacer />
+                                        <m:Button icon="sap-icon://edit" text="{i18n>edit}"
+                                            type="Ghost" visible="{= !${oneWay>/editMode} }"
+                                            press="onGroupEditDetailsPress" />
+                                        <m:Button icon="sap-icon://save" text="{i18n>save}"
+                                            visible="{= !!${oneWay>/editMode}}"
+                                            type="Emphasized"
+                                            enabled="{oneWay>/groupValid}"
+                                            press="onGroupSavePress" />
+                                        <m:Button text="{i18n>cancel}"
+                                            class="sapUiTinyMarginBegin"
+                                            visible="{= !!${oneWay>/editMode}}"
+                                            press="onGroupCancelPress" />
+                                    </m:OverflowToolbar>
+                                </forms:toolbar>
+                                <forms:formContainers>
+                                    <forms:FormContainer visible="{= !${oneWay>/editMode} }">
+                                        <forms:formElements>
+                                            <forms:FormElement label="{i18n>name}">
+                                                <forms:fields>
+                                                    <m:Text text="{oneWay>/groupData/name}" />
+                                                </forms:fields>
+                                            </forms:FormElement>
+                                            <forms:FormElement label="{i18n>uuid}">
+                                                <forms:fields>
+                                                    <m:Text text="{oneWay>/groupData/id}" />
+                                                </forms:fields>
+                                            </forms:FormElement>
+                                            <forms:FormElement label="{i18n>description}">
+                                                <forms:fields>
+                                                    <m:Text text="{oneWay>/groupData/description}" />
+                                                </forms:fields>
+                                            </forms:FormElement>
+                                            <forms:FormElement label="{i18n>systemsRole}">
+                                                <forms:fields>
+                                                    <m:Text
+                                                        text="{parts: ['oneWay>/groupData/role'], formatter: 'commonFormatter.setGroupRole'}" />
+                                                </forms:fields>
+                                            </forms:FormElement>
+                                            <forms:FormElement label="{i18n>iamId}">
+                                                <forms:fields>
+                                                    <m:Text text="{oneWay>/groupData/iamIdentifier}" />
+                                                </forms:fields>
+                                            </forms:FormElement>
+                                        </forms:formElements>
+                                    </forms:FormContainer>
+
+                                    <forms:FormContainer visible="{= !!${oneWay>/editMode} }">
+                                        <forms:formElements>
+                                            <forms:FormElement label="{i18n>name}">
+                                                <forms:fields>
+                                                    <m:Input value="{oneWay>/groupData/name}"
+                                                        liveChange="onGroupNameChanged"
+                                                        valueLiveUpdate="true"
+                                                        valueState="{oneWay>/groupNameValueState}"
+                                                        valueStateText="{oneWay>/groupNameValueStateText}" />
+                                                </forms:fields>
+                                            </forms:FormElement>
+                                            <forms:FormElement label="{i18n>uuid}">
+                                                <forms:fields>
+                                                    <m:Text text="{oneWay>/groupData/id}" />
+                                                </forms:fields>
+                                            </forms:FormElement>
+                                            <forms:FormElement label="{i18n>description}">
+                                                <forms:fields>
+                                                    <m:TextArea
+                                                        value="{oneWay>/groupData/description}"
+                                                        rows="4"
+                                                        liveChange="onGroupDescriptionChanged"
+                                                        width="100%" />
+                                                </forms:fields>
+                                            </forms:FormElement>
+                                            <forms:FormElement label="{i18n>systemsRole}">
+                                                <forms:fields>
+                                                    <m:Text
+                                                        text="{parts: ['oneWay>/groupData/role'], formatter: 'commonFormatter.setGroupRole'}" />
+                                                </forms:fields>
+                                            </forms:FormElement>
+                                            <forms:FormElement label="{i18n>iamId}">
+                                                <forms:fields>
+                                                    <m:Text text="{oneWay>/groupData/iamIdentifier}" />
+                                                </forms:fields>
+                                            </forms:FormElement>
+                                        </forms:formElements>
+                                    </forms:FormContainer>
+                                </forms:formContainers>
+                            </forms:Form>
+                        </m:VBox>
+                    </ObjectPageSubSection>
+                </subSections>
+            </ObjectPageSection>
+        </sections>
+    </ObjectPageLayout>
+</mvc:View>

@@ -1,0 +1,143 @@
+<mvc:View height="100%"
+    controllerName="kms.controller.App"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:tnt="sap.tnt">
+    <tnt:ToolPage id="kmsApp" class="sapUiSizeCompact">
+        <tnt:header>
+            <tnt:ToolHeader>
+                <Button
+                    id="sideNavigationToggleButton"
+                    icon="sap-icon://menu2"
+                    type="Transparent"
+                    press=".onSideNavButtonPress">
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="shellBar-sideNavigationToggleButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
+                <Image height="1.5rem"
+                    class="sapUiSmallMarginBegin"
+                    src="https://www.sap.com/dam/application/shared/logos/sap-logo-svg.svg">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="shellBar-homeIcon"
+                            writeToDom="true" />
+                    </customData>
+                </Image>
+                <Title
+                    text="{i18n>appTitle}"
+                    level="H2" />
+                <ToolbarSpacer />
+                <!-- KMS20-2751 TEMPORARY -->
+                <!-- <MenuButton
+                    text="{= ${twoWay>/selectedTenantName} ? ${twoWay>/selectedTenantName} : ${i18n>invalidTenant}}"
+                    type="{= ${twoWay>/selectedTenantName} ? 'Transparent' : 'Reject'}"
+                    icon="{= ${twoWay>/selectedTenantName} ? '' : 'sap-icon://warning'}"
+                    class="sapUiTinyMarginEnd">
+                    <menu>
+                        <Menu items="{oneWay>/tenants}" itemSelected="onTenantChanged"
+                            class="sapUiSizeCompact">
+                            <MenuItem key="{oneWay>id}" text="{oneWay>name}" />
+                        </Menu>
+                    </menu>
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="shellBar-tenantMenuButton"
+                            writeToDom="true" />
+                    </customData>
+                </MenuButton> -->
+                <Avatar initials="KM" displaySize="XS" press="onUserNamePress">
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="shellBar-avatar"
+                            writeToDom="true" />
+                    </customData>
+                </Avatar>
+            </tnt:ToolHeader>
+        </tnt:header>
+        <tnt:sideContent>
+            <tnt:SideNavigation
+                selectedKey="{twoWay>/selectedKey}"
+                itemSelect="onNavigationClick">
+                <tnt:NavigationList>
+                    <tnt:NavigationListItem
+                        text="{i18n>sideContentKeyConfiguration}"
+                        icon="sap-icon://key"
+                        key="keyConfigs">
+                        <tnt:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="sideContent-keyConfigsItem"
+                                writeToDom="true" />
+                        </tnt:customData>
+                    </tnt:NavigationListItem>
+                    <tnt:NavigationListItem
+                        text="{i18n>sideContentSystems}"
+                        icon="sap-icon://it-system"
+                        key="systems">
+                        <tnt:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="sideContent-systemsItem"
+                                writeToDom="true" />
+                        </tnt:customData>
+                    </tnt:NavigationListItem>
+                    <tnt:NavigationListItem
+                        text="{i18n>sideContentTasks}"
+                        icon="sap-icon://task"
+                        key="tasks">
+                        <tnt:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="sideContent-tasksItem"
+                                writeToDom="true" />
+                        </tnt:customData>
+                    </tnt:NavigationListItem>
+                    <tnt:NavigationListItem
+                        text="{i18n>sideContentGroupManagement}"
+                        icon="sap-icon://employee"
+                        key="groups">
+                        <tnt:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="sideContent-groupsItem"
+                                writeToDom="true" />
+                        </tnt:customData>
+                    </tnt:NavigationListItem>
+                </tnt:NavigationList>
+                <tnt:fixedItem>
+                    <tnt:NavigationList>
+                        <tnt:NavigationListItem
+                            text="{i18n>sideContentSettings}"
+                            icon="sap-icon://settings"
+                            key="settings"
+                            href="#/settings">
+                            <tnt:customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="sideContent-settingsItem"
+                                    writeToDom="true" />
+                            </tnt:customData>
+                        </tnt:NavigationListItem>
+                    </tnt:NavigationList>
+                </tnt:fixedItem>
+            </tnt:SideNavigation>
+        </tnt:sideContent>
+        <tnt:mainContents>
+            <App id="mainContents" />
+        </tnt:mainContents>
+    </tnt:ToolPage>
+</mvc:View>

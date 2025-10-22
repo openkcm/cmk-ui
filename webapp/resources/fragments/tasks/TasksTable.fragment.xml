@@ -1,0 +1,89 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage', commonFormatter: 'kms/common/Formatters' }">
+    <Table
+        id="tasksTable"
+        inset="false"
+        items="{oneWay>/workflowTasks}">
+        <headerToolbar>
+            <OverflowToolbar>
+                <Title
+                    text="{parts: ['i18n>workflowTasksCount', 'oneWay>/workflowTasksCount'], formatter: 'formatMessage'}"
+                    level="H2" />
+                <ToolbarSpacer />
+                <Button
+                    icon="sap-icon://sort"
+                    press="onTaskTableSortPress"
+                    class="sapUiSmallMarginEnd"
+                    type="Transparent">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="tasksTable-sortButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
+            </OverflowToolbar>
+        </headerToolbar>
+        <columns>
+            <Column minScreenWidth="Tablet" demandPopin="true">
+                <Text text="{i18n>name}" />
+            </Column>
+            <Column minScreenWidth="Tablet" demandPopin="true">
+                <Text text="{i18n>taskId}" />
+            </Column>
+            <Column minScreenWidth="Tablet" demandPopin="true">
+                <Text text="{i18n>createdOn}" />
+            </Column>
+            <Column minScreenWidth="Tablet" demandPopin="true">
+                <Text text="{i18n>status}" />
+            </Column>
+        </columns>
+        <items>
+            <ColumnListItem vAlign="Middle" type="Navigation" press="onTaskPress">
+                <cells>
+                    <ObjectIdentifier
+                        title="{parts: ['oneWay>artifactType'], formatter: '.getText'}"
+                        text="{parts: ['oneWay>actionType'], formatter: '.getText'}">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="tasksTable-taskObjectIdentifier"
+                                writeToDom="true" />
+                        </customData>
+                    </ObjectIdentifier>
+                    <Text text="{oneWay>id}">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="tasksTable-taskIdText"
+                                writeToDom="true" />
+                        </customData>
+                    </Text>
+                    <Text
+                        text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="tasksTable-createdOnText"
+                                writeToDom="true" />
+                        </customData>
+                    </Text>
+                    <ObjectStatus
+                        icon="{parts: ['oneWay>state'], formatter: 'commonFormatter.setTaskStatus'}"
+                        text="{parts: ['oneWay>state'], formatter: '.getText'}"
+                        active="true"
+                        inverted="true"
+                        state="{parts: ['oneWay>state'], formatter: 'commonFormatter.setTaskStatusIndicationState'}">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="tasksTable-statusObjectStatus"
+                                writeToDom="true" />
+                        </customData>
+                    </ObjectStatus>
+                </cells>
+            </ColumnListItem>
+        </items>
+    </Table>
+</core:FragmentDefinition>

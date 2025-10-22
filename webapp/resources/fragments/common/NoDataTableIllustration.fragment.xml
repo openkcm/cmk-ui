@@ -1,0 +1,13 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:tnt="sap.tnt"
+    xmlns:forms="sap.ui.layout.form"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    <IllustratedMessage
+        enableVerticalResponsiveness="false"
+        enableDefaultTitleAndDescription="false"
+        title="{parts: ['oneWay>/noTableDataText'], formatter: '.getText'}"
+        illustrationType="{oneWay>/noTableDataIllustrationType}"
+        description=""
+        illustrationSize="Scene" />
+</core:FragmentDefinition>

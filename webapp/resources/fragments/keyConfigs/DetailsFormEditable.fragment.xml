@@ -1,0 +1,126 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout"
+    xmlns:forms="sap.ui.layout.form">
+    <forms:Form width="100%" editable="true">
+        <forms:layout>
+            <forms:ColumnLayout
+                columnsM="2"
+                columnsL="3"
+                columnsXL="3" />
+        </forms:layout>
+        <forms:toolbar>
+            <OverflowToolbar>
+                <Title text="{i18n>details}" />
+                <ToolbarSpacer />
+                <Button icon="sap-icon://save" text="{i18n>save}"
+                    type="Emphasized"
+                    press="onSaveKeyConfigPress">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="keyConfigDetailEdit-saveButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
+                <Button icon="sap-icon://decline" text="{i18n>cancel}"
+                    type="Ghost"
+                    press="onCancelEditPress">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="keyConfigDetailEdit-cancelButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
+            </OverflowToolbar>
+        </forms:toolbar>
+        <forms:formContainers>
+            <forms:FormContainer>
+                <forms:formElements>
+                    <forms:FormElement label="{i18n>name}">
+                        <forms:fields>
+                            <Input value="{twoWay>/keyConfig/name}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyConfigDetailEdit-nameInput"
+                                        writeToDom="true" />
+                                </customData>
+                            </Input>
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>uuid}">
+                        <forms:fields>
+                            <Input editable="false"
+                                value="{oneWay>/keyConfig/id}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyConfigDetailEdit-idInput"
+                                        writeToDom="true" />
+                                </customData>
+                            </Input>
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>keyAdministrators}">
+                        <forms:fields>
+                            <Input editable="false" value="{oneWay>/keyConfig/adminGroupID}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyConfigDetailEdit-adminGroupInput"
+                                        writeToDom="true" />
+                                </customData>
+                            </Input>
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>tags}">
+                        <forms:fields>
+                            <MultiInput id="tagsMultiInput" tokens="{oneWay>/tags}" editable="true"
+                                showSuggestion="false" showValueHelp="false"
+                                tokenUpdate="onTagsUpdate">
+                                <tokens>
+                                    <Token key="{oneWay>}" text="{oneWay>}" />
+                                </tokens>
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyConfigDetailEdit-tagsMultiInput"
+                                        writeToDom="true" />
+                                </customData>
+                            </MultiInput>
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>createdBy}">
+                        <forms:fields>
+                            <Input editable="false"
+                                value="{oneWay>/keyConfig/metadata/creatorName}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyConfigDetailEdit-createdByInput"
+                                        writeToDom="true" />
+                                </customData>
+                            </Input>
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>createdOn}">
+                        <forms:fields>
+                            <Input
+                                editable="false"
+                                value="{path:'oneWay>/keyConfig/metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyConfigDetailEdit-createdOnInput"
+                                        writeToDom="true" />
+                                </customData>
+                            </Input>
+                        </forms:fields>
+                    </forms:FormElement>
+                </forms:formElements>
+            </forms:FormContainer>
+        </forms:formContainers>
+    </forms:Form>
+</core:FragmentDefinition>

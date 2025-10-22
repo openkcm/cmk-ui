@@ -1,0 +1,235 @@
+{
+    "_version": "1.21.0",
+    "sap.app": {
+        "id": "kms",
+        "type": "application",
+        "i18n": {
+            "bundleUrl": "i18n/i18n.properties",
+            "fallbackLocale": "en",
+            "supportedLocales": [
+                "en",
+                "de"
+            ]
+        },
+        "title": "{{appTitle}}",
+        "description": "KMS UI",
+        "applicationVersion": {
+            "version": "1.0.0"
+        }
+    },
+    "sap.ui": {
+        "technology": "UI5",
+        "deviceTypes": {
+            "desktop": true,
+            "tablet": false,
+            "phone": false
+        }
+    },
+    "sap.ui5": {
+        "contentDensities": {
+            "compact": true,
+            "cozy": true
+        },
+        "rootView": {
+            "viewName": "kms.view.App",
+            "type": "XML",
+            "id": "kmsApp",
+            "async": true
+        },
+        "resources": {
+            "css": [
+                {
+                    "uri": "css/style.css"
+                }
+            ]
+        },
+        "dependencies": {
+            "minUI5Version": "1.77.0",
+            "libs": {
+                "sap.m": {},
+                "sap.tnt": {},
+                "sap.ui.core": {},
+                "sap.ui.layout": {},
+                "sap.uxap": {}
+            }
+        },
+        "models": {
+            "i18n": {
+                "type": "sap.ui.model.resource.ResourceModel",
+                "uri": "i18n/i18n.properties"
+            }
+        },
+        "routing": {
+            "config": {
+                "routerClass": "sap.m.routing.Router",
+                "controlId": "mainContents",
+                "viewType": "XML",
+                "controlAggregation": "pages",
+                "viewPath": "kms.view",
+                "async": true
+            },
+            "routes": [
+                {
+                    "pattern": "{tenantId}/keyConfigs",
+                    "name": "keyConfigs",
+                    "target": "keyConfigs"
+                },
+                {
+                    "pattern": "{tenantId}/keyConfigs/{keyConfigId}:?query:",
+                    "name": "keyConfigDetail",
+                    "target": [
+                        "keyConfigDetail"
+                    ]
+                },
+                {
+                    "pattern": "{tenantId}/keyConfigs/{keyConfigId}/{type}/{id}:?query:",
+                    "name": "keyConfigDetailPanel",
+                    "target": [
+                        "keyConfigDetail",
+                        "keyConfigDetailPanel"
+                    ]
+                },
+                {
+                    "pattern": "{tenantId}/systems",
+                    "name": "systems",
+                    "target": "systems"
+                },
+                {
+                    "pattern": "{tenantId}/tasks",
+                    "name": "tasks",
+                    "target": "tasks"
+                },
+                {
+                    "pattern": "{tenantId}/tasks",
+                    "name": "tasks",
+                    "target": [
+                        "tasks"
+                    ]
+                },
+                {
+                    "pattern": "{tenantId}/tasks/{taskId}",
+                    "name": "tasksDetail",
+                    "target": [
+                        "tasks",
+                        "tasksDetail"
+                    ]
+                },
+                {
+                    "pattern": "{tenantId}/groups",
+                    "name": "groups",
+                    "target": "groups"
+                },
+                {
+                    "pattern": "{tenantId}/group/{groupId}",
+                    "name": "groupDetail",
+                    "target": [
+                        "groups",
+                        "groupDetail"
+                    ]
+                },
+                {
+                    "pattern": "{tenantId}/settings",
+                    "name": "settings",
+                    "target": "settings"
+                },
+                {
+                    "pattern": "{tenantId}/systems",
+                    "name": "systems",
+                    "target": [
+                        "systems"
+                    ]
+                },
+                {
+                    "pattern": "{tenantId}/systems/{systemId}",
+                    "name": "systemsDetail",
+                    "target": [
+                        "systems",
+                        "systemsDetail"
+                    ]
+                }
+            ],
+            "targets": {
+                "keyConfigs": {
+                    "viewId": "keyConfigs",
+                    "viewName": "keyConfigs.KeyConfigs"
+                },
+                "keyConfigDetailLayout": {
+                    "viewId": "keyConfigDetailLayout",
+                    "viewName": "keyConfigs.detail.Layout"
+                },
+                "keyConfigDetail": {
+                    "parent": "keyConfigDetailLayout",
+                    "controlId": "keyConfigDetailLayout",
+                    "viewName": "keyConfigs.detail.Detail",
+                    "controlAggregation": "beginColumnPages",
+                    "clearControlAggregation": true
+                },
+                "keyConfigDetailPanel": {
+                    "parent": "keyConfigDetailLayout",
+                    "controlId": "keyConfigDetailLayout",
+                    "viewName": "keyConfigs.detail.DetailPanel",
+                    "controlAggregation": "midColumnPages",
+                    "clearControlAggregation": true
+                },
+                "tasksLayout": {
+                    "viewId": "tasksLayout",
+                    "viewName": "tasks.Layout"
+                },
+                "tasks": {
+                    "parent": "tasksLayout",
+                    "controlId": "tasksLayout",
+                    "viewName": "tasks.Tasks",
+                    "clearControlAggregation": true,
+                    "controlAggregation": "beginColumnPages"
+                },
+                "tasksDetail": {
+                    "parent": "tasksLayout",
+                    "controlId": "tasksLayout",
+                    "viewName": "tasks.Details",
+                    "clearControlAggregation": true,
+                    "controlAggregation": "midColumnPages"
+                },
+                "groupsLayout": {
+                    "viewId": "groupsLayout",
+                    "viewName": "groups.Layout"
+                },
+                "groups": {
+                    "parent": "groupsLayout",
+                    "controlId": "groupsLayout",
+                    "viewName": "groups.Groups",
+                    "clearControlAggregation": true,
+                    "controlAggregation": "beginColumnPages"
+                },
+                "groupDetail": {
+                    "parent": "groupsLayout",
+                    "controlId": "groupsLayout",
+                    "viewName": "groups.GroupDetail",
+                    "clearControlAggregation": true,
+                    "controlAggregation": "midColumnPages"
+                },
+                "settings": {
+                    "viewId": "settings",
+                    "viewName": "Settings"
+                },
+                "systemsLayout": {
+                    "viewId": "systemsLayout",
+                    "viewName": "systems.Layout"
+                },
+                "systems": {
+                    "parent": "systemsLayout",
+                    "controlId": "systemsLayout",
+                    "viewName": "systems.Systems",
+                    "clearControlAggregation": true,
+                    "controlAggregation": "beginColumnPages"
+                },
+                "systemsDetail": {
+                    "parent": "systemsLayout",
+                    "controlId": "systemsLayout",
+                    "viewName": "systems.Details",
+                    "clearControlAggregation": true,
+                    "controlAggregation": "midColumnPages"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,101 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core">
+    <Dialog
+        id="connectTargetSystemDialogs"
+        contentHeight="35rem"
+        contentWidth="30rem"
+        class="sapUiContentPadding"
+        title="{i18n>connectSystem}">
+        <VBox
+            width="100%"
+            class="sapUiContentPadding">
+            <MessageStrip
+                text="{i18n>connnectSystemMessageStrip}"
+                showIcon="true"
+                showCloseButton="false"
+                class="sapUiMediumMarginBottom">
+            </MessageStrip>
+            <Label text="{i18n>sideContentSystems}:" class="sapUiTinyMarginBottom"></Label>
+            <VBox justifyContent="SpaceBetween"
+                backgroundDesign="Solid"
+                class="gray-background-color rounded-box">
+                <Title text="{connectSystemModel>/name}" titleStyle="H5"
+                    class="sapUiSmallMarginBegin sapUiSmallMarginTop">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="connectSystem-nameTitle"
+                            writeToDom="true" />
+                    </customData>
+                </Title>
+                <Label text="{connectSystemModel>/id}"
+                    class="sapUiSmallMarginBegin" />
+                <HBox class="sapUiSmallMarginBegin sapUiSmallMarginTop sapUiSmallMarginBottom">
+                    <Label text="{i18n>region}:" />
+                    <Text text="{connectSystemModel>/region}" class="sapUiTinyMarginBegin">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="connectSystem-regionText"
+                                writeToDom="true" />
+                        </customData>
+                    </Text>
+                </HBox>
+            </VBox>
+            <HBox justifyContent="Center" alignContent="Center"
+                class="sapUiSmallMarginTop sapUiSmallMarginBottom">
+                <core:Icon
+                    src="sap-icon://arrow-bottom"
+                    class="icon-size">
+                </core:Icon>
+            </HBox>
+            <VBox justifyContent="SpaceBetween"
+                backgroundDesign="Solid"
+                class="gray-background-color rounded-box">
+                <VBox class="sapUiSmallMargin">
+                    <Label text="{i18n>selectedTargetKeyConfiguration}:" />
+                    <ComboBox
+                        width="100%"
+                        selectedKey="{connectSystemModel>/selectedKeyConfig}"
+                        items="{connectSystemModel>/KeyConfigList}">
+                        <core:Item key="{connectSystemModel>id}" text="{connectSystemModel>name}" />
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="connectSystem-selectKeyConfigComboBox"
+                                writeToDom="true" />
+                        </customData>
+                    </ComboBox>
+                </VBox>
+            </VBox>
+        </VBox>
+        <footer>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <Button text="{i18n>sendForApproval}" icon="sap-icon://paper-plane"
+                    type="Emphasized"
+                    enabled="{= !!${connectSystemModel>/selectedKeyConfig}}"
+                    visible="{model>/createKeyEnabled}"
+                    press="onConnectSystemSubmitPress">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="connectSystem-submitButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
+                <Button text="{i18n>cancel}" type="Transparent"
+                    press="onConnectSystemCancelPress">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="connectSystem-cancelButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
+            </OverflowToolbar>
+        </footer>
+    </Dialog>
+</core:FragmentDefinition>

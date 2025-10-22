@@ -1,0 +1,81 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:u="sap.ui.unified"
+    xmlns:layout="sap.ui.layout">
+    <Dialog
+        escapeHandler=".onConfigCreationCancelPress"
+        id="configCreateDialog"
+        title="{i18n>createConfiguration}"
+        verticalScrolling="false"
+        class="sapUiContentPadding"
+        contentHeight="auto"
+        contentWidth="40%">
+        <content>
+            <VBox>
+                <Label text="{i18n>name}:" required="true" />
+                <Input value="{model>/name}" valueState="{model>/nameValueState}"
+                    valueLiveUpdate="true" liveChange="onConfigCreationNameChange"
+                    valueStateText="{model>/nameValueStateText}">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="createConfig-nameInput"
+                            writeToDom="true" />
+                    </customData>
+                </Input>
+                <Label text="{i18n>description}:"
+                    class="sapUiTinyMarginTop" />
+                <TextArea value="{model>/description}" rows="4"
+                    width="100%">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="createConfig-descriptionText"
+                            writeToDom="true" />
+                    </customData>
+                </TextArea>
+                <Label text="{i18n>adminGroup}" required="true" class="sapUiTinyMarginTop" />
+                <Select
+                    width="100%"
+                    change="onConfigCreationAdminGroupChange"
+                    valueState="{model>/adminGroupValueState}"
+                    valueStateText="{model>/adminGroupValueStateText}"
+                    forceSelection="true"
+                    selectedKey="{model>/adminGroup}"
+                    items="{model>/adminGroupList}">
+                    <core:Item key="{model>id}" text="{model>name}" />
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="createConfig-adminGroupSelect"
+                            writeToDom="true" />
+                    </customData>
+                </Select>
+            </VBox>
+        </content>
+        <beginButton>
+            <Button text="{i18n>create}" press="onConfigCreationCreatePress" type="Emphasized"
+                enabled="{model>/createButtonEnabled}">
+                <customData>
+                    <core:CustomData
+                        key="testId"
+                        value="createConfig-createButton"
+                        writeToDom="true" />
+                </customData>
+            </Button>
+        </beginButton>
+        <endButton>
+            <Button text="{i18n>cancel}" press="onConfigCreationCancelPress" type="Transparent">
+                <customData>
+                    <core:CustomData
+                        key="testId"
+                        value="createConfig-cancelButton"
+                        writeToDom="true" />
+                </customData>
+            </Button>
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

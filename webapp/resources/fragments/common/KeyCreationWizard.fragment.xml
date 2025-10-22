@@ -1,0 +1,248 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:u="sap.ui.unified"
+    xmlns:layout="sap.ui.layout">
+    <Dialog
+        escapeHandler=".onKeyCreationWizardCancelPress"
+        showHeader="false"
+        verticalScrolling="false"
+        contentHeight="80%"
+        contentWidth="40%">
+        <f:DynamicPage
+            stickySubheaderProvider="keyCreationWizard"
+            toggleHeaderOnTitleClick="false"
+            class="sapUiNoContentPadding"
+            showFooter="true">
+            <f:title>
+                <f:DynamicPageTitle>
+                    <f:heading>
+                        <Title text="{i18n>keyCreationWizard}" />
+                    </f:heading>
+                </f:DynamicPageTitle>
+            </f:title>
+            <f:content>
+                <NavContainer id="keyCreationNavContainer">
+                    <pages>
+                        <Page id="keyCreationWizardPage" showHeader="false">
+                            <content>
+                                <Wizard id="keyCreationWizard"
+                                    class="sapUiResponsivePadding--header sapUiResponsivePadding--content"
+                                    complete="onKeyCreationWizardComplete">
+                                    <WizardStep id="detailsStep"
+                                        title="{i18n>details}"
+                                        validated="{model>/detailsStepValid}"
+                                        activate="">
+                                        <VBox width="100%">
+                                            <Label text="{i18n>keyName}:" required="true" />
+                                            <Input value="{model>/name}"
+                                                liveChange="onKeyCreateNameChanged"
+                                                valueLiveUpdate="true"
+                                                valueState="{model>/keyNameValueState}"
+                                                valueStateText="{model>/keyNameValueStateText}">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="keyCreationWizard-nameInput"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </Input>
+                                            <Label text="{i18n>keyDescription}:"
+                                                class="sapUiTinyMarginTop" />
+                                            <TextArea value="{model>/description}" rows="4"
+                                                width="100%">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="keyCreationWizard-descriptionInput"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </TextArea>
+                                        </VBox>
+                                    </WizardStep>
+                                    <WizardStep id="keyRegionStep"
+                                        validated="{model>/keyRegionStepValid}"
+                                        activate=""
+                                        title="{i18n>region}">
+                                        <Select
+                                            width="100%"
+                                            change="onKeyCreateRegionChanged"
+                                            forceSelection="true"
+                                            selectedKey="{model>/region}"
+                                            items="{model>/regionList}">
+                                            <core:Item key="{model>key}" text="{model>text}" />
+                                            <customData>
+                                                <core:CustomData
+                                                    key="testId"
+                                                    value="keyCreationWizard-regionSelect"
+                                                    writeToDom="true" />
+                                            </customData>
+                                        </Select>
+                                    </WizardStep>
+                                    <WizardStep id="keyTypeStep"
+                                        validated="{model>/keyTypeStepValid}"
+                                        title="{i18n>keyType}"
+                                        activate="">
+                                        <SegmentedButton selectedKey="{model>/algorithm}">
+                                            <customData>
+                                                <core:CustomData
+                                                    key="testId"
+                                                    value="keyCreationWizard-typeButton"
+                                                    writeToDom="true" />
+                                            </customData>
+                                            <items>
+                                                <SegmentedButtonItem text="AES-256" key="AES256" />
+                                                <SegmentedButtonItem text="RSA-3072" key="RSA3072" />
+                                                <SegmentedButtonItem text="RSA-4096" key="RSA4096" />
+                                            </items>
+                                    </SegmentedButton>
+                                </WizardStep>
+                                </Wizard>
+                            </content>
+                        </Page>
+                        <Page id="keyCreationReviewPage" showHeader="false">
+                            <content>
+                                <VBox class="sapUiSmallMargin">
+                                    <form:SimpleForm
+                                        class="sapUiSmallMarginBottom"
+                                        editable="false"
+                                        layout="ResponsiveGridLayout">
+                                        <form:toolbar>
+                                            <Toolbar>
+                                                <Title text="1. {i18n>details}" />
+                                                <ToolbarSpacer />
+                                                <Button press=".onNavBackToStepPress(0)"
+                                                    text="{i18n>edit}">
+                                                    <customData>
+                                                        <core:CustomData
+                                                            key="testId"
+                                                            value="keyCreationWizard-editDetailsButton"
+                                                            writeToDom="true" />
+                                                    </customData>
+                                                </Button>
+                                            </Toolbar>
+                                        </form:toolbar>
+                                        <form:content>
+                                            <Label text="{i18n>keyName}" />
+                                            <Input value="{model>/name}"
+                                                editable="false">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="keyCreationWizard-nameText"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </Input>
+                                            <Label text="{i18n>keyDescription}:"
+                                                class="sapUiTinyMarginTop" />
+                                            <TextArea editable="false" value="{model>/description}"
+                                                rows="4"
+                                                width="100%">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="keyCreationWizard-descriptionText"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </TextArea>
+                                        </form:content>
+                                    </form:SimpleForm>
+
+                                    <form:SimpleForm
+                                        class="sapUiSmallMarginBottom"
+                                        editable="false"
+                                        layout="ResponsiveGridLayout">
+                                        <form:toolbar>
+                                            <Toolbar>
+                                                <Title text="2. {i18n>region}" />
+                                                <ToolbarSpacer />
+                                                <Button press=".onNavBackToStepPress(1)"
+                                                    text="{i18n>edit}">
+                                                    <customData>
+                                                        <core:CustomData
+                                                            key="testId"
+                                                            value="keyCreationWizard-editRegionButton"
+                                                            writeToDom="true" />
+                                                    </customData>
+                                                </Button>
+                                            </Toolbar>
+                                        </form:toolbar>
+                                        <form:content>
+                                            <Label text="{i18n>region}" />
+                                            <Select
+                                                editable="false"
+                                                width="100%"
+                                                forceSelection="true"
+                                                selectedKey="{model>/region}"
+                                                items="{model>/regionList}">
+                                                <core:Item key="{model>key}" text="{model>text}" />
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="keyCreationWizard-regionDisabledSelect"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </Select>
+                                        </form:content>
+                                    </form:SimpleForm>
+
+                                    <form:SimpleForm
+                                        class="sapUiSmallMarginBottom"
+                                        editable="false"
+                                        layout="ResponsiveGridLayout">
+                                        <form:toolbar>
+                                            <Toolbar>
+                                                <Title text="3. {i18n>keyType}" />
+                                                <ToolbarSpacer />
+                                                <Button press=".onNavBackToStepPress(2)"
+                                                    text="{i18n>edit}" />
+                                            </Toolbar>
+                                        </form:toolbar>
+                                        <form:content>
+                                            <Label text="{i18n>keyType}" />
+                                            <Input value="{model>/algorithm}"
+                                                editable="false">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="keyCreationWizard-algorithDisabledInput"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </Input>
+                                        </form:content>
+                                    </form:SimpleForm>
+                                </VBox>
+                            </content>
+                        </Page>
+                    </pages>
+                </NavContainer>
+            </f:content>
+            <f:footer>
+                <OverflowToolbar>
+                    <ToolbarSpacer />
+                    <Button text="{i18n>createKey}" type="Emphasized"
+                        visible="{model>/createKeyEnabled}"
+                        press="onKeyCreationWizardSubmitPress">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="keyCreationWizard-submitButton"
+                                writeToDom="true" />
+                        </customData>
+                    </Button>
+                    <Button text="{i18n>cancel}" type="Transparent"
+                        press="onKeyCreationWizardCancelPress">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="keyCreationWizard-cancelButton"
+                                writeToDom="true" />
+                        </customData>
+                    </Button>
+                </OverflowToolbar>
+            </f:footer>
+        </f:DynamicPage>
+    </Dialog>
+</core:FragmentDefinition>

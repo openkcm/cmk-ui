@@ -1,0 +1,190 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:tnt="sap.tnt"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage', commonFormatter: 'kms/common/Formatters' }">
+    <HBox width="100%"
+        justifyContent="End">
+        <tnt:InfoLabel
+            visible="{= !${oneWay>/keyConfig/canConnectSystems} &amp;&amp; !${oneWay>/isSytemsView}}"
+            icon="sap-icon://warning"
+            text="{i18n>connectSystemDisabledTooltip}"
+            renderMode="Narrow"
+            colorScheme="1" />
+    </HBox>
+    <Table
+        id="systemsTable"
+        inset="false"
+        items="{oneWay>/systems}"
+        busy="{oneWay>/systemsTableUpdating}">
+        <headerToolbar>
+            <OverflowToolbar>
+                <Title
+                    text="{parts: ['i18n>systemsCount', 'oneWay>/systemsCount'], formatter: 'formatMessage'}"
+                    level="H2" />
+                <ToolbarSpacer />
+                <Button text="{i18n>connect}" icon="sap-icon://add"
+                    enabled="{= ${oneWay>/keyConfig/canConnectSystems}}"
+                    press="onConnectSystemPress"
+                    visible="{= !!${oneWay>/keyConfigDetail}}">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="systemsTable-connectButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
+                <Button
+                    icon="sap-icon://filter"
+                    press="onKeysTableFilterPress"
+                    type="Transparent">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="keysTable-filterButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
+                <Button
+                    icon="sap-icon://sort"
+                    press="onKeysTableSortPress"
+                    class="sapUiSmallMarginEnd"
+                    type="Transparent">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="keysTable-sortButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
+            </OverflowToolbar>
+        </headerToolbar>
+
+        <columns>
+            <Column minScreenWidth="Tablet" demandPopin="true">
+                <Text text="{i18n>name}" />
+            </Column>
+            <Column minScreenWidth="Tablet" demandPopin="true">
+                <Text text="{i18n>identifier}" />
+            </Column>
+            <Column minScreenWidth="Tablet" demandPopin="true">
+                <Text text="{i18n>type}" />
+            </Column>
+            <Column minScreenWidth="Tablet" demandPopin="true">
+                <Text text="{i18n>systemsRole}" />
+            </Column>
+            <Column minScreenWidth="Tablet" demandPopin="true">
+                <Text
+                    text="{= !!${oneWay>/keyConfigDetail} ? ${i18n>state} : ${i18n>keyConfiguration}}" />
+            </Column>
+            <Column minScreenWidth="Tablet" demandPopin="true"
+                visible="{= !!${oneWay>/keyConfigDetail}}" hAlign="End"
+                vAlign="Middle">
+                <Text text="{i18n>actions}" />
+            </Column>
+        </columns>
+
+        <items>
+            <ColumnListItem vAlign="Middle" type="Navigation" press="onSystemPress">
+                <cells>
+                    <ObjectIdentifier title="{oneWay>properties/Name}" text="{oneWay>region}">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="systemsTable-nameObjectIdentifier"
+                                writeToDom="true" />
+                        </customData>
+                    </ObjectIdentifier>
+                    <Text text="{oneWay>identifier}">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="systemsTable-idText"
+                                writeToDom="true" />
+                        </customData>
+                    </Text>
+                    <Text
+                        text="{parts: ['oneWay>type'], formatter: 'commonFormatter.setSystemType'}">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="systemsTable-typeText"
+                                writeToDom="true" />
+                        </customData>
+                    </Text>
+                    <Text
+                        text="{parts: ['oneWay>properties/systemrole', 'oneWay>properties/systemroleiD'], formatter: 'commonFormatter.setSystemRole'}">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="systemsTable-roleText"
+                                writeToDom="true" />
+                        </customData>
+                    </Text>
+                    <VBox>
+                        <ObjectStatus
+                            icon="{parts: ['oneWay>status'], formatter: 'commonFormatter.setSystemStatusIcon'}"
+                            text="{parts: ['oneWay>status'], formatter: '.getText'}"
+                            active="true"
+                            press="handleStatusPressed"
+                            visible="{= ${oneWay>status} !== 'DISCONNECTED'}"
+                            inverted="true"
+                            state="{parts: ['oneWay>status'], formatter: 'commonFormatter.setSystemStatusColor'}">
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="systemsTable-connectedObjectStatus"
+                                    writeToDom="true" />
+                            </customData>
+                        </ObjectStatus>
+                        <Button text="{i18n>connect}"
+                            press="onTargetConnectSystemPress"
+                            visible="{= ${oneWay>status} === 'DISCONNECTED'}"
+                            icon="sap-icon://add">
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="systemsTable-connectButton"
+                                    writeToDom="true" />
+                            </customData>
+                        </Button>
+                    </VBox>
+
+                    <VBox alignContent="Center"
+                        justifyContent="Start">
+                        <MenuButton icon="sap-icon://action-settings" type="Transparent">
+                            <menu>
+                                <Menu class="sapUiSizeCompact">
+                                    <MenuItem text="{i18n>switchKeyConfiguration}"
+                                        press="onSwitchKeyConfigPress">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="systemsTable-switchKeyConfigMenuItem"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </MenuItem>
+                                    <MenuItem
+                                        press="onSystemsTableDisconnectPress"
+                                        text="{i18n>disconnect}">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="systemsTable-disconnectMenuItem"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </MenuItem>
+                                </Menu>
+                            </menu>
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="systemsTable-actionsMenuButton"
+                                    writeToDom="true" />
+                            </customData>
+                        </MenuButton>
+                    </VBox>
+                </cells>
+            </ColumnListItem>
+        </items>
+    </Table>
+</core:FragmentDefinition>

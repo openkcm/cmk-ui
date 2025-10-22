@@ -1,0 +1,114 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:tnt="sap.tnt"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    <Table
+        noDataText=" "
+        items="{
+                    path: 'oneWay>/keyVersions',
+                    sorter: {
+                        path: 'version',
+                        descending: true
+                    }
+                }"
+        contextualWidth="Auto"
+        popinLayout="GridSmall">
+        <headerToolbar>
+            <OverflowToolbar>
+                <Title
+                    text="{parts: ['i18n>versionsWithCount', 'oneWay>/keyVersionsCount'], formatter: 'formatMessage'}"
+                    level="H2" />
+                <ToolbarSpacer />
+                <MenuButton text="{i18n>rotate}" icon="sap-icon://synchronize" type="Ghost">
+                    <menu>
+                        <Menu class="sapUiSizeCompact">
+                            <MenuItem text="{i18n>rotateNow}"
+                                press="onRotateNowPress">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="versionsTable-rotateNowButton"
+                                        writeToDom="true" />
+                                </customData>
+                            </MenuItem>
+                            <MenuItem text="{i18n>confgureRotation}" enabled="false"
+                                press="onConfigureRotationPress">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="versionsTable-configureRotationButton"
+                                        writeToDom="true" />
+                                </customData>
+                            </MenuItem>
+                        </Menu>
+                    </menu>
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="versionsTable-rotateButton"
+                            writeToDom="true" />
+                    </customData>
+                </MenuButton>
+            </OverflowToolbar>
+        </headerToolbar>
+        <columns>
+            <Column
+                vAlign="Middle"
+                hAlign="Begin"
+                minScreenWidth="XSmall"
+                demandPopin="false">
+                <Text text="{i18n>version}" />
+            </Column>
+            <Column
+                vAlign="Middle"
+                hAlign="Begin"
+                minScreenWidth="XSmall"
+                demandPopin="true">
+                <Text text="{i18n>createdOn}" wrapping="true" />
+            </Column>
+        </columns>
+        <items>
+            <ColumnListItem vAlign="Middle" type="Inactive">
+                <cells>
+                    <HBox alignItems="End" justifyContent="Start">
+                        <tnt:InfoLabel
+                            icon="sap-icon://favorite"
+                            visible="{= !!${oneWay>isPrimary}}"
+                            class="sapUiTinyMarginEnd"
+                            text="{oneWay>version} • {i18n>active}"
+                            displayOnly="true"
+                            colorScheme="5" />
+                        <Text text="{oneWay>version}" visible="{= !${oneWay>isPrimary}}">
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="versionsTable-versionText"
+                                    writeToDom="true" />
+                            </customData>
+                        </Text>
+                    </HBox>
+                    <Text
+                        text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC"
+                        wrapping="true">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="versionsTable-createdOnText"
+                                writeToDom="true" />
+                        </customData>
+                    </Text>
+                    <VBox justifyContent="Center">
+                        <tnt:InfoLabel
+                            visible="{= ${oneWay>state} === 'ENABLED'}"
+                            text="{i18n>enabled}"
+                            colorScheme="8" />
+                        <tnt:InfoLabel
+                            visible="{= ${oneWay>state} === 'DISABLED'}"
+                            text="{i18n>disabled}"
+                            colorScheme="2" />
+                    </VBox>
+                </cells>
+            </ColumnListItem>
+        </items>
+    </Table>
+</core:FragmentDefinition>
