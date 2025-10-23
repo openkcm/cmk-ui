@@ -19,12 +19,26 @@
                     <Button
                         icon="sap-icon://refresh"
                         type="Transparent"
-                        press="setGroups" />
+                        press="setGroups">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="groupMangement-refreshButton"
+                                writeToDom="true" />
+                        </customData>
+                    </Button>
                     <Button
                         icon="sap-icon://add"
                         type="Emphasized"
                         text="{i18n>createGroup}"
-                        press="onCreateGroupPress" />
+                        press="onCreateGroupPress">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="groupMangement-createGroupButton"
+                                writeToDom="true" />
+                        </customData>
+                    </Button>
                 </f:actions>
             </f:DynamicPageTitle>
         </f:title>

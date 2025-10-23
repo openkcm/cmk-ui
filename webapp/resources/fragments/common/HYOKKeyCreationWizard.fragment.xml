@@ -414,7 +414,14 @@
                     <ToolbarSpacer />
                     <Button text="{i18n>addKey}" type="Emphasized"
                         visible="{= !!${model>/reviewMode}}"
-                        press="onKeyCreationWizardSubmitPress" />
+                        press="onKeyCreationWizardSubmitPress">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="HYOKKeyCreationWizard-reviewButton"
+                                writeToDom="true" />
+                        </customData>
+                        </Button>
                     <Button text="{i18n>cancel}" type="Transparent"
                         press="onKeyCreationWizardCancelPress">
                         <customData>
