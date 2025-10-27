@@ -14,9 +14,9 @@
         cancel="onConnectSystemsCancelPress"
         items="{model>/systemsList}">
         <StandardListItem
-            title="{model>name}"
+            title="{model>properties/externalName}"
             description="{model>region}"
-            selected="{model>connected}"
+            selected="{= ${model>status} === 'CONNECTED' }"
             type="Active" />
     </SelectDialog>
 </core:FragmentDefinition>

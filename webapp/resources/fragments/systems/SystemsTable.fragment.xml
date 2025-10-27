@@ -86,7 +86,7 @@
         <items>
             <ColumnListItem vAlign="Middle" type="Navigation" press="onSystemPress">
                 <cells>
-                    <ObjectIdentifier title="{oneWay>properties/Name}" text="{oneWay>region}">
+                    <ObjectIdentifier title="{oneWay>properties/externalName}" text="{oneWay>region}">
                         <customData>
                             <core:CustomData
                                 key="testId"
@@ -112,7 +112,7 @@
                         </customData>
                     </Text>
                     <Text
-                        text="{parts: ['oneWay>properties/systemrole', 'oneWay>properties/systemroleiD'], formatter: 'commonFormatter.setSystemRole'}">
+                        text="{parts: ['oneWay>properties/roleName', 'oneWay>properties/roleID'], formatter: 'commonFormatter.setSystemRole'}">
                         <customData>
                             <core:CustomData
                                 key="testId"

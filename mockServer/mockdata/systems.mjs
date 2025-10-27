@@ -11,9 +11,9 @@ export default (systemId, keyConfigurationID) => {
                 keyConfigurationName: `Key Config ${chance.state({ full: true })}`,
                 region: chance.pickone(['eu-central-1', 'us-east-1', 'us-west-2']),
                 properties: {
-                    Role: chance.pickone(["SAP Analytics Cloud", "SuccessFactors Learning", "SAP Ariba", "SAP Fieldglass", "SAP Concur"]),
-                    RoleID: chance.string({ length: 3, pool: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' }),
-                    Name: `System ${chance.animal()}`
+                    roleName: chance.pickone(["SAP Analytics Cloud", "SuccessFactors Learning", "SAP Ariba", "SAP Fieldglass", "SAP Concur"]),
+                    roleID: chance.string({ length: 3, pool: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' }),
+                    externalName: `System ${chance.animal()}`
                 },
                 status: chance.pickone(states),
                 type: "SYSTEM"
@@ -34,9 +34,9 @@ export default (systemId, keyConfigurationID) => {
             keyConfigurationName: `Key Config ${chance.state({ full: true })}`,
             region: chance.pickone(['eu-central-1', 'us-east-1', 'us-west-2']),
             properties: {
-                Role: chance.pickone(["SAP Analytics Cloud", "SuccessFactors Learning", "SAP Ariba", "SAP Fieldglass", "SAP Concur"]),
-                RoleID: chance.string({ length: 3, pool: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' }),
-                Name: `System ${chance.animal()}`
+                roleName: chance.pickone(["SAP Analytics Cloud", "SuccessFactors Learning", "SAP Ariba", "SAP Fieldglass", "SAP Concur"]),
+                roleID: chance.string({ length: 3, pool: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' }),
+                externalName: `System ${chance.animal()}`
             },
             status: chance.pickone(states),
             type: "SYSTEM"
