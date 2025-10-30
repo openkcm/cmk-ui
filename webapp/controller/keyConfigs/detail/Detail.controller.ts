@@ -183,6 +183,18 @@ export default class KeyConfigDetail extends BaseController {
             console.error('View or component is undefined');
             return;
         }
+
+        if (!this.oneWayModel.getProperty('/allSystems')) {
+            try {
+                await this.updateSystemsTable();
+            }
+            catch (error) {
+                console.error('Error loading systems data:', error);
+                showErrorMessage(error as AxiosError, this.getText('errorFetchingSystems'));
+                return;
+            }
+        }
+
         if (!this.connectSystemPopover) {
             this.connectSystemPopover = await Fragment.load({
                 id: view?.getId() || '',
@@ -192,12 +204,12 @@ export default class KeyConfigDetail extends BaseController {
             this.connectSystemPopover.addStyleClass('sapUiSizeCompact');
             this.connectSystemPopover.setModel(component.getModel('i18n'), 'i18n');
             this.connectSystemPopover.setModel(this.connectSystemModel, 'model');
-            this.connectSystemPopover.open();
             this.resetConnectSystemModel();
+            this.connectSystemPopover.open();
         }
         else {
-            this.connectSystemPopover.open();
             this.resetConnectSystemModel();
+            this.connectSystemPopover.open();
         }
     }
 
@@ -385,7 +397,12 @@ export default class KeyConfigDetail extends BaseController {
 
     private async getConnectedSystems() {
         try {
-            return await this.api.get<KeyResponse>('systems', { keyConfigurationID: this.keyConfigId, $top: this.top, $skip: this.systemsSkip });
+            const payload = {
+                $filter: `keyConfigurationID eq '${this.keyConfigId}'`,
+                $top: this.top,
+                $skip: this.systemsSkip
+            };
+            return await this.api.get<KeyResponse>('systems', payload);
         }
         catch (error) {
             console.error(error);
@@ -961,10 +978,11 @@ export default class KeyConfigDetail extends BaseController {
     }
 
     private resetConnectSystemModel() {
-        const allSystems = this.oneWayModel.getProperty('/allSystems') as System[];
-        const connectedSystems = this.oneWayModel.getProperty('/systems') as System[];
-        const filteredSystems = allSystems?.filter(system =>
-            !connectedSystems?.some(connectedSystem => connectedSystem.id === system.id)
+        const allSystems = this.oneWayModel.getProperty('/allSystems') as System[] || [];
+        const connectedSystems = this.oneWayModel.getProperty('/systems') as System[] || [];
+
+        const filteredSystems = allSystems.filter(system =>
+            !connectedSystems.some(connectedSystem => connectedSystem.id === system.id)
         );
         this.connectSystemModel.setProperty('/systemsList', filteredSystems);
     }
