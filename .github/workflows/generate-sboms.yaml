@@ -1,0 +1,56 @@
+name: Generate SBOM
+
+on:
+  workflow_call:
+    inputs:
+      name:
+        required: true
+        type: string
+      path:
+        required: true
+        type: string
+
+jobs:
+  generate_sbom:
+    runs-on: [self-hosted, solinas]
+    container: golang:latest
+    steps:
+      - name: Checkout private repo
+        if: contains(inputs.name, 'kms/')
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.name }}
+          path: ${{ inputs.path }}
+
+      
+      - name: Checkout public repo
+        if: (!contains(inputs.name, 'kms/'))
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.name }}
+          path: ${{ inputs.path }}
+          github-server-url: 'https://github.com'
+          token: ${{ secrets.GH_PUBLIC_PAT }} # This PAT needs to be created on github.com and secret needs to be added as org secret.
+      
+      - name: setup node 
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' 
+
+      - name: Install CycloneDX-gomod
+        run: |
+          cd ${{ inputs.path }}
+          npm ci
+          npx cyclonedx-npm --output-file bom.json
+            
+      - name: Generate SBOM
+        run: |
+          cd ${{ inputs.path }}
+          #../bin/cyclonedx-gomod mod -verbose -json -output ../${{ inputs.path }}-sbom.json
+          cyclonedx-npm --output-file bom.json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v3
+        with:
+          name: sbom-${{ inputs.path }}
+          path: ${{ inputs.path }}-sbom.json

@@ -1,0 +1,38 @@
+name: Run UI linter
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  linter:
+    runs-on: [ solinas-small ]
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        token: ${{ secrets.GH_ACTION_REPO_READ }}
+    - name: Print Details
+      run: |
+        pwd
+        ls -lrt
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
+    - name: Install eslint
+      run: |
+        npm install eslint
+
+    - name: Print Details A
+      run: |
+        echo "Got to A"
+      
+    - name: Run linter
+      run: npx eslint --fix
+    - name: Print Details B
+      run: |
+        echo "Got to B"
+    - name: Run type check
+      run: npx tsc --noemit

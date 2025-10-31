@@ -1,0 +1,424 @@
+name: Build stage
+
+# yamllint disable-line rule:truthy
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      piper-version:
+        required: false
+        type: string
+        default: 'latest'
+      sap-piper-version:
+        required: false
+        type: string
+        default: 'latest'
+      on-productive-branch:
+        required: true
+        type: string
+      is-optimized-and-scheduled:
+        required: false
+        type: string
+        default: 'false'
+      runs-on:
+        required: false
+        type: string
+        default: '[ "self-hosted" ]'
+      active-stages-map:
+        required: true
+        type: string
+      active-steps-map:
+        required: true
+        type: string
+      pipeline-env:
+        required: true
+        type: string
+      global-extensions-repository:
+        type: string
+        default: ''
+      extensibility-enabled:
+        type: boolean
+        default: false
+      checkout-submodules:
+        required: false
+        type: string
+        default: 'false'
+      checkout-lfs:
+        required: false
+        type: string
+        default: 'false'
+    outputs:
+      active-stages-map:
+        value: ${{ jobs.Build.outputs.activeStagesMap }}
+      active-steps-map:
+        value: ${{ jobs.Build.outputs.activeStepsMap }}
+      pipeline-env:
+        value: ${{ jobs.Build.outputs.pipelineEnv }}
+env:
+  PIPER_ACTION_PIPER_VERSION: ${{ inputs.piper-version }}
+  PIPER_ACTION_SAP_PIPER_VERSION: ${{ inputs.sap-piper-version }}
+  PIPER_ACTION_SAP_PIPER_OWNER: project-piper
+  PIPER_ACTION_SAP_PIPER_REPOSITORY: sap-piper
+  PIPER_ACTION_GITHUB_ENTERPRISE_TOKEN: ${{ github.token }}
+  PIPER_ENTERPRISE_SERVER_URL: ${{ secrets.PIPER_ENTERPRISE_SERVER_URL }}
+  PIPER_ACTION_WDF_GITHUB_ENTERPRISE_TOKEN: ${{ secrets.PIPER_WDF_GITHUB_TOKEN }}
+  PIPER_ACTION_PIPELINE_ENV: ${{ inputs.pipeline-env }}
+  PIPER_vaultAppRoleID: ${{ secrets.PIPER_VAULTAPPROLEID }}
+  PIPER_vaultAppRoleSecretID: ${{ secrets.PIPER_VAULTAPPROLESECRETID }}
+jobs:
+  Build:
+    runs-on: ${{ fromJSON(inputs.runs-on) }}
+    if: fromJSON(inputs.active-stages-map).Build == true
+    outputs:
+      activeStagesMap: ${{ steps.checkIfStepActive.outputs.activeStagesMap }}
+      activeStepsMap: ${{ steps.checkIfStepActive.outputs.activeStepsMap }}
+      pipelineEnv: ${{ steps.pipelineEnv.outputs.pipelineEnv }}
+
+    steps:
+      - name: checkout kms/ui
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_ACTION_REPO_READ }}
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - uses: actions/setup-go@3041bf56c941b39c61721a86cd11f3bb1338122a # v5.2.0
+        with:
+          go-version: '1.24'
+          check-latest: true
+
+      - id: stage_config
+        name: Read stage configuration
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: getConfig
+          flags: --stageConfig --outputFile stage-config.json
+      - run: |
+          echo "buildTool=$(jq -j .buildTool stage-config.json)" >> $GITHUB_ENV
+          echo "::notice::buildTool=$(jq -j .buildTool stage-config.json)"
+      - run: |
+          if [[ ${{ env.buildTool }} == "maven" ]]; then
+            echo "dockerImage=maven:3.6-jdk-8" >> $GITHUB_ENV
+          elif [[ ${{ env.buildTool }} == "gradle" ]]; then
+            echo "dockerImage=gradle:6-jdk11-alpine" >> $GITHUB_ENV
+          fi
+      - name: Checkout global extension
+        if: |
+          inputs.extensibility-enabled == true &&
+          inputs.global-extensions-repository != ''
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.global-extensions-repository }}
+          path: .pipeline/tmp/global_extensions
+      # Requires "id-token: write" permissions, which is to be configured in the workflow that imports the GPP
+      - name: Retrieve System Trust session token
+        id: system_trust
+        uses: project-piper/system-trust-composite-action@18ce544d25f2645c0bafce491aa8661e9e6da006
+        continue-on-error: true
+      - name: preBuild
+        if: inputs.extensibility-enabled == true
+        uses: project-piper/piper-pipeline-github/.github/workflows@main
+        with:
+          extension: preBuild
+      - name: artifactPrepareVersion
+        if: |
+          fromJSON(inputs.active-steps-map)[github.job]['artifactPrepareVersion'] == true &&
+          inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: artifactPrepareVersion
+          docker-image: ${{ env.dockerImage }}
+          # username and password will be overridden by secrets in Vault if set
+          flags: --username github-actions --password ${{ github.token }}
+      - name: artifactPrepareVersion
+        if: |
+          fromJSON(inputs.active-steps-map)[github.job]['artifactPrepareVersion'] == true &&
+          inputs.on-productive-branch != 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: artifactPrepareVersion
+          docker-image: ${{ env.dockerImage }}
+          flags: --versioningType cloud_noTag
+      # sapCumulusUpload needs to generate the pipelineRunKey before gcpPublishEvent can run. The step won't upload any files.
+      - name: sapCumulusUpload (generate pipeline run key)
+        if: |
+          fromJSON(inputs.active-steps-map)[github.job]['sapCumulusUpload'] == true &&
+          inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapCumulusUpload
+          flags: --filePattern "" --stepResultType ""
+      - name: gcpPublishEvent - pipelineTaskRunFinished (artifactPrepareVersion)
+        if: fromJSON(inputs.active-steps-map)[github.job]['gcpPublishEvent'] == true &&
+            inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: gcpPublishEvent
+          flags: '--eventType sap.hyperspace.pipelineTaskRunFinished --topic hyperspace-pipelinetaskrun-finished --additionalEventData {"taskName":"artifactPrepareVersion","outcome":"success"}'
+        continue-on-error: true
+      - name: sapCallStagingService
+        if: fromJSON(inputs.active-steps-map)[github.job]['sapCallStagingService'] == true
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapCallStagingService
+          flags: '--action createGroup'
+      - name: sapCallStagingService
+        if: fromJSON(inputs.active-steps-map)[github.job]['sapCallStagingService'] == true
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapCallStagingService
+          flags: '--action createRepositories'
+      - name: mtaBuild
+        if: fromJSON(inputs.active-steps-map)[github.job]['mtaBuild'] == true
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: mtaBuild
+      - name: gradleExecuteBuild
+        if: fromJSON(inputs.active-steps-map)[github.job]['gradleExecuteBuild'] == true
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: gradleExecuteBuild
+      - name: npmExecuteScripts
+        if: fromJSON(inputs.active-steps-map)[github.job]['npmExecuteScripts'] == true
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: npmExecuteScripts
+      - name: mavenBuild
+        if: fromJSON(inputs.active-steps-map)[github.job]['mavenBuild'] == true
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: mavenBuild
+      - name: pythonBuild
+        if: fromJSON(inputs.active-steps-map)[github.job]['pythonBuild'] == true
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: pythonBuild
+      - name: golangBuild
+        if: fromJSON(inputs.active-steps-map)[github.job]['golangBuild'] == true
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: golangBuild
+      - name: kanikoExecute
+        if: fromJSON(inputs.active-steps-map)[github.job]['kanikoExecute'] == true
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: kanikoExecute
+      - name: cnbBuild
+        if: fromJSON(inputs.active-steps-map)[github.job]['cnbBuild'] == true
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: cnbBuild
+      - name: hadolintExecute
+        if: fromJSON(inputs.active-steps-map)[github.job]['hadolintExecute'] == true
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: hadolintExecute
+      - name: helmExecute
+        if: fromJSON(inputs.active-steps-map)[github.job]['helmExecute'] == true
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: helmExecute
+      # There is a special case in the stage configuration for sapDownloadArtifact
+      # which depends on the existence of a CPE value that is dynamically created by helmExecute.
+      # Therefore checkIfStepActive needs to run again if helmExecute is executed
+      - name: checkIfStepActive (post helmExecute)
+        if: fromJSON(inputs.active-steps-map)[github.job]['helmExecute'] == true
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: ''
+          create-check-if-step-active-maps: true
+      - name: sapOcmCreateComponent
+        if: |
+          fromJSON(inputs.active-steps-map)[github.job]['sapOcmCreateComponent'] == true &&
+          inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapOcmCreateComponent
+      - name: imagePushToRegistry
+        if: |
+          fromJSON(inputs.active-steps-map)[github.job]['imagePushToRegistry'] == true &&
+          inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: imagePushToRegistry
+      - name: sapCumulusUpload (URL log upload)
+        if: |
+          fromJSON(inputs.active-steps-map)[github.job]['sapCumulusUpload'] == true &&
+          inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapCumulusUpload
+          flags: --filePattern **/url-log.json --stepResultType access-log
+      - name: sapGenerateEnvironmentInfo
+        if: inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapGenerateEnvironmentInfo
+          flags: --buildEnvironment Hyperspace_GitHubActions_native_BuildStep
+      - uses: actions/upload-artifact@v3
+        if: |
+          inputs.on-productive-branch == 'true'
+        with:
+          path: ./build-settings.json
+      - uses: actions/upload-artifact@v3
+        if: inputs.on-productive-branch == 'true'
+        with:
+          path: ./env*.json
+      - name: sapCumulusUpload (piper-config.yaml)
+        if: |
+          fromJSON(inputs.active-steps-map)[github.job]['sapCumulusUpload'] == true &&
+          inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapCumulusUpload
+          flags: --filePattern piper-config.yaml --stepResultType config
+      - name: sapCumulusUpload (build settings info)
+        if: |
+          fromJSON(inputs.active-steps-map)[github.job]['sapCumulusUpload'] == true &&
+          inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapCumulusUpload
+          flags: --filePattern build-settings.json --stepResultType settings
+      # build-setting.json upload for SLC-29 policy evaluation
+      - name: sapCumulusUpload (build settings info for SLC-29-PNB policy)
+        if: |
+          fromJSON(inputs.active-steps-map)[github.job]['sapCumulusUpload'] == true &&
+          inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapCumulusUpload
+          flags: --filePattern build-settings.json --stepResultType policy-evidence/SLC-29-PNB
+      - name: sapCumulusUpload (environment info)
+        if: |
+          fromJSON(inputs.active-steps-map)[github.job]['sapCumulusUpload'] == true &&
+          inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapCumulusUpload
+          flags: --filePattern env*.json --stepResultType root
+      # env.json upload for SLC-25 policy evaluation
+      - name: sapCumulusUpload (environment info for SLC-25 policy)
+        if: |
+          fromJSON(inputs.active-steps-map)[github.job]['sapCumulusUpload'] == true &&
+          inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapCumulusUpload
+          flags: --filePattern env*.json --stepResultType policy-evidence/SLC-25
+      # env.json upload for SLC-29 policy evaluation
+      - name: sapCumulusUpload (environment info for SLC-29-PI policy)
+        if: |
+          fromJSON(inputs.active-steps-map)[github.job]['sapCumulusUpload'] == true &&
+          inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapCumulusUpload
+          flags: --filePattern env*.json --stepResultType policy-evidence/SLC-29-PI
+      # hs-assessmeent file should be uploaded before BOM file
+      # see issue: https://github.wdf.sap.corp/ContinuousDelivery/piper-ita/issues/849
+      - name: sapCumulusUpload (HS assessment)
+        if: |
+          fromJSON(inputs.active-steps-map)[github.job]['sapCumulusUpload'] == true &&
+          inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapCumulusUpload
+          flags: --filePattern hs-assessments.yaml --stepResultType assessment
+      - name: sapCumulusUpload (SBom)
+        if: |
+          fromJSON(inputs.active-steps-map)[github.job]['sapCumulusUpload'] == true &&
+          inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapCumulusUpload
+          flags: --filePattern **/bom-*.xml --stepResultType sbom
+      - name: sapCallStagingService
+        if: |
+          always() &&
+          fromJSON(inputs.active-steps-map)[github.job]['sapCallStagingService'] == true
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapCallStagingService
+          flags: '--action close'
+      - name: karmaExecuteTests
+        if: fromJSON(inputs.active-steps-map)[github.job]['karmaExecuteTests'] == true
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: karmaExecuteTests
+      - name: sapCumulusUpload (junit test results)
+        if: |
+          fromJSON(inputs.active-steps-map)[github.job]['sapCumulusUpload'] == true &&
+          inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapCumulusUpload
+          flags: --filePattern **/TEST-*.xml --stepResultType junit
+      - name: sapCumulusUpload (jacoco code coverage results)
+        if: |
+          fromJSON(inputs.active-steps-map)[github.job]['sapCumulusUpload'] == true &&
+          inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapCumulusUpload
+          flags: --filePattern **/jacoco.xml --stepResultType jacoco-coverage
+      - name: sapCumulusUpload (cobertura test coverage results)
+        if: |
+          fromJSON(inputs.active-steps-map)[github.job]['sapCumulusUpload'] == true &&
+          inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapCumulusUpload
+          flags: --filePattern **/cobertura-coverage.xml --stepResultType cobertura-coverage
+      - name: sapCumulusUpload (requirement mapping)
+        if: |
+          fromJSON(inputs.active-steps-map)[github.job]['sapCumulusUpload'] == true &&
+          inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapCumulusUpload
+          flags: --filePattern **/requirement.mapping --stepResultType requirement-mapping
+      - name: sonarExecuteScan
+        if: fromJSON(inputs.active-steps-map)[github.job]['sonarExecuteScan'] == true
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sonarExecuteScan
+      - name: sapCumulusUpload (sonarqube results)
+        if: |
+          fromJSON(inputs.active-steps-map)[github.job]['sapCumulusUpload'] == true &&
+          inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapCumulusUpload
+          flags: --filePattern **/sonarscan-result.json,**/sonarscan.json --stepResultType sonarqube
+      - name: sapCumulusUpload (FC-1 policy evidence)
+        if: |
+          fromJSON(inputs.active-steps-map)[github.job]['sapCumulusUpload'] == true &&
+          inputs.on-productive-branch == 'true'
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        with:
+          step-name: sapCumulusUpload
+          flags: --filePattern **/sonarscan-result.json,**/sonarscan.json --stepResultType policy-evidence/FC-1
+      - name: postBuild
+        if: inputs.extensibility-enabled == true
+        uses: project-piper/piper-pipeline-github/.github/workflows@main
+        with:
+          extension: postBuild
+      - name: Export checkIfStepActive maps
+        if: always()
+        id: checkIfStepActive
+        run: |
+          if [ -f .pipeline/stage_out.json ]; then
+            echo "activeStagesMap=$(jq -c . < .pipeline/stage_out.json)" >> $GITHUB_OUTPUT
+            echo "activeStepsMap=$(jq -c . < .pipeline/step_out.json)" >> $GITHUB_OUTPUT
+          else
+            echo "activeStagesMap=$( jq -c . <<< '${{ inputs.active-stages-map }}' )" >> $GITHUB_OUTPUT
+            echo "activeStepsMap=$( jq -c . <<< '${{ inputs.active-steps-map }}' )" >> $GITHUB_OUTPUT
+          fi
+      - name: Export pipeline environment
+        if: always()
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547 # v1.19.0
+        id: pipelineEnv
+        with:
+          step-name: ''
+          export-pipeline-environment: true
+

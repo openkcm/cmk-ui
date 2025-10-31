@@ -9,7 +9,7 @@ general:
   vaultBasePath: piper/PIPELINE-GROUP-7718
   vaultNamespace: ies/hyperspace/pipelines
   vaultPath: piper/PIPELINE-GROUP-7718
-  vaultPipelineName: PIPELINE-43716
+  vaultPipelineName: 'ui'
   vaultServerUrl: https://vault.tools.sap
   version: main
   containerImageName: "ui"
@@ -52,3 +52,5 @@ steps:
     targetRepositoryName: ui
     targetRepositoryURL: https://common.repositories.cloud.sap/artifactory/kms-helm/ui
     helmCommand: publish
+  sapCumulusUpload:
+    pipelineId: 'eeb88253-1363-4313-9679-3f819df19c47'

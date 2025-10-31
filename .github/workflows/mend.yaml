@@ -1,0 +1,62 @@
+name: mend
+
+on:
+  workflow_dispatch:
+    inputs:
+      build-type:
+        required: true
+        type: string
+        default: 'GO'
+  workflow_call:
+    inputs:
+      build-type:
+        required: true
+        type: string
+        default: 'GO'
+jobs:
+  mend:
+    runs-on: [solinas-small]
+    steps:
+     - name: checkout kms/ui
+       uses: actions/checkout@v4
+       with:
+         repository: kms/ui
+         submodules: recursive
+
+     - name: Generate Build Version
+       uses: hashicorp/actions-generate-metadata@main
+       id: execute
+       with:
+         repository: go-svc-template
+         version: unknown
+         product: kms20
+         metadataFileName: build_version.json
+
+     - name: Set Mend Version
+       run: |
+        import sys
+        import yaml
+        def set_version(file_name, value):
+            value_str=value.replace('-','_')
+            print(value_str)
+            with open(file_name) as f:
+              doc = yaml.safe_load(f)
+              doc['general']['version'] = value_str
+            with open(file_name, 'w') as f:
+              yaml.dump(doc, f)
+        set_version("./.pipeline/config.yml", "${{ github.ref_name }}")
+       shell: python
+
+     - name: Display pipeline Config
+       run: |
+         cat "./.pipeline/config.yml"
+
+     - name: whitesourceExecuteDockerScan
+       uses: SAP/project-piper-action@v1.9.0
+       with:
+        step-name: whitesourceExecuteScan
+        sap-piper-owner: 'project-piper'
+        sap-piper-repository: 'sap-piper'
+       env:
+        PIPER_vaultAppRoleID : ${{ secrets.PIPER_VAULTAPPROLEID }}
+        PIPER_vaultAppRoleSecretID: ${{ secrets.PIPER_VAULTAPPROLESECRETID }}

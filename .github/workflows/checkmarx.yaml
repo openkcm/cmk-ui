@@ -1,0 +1,47 @@
+name: checkmarx-all-repos
+
+on:
+  workflow_call:
+    inputs:
+      project-name:
+        required: false
+        type: string
+
+  workflow_dispatch:
+    inputs:
+      project-name:
+        required: false
+        type: string
+
+jobs:
+  checkmarx:
+    env:
+      PIPER_ACTION_GITHUB_ENTERPRISE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PIPER_ACTION_SAP_PIPER_OWNER: project-piper
+      PIPER_ACTION_SAP_PIPER_REPOSITORY: sap-piper
+      PIPER_vaultAppRoleID: ${{ secrets.PIPER_VAULTAPPROLEID }}
+      PIPER_vaultAppRoleSecretID: ${{ secrets.PIPER_VAULTAPPROLESECRETID }}
+    runs-on: [self-hosted, solinas]
+    steps:
+      - name: checkout kms/ui
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_ACTION_REPO_READ }}
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Checkmarx One scan
+        timeout-minutes: 30
+        uses: checkmarx/ast-github-action@main
+        with:
+          project_name: ui
+          base_uri: https://checkmarx.tools.sap
+          cx_client_id: ${{ secrets.CX_CLIENT_ID }}
+          cx_client_secret: ${{ secrets.CX_CLIENT_SECRET }}
+          cx_tenant: sap
+          additional_params: ${{ vars.CX_ADDITIONAL_PARAMS }}
+
+      - uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547
+        name: sapCumulusUpload
+        with:
+          step-name: sapCumulusUpload
+          flags: --filePattern output.log --stepResultType checkmarxOne
