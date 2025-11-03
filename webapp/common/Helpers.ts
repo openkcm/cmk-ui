@@ -11,6 +11,10 @@ interface ErrorResponse {
         data: {
             error: {
                 code: string
+                context?: {
+                    reason?: string
+                }
+                message?: string
                 requestID: string
                 status: number
             }
@@ -104,6 +108,20 @@ export function getErrorStatus(error: AxiosError): number | undefined {
     return errorStatus;
 }
 
+export function getErrorContext(error: AxiosError): { reason?: string, type?: string } | undefined {
+    if (error.message.includes('data') && error.message.includes('context')) {
+        const errorMessage = JSON.parse(error.message) as ErrorResponse;
+        return errorMessage?.error?.data?.error?.context;
+    }
+}
+
+export function getErrorDataMessage(error: AxiosError): string | undefined {
+    if (error.message.includes('data')) {
+        const errorMessage = JSON.parse(error.message) as ErrorResponse;
+        return errorMessage?.error?.data?.error?.message;
+    }
+}
+
 export function showErrorMessage(error: AxiosError, userMessage: string): void {
     const requestID: string = getRequestId(error);
     const statusCode = getErrorStatus(error);
@@ -116,11 +134,11 @@ export function showErrorMessage(error: AxiosError, userMessage: string): void {
     MessageBox.error(userMessage, {
         title: 'Error',
         details: '<p><strong>' + 'Error Details:' + '</strong></p>'
-            + '<ul>'
-            + '<li><strong>' + 'Request ID: ' + '</strong>' + ' ' + requestID + '</li>'
-            + '<li><strong>' + 'Timestamp (UTC): ' + '</strong>' + datetime + '</li>'
-            + '<li><strong>' + 'Support Page: ' + '</strong>' + "<a href='https://support.sap.com/'>https://support.sap.com<a/>" + '</li>'
-            + '</ul>',
+          + '<ul>'
+          + '<li><strong>' + 'Request ID: ' + '</strong>' + ' ' + requestID + '</li>'
+          + '<li><strong>' + 'Timestamp (UTC): ' + '</strong>' + datetime + '</li>'
+          + '<li><strong>' + 'Support Page: ' + '</strong>' + "<a href='https://support.sap.com/'>https://support.sap.com<a/>" + '</li>'
+          + '</ul>',
         styleClass: 'sapUiUserSelectable'
     });
 }
