@@ -81,6 +81,12 @@ jobs:
           token: ${{ secrets.GH_ACTION_REPO_READ }}
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
+      - name: Add commit ID to index.html
+        run: |
+          COMMIT_ID=$(git rev-parse HEAD)
+          sed -i "/<head>/a\\    <!-- Build commit: $COMMIT_ID -->" webapp/index.html
+          echo "Added commit ID $COMMIT_ID to index.html"
+
       - uses: actions/setup-go@3041bf56c941b39c61721a86cd11f3bb1338122a # v5.2.0
         with:
           go-version: '1.24'
