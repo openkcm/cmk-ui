@@ -51,7 +51,14 @@
                                         itemSelectionMode="None">
                                         <items>
                                             <MenuItem text="{oneWay>}"
-                                                press=".handleCreateKeyRoute('HYOK', ${oneWay>})" />
+                                                press=".handleCreateKeyRoute('HYOK', ${oneWay>})">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="createHyok-awsButton"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </MenuItem>
                                         </items>
                                     </MenuItemGroup>
                                 </items>
