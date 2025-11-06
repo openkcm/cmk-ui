@@ -50,6 +50,8 @@ jobs:
      - name: Display pipeline Config
        run: |
          cat "./.pipeline/config.yml"
+         pwd
+         ls -lrt
 
      - name: whitesourceExecuteDockerScan
        uses: SAP/project-piper-action@v1.9.0
@@ -57,6 +59,7 @@ jobs:
         step-name: whitesourceExecuteScan
         sap-piper-owner: 'project-piper'
         sap-piper-repository: 'sap-piper'
+        projectName: 'KMS20-ui'
        env:
         PIPER_vaultAppRoleID : ${{ secrets.PIPER_VAULTAPPROLEID }}
         PIPER_vaultAppRoleSecretID: ${{ secrets.PIPER_VAULTAPPROLESECRETID }}

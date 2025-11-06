@@ -53,7 +53,7 @@ jobs:
       extensibility-enabled: true # this does enable the PreBuild extensibility
 
   post-stage:
-    needs: [ init-stage, piper-build-stage, mend, checkmarx, sonar, lint ]
+    needs: [ init-stage, piper-build-stage, compliance, checkmarx, sonar, lint ]
     if: always() && !cancelled() && fromJSON(needs.init-stage.outputs.active-stages-map).Post == true
     uses: project-piper/piper-pipeline-github/.github/workflows/post.yml@v1.32.0
     secrets: inherit
@@ -129,3 +129,40 @@ jobs:
     secrets: inherit
     with:
       build-type: ${{ inputs.build-type }}
+
+  compliance:
+    needs: [ mend ]
+      #if: ${{ fromJSON(needs.init-stage.outputs.on-productive-branch) }}
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_ACTION_REPO_READ }}
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Run PPMS Compliance Check
+        uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547
+        env:
+          PIPER_vaultAppRoleID: ${{ secrets.PIPER_VAULTAPPROLEID }}
+          PIPER_vaultAppRoleSecretID: ${{ secrets.PIPER_VAULTAPPROLESECRETID }}
+          PIPER_ACTION_GITHUB_ENTERPRISE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PIPER_ACTION_GITHUB_ENTERPRISE_URL: https://github.tools.sap
+          PIPER_ACTION_SAP_PIPER_OWNER: project-piper
+          PIPER_ACTION_SAP_PIPER_REPOSITORY: sap-piper
+        with:
+          step-name: sapCheckPPMSCompliance
+          flags: |
+            --username ${{ secrets.PPMS_USER }}
+            --password ${{ secrets.PPMS_PASSWORD }}
+            --ppmsID 73555000100200023679
+            --uploadChangeRequest true
+            --createBuildVersion true
+            --version v1.0.0
+            --whitesourceProductToken ${{ secrets.WS_PRODUCTTOKEN }}
+            --whitesourceProductName ${{ secrets.WS_PRODUCT_NAME }}
+            --whitesourceProjectNames "KMS20-sap-cmk - main"
+
+      - name: Details
+        run: |
+          pwd
+          ls -lrt

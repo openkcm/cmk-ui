@@ -13,6 +13,8 @@ general:
   vaultServerUrl: https://vault.tools.sap
   version: main
   containerImageName: "ui"
+  ppmsID: "73555000100200023677"
+  nativeVoting: true
 stages:
   Build:
     artifactPrepareVersion: true
