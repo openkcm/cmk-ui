@@ -11,7 +11,6 @@ general:
   vaultPath: piper/PIPELINE-GROUP-7718
   vaultPipelineName: 'ui'
   vaultServerUrl: https://vault.tools.sap
-  version: main
   containerImageName: "ui"
   ppmsID: "73555000100200023677"
   nativeVoting: true
@@ -39,11 +38,12 @@ steps:
   imagePushToRegistry:
     targetRegistryUrl: https://kms.common.repositories.cloud.sap
   whitesourceExecuteScan:
-    productName: SHC - KMS20
-    projectName: KMS20-ui
-    SkipProjectsWithEmptyTokens: true
-    failOnSevereVulnerabilities: false
-    cvssSeverityLimit: -1
+    scanType: ua
+    productName: "SHC - KMS20"
+    projectName: "kms-ui"
+      #SkipProjectsWithEmptyTokens: true
+      #failOnSevereVulnerabilities: false
+      #cvssSeverityLimit: -1
     disableNpmSubmodulesAggregation: true
   npmExecuteScripts:
     publish: false

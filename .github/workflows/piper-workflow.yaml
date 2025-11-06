@@ -41,7 +41,6 @@ jobs:
 
   piper-build-stage:
     needs: [init-stage]
-    if: ${{ needs.init-stage.outputs.on-productive-branch }} == 'true'
     uses: ./.github/workflows/build.yml
     secrets: inherit
     with:
@@ -110,7 +109,6 @@ jobs:
         
   checkmarx:
     needs: [init-stage]
-    if: ${{ needs.init-stage.outputs.on-productive-branch }} == true
     uses: ./.github/workflows/checkmarx.yaml
     with:
       project-name: ${{ vars.CHECKMARX_PROJECT_NAME }}
@@ -118,21 +116,20 @@ jobs:
 
   sonar:
     needs: [init-stage]
-    if: ${{ needs.init-stage.outputs.on-productive-branch }} == true
     uses: ./.github/workflows/sonarqube.yaml
     secrets: inherit
 
+  # Only run mend on release branch
   mend:
-    if: github.ref == 'refs/heads/main'
+    if: ${{ fromJSON(needs.init-stage.outputs.on-productive-branch) }}
     needs: [init-stage]
     uses: ./.github/workflows/mend.yaml
     secrets: inherit
-    with:
-      build-type: ${{ inputs.build-type }}
 
+  # Only run compliance on release branch
   compliance:
     needs: [ mend ]
-      #if: ${{ fromJSON(needs.init-stage.outputs.on-productive-branch) }}
+    if: ${{ fromJSON(needs.init-stage.outputs.on-productive-branch) }}
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
@@ -149,20 +146,13 @@ jobs:
           PIPER_ACTION_GITHUB_ENTERPRISE_URL: https://github.tools.sap
           PIPER_ACTION_SAP_PIPER_OWNER: project-piper
           PIPER_ACTION_SAP_PIPER_REPOSITORY: sap-piper
+          PIPER_whitesourceProductName: "SHC - KMS20"
         with:
           step-name: sapCheckPPMSCompliance
           flags: |
             --username ${{ secrets.PPMS_USER }}
             --password ${{ secrets.PPMS_PASSWORD }}
-            --ppmsID 73555000100200023679
+            --ppmsID 73555000100200023677
             --uploadChangeRequest true
-            --createBuildVersion true
-            --version v1.0.0
             --whitesourceProductToken ${{ secrets.WS_PRODUCTTOKEN }}
-            --whitesourceProductName ${{ secrets.WS_PRODUCT_NAME }}
-            --whitesourceProjectNames "KMS20-sap-cmk - main"
-
-      - name: Details
-        run: |
-          pwd
-          ls -lrt
+            --whitesourceProjectNames "kms-ui - main"

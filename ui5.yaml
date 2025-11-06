@@ -1,6 +1,6 @@
 specVersion: "4.0"
 metadata:
-  name: kms
+  name: kms-ui
 type: application
 framework:
   name: OpenUI5
