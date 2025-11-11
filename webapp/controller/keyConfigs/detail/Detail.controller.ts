@@ -387,7 +387,7 @@ export default class KeyConfigDetail extends BaseController {
 
     private async getkeystoreSettings() {
         try {
-            return await this.api.get<KeystoreResponse>('tenants/keystores');
+            return await this.api.get<KeystoreResponse>('tenantConfigurations/keystores');
         }
         catch (error) {
             console.error(error);

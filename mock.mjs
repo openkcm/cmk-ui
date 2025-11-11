@@ -124,7 +124,7 @@ app.get("/cmk/v1/tenant1-id/keyConfigurations/:keyConfigurationID/certificates",
     const { keyConfigurationID } = req.params;
     res.json(managementAndCryptoCerts(keyConfigurationID));
 });
-app.get("/cmk/v1/tenant1-id/tenants/keystores", (req, res) => {
+app.get("/cmk/v1/tenant1-id/tenantConfigurations/keystores", (req, res) => {
     res.json(generateKeyStores());
 });
 
