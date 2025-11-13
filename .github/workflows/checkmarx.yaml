@@ -33,7 +33,7 @@ jobs:
         timeout-minutes: 30
         uses: checkmarx/ast-github-action@main
         with:
-          project_name: ui
+          project_name: ${{ vars.CHECKMARX_PROJECT_NAME }}
           base_uri: https://checkmarx.tools.sap
           cx_client_id: ${{ secrets.CX_CLIENT_ID }}
           cx_client_secret: ${{ secrets.CX_CLIENT_SECRET }}
