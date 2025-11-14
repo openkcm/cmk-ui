@@ -6,11 +6,17 @@ on:
       project-name:
         required: false
         type: string
+      on-productive-branch:
+        required: true
+        type: string
 
   workflow_dispatch:
     inputs:
       project-name:
         required: false
+        type: string
+      on-productive-branch:
+        required: true
         type: string
 
 jobs:
@@ -41,6 +47,7 @@ jobs:
           additional_params: ${{ vars.CX_ADDITIONAL_PARAMS }}
 
       - uses: SAP/project-piper-action@2c5592ddbeac49b08e71fef12aea8066dd26c547
+        if: ${{ inputs.on-productive-branch == 'true' }}
         name: sapCumulusUpload
         with:
           step-name: sapCumulusUpload
