@@ -65,13 +65,20 @@ export default class App extends BaseController {
         if (tenantIdMatch) {
             try {
                 Api.updateTenantId(tenantIdMatch[1]);
+                await this.fetchAndSetTenants();
+                this.setTenantData(tenantIdMatch[1]);
             }
             catch (error) {
                 console.error('Invalid tenant', error);
                 this.getView()?.setVisible(false);
+                return;
             }
         }
-        this.setTenantData(tenantIdMatch ? tenantIdMatch[1] : undefined);
+        else {
+            console.error('No tenant ID found in URL');
+            this.getView()?.setVisible(false);
+            return;
+        }
         const urlAfterTenant = currentUrl.slice(1).split('/')[2];
         // END KMS20-2751 TEMPORARY: Set the tenant from the URL
 
@@ -81,6 +88,22 @@ export default class App extends BaseController {
             });
         }
         this.getRouter().attachRouteMatched(this.onRouteChange.bind(this));
+    }
+
+    private async fetchAndSetTenants(): Promise<void> {
+        try {
+            const tenantsResponse = await this.api.getTenantsForTenant();
+            if (tenantsResponse?.value && tenantsResponse.value.length > 0) {
+                this.oneWayModel.setProperty('/tenants', tenantsResponse.value);
+            }
+            else {
+                throw new Error('No tenants found');
+            }
+        }
+        catch (error) {
+            console.error('Error fetching tenants:', error);
+            throw error;
+        }
     }
 
     public onRouteChange(event: Router$RouteMatchedEvent): void {
@@ -127,7 +150,6 @@ export default class App extends BaseController {
     public setTenantData(tenantId?: string): void {
         const tenants = this.api.getTenantsList();
         if (tenants && tenants.length > 0) {
-            this.oneWayModel.setProperty('/tenants', tenants);
             // KMS20-2751 TEMPORARY: Set the tenant from the URL
             if (tenantId) {
                 this.twoWayModel.setProperty('/selectedTenant', tenantId);

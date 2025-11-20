@@ -37,7 +37,7 @@ export default class Component extends UIComponent {
         this.apiInitializedPromise = (async () => {
             try {
                 const config = await loadConfig();
-                await Api.init(config.apiBaseUrl);
+                Api.init(config.apiBaseUrl);
                 const yamlText = await loadYAMLConfig();
                 const doc = yaml.load(yamlText);
                 Ora.init(doc as object);

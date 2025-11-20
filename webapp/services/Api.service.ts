@@ -23,17 +23,17 @@ export default class Api {
             baseURL: `${this.baseURL}/cmk/v1`,
             headers: {
                 'Content-Type': 'application/json'
-            }
+            },
+            withCredentials: true
         });
         this.setAxiosHeaderContentType = (contentType) => {
             this.axiosInstance.defaults.headers['Content-Type'] = contentType;
         };
     }
 
-    public static async init(baseUrl: string): Promise<void> {
+    public static init(baseUrl: string): void {
         if (!Api.instance) {
             Api.instance = new Api(baseUrl);
-            await Api.instance.getAndSetTenants();
         }
     }
 
@@ -48,23 +48,19 @@ export default class Api {
         if (!Api.instance) {
             throw new Error('API not initialized. Call Api.init() first.');
         }
-        const tenants = Api.instance.tenants?.value || [];
-        const tenantExists = tenants.some(tenant => tenant.id === tenantId);
-        if (!tenantExists) {
-            throw new Error(`Tenant with id ${tenantId} does not exist.`);
-        }
         Api.instance.axiosInstance.defaults.baseURL = `${Api.instance.baseURL}/cmk/v1/${tenantId}`;
+        Api.instance.tenantId = tenantId;
     }
 
-    private async getAndSetTenants(): Promise<void> {
-        const tenantsResponse = await this.get<TenantsResponse>('sys/tenants', { $top: 1024, $skip: 0 });
-        this.tenants = tenantsResponse?.value ? tenantsResponse : undefined;
-        if (this.tenants && this.tenants.value.length > 0) {
-            Api.instance.setTenantId(this.tenants.value[0].id);
-            Api.instance.setTenantName(this.tenants.value[0].name || '');
+    public async getTenantsForTenant(): Promise<TenantsResponse | undefined> {
+        try {
+            const response = await this.get<TenantsResponse>('tenants', { $top: 1024, $skip: 0 });
+            this.tenants = response?.value ? response : undefined;
+            return response;
         }
-        else {
-            throw new Error('No tenants found');
+        catch (error) {
+            console.log('Error fetching tenants:', error);
+            return undefined;
         }
     }
 
