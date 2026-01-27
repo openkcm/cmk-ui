@@ -5,7 +5,7 @@
         <headerTitle>
             <ObjectPageDynamicHeaderTitle>
                 <expandedHeading>
-                    <m:Title text="{oneWay>/selectedSystem/properties/Name}" wrapping="true" />
+                    <m:Title text="{oneWay>/selectedSystem/properties/externalName}" wrapping="true" />
                 </expandedHeading>
                 <expandedContent>
                     <m:VBox>
@@ -21,15 +21,28 @@
                     </m:VBox>
                 </expandedContent>
                 <actions>
-                    <m:ToolbarSpacer></m:ToolbarSpacer>
-                    <ObjectPageHeaderActionButton text="{i18n>switchKeyConfiguration}"
-                        visible="{= !!${oneWay>/selectedSystem/keyConfigurationID}}"
+                    <m:OverflowToolbar style="Clear"
+                        visible="{=  ${roleBasedAccess>/systems/canManage}}">
+                        <m:ToolbarSpacer />
+                        <!-- @Todo TEMP: Revert after demo -->
+                        <!-- <ObjectPageHeaderActionButton text="{i18n>switchKeyConfiguration}"
+                        visible="{= !!${oneWay>/selectedSystem/keyConfigurationID} &amp;&amp;
+                    ${oneWay>/selectedSystem/status} !== 'FAILED'}"
                         press="onSwitchKeyConfigPress"
-                        hideText="false" />
-                    <ObjectPageHeaderActionButton text="{i18n>disconnect}" hideText="false"
-                        visible="{= !!${oneWay>/selectedSystem/keyConfigurationID}}"
-                        press="onSystemDisconnectPress"
-                        type="Reject" />
+                        hideText="false" /> -->
+                        <ObjectPageHeaderActionButton text="{i18n>cancel}"
+                            visible="{= !!${oneWay>/selectedSystem/canCancel} &amp;&amp; ${oneWay>/selectedSystem/status} === 'FAILED'}"
+                            press="onSystemCancelPress"
+                            hideText="false" type="Reject" />
+                        <ObjectPageHeaderActionButton text="{i18n>retry}"
+                            visible="{= !!${oneWay>/selectedSystem/canRetry} &amp;&amp; ${oneWay>/selectedSystem/status} === 'FAILED'}"
+                            press="onSystemRetryPress"
+                            hideText="false" type="Emphasized" />
+                        <ObjectPageHeaderActionButton text="{i18n>disconnect}" hideText="false"
+                            visible="{= !!${oneWay>/selectedSystem/keyConfigurationID} &amp;&amp; ${oneWay>/selectedSystem/status} !== 'FAILED'}"
+                            press="onSystemDisconnectPress"
+                            type="Reject" />
+                    </m:OverflowToolbar>
                 </actions>
                 <navigationActions>
                     <m:OverflowToolbarButton type="Transparent" icon="sap-icon://decline"

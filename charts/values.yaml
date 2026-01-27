@@ -143,10 +143,13 @@ ui:
   podSecurityContext: { }
   # fsGroup: 2000
 
+  # This is for setting up pod topology spread constraints by hostname more information can be found here:
+  # https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+  topologySpreadConstraints: []
+
 # This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets:
   - name: "registry-access"
 
-namespace: ui
 
 extraContainers: []

@@ -1,0 +1,97 @@
+<mvc:View
+    controllerName="kms.controller.keyConfigs.KeyConfigs"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core"
+    xmlns:kms="kms.control"
+    xmlns:mvc="sap.ui.core.mvc"
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    <VBox width="100%">
+        <!-- First Row of Tiles -->
+        <FlexBox
+            width="100%"
+            wrap="Wrap"
+            justifyContent="Start"
+            class="sapUiSmallMarginBottom">
+
+            <!-- <GenericTile
+        header="Key Configurations"
+        class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout"
+        visible="{= ${roleBasedAccess>/keyConfig/canView} }"
+        press=".onTilePress">
+        <tileContent>
+            <TileContent footer="Current Status">
+                <NumericContent
+                    value="12"
+                    icon="sap-icon://key"
+                    valueColor="Critical" />
+            </TileContent>
+        </tileContent>
+    </GenericTile> -->
+            <GenericTile
+                header="Systems"
+                class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout"
+                visible="{= ${roleBasedAccess>/systems/canView} }"
+                press=".onTilePress">
+                <tileContent>
+                    <TileContent footer="Available Systems">
+                        <NumericContent
+                            value="5"
+                            icon="sap-icon://it-system"
+                            valueColor="Critical" />
+                    </TileContent>
+                </tileContent>
+            </GenericTile>
+            <GenericTile
+                header="Tasks"
+                class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout"
+                visible="{= ${roleBasedAccess>/tasks/canView} }"
+                press=".onTilePress">
+                <tileContent>
+                    <TileContent footer="Open tasks">
+                        <NumericContent
+                            value="34"
+                            icon="sap-icon://task"
+                            valueColor="Critical" />
+                    </TileContent>
+                </tileContent>
+            </GenericTile>
+            <GenericTile
+                header="User Group"
+                class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout"
+                visible="{= ${roleBasedAccess>/userGroups/canView} }"
+                press=".onTilePress">
+                <tileContent>
+                    <TileContent footer="Total Groups">
+                        <NumericContent
+                            value="2"
+                            icon="sap-icon://employee"
+                            valueColor="Critical" />
+                    </TileContent>
+                </tileContent>
+            </GenericTile>
+        </FlexBox>
+
+        <FlexBox
+            width="100%"
+            justifyContent="Start">
+            <GenericTile
+                header="Helpdesk"
+                subheader="Access guides and technical assistance: HELP_LINK"
+                width="50rem"
+                mode="HeaderMode"
+                valueColor="Good"
+                class="sapUiTinyMargin"
+                press=".onTilePress('helpdesk')">
+                <tileContent>
+                    <TileContent footer="Customer Support">
+                        <NumericContent
+                            value="helpLink"
+                            icon="sap-icon://customer-support"
+                            valueColor="Good" />
+                    </TileContent>
+                </tileContent>
+            </GenericTile>
+        </FlexBox>
+    </VBox>
+</mvc:View>

@@ -25,7 +25,8 @@
             <Column minScreenWidth="Tablet" demandPopin="true">
                 <Text text="{i18n>iamId}" wrapping="false" />
             </Column>
-            <Column minScreenWidth="Large" hAlign="End" vAlign="Middle" demandPopin="true">
+            <Column minScreenWidth="Large" hAlign="End" vAlign="Middle"
+                demandPopin="true" visible="{= ${roleBasedAccess>/userGroups/canManage} }">
                 <Text text="{i18n>actions}" wrapping="false" />
             </Column>
         </columns>
@@ -55,7 +56,7 @@
                     <Text text="{path:'oneWay>iamIdentifier'}" />
                     <VBox>
                         <MenuButton icon="sap-icon://action-settings" type="Transparent"
-                            visible="{= !${oneWay>edit}}">
+                            visible="{= !${oneWay>edit} &amp;&amp; ${roleBasedAccess>/userGroups/canManage}}">
                             <menu>
                                 <Menu class="sapUiSizeCompact">
                                     <MenuItem press="onKeyTableDeletePress" text="{i18n>delete}"

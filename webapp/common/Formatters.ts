@@ -1,6 +1,7 @@
 import { ValueState, IndicationColor } from 'sap/ui/core/library';
-import { TaskStates, SystemStatus, SystemType, GroupRoles, KeyStates, StateColors } from './Enums';
+import { TaskStates, SystemStatus, SystemType, GroupRoles, KeyStates, StateColors, KeyCreationTypes, WorkflowStatus, ActionTypes, ArtifactTypes } from './Enums';
 import { getText } from 'kms/common/Helpers';
+import { AWSAccessDetails } from './Types';
 
 export function setTaskStatus(state: TaskStates): string {
     switch (state) {
@@ -130,4 +131,59 @@ export function setKeyStateColor(state: string): int {
         default:
             return 10;
     }
+}
+
+export function setEnableMenuItemVisible(keyType: KeyCreationTypes, keyState: KeyStates): boolean {
+    return keyType !== KeyCreationTypes.HYOK && keyState === KeyStates.DISABLED;
+}
+
+export function setDisableMenuItemVisible(keyType: KeyCreationTypes, keyState: KeyStates): boolean {
+    return keyType !== KeyCreationTypes.HYOK && keyState === KeyStates.ENABLED;
+}
+
+export function setConnectSystemInfoMessageStripVisible(workflowStatus: string): boolean {
+    switch (workflowStatus) {
+        case WorkflowStatus.WORKFLOW_ALREADY_EXISTS:
+        case WorkflowStatus.WORKFLOW_REQUIRED:
+        case WorkflowStatus.ERROR:
+            return true;
+        default:
+            return false;
+    }
+}
+
+export function setConnectSystemInfoMessageStripText(workflowStatus: string): string {
+    switch (workflowStatus) {
+        case WorkflowStatus.WORKFLOW_ALREADY_EXISTS:
+            return getText('workflowAlreadyExistsMessage');
+        case WorkflowStatus.WORKFLOW_REQUIRED:
+            return getText('connnectSystemNeedsApprovalMessage');
+        case WorkflowStatus.ERROR:
+            return getText('errorGeneric');
+        default:
+            return '';
+    }
+}
+
+export function formatActionAndArtifact(artifactType: ArtifactTypes, actionType: ActionTypes, artifactName: string): string {
+    if (!artifactType || !actionType) {
+        return '';
+    }
+    const translatedAction = getText(actionType);
+    const translatedArtifact = getText(artifactType);
+
+    // Return the combined string, e.g., "Connect System"
+    return `${translatedAction} \r\n ${translatedArtifact} \r\n ${artifactName}`;
+}
+
+export function appendIDToLabelText(labelText: string): string {
+    return `${getText(labelText)} (${getText('ID')})`;
+}
+
+export function appendNameToLabelText(labelText: string): string {
+    return `${getText(labelText)} (${getText('name')})`;
+}
+
+export function isCryptoDetailEditable(cryptoARNsArray: { key: string, value: AWSAccessDetails }[]): boolean {
+    return cryptoARNsArray?.some(cryptoARN => cryptoARN.value.isEditable);
 }

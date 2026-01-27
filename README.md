@@ -1,8 +1,6 @@
-# OpenKCM: CMK UI
+# KMS 2 UI
 
-[![REUSE status](https://api.reuse.software/badge/github.com/openkcm/cmk-ui)](https://api.reuse.software/info/github.com/openkcm/cmk-ui)
-
-User Interface for the OpenKCM CMK Portal.
+This repository contains the User Interface for the KMS2 Portal Project.
 
 ## Description
 
@@ -36,7 +34,7 @@ The API base URL is set in `webapp/config/config.json`. Modify the `apiBaseUrl` 
 ```bash
 npm install
 ```
-4. To start the local development server, run `npm start`. Using a 3rd party webserver is NOT supported due to using UI5 middleware. If using the mock server, remember to start that separately [as shown here](https://github.tools.sap/kms/ui/edit/main/README.md#local-api):
+4. To start the local development server, run `npm start`. Using a 3rd party webserver is NOT supported due to using UI5 middleware. If using the mock server, remember to start that separately [as shown here](https://github.com/openkcm/cmk-ui/blob/main/README.md#local-api):
 5. Application will start on port 8081
 6. If using a local CMK API instance and are using MacOS, run `npm run startchrome` to open a Chrome instance with web security turned off. Using a normal Chrome browser will result in CORS errors.
 
@@ -115,14 +113,14 @@ Before you begin, ensure you have the following installed on your system:
 
 #### Prerequisites - create k3d cluster
 Pull cmk project
-- [https://github.tools.sap/kms/cmk.git](https://github.tools.sap/kms/cmk.git)
+- [https://github.com/openkcm/cmk](https://github.com/openkcm/cmk)
 
 Follow instructions from README.md, to install cmk cluster
-run
+run 
 ```bash
 make start-cmk
 ```
-or
+or 
 ```bash
 make start-cmk-colima
 ```
@@ -141,19 +139,3 @@ export CONTAINER_PORT=$(kubectl get pod --namespace cmk $POD_NAME -o jsonpath="{
 echo "Visit http://127.0.0.1:8086 to use your application"
 kubectl --namespace cmk port-forward $POD_NAME 8086:$CONTAINER_PORT
 ```
-
-
-## Support, Feedback, Contributing
-
-This project is open to feature requests/suggestions, bug reports etc. via [GitHub issues](https://github.com/openkcm/cmk-ui/issues). Contribution and feedback are encouraged and always welcome. For more information about how to contribute, the project structure, as well as additional contribution information, see our [Contribution Guidelines](CONTRIBUTING.md).
-
-## Security / Disclosure
-If you find any bug that may be a security problem, please follow our instructions at [in our security policy](https://github.com/openkcm/cmk-ui/security/policy) on how to report it. Please do not create GitHub issues for security-related doubts or problems.
-
-## Code of Conduct
-
-We as members, contributors, and leaders pledge to make participation in our community a harassment-free experience for everyone. By participating in this project, you agree to abide by its [Code of Conduct](https://github.com/openkcm/.github/blob/main/CODE_OF_CONDUCT.md) at all times.
-
-## Licensing
-
-Copyright (20xx-)20xx SAP SE or an SAP affiliate company and OpenKCM contributors. Please see our [LICENSE](LICENSE) for copyright and license information. Detailed information including third-party components and their licensing/copyright information is available [via the REUSE tool](https://api.reuse.software/info/github.com/openkcm/cmk-ui).

@@ -1,6 +1,6 @@
 import { BYOKProviders, HYOKProviders, KeyCreationTypes } from 'kms/common/Enums';
 import { MangedKeyPayload, HyokKeyPayload, AWScertificates, hyokAWSCryptoCertInput, hyokAWSManagementCertInput, AWSAccessDetails } from 'kms/common/Types';
-import { showErrorMessage } from 'kms/common/Helpers';
+import { getErrorContext, getErrorDataMessage, showErrorMessage } from 'kms/common/Helpers';
 import { AxiosError } from 'axios';
 import BaseController from 'kms/controller/BaseController';
 import KeyConfigDetail from 'kms/controller/keyConfigs/detail/Detail.controller';
@@ -166,7 +166,7 @@ export default class HyokKeyRegistration extends BaseController {
             this.resetModel();
         }
         catch (error) {
-            showErrorMessage(error as AxiosError, this.parentController.getText('errorAddingKey'));
+            this._handleHYOKKeyRegistrationError(error as AxiosError);
             console.error('Error creating key', error);
         }
         finally {
@@ -252,8 +252,8 @@ export default class HyokKeyRegistration extends BaseController {
         const hyokAWSManagementCertObj = this.keyCreationModel.getProperty('/hyokAWSManagementCertObj') as hyokAWSManagementCertInput;
         const managementRolesComplete
             = (hyokAWSManagementCertObj?.trustAnchorARN ?? '').length > 0
-            && (hyokAWSManagementCertObj?.roleARN ?? '').length > 0
-            && (hyokAWSManagementCertObj?.rootCA ?? '').length > 0;
+              && (hyokAWSManagementCertObj?.roleARN ?? '').length > 0
+              && (hyokAWSManagementCertObj?.rootCA ?? '').length > 0;
         this.keyCreationModel.setProperty('/hyokManagementRoleStepValid', managementRolesComplete);
     }
 
@@ -286,8 +286,8 @@ export default class HyokKeyRegistration extends BaseController {
     private async getHYOKAWSCertificates(): Promise<{ hyokAWSManagementCerts: AWScertificates[], cryptoRolesCerts: AWScertificates[] }> {
         const hyokAWScertificates = await this.api.get<HYOKAWScertificates>(`keyConfigurations/${this.keyConfigId}/certificates`);
         const certs = {
-            hyokAWSManagementCerts: hyokAWScertificates?.tenantDefault?.value,
-            cryptoRolesCerts: hyokAWScertificates?.crypto?.value
+            hyokAWSManagementCerts: hyokAWScertificates?.tenantDefault?.value ?? [],
+            cryptoRolesCerts: hyokAWScertificates?.crypto?.value ?? []
         };
         return certs;
     }
@@ -316,5 +316,18 @@ export default class HyokKeyRegistration extends BaseController {
             });
         });
         return cryptoPayload;
+    }
+
+    private _handleHYOKKeyRegistrationError(error: AxiosError): void {
+        const errorContext = getErrorContext(error);
+        const errorMessage = getErrorDataMessage(error);
+        if (errorContext?.reason || errorMessage) {
+            const errorContextCode = errorContext?.reason ? ` (Error code: ${errorContext?.reason})` : '';
+            const detailedErrorMessage = errorMessage ? ` ${errorMessage}` : '';
+            showErrorMessage(error, this.parentController.getText('errorHYOKKeyRegistrationAuthenticationFailed', [detailedErrorMessage + errorContextCode]));
+        }
+        else {
+            showErrorMessage(error, this.parentController.getText('errorAddingKey'));
+        }
     }
 }

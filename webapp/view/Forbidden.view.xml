@@ -1,0 +1,35 @@
+<mvc:View
+    controllerName="kms.controller.Forbidden"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:mvc="sap.ui.core.mvc">
+    <f:DynamicPage>
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="Forbidden" />
+                </f:heading>
+                <f:snappedTitleOnMobile>
+                    <Title text="Forbidden" />
+                </f:snappedTitleOnMobile>
+            </f:DynamicPageTitle>
+        </f:title>
+        <f:content>
+            <VBox alignItems="Center" justifyContent="Center">
+                <IllustratedMessage enableVerticalResponsiveness="false"
+                    title="{i18n>notAuthorised}"
+                    description="{forbidden>/errorMessage}"
+                    enableDefaultTitleAndDescription="false"
+                    illustrationType="sapIllus-UnableToLoad"
+                    illustrationSize="Scene">
+                </IllustratedMessage>
+                <Button 
+                    text="{i18n>retryLogin}"
+                    type="Emphasized"
+                    press=".onRetryLogin"
+                    visible="{forbidden>/loginButtonVisible}"
+                    class="sapUiSmallMarginTop" />
+            </VBox>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

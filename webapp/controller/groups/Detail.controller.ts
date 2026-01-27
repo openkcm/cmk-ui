@@ -2,7 +2,7 @@ import BaseController from 'kms/controller/BaseController';
 import BindingMode from 'sap/ui/model/BindingMode';
 import JSONModel from 'sap/ui/model/json/JSONModel';
 import Api from 'kms/services/Api.service';
-import { Group } from 'kms/common/Types';
+import { Group, GroupIAMExistance } from 'kms/common/Types';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import { showErrorMessage, setNameValueState } from 'kms/common/Helpers';
 import { AxiosError } from 'axios';
@@ -11,9 +11,8 @@ import { Input$LiveChangeEvent } from 'sap/m/Input';
 import { TextArea$LiveChangeEvent } from 'sap/m/TextArea';
 import { EventChannelIds, EventIDs } from 'kms/common/Enums';
 import EventBus from 'sap/ui/core/EventBus';
-interface GroupResponse {
-    value: Group[]
-    count: number
+interface IamResponse {
+    value: GroupIAMExistance[]
 }
 interface GroupPayload {
     name: string
@@ -45,21 +44,47 @@ export default class GroupDetail extends BaseController {
         this.api = Api.getInstance();
         this.tenantId = routeArgs?.tenantId;
         this.groupId = routeArgs.groupId || '';
-        this.setUser().catch((error: unknown) => {
+        this.getGroup().catch((error: unknown) => {
             console.error(error);
         });
         this.eventBus.publish(EventChannelIds.GROUPS, EventIDs.LOAD_GROUPS, { groupId: this.groupId, tenantId: this.tenantId });
     };
 
-    private async setUser(): Promise<void> {
+    private async getGroup(): Promise<void> {
         this.getView()?.setBusy(true);
         try {
-            const group = await this.api.get<GroupResponse[]>(`groups/${this.groupId}`);
+            const group = await this.api.get<Group>(`groups/${this.groupId}`);
             this.oneWayModel.setProperty('/groupData', group);
+            this.groupIAMCheck(group?.iamIdentifier).catch((error: unknown) => {
+                console.error(error);
+            });
         }
         catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorFetchingUser'));
+        }
+        finally {
+            this.getView()?.setBusy(false);
+        }
+    };
+
+    private async groupIAMCheck(iamIdentifier: string | undefined): Promise<void> {
+        this.getView()?.setBusy(true);
+        if (!iamIdentifier) {
+            console.warn('No IAM Identifier found for group');
+            return;
+        }
+        const payload = {
+            iamIdentifiers: [
+                iamIdentifier
+            ]
+        };
+        try {
+            const iamResponse = await this.api.post<IamResponse>('groups/iamCheck', payload);
+            this.oneWayModel.setProperty('/groupData/groupInIAM', iamResponse?.value[0].exists);
+        }
+        catch (error) {
+            console.error(error);
         }
         finally {
             this.getView()?.setBusy(false);
@@ -106,7 +131,7 @@ export default class GroupDetail extends BaseController {
         try {
             await this.api.patch(`groups/${this.groupId}`, payload);
             MessageBox.success(this.getText('groupUpdatedSuccessfully'));
-            await this.setUser();
+            await this.getGroup();
             this.getRouter().navTo('groups', {
                 tenantId: this.tenantId
             });

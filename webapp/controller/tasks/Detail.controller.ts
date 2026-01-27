@@ -2,7 +2,7 @@ import BaseController from 'kms/controller/BaseController';
 import BindingMode from 'sap/ui/model/BindingMode';
 import JSONModel from 'sap/ui/model/json/JSONModel';
 import Api from 'kms/services/Api.service';
-import { Approver, Task } from 'kms/common/Types';
+import { ApprovalGroup, Approver, Task, TaskDecision } from 'kms/common/Types';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import { Button$PressEvent } from 'sap/m/Button';
 import { AxiosError } from 'axios';
@@ -11,10 +11,6 @@ import { EventChannelIds, EventIDs, TaskStates, TaskStateTransitionAction } from
 import MessageToast from 'sap/m/MessageToast';
 import EventBus from 'sap/ui/core/EventBus';
 
-interface ApproversResponse {
-    value: Approver[]
-    count: number
-}
 interface TaskTransitionActionsObj {
     key: TaskStateTransitionAction
     text: string
@@ -65,11 +61,11 @@ export default class Tasks extends BaseController {
         this.getView()?.setBusy(true);
         try {
             const task = await this.api.get<Task>(`workflows/${this.taskId}`);
-            const approversData = await this.api.get<ApproversResponse>(`workflows/${this.taskId}/approvers`);
+
             if (task) {
                 this.oneWayModel.setProperty('/task', task);
-                this.oneWayModel.setProperty('/approvers', approversData?.value);
-                this.setTaskActionButtonData(task, approversData?.value);
+                this.oneWayModel.setProperty('/task/taskDescription', this.setTaskDescription(task));
+                this.setTaskActionButtonData(task);
             }
             else {
                 console.error('Task not found');
@@ -85,63 +81,56 @@ export default class Tasks extends BaseController {
         }
     };
 
-    private setTaskActionButtonData(task: Task, approvers: Approver[]): void {
-        // const userId: string = 'random_id' //Change this to actuall user id once the data is available;
+    private setTaskDescription(task: Task): string {
+        let description = '';
+        const parameterDescription = task.parameters ? ` ${this.getText('to')} ${this.getText(task?.parametersResourceType)}: ${task.parametersResourceName}` : '';
+
+        description = `${task.initiatorName} ${this.getText('requestsApprovalFor')}  ${this.getText(task?.actionType)} ${task.artifactType}: ${task.artifactName} ${parameterDescription}.`;
+        return description;
+    }
+
+    private setTaskActionButtonData(task: Task): void {
         let taskTransitionActions = [] as TaskTransitionActionsObj[];
-        const approverIds = approvers?.map(approver => approver.id);
-        //  const userId: string = approverIds[0]; //Temp Setting to test the Approver action items on tasks
-        const userId: string = task?.initiatorID; // Temp Setting to test the Initiator action items on tasks
-        const userIsTaskInitiator = userId === task?.initiatorID;
-        const userIsTaskApprover = approverIds.includes(userId);
-        if (userIsTaskInitiator) {
-            if (task?.state === TaskStates.WAIT_APPROVAL) {
-                taskTransitionActions = [
-                    {
-                        key: TaskStateTransitionAction.REVOKE,
-                        text: this.getText('Revoke'),
-                        buttonType: 'Reject'
-                    }];
+        const transitionKeysObjMap: Record<string, TaskTransitionActionsObj> = {
+            CONFIRM: {
+                key: TaskStateTransitionAction.CONFIRM,
+                text: this.getText('Confirm'),
+                buttonType: 'Accept'
+            },
+            REVOKE: {
+                key: TaskStateTransitionAction.REVOKE,
+                text: this.getText('Revoke'),
+                buttonType: 'Reject'
+            },
+            APPROVE: {
+                key: TaskStateTransitionAction.APPROVE,
+                text: this.getText('Approve'),
+                buttonType: 'Accept'
+            },
+            REJECT: {
+                key: TaskStateTransitionAction.REJECT,
+                text: this.getText('Reject'),
+                buttonType: 'Reject'
             }
-            else if (task?.state === TaskStates.WAIT_CONFIRMATION) {
-                taskTransitionActions = [
-                    {
-                        key: TaskStateTransitionAction.CONFIRM,
-                        text: this.getText('Confirm'),
-                        buttonType: 'Accept'
-                    },
-                    {
-                        key: TaskStateTransitionAction.REVOKE,
-                        text: this.getText('Revoke'),
-                        buttonType: 'Reject'
-                    }];
-            }
-        }
-        else if (userIsTaskApprover) {
-            if (task.state === TaskStates.WAIT_APPROVAL) {
-                taskTransitionActions = [
-                    {
-                        key: TaskStateTransitionAction.APPROVE,
-                        text: this.getText('Approve'),
-                        buttonType: 'Accept'
-                    },
-                    {
-                        key: TaskStateTransitionAction.REJECT,
-                        text: this.getText('Reject'),
-                        buttonType: 'Reject'
-                    }];
-            }
-        }
-        else {
-            taskTransitionActions = [];
-        }
+        };
+        taskTransitionActions = task.availableTransitions?.map((transition) => {
+            return transitionKeysObjMap[transition];
+        });
         this.oneWayModel.setProperty('/taskTransitionActions', taskTransitionActions);
     }
 
-    public parseApproverNamesWithDecisions(approvers: Approver[]) {
-        const approversParsed = approvers?.map((approver) => {
-            return `${approver?.name} (${this.getText('decision')}: ${this.getText(approver?.decision)})`;
+    public parseApproverGroups(groups: ApprovalGroup[]) {
+        const approversParsed = groups?.map((approver) => {
+            return approver.name;
         });
         return approversParsed?.join('\r\n');
+    }
+
+    public parseApproverNamesWithDecisions(decisions: TaskDecision[]) {
+        const approverDecisionParsed = decisions?.map((decisionItem) => {
+            return `${decisionItem?.name} (${this.getText('decision')}: ${this.getText(decisionItem?.decision)})`;
+        });
+        return approverDecisionParsed?.join('\r\n');
     }
 
     public async onTaskActionPress(_event: Button$PressEvent, key: TaskStateTransitionAction) {
@@ -175,5 +164,13 @@ export default class Tasks extends BaseController {
 
     public async onCopyToClipboardPress(event: Button$PressEvent): Promise<void> {
         await copyToClipboard(event);
+    }
+
+    public checkMinApproverAttentionRequired(state: TaskStates): boolean {
+        let minApproverAttentionRequired = false;
+        if (state === TaskStates.WAIT_APPROVAL) {
+            minApproverAttentionRequired = true;
+        }
+        return minApproverAttentionRequired;
     }
 }

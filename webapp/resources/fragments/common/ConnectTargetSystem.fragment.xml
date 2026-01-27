@@ -1,7 +1,9 @@
 <core:FragmentDefinition
     xmlns="sap.m"
     xmlns:f="sap.f"
-    xmlns:core="sap.ui.core">
+    xmlns:core="sap.ui.core"
+    core:require="{ commonFormatter: 'kms/common/Formatters' }"
+    >
     <Dialog
         id="connectTargetSystemDialogs"
         contentHeight="35rem"
@@ -10,18 +12,13 @@
         title="{i18n>connectSystem}">
         <VBox
             width="100%"
+            visible="{= ${connectSystemModel>/KeyConfigList}.length > 0}"
             class="sapUiContentPadding">
-            <MessageStrip
-                text="{i18n>connnectSystemMessageStrip}"
-                showIcon="true"
-                showCloseButton="false"
-                class="sapUiMediumMarginBottom">
-            </MessageStrip>
-            <Label text="{i18n>sideContentSystems}:" class="sapUiTinyMarginBottom"></Label>
+            <Label text="{i18n>SYSTEM}:" class="sapUiTinyMarginBottom"></Label>
             <VBox justifyContent="SpaceBetween"
                 backgroundDesign="Solid"
                 class="gray-background-color rounded-box">
-                <Title text="{connectSystemModel>/name}" titleStyle="H5"
+                <Title text="{connectSystemModel>/properties/externalName}" titleStyle="H5"
                     class="sapUiSmallMarginBegin sapUiSmallMarginTop">
                     <customData>
                         <core:CustomData
@@ -30,7 +27,7 @@
                             writeToDom="true" />
                     </customData>
                 </Title>
-                <Label text="{connectSystemModel>/id}"
+                <Label text="{connectSystemModel>/identifier}"
                     class="sapUiSmallMarginBegin" />
                 <HBox class="sapUiSmallMarginBegin sapUiSmallMarginTop sapUiSmallMarginBottom">
                     <Label text="{i18n>region}:" />
@@ -59,6 +56,7 @@
                     <ComboBox
                         width="100%"
                         selectedKey="{connectSystemModel>/selectedKeyConfig}"
+                        selectionChange="onSelectedKeyConfigChange"
                         items="{connectSystemModel>/KeyConfigList}">
                         <core:Item key="{connectSystemModel>id}" text="{connectSystemModel>name}" />
                         <customData>
@@ -70,15 +68,41 @@
                     </ComboBox>
                 </VBox>
             </VBox>
+            <MessageStrip
+                visible="{parts: ['connectSystemModel>/workflowStatus'], formatter: 'commonFormatter.setConnectSystemInfoMessageStripVisible'}"
+                text="{parts: ['connectSystemModel>/workflowStatus'], formatter: 'commonFormatter.setConnectSystemInfoMessageStripText'}"
+                showIcon="true"
+                showCloseButton="false"
+                class="sapUiMediumMarginBottom">
+            </MessageStrip>
         </VBox>
+        <IllustratedMessage
+            visible="{= ${connectSystemModel>/KeyConfigList}.length === 0 }"
+            enableVerticalResponsiveness="false"
+            title="{i18n>connectSystemsDisabled}"
+            description="{i18n>connectSystemDisabledTooltip}"
+            illustrationType="sapIllus-NoColumnsSet"
+            illustrationSize="Dialog" />
         <footer>
             <OverflowToolbar>
                 <ToolbarSpacer />
-                <Button text="{i18n>sendForApproval}" icon="sap-icon://paper-plane"
+                <Button text="{i18n>connect}" icon="sap-icon://connect"
                     type="Emphasized"
                     enabled="{= !!${connectSystemModel>/selectedKeyConfig}}"
-                    visible="{model>/createKeyEnabled}"
+                    visible="{connectSystemModel>/showConnectButton}"
                     press="onConnectSystemSubmitPress">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="connectSystem-submitButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
+                 <Button text="{i18n>sendForApproval}" icon="sap-icon://paper-plane"
+                    type="Emphasized"
+                    enabled="{= !!${connectSystemModel>/selectedKeyConfig}}"
+                    visible="{connectSystemModel>/showApprovalButton}"
+                    press="onConnectSystemSendForApprovalPress">
                     <customData>
                         <core:CustomData
                             key="testId"

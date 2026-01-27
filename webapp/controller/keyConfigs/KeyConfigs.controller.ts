@@ -105,16 +105,15 @@ export default class Keys extends BaseController {
         this.getView()?.setBusy(true);
         try {
             const keyConfigs = await this.api.get<KeyConfigsResponse>('keyConfigurations', { $top: this.top, $skip: this.skip, expandGroup: true });
-            const keyConfigsData = keyConfigs.value;
-            keyConfigsData.forEach((config) => {
-                config.primaryKeyID = '4556cadf-4c8b-4ecd-a754-dedda1086198';
-            });
-            const keystoreSettings = await this.getkeystoreSettings();
-            this.oneWayModel.setProperty('/keystoreSettings', keystoreSettings);
-            this.oneWayModel.setProperty('/configs', keyConfigsData);
-            this.oneWayModel.setProperty('/configsCount', keyConfigs.count || 0);
-            this.paginationModel.setProperty('/totalPages', Math.ceil(keyConfigs.count / this.top));
-            this.paginationModel.setProperty('/currentPage', this.currentPage);
+            const keyConfigsData = keyConfigs?.value;
+            if (keyConfigsData) {
+                const keystoreSettings = await this.getkeystoreSettings();
+                this.oneWayModel.setProperty('/keystoreSettings', keystoreSettings);
+                this.oneWayModel.setProperty('/configs', keyConfigsData);
+                this.oneWayModel.setProperty('/configsCount', keyConfigs?.count || 0);
+                this.paginationModel.setProperty('/totalPages', Math.ceil((keyConfigs?.count ?? 0) / this.top));
+                this.paginationModel.setProperty('/currentPage', this.currentPage);
+            }
         }
         catch (error) {
             console.error(error);
@@ -218,7 +217,7 @@ export default class Keys extends BaseController {
                 MessageBox.information(this.getText('noAdminGroupsMessage'), {
                     actions: [this.getText('manageGroups'), MessageBox.Action.CLOSE],
                     emphasizedAction: this.getText('manageGroups'),
-                    onClose: (action: string) => {
+                    onClose: (action: string | null) => {
                         if (action === this.getText('manageGroups')) {
                             this.getRouter().navTo('groups', {
                                 tenantId: this.tenantId
@@ -257,7 +256,7 @@ export default class Keys extends BaseController {
         this.getView()?.setBusy(true);
         try {
             const groups = await this.api.get<GroupsResponse>('groups', { $top: this.top, $skip: this.skip });
-            const groupsData = groups.value;
+            const groupsData = groups?.value;
             this.oneWayModel.setProperty('/groupsData', groupsData);
         }
         catch (error) {
@@ -388,7 +387,7 @@ export default class Keys extends BaseController {
 
     private async getkeystoreSettings(): Promise<KeystoreResponse | undefined> {
         try {
-            return await this.api.get<KeystoreResponse>('tenants/keystores');
+            return await this.api.get<KeystoreResponse>('tenantConfigurations/keystores');
         }
         catch (error) {
             console.error(error);

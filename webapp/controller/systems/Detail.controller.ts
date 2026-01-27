@@ -2,7 +2,7 @@ import BaseController from 'kms/controller/BaseController';
 import BindingMode from 'sap/ui/model/BindingMode';
 import JSONModel from 'sap/ui/model/json/JSONModel';
 import Api from 'kms/services/Api.service';
-import { System, KeyConfig } from 'kms/common/Types';
+import { System, KeyConfig, WorkflowParams, SystemRecoveryActions } from 'kms/common/Types';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import { Button$PressEvent } from 'sap/m/Button';
 import MessageBox from 'sap/m/MessageBox';
@@ -11,8 +11,9 @@ import EventBus from 'sap/ui/core/EventBus';
 import MessageToast from 'sap/m/MessageToast';
 import Dialog from 'sap/m/Dialog';
 import Fragment from 'sap/ui/core/Fragment';
-import { EventChannelIds, EventIDs } from 'kms/common/Enums';
+import { ActionTypes, ArtifactTypes, EventChannelIds, EventIDs } from 'kms/common/Enums';
 import { AxiosError } from 'axios';
+import Workflow from 'kms/component/Workflow';
 interface KeyConfigsResponse {
     value: KeyConfig[]
     count: number
@@ -29,6 +30,7 @@ export default class Systems extends BaseController {
     private id: string;
     private eventBus = EventBus.getInstance();
     private switchKeyConfigDialog: Dialog | undefined;
+    private workflowComponent: Workflow | undefined;
     private readonly switchKeyConfigModel = new JSONModel({});
 
     public onInit(): void {
@@ -56,6 +58,9 @@ export default class Systems extends BaseController {
             const selectedSystem = await this.api.get(`systems/${this.id}`);
             if (selectedSystem) {
                 this.oneWayModel.setProperty('/selectedSystem', selectedSystem);
+                this.getSystemRecoveryActions(this.id).catch((error: unknown) => {
+                    console.error(error);
+                });
             }
             else {
                 console.error('System not found');
@@ -73,13 +78,53 @@ export default class Systems extends BaseController {
         }
     };
 
-    public onSystemDisconnectPress(): void {
-        MessageBox.confirm(this.getText('confirmDisconnectSystem'), {
-            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-            onClose: async (action: unknown) => {
-                if (action === MessageBox.Action.YES) {
-                    await this.disconnectSystem(this.id);
-                }
+    private async getSystemRecoveryActions(systemsID: string): Promise<void> {
+        this.getView()?.setBusy(true);
+        try {
+            const recoveryActions = await this.api.get<SystemRecoveryActions>(`systems/${systemsID}/recoveryActions`);
+            this.oneWayModel.setProperty('/selectedSystem/canCancel', recoveryActions?.canCancel);
+            this.oneWayModel.setProperty('/selectedSystem/canRetry', recoveryActions?.canRetry);
+        }
+        catch (error) {
+            console.error(error);
+            showErrorMessage(error as AxiosError, this.getText('errorSystemRecoveryActions'));
+        }
+        finally {
+            this.getView()?.setBusy(false);
+        }
+    }
+
+    public async onSystemDisconnectPress(): Promise<void> {
+        const workflowParams = {
+            artifactType: ArtifactTypes.SYSTEM,
+            artifactID: this.id,
+            actionType: ActionTypes.UNLINK
+        } as WorkflowParams;
+
+        this.workflowComponent = new Workflow('workflowComponent');
+        this.workflowComponent.init();
+        await this.workflowComponent?.checkWorkflowStatus(workflowParams, {
+            onWorkflowNotRequired: () => {
+                MessageBox.confirm(this.getText('confirmDisconnectSystem'), {
+                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onClose: async (action: unknown) => {
+                        if (action === MessageBox.Action.YES) {
+                            await this.disconnectSystem(this.id);
+                        }
+                    }
+                });
+            },
+            onWorkflowRequired: () => {
+                MessageBox.confirm(this.getText('confirmDisconnectSystemWorkflowCreation'), {
+                    actions: [this.getText('sendForApproval'), MessageBox.Action.NO],
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onClose: async (action: unknown) => {
+                        if (action === this.getText('sendForApproval')) {
+                            await this.workflowComponent?.createWorkflow(workflowParams);
+                        }
+                    }
+                });
             }
         });
     }
@@ -101,6 +146,50 @@ export default class Systems extends BaseController {
         }
     }
 
+    public onSystemCancelPress(): void {
+        MessageBox.confirm(this.getText('confirmSystemCancel'), {
+            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            onClose: async (action: unknown) => {
+                if (action === MessageBox.Action.YES) {
+                    await this.performSystemRecovery(this.id, 'CANCEL');
+                }
+            }
+        });
+    }
+
+    public onSystemRetryPress(): void {
+        MessageBox.confirm(this.getText('confirmSystemRetry'), {
+            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            onClose: async (action: unknown) => {
+                if (action === MessageBox.Action.YES) {
+                    await this.performSystemRecovery(this.id, 'RETRY');
+                }
+            }
+        });
+    }
+
+    private async performSystemRecovery(systemsID: string, action: string): Promise<void> {
+        this.getView()?.setBusy(true);
+        const payload = {
+            action: action
+        };
+        try {
+            await this.api.post(`systems/${systemsID}/recoveryActions`, payload);
+            MessageToast.show(this.getText('systemRecoveredSuccessfully'));
+            await this.getSystemDetails();
+            this.eventBus.publish(EventChannelIds.SYSTEMS, EventIDs.LOAD_SYSTEMS);
+        }
+        catch (error) {
+            console.error(error);
+            showErrorMessage(error as AxiosError, this.getText('errorRecoveringSystem'));
+        }
+        finally {
+            this.getView()?.setBusy(false);
+        }
+    }
+
     public async onSwitchKeyConfigPress(): Promise<void> {
         const selectedSystem = this.oneWayModel.getProperty('/selectedSystem') as System;
         const component = this.getOwnerComponent();
@@ -113,7 +202,7 @@ export default class Systems extends BaseController {
         const connectedKeyConfig = selectedSystem.keyConfigurationID
             ? await this.api.get<KeyConfig>(`keyConfigurations/${selectedSystem.keyConfigurationID}`)
             : undefined;
-        const filteredKeyConfigs = keyConfigs.value.filter((keyConfig: KeyConfig) => connectedKeyConfig ? (keyConfig.id !== connectedKeyConfig.id) : true);
+        const filteredKeyConfigs = keyConfigs?.value.filter((keyConfig: KeyConfig) => connectedKeyConfig ? (keyConfig.id !== connectedKeyConfig.id) : true);
 
         if (!this.switchKeyConfigDialog) {
             this.switchKeyConfigDialog = await Fragment.load({
@@ -144,7 +233,6 @@ export default class Systems extends BaseController {
         const keyConfigId: string = this.switchKeyConfigModel.getProperty('/selectedKeyConfig') as string;
         try {
             await this.api.patch(`systems/${systemId}/link`, { keyConfigurationID: keyConfigId });
-            MessageToast.show(this.getText('keyConfigConnectSystemSuccessfully'));
             this.onSwitchKeyConfigCancelPress();
             await this.getSystemDetails();
             this.eventBus.publish(EventChannelIds.SYSTEMS, EventIDs.LOAD_SYSTEMS);

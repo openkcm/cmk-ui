@@ -41,12 +41,12 @@ build-helm:
 # Target to apply helm chart
 apply-helm-chart:
 	@echo "Applying Helm chart."
-	helm upgrade --install $(CHART_NAME) $(CHART_DIR) --values $(CHART_VALUES)
+	helm upgrade --install $(CHART_NAME) $(CHART_DIR) --values $(CHART_VALUES) --namespace $(NAMESPACE) --create-namespace
 
 # Target to apply UI helm chart
 apply-ui-helm-chart:
 	@echo "Applying UI Helm chart."
-	@$(MAKE) apply-helm-chart CHART_NAME=ui CHART_DIR=./charts APPLY_NAMESPACE=$(NAMESPACE)
+	@$(MAKE) apply-helm-chart CHART_NAME=ui CHART_DIR=./charts NAMESPACE=ui
 
 # Target to port forward UI app from cluster port 8080 to local port 80
 port-forward: wait-for-svc-cmk

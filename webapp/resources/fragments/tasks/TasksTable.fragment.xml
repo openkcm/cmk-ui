@@ -27,7 +27,7 @@
         </headerToolbar>
         <columns>
             <Column minScreenWidth="Tablet" demandPopin="true">
-                <Text text="{i18n>name}" />
+                <Text text="{i18n>subject}" />
             </Column>
             <Column minScreenWidth="Tablet" demandPopin="true">
                 <Text text="{i18n>taskId}" />
@@ -42,16 +42,22 @@
         <items>
             <ColumnListItem vAlign="Middle" type="Navigation" press="onTaskPress">
                 <cells>
-                    <ObjectIdentifier
-                        title="{parts: ['oneWay>artifactType'], formatter: '.getText'}"
-                        text="{parts: ['oneWay>actionType'], formatter: '.getText'}">
+                    <Text
+                        text="{
+                        parts: [
+                            {path: 'oneWay>artifactType'},
+                            {path: 'oneWay>actionType'},
+                            {path: 'oneWay>artifactName'}
+                        ],
+                        formatter: 'commonFormatter.formatActionAndArtifact'
+                    }">
                         <customData>
                             <core:CustomData
                                 key="testId"
-                                value="tasksTable-taskObjectIdentifier"
+                                value="tasksTable-taskTableRequestType"
                                 writeToDom="true" />
                         </customData>
-                    </ObjectIdentifier>
+                    </Text>
                     <Text text="{oneWay>id}">
                         <customData>
                             <core:CustomData
@@ -61,7 +67,7 @@
                         </customData>
                     </Text>
                     <Text
-                        text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC">
+                        text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{ source:{pattern: 'yyyy-MM-dd\'T\'HH:mm:ss.SSSSSSX'}}}">
                         <customData>
                             <core:CustomData
                                 key="testId"

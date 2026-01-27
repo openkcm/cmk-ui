@@ -1,6 +1,6 @@
 specVersion: "4.0"
 metadata:
-  name: kms
+  name: kms-ui
 type: application
 framework:
   name: OpenUI5
@@ -16,6 +16,7 @@ builder:
   resources:
     excludes:
       - "test/e2e/**"
+      - "**/*.js.map"
   customTasks:
     - name: ui5-tooling-modules-task
       afterTask: replaceVersion
@@ -23,6 +24,11 @@ builder:
         prependPathMappings: true
     - name: ui5-tooling-transpile-task
       afterTask: replaceVersion
+      configuration:
+        removeSourceMaps: true
+        omitSourceMap: true
+        # Optional: ensures TS files don't end up in the dist folder
+        omitTSFromBuildResult: true
 server:
   customMiddleware:
     - name: ui5-tooling-modules-middleware
