@@ -8,13 +8,18 @@ import ResourceModel from 'sap/ui/model/resource/ResourceModel';
 interface ErrorResponse {
     error: {
         message: string
-        data: {
-            error: {
-                code: string
-                requestID: string
-                status: number
-            }
+        data: ErrorResponseData
+    }
+}
+interface ErrorResponseData {
+    error: {
+        code: string
+        context?: {
+            reason?: string
         }
+        message?: string
+        requestID: string
+        status: number
     }
 }
 
@@ -104,23 +109,38 @@ export function getErrorStatus(error: AxiosError): number | undefined {
     return errorStatus;
 }
 
-export function showErrorMessage(error: AxiosError, userMessage: string): void {
+export function getErrorContext(error: AxiosError): { reason?: string, type?: string } | undefined {
+    if (error.message.includes('data') && error.message.includes('context')) {
+        const errorMessage = JSON.parse(error.message) as ErrorResponse;
+        return errorMessage?.error?.data?.error?.context;
+    }
+}
+
+export function getErrorDataMessage(error: AxiosError): string | undefined {
+    if (error.message.includes('data')) {
+        const errorMessage = JSON.parse(error.message) as ErrorResponse;
+        return errorMessage?.error?.data?.error?.message;
+    }
+}
+
+export function showErrorMessage(error: AxiosError, userMessage: string | undefined, i18nKey?: string): void {
     const requestID: string = getRequestId(error);
     const statusCode = getErrorStatus(error);
     const datetime = convertDateToUTC(new Date());
+    let errorMessage = userMessage || getText(i18nKey || 'genericError');
 
     if (statusCode === 500) {
-        userMessage = getText('genericError');
+        errorMessage = getText('genericError');
     }
 
-    MessageBox.error(userMessage, {
+    MessageBox.error(errorMessage, {
         title: 'Error',
         details: '<p><strong>' + 'Error Details:' + '</strong></p>'
-            + '<ul>'
-            + '<li><strong>' + 'Request ID: ' + '</strong>' + ' ' + requestID + '</li>'
-            + '<li><strong>' + 'Timestamp (UTC): ' + '</strong>' + datetime + '</li>'
-            + '<li><strong>' + 'Support Page: ' + '</strong>' + "<a href='https://support.sap.com/'>https://support.sap.com<a/>" + '</li>'
-            + '</ul>',
+          + '<ul>'
+          + '<li><strong>' + 'Request ID: ' + '</strong>' + ' ' + requestID + '</li>'
+          + '<li><strong>' + 'Timestamp (UTC): ' + '</strong>' + datetime + '</li>'
+          + '<li><strong>' + 'Support Page: ' + '</strong>' + "<a href='https://support.sap.com/'>https://support.sap.com<a/>" + '</li>'
+          + '</ul>',
         styleClass: 'sapUiUserSelectable'
     });
 }

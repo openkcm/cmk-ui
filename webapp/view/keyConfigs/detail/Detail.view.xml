@@ -47,6 +47,7 @@
                         text="{i18n>delete}"
                         icon="sap-icon://delete"
                         type="Reject"
+                        visible="{= ${roleBasedAccess>/keyConfig/canManage}}"
                         press="deleteKeyConfig">
                         <m:customData>
                             <core:CustomData

@@ -7,22 +7,24 @@
     xmlns:core="sap.ui.core"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:dataHelp="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
-    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage', commonFormatter: 'kms/common/Formatters' }">
     <ObjectPageLayout showFooter="true">
         <headerTitle>
             <ObjectPageDynamicHeaderTitle>
                 <expandedHeading>
-                    <m:Title
-                        text="{parts: ['oneWay>/task/artifactType'], formatter: '.getText'}" />
+                    <m:Title text="{i18n>approvalRequest}" wrapping="true" />
                 </expandedHeading>
-                <snappedHeading>
-                    <m:Title
-                        text="{parts: ['oneWay>/task/artifactType'], formatter: '.getText'}" />
-                </snappedHeading>
                 <expandedContent>
                     <m:VBox>
                         <m:Label
-                            text="{parts: ['oneWay>/task/actionType'], formatter: '.getText'}" />
+                            text="{
+                                parts: [
+                                    {path: 'oneWay>/task/artifactType'},
+                                    {path: 'oneWay>/task/actionType'},
+                                    {path: 'oneWay>/task/artifactName'}
+                                ],
+                                formatter: 'commonFormatter.formatActionAndArtifact'
+                            }" />
                         <m:HBox justifyContent="Start" alignContent="Center" alignItems="Center">
                             <m:Label text="{oneWay>/task/id}" />
                             <m:Button icon="sap-icon://copy" type="Transparent"
@@ -38,7 +40,6 @@
                             </m:Button>
                         </m:HBox>
                     </m:VBox>
-
                 </expandedContent>
                 <actions>
                     <m:Button icon="sap-icon://refresh"
@@ -78,9 +79,28 @@
                     </ObjectPageSubSection>
                 </subSections>
             </ObjectPageSection>
+            <ObjectPageSection titleUppercase="false" id="taskApproversDetails"
+                title="{i18n>approvers}" showTitle="false">
+                <subSections>
+                    <ObjectPageSubSection>
+                        <m:VBox>
+                            <core:Fragment
+                                fragmentName="kms.resources.fragments.tasks.ApproversDetailsForm"
+                                type="XML" />
+                            <m:MessageStrip
+                                visible="{parts: ['oneWay>/task/state'], formatter: '.checkMinApproverAttentionRequired'}"
+                                type="Warning"
+                                showCloseButton="false"
+                                text="{i18n>approversMinApproverAttentionMessage}">
+                            </m:MessageStrip>
+                        </m:VBox>
+                    </ObjectPageSubSection>
+                </subSections>
+            </ObjectPageSection>
         </sections>
         <footer>
-            <m:OverflowToolbar visible="{= ${oneWay>/taskTransitionActions}.length !== 0}">
+            <m:OverflowToolbar
+                visible="{= ${oneWay>/taskTransitionActions}.length !== 0 &amp;&amp; ${roleBasedAccess>/keyConfig/canManage} }">
                 <m:ToolbarSpacer />
                 <m:HBox items="{oneWay>/taskTransitionActions}">
                     <m:Button class="sapUiTinyMarginBegin"

@@ -19,38 +19,13 @@
         <forms:formContainers>
             <forms:FormContainer>
                 <forms:formElements>
-                    <forms:FormElement label="{i18n>uuid}">
+                    <forms:FormElement label="{i18n>taskId}">
                         <forms:fields>
                             <Text text="{oneWay>/task/id}">
                                 <customData>
                                     <core:CustomData
                                         key="testId"
                                         value="taskDetail-idText"
-                                        writeToDom="true" />
-                                </customData>
-                            </Text>
-                        </forms:fields>
-                    </forms:FormElement>
-                    <forms:FormElement label="{i18n>createdBy}">
-                        <forms:fields>
-                            <Text text="{oneWay>/task/initiatorName}">
-                                <customData>
-                                    <core:CustomData
-                                        key="testId"
-                                        value="taskDetail-initiatorText"
-                                        writeToDom="true" />
-                                </customData>
-                            </Text>
-                        </forms:fields>
-                    </forms:FormElement>
-                    <forms:FormElement label="{i18n>approvers}">
-                        <forms:fields>
-                            <Text
-                                text="{parts: ['oneWay>/approvers'], formatter: '.parseApproverNamesWithDecisions'}">
-                                <customData>
-                                    <core:CustomData
-                                        key="testId"
-                                        value="taskDetail-approversText"
                                         writeToDom="true" />
                                 </customData>
                             </Text>
@@ -73,14 +48,83 @@
                             </ObjectStatus>
                         </forms:fields>
                     </forms:FormElement>
-                    <forms:FormElement label="{i18n>createdOn}">
+                    <forms:FormElement label="{i18n>createdBy}">
                         <forms:fields>
-                            <Text
-                                text="{path:'oneWay>/task/metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC">
+                            <Text text="{oneWay>/task/initiatorName}">
                                 <customData>
                                     <core:CustomData
                                         key="testId"
-                                        value="taskDetail-createdOnText"
+                                        value="taskDetail-initiatorText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement
+                        label="{
+                                parts: [
+                                    {path: 'oneWay>/task/artifactType'}
+                                ],
+                                formatter: 'commonFormatter.appendIDToLabelText'
+                            }">
+                        <forms:fields>
+                            <Text
+                                text="{oneWay>/task/artifactID}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="taskDetail-artifactIdText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement
+                        label="{
+                                parts: [
+                                    {path: 'oneWay>/task/artifactType'}
+                                ],
+                                formatter: 'commonFormatter.appendNameToLabelText'
+                            }">
+                        <forms:fields>
+                            <Text
+                                text="{oneWay>/task/artifactName}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="taskDetail-artifactNameText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement
+                        label="{
+                                parts: [
+                                    {path: 'oneWay>/task/parametersResourceType'}
+                                ],
+                                formatter: '.getText'
+                            }">
+                        <forms:fields>
+                            <Text
+                                text="{oneWay>/task/parametersResourceName}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="taskDetail-parameterId"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>description}">
+                        <forms:fields>
+                            <Text
+                                text="{oneWay>/task/taskDescription}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="taskDetail-desceriptionText"
                                         writeToDom="true" />
                                 </customData>
                             </Text>

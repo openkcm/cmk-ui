@@ -20,7 +20,7 @@
         <f:header>
             <f:DynamicPageHeader>
                 <f:content>
-                    <kms:FilterBar id="tasksFilterBar" search="getTasks"
+                    <!-- <kms:FilterBar id="tasksFilterBar" search="getTasks"
                         reset="onReset">
                         <kms:FilterBarItem label="{i18n>status}">
                             <MultiComboBox
@@ -54,7 +54,7 @@
                                 </customData>
                             </MultiComboBox>
                         </kms:FilterBarItem>
-                    </kms:FilterBar>
+                    </kms:FilterBar> -->
                 </f:content>
             </f:DynamicPageHeader>
         </f:header>

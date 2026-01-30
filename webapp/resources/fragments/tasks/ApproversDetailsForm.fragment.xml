@@ -1,0 +1,53 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout"
+    xmlns:forms="sap.ui.layout.form"
+    core:require="{commonFormatter: 'kms/common/Formatters' }"
+>
+    <forms:Form width="100%" editable="true">
+        <forms:layout>
+            <forms:ColumnLayout
+                columnsM="2"
+                columnsL="3"
+                columnsXL="3" />
+        </forms:layout>
+        <forms:toolbar>
+            <OverflowToolbar>
+                <Title text="{i18n>approvers}" />
+            </OverflowToolbar>
+        </forms:toolbar>
+        <forms:formContainers>
+            <forms:FormContainer>
+                <forms:formElements>
+                    <forms:FormElement label="{i18n>userGroups}">
+                        <forms:fields>
+                            <Text
+                                text="{parts: ['oneWay>/task/approverGroups'], formatter: '.parseApproverGroups'}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="taskDetail-approversText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>approvers}"
+                        visible="{= ${oneWay>/task/decisions}.length > 0 }">
+                        <forms:fields>
+                            <Text
+                                text="{parts: ['oneWay>/task/decisions'], formatter: '.parseApproverNamesWithDecisions'}">
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="taskDetail-approversText"
+                                        writeToDom="true" />
+                                </customData>
+                            </Text>
+                        </forms:fields>
+                    </forms:FormElement>
+                </forms:formElements>
+            </forms:FormContainer>
+        </forms:formContainers>
+    </forms:Form>
+</core:FragmentDefinition>

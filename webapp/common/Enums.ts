@@ -55,7 +55,9 @@ export enum TaskStates {
 export enum ActionTypes {
     UPDATE_STATE = 'UPDATE_STATE',
     UPDATE_PRIMARY_KEY = 'UPDATE_PRIMARY_KEY',
-    UPDATE_KEY_CONFIGURATION = 'UPDATE_KEY_CONFIGURATION',
+    LINK = 'LINK',
+    UNLINK = 'UNLINK',
+    SWITCH = 'SWITCH',
     DELETE = 'DELETE'
 }
 
@@ -65,16 +67,10 @@ export enum ArtifactTypes {
     SYSTEM = 'SYSTEM'
 }
 
-export enum WorkflowActionTypes {
-    KEYDELETE = 'KEYDELETE',
-    KEYUPDATE = 'KEYUPDATE'
-}
-
 export enum TaskType {
     KEY = 'KEY',
     SYSTEM = 'SYSTEM',
     USER = 'USER'
-
 }
 
 export enum EventChannelIds {
@@ -125,5 +121,17 @@ export const StateColors = {
     PURPLE: IndicationColor.Indication17,
     GRAY: IndicationColor.Indication20
 };
+export const WorkflowStatus = {
+    WORKFLOW_ALREADY_EXISTS: 'WORKFLOW_ALREADY_EXISTS',
+    WORKFLOW_NOT_REQUIRED: 'WORKFLOW_NOT_REQUIRED',
+    WORKFLOW_REQUIRED: 'WORKFLOW_REQUIRED',
+    ERROR: 'ERROR'
+};
 
-export default { KeyStates, CloudProviders, KeyCreationTypes, KeyConfigDetailPanelTypes, TaskStatus, TaskStateTransitionAction, TaskStates, ActionTypes, ArtifactTypes, WorkflowActionTypes, TaskType, EventChannelIds, EventIDs, HYOKProviders, BYOKProviders, SystemStatus, SystemType, GroupRoles };
+export const UserRoles = {
+    KEY_ADMINISTRATOR: 'KEY_ADMINISTRATOR',
+    TENANT_ADMINISTRATOR: 'TENANT_ADMINISTRATOR',
+    TENANT_AUDITOR: 'TENANT_AUDITOR'
+};
+
+export default { KeyStates, CloudProviders, KeyCreationTypes, KeyConfigDetailPanelTypes, TaskStatus, TaskStateTransitionAction, TaskStates, ActionTypes, ArtifactTypes, TaskType, EventChannelIds, EventIDs, HYOKProviders, BYOKProviders, SystemStatus, SystemType, GroupRoles, WorkflowStatus };

@@ -57,7 +57,7 @@
                         justifyContent="End">
                         <tnt:InfoLabel
                             icon="sap-icon://favorite"
-                            visible="{= !!${oneWay>primaryKeyID}}"
+                            visible="{= ${oneWay>metadata/totalKeys} > 0 }"
                             text="{i18n>primaryKeyCreated}"
                             displayOnly="true"
                             colorScheme="5" />
@@ -133,6 +133,7 @@
                         <Button text="{i18n>connect}"
                             enabled="{= !!${oneWay>primaryKeyID}}"
                             press="onTargetConnectSystemPress"
+                            visible="{= !!${oneWay>canConnectSystems} &amp;&amp; ${roleBasedAccess>/keyConfig/canManage}}"
                             icon="sap-icon://chain-link">
                             <customData>
                                 <core:CustomData

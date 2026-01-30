@@ -1,6 +1,6 @@
 export default () => {
     const genereateTenants = () => {
-        const response = {
+        return {
             value: [
                 {
                     id: "tenant1-id",
@@ -14,7 +14,6 @@ export default () => {
                 }
             ]
         }
-        return response;
     };
     return genereateTenants();
 }

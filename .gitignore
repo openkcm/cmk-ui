@@ -2,8 +2,6 @@
 /node_modules
 /node_modules/*
 .DS_Store
-/playwright/.auth
-/playwright-report/*
 /test-results/*
 /coverage/*
 /coverage
@@ -16,6 +14,4 @@
 # Playwright
 node_modules/
 /test-results/
-/playwright-report/
 /blob-report/
-/playwright/.cache/

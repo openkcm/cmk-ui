@@ -12,7 +12,7 @@
                 <HBox alignContent="Center" justifyContent="Center"
                     class="sapUiSmallMarginTop">
                     <Avatar
-                        initials="KM"
+                        initials="{twoWay>/userInitials}"
                         displaySize="L"
                         showBorder="true"
                         press="onPress">
@@ -26,7 +26,7 @@
                 </HBox>
                 <HBox justifyContent="Center" alignContent="Center"
                     class="sapUiTinyMarginTop">
-                    <Title text="First Last" level="H3">
+                    <Title text="{twoWay>/userName}" level="H3">
                         <customData>
                             <core:CustomData
                                 key="testId"
@@ -36,7 +36,7 @@
                     </Title>
                 </HBox>
                 <HBox justifyContent="Center" alignContent="Center">
-                    <Label text="first.last@sap.com">
+                    <Label text="{twoWay>/userEmail}">
                         <customData>
                             <core:CustomData
                                 key="testId"
@@ -45,7 +45,7 @@
                         </customData>
                     </Label>
                 </HBox>
-                <tnt:NavigationList id="userInfoNavList" class="sapUiTinyMarginTop"
+                <!-- <tnt:NavigationList id="userInfoNavList" class="sapUiTinyMarginTop"
                     itemSelect="onUserInfoListSelect">
                     <tnt:NavigationListItem
                         text="{i18n>userAccount}"
@@ -99,7 +99,7 @@
                                 writeToDom="true" />
                         </customData>
                     </Button>
-                </HBox>
+                </HBox> -->
             </VBox>
         </content>
     </ResponsivePopover>

@@ -10,21 +10,37 @@
         <f:title>
             <f:DynamicPageTitle>
                 <f:heading>
-                    <Title text="{i18n>sideContentGroupManagement}" />
+                    <Title text="{i18n>sideContentUserGroups}" />
                 </f:heading>
                 <f:snappedTitleOnMobile>
-                    <Title text="{i18n>sideContentGroupManagement}" />
+                    <Title text="{i18n>sideContentUserGroups}" />
                 </f:snappedTitleOnMobile>
                 <f:actions>
                     <Button
                         icon="sap-icon://refresh"
                         type="Transparent"
-                        press="setGroups" />
+                        press="setGroups">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="groupMangement-refreshButton"
+                                writeToDom="true" />
+                        </customData>
+                    </Button>
                     <Button
                         icon="sap-icon://add"
                         type="Emphasized"
                         text="{i18n>createGroup}"
-                        press="onCreateGroupPress" />
+                        press="onCreateGroupPress"
+                        visible="{= ${roleBasedAccess>/userGroups/canManage}}"
+                    >
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="groupMangement-createGroupButton"
+                                writeToDom="true" />
+                        </customData>
+                    </Button>
                 </f:actions>
             </f:DynamicPageTitle>
         </f:title>
@@ -36,10 +52,10 @@
                             fragmentName="kms.resources.fragments.groups.UserGroupsTable"
                             type="XML" />
                         <kms:Pagination
-                                currentPage="{pagination>/currentPage}"
-                                totalPages="{pagination>/totalPages}"
-                                onPreviousPage="onPreviousPage"
-                                onNextPage="onNextPage" />
+                            currentPage="{pagination>/currentPage}"
+                            totalPages="{pagination>/totalPages}"
+                            onPreviousPage="onPreviousPage"
+                            onNextPage="onNextPage" />
                     </VBox>
                 </Panel>
                 <VBox visible="{= ${oneWay>/groupsCount} === 0 }">

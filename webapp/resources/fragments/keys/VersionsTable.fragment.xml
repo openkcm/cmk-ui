@@ -88,7 +88,7 @@
                         </Text>
                     </HBox>
                     <Text
-                        text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC"
+                        text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-dd\'T\'HH:mm:ss.SSSSSSX'}}} UTC"
                         wrapping="true">
                         <customData>
                             <core:CustomData

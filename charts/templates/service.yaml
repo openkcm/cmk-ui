@@ -4,7 +4,6 @@ metadata:
   name: {{ include "ui.fullname" . }}
   labels:
     {{- include "ui.labels" . | nindent 4 }}
-  namespace: {{ $.Values.namespace }}
 {{- with .Values.ui.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}

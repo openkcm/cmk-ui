@@ -25,7 +25,7 @@
                 <Button text="{i18n>connect}" icon="sap-icon://add"
                     enabled="{= ${oneWay>/keyConfig/canConnectSystems}}"
                     press="onConnectSystemPress"
-                    visible="{= !!${oneWay>/keyConfigDetail}}">
+                    visible="{= !!${oneWay>/keyConfigDetail} &amp;&amp; ${roleBasedAccess>/keyConfig/canManage}}">
                     <customData>
                         <core:CustomData
                             key="testId"
@@ -34,8 +34,20 @@
                     </customData>
                 </Button>
                 <Button
+                        icon="sap-icon://refresh"
+                        type="Transparent"
+                        press="updateSystemsTable">
+                    <customData>
+                        <core:CustomData
+                                key="testId"
+                                value="systemsTable-refreshButton"
+                                writeToDom="true" />
+                    </customData>
+                </Button>
+                <Button
                     icon="sap-icon://filter"
                     press="onKeysTableFilterPress"
+                    visible="{= !!${oneWay>/keyConfigDetail}}"
                     type="Transparent">
                     <customData>
                         <core:CustomData
@@ -47,6 +59,7 @@
                 <Button
                     icon="sap-icon://sort"
                     press="onKeysTableSortPress"
+                    visible="{= !!${oneWay>/keyConfigDetail}}"
                     class="sapUiSmallMarginEnd"
                     type="Transparent">
                     <customData>
@@ -77,7 +90,8 @@
                     text="{= !!${oneWay>/keyConfigDetail} ? ${i18n>state} : ${i18n>keyConfiguration}}" />
             </Column>
             <Column minScreenWidth="Tablet" demandPopin="true"
-                visible="{= !!${oneWay>/keyConfigDetail}}" hAlign="End"
+                visible="{= ${roleBasedAccess>/keyConfig/canManage} &amp;&amp; !!${oneWay>/keyConfigDetail}}"
+                hAlign="End"
                 vAlign="Middle">
                 <Text text="{i18n>actions}" />
             </Column>
@@ -86,7 +100,8 @@
         <items>
             <ColumnListItem vAlign="Middle" type="Navigation" press="onSystemPress">
                 <cells>
-                    <ObjectIdentifier title="{oneWay>properties/Name}" text="{oneWay>region}">
+                    <ObjectIdentifier title="{oneWay>properties/externalName}"
+                        text="{oneWay>region}">
                         <customData>
                             <core:CustomData
                                 key="testId"
@@ -112,7 +127,7 @@
                         </customData>
                     </Text>
                     <Text
-                        text="{parts: ['oneWay>properties/systemrole', 'oneWay>properties/systemroleiD'], formatter: 'commonFormatter.setSystemRole'}">
+                        text="{parts: ['oneWay>properties/roleName', 'oneWay>properties/roleID'], formatter: 'commonFormatter.setSystemRole'}">
                         <customData>
                             <core:CustomData
                                 key="testId"
@@ -138,6 +153,7 @@
                         </ObjectStatus>
                         <Button text="{i18n>connect}"
                             press="onTargetConnectSystemPress"
+                            enabled="{= ${roleBasedAccess>/systems/canManage} }"
                             visible="{= ${oneWay>status} === 'DISCONNECTED'}"
                             icon="sap-icon://add">
                             <customData>
@@ -150,11 +166,14 @@
                     </VBox>
 
                     <VBox alignContent="Center"
-                        justifyContent="Start">
-                        <MenuButton icon="sap-icon://action-settings" type="Transparent">
+                        justifyContent="Start"
+                        visible="{= ${roleBasedAccess>/keyConfig/canManage} }">
+                        <MenuButton icon="sap-icon://action-settings" type="Transparent"
+                            visible="{= ${oneWay>status} !== 'FAILED'}">
                             <menu>
                                 <Menu class="sapUiSizeCompact">
-                                    <MenuItem text="{i18n>switchKeyConfiguration}"
+                                    <!-- @Todo TEMP: Revert after demo -->
+                                    <!-- <MenuItem text="{i18n>switchKeyConfiguration}"
                                         press="onSwitchKeyConfigPress">
                                         <customData>
                                             <core:CustomData
@@ -162,9 +181,10 @@
                                                 value="systemsTable-switchKeyConfigMenuItem"
                                                 writeToDom="true" />
                                         </customData>
-                                    </MenuItem>
+                                    </MenuItem> -->
                                     <MenuItem
                                         press="onSystemsTableDisconnectPress"
+                                        visible="{= !!${oneWay>keyConfigurationID} &amp;&amp; ${oneWay>status} !== 'FAILED'}"
                                         text="{i18n>disconnect}">
                                         <customData>
                                             <core:CustomData

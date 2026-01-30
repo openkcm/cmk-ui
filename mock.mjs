@@ -17,7 +17,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get("/cmk/v1/sys/tenants", (req, res) => {
+app.get("/cmk/v1/tenant1-id/tenants", (req, res) => {
     res.json(genereateTenants());
 });
 
@@ -82,19 +82,29 @@ app.patch("/cmk/v1/tenant1-id/keys/:id/versions/:id", (req, res) => {
     res.status(200).json({});
 });
 
+app.get("/cmk/v1/tenant1-id/systems/:systemId?/recoveryActions", (req, res) => {
+    const { systemId, keyConfigurationID } = req.params;
+    res.json(systems(systemId, keyConfigurationID, 'recoveryActions', 'get'));
+});
+
 app.get("/cmk/v1/tenant1-id/systems/:systemId?/:keyConfigurationID?", (req, res) => {
-    const { systemId, keyConfigurationID } = req.query;
-    res.json(systems(systemId, keyConfigurationID));
+    const { systemId, keyConfigurationID } = req.params;
+    res.json(systems(systemId, keyConfigurationID, 'getSystems'));
 });
 
 app.patch("/cmk/v1/tenant1-id/systems/:systemId?/link/", (req, res) => {
     const { systemId, keyConfigurationID } = req.query;
-    res.json(systems(systemId, keyConfigurationID));
+    res.json(systems(systemId, keyConfigurationID, ''));
 });
 
 app.delete("/cmk/v1/tenant1-id/systems/:systemId?/link/", (req, res) => {
     const { systemId, keyConfigurationID } = req.query;
-    res.json(systems(systemId, keyConfigurationID));
+    res.json(systems(systemId, keyConfigurationID, ''));
+});
+
+app.post("/cmk/v1/tenant1-id/systems/:systemId?/recoveryActions/", (req, res) => {
+    const { systemId, keyConfigurationID } = req.params;
+    res.json(systems(systemId, keyConfigurationID, 'recoveryActions', 'post'));
 });
 
 app.get("/cmk/v1/tenant1-id/groups", (req, res) => {
@@ -124,7 +134,7 @@ app.get("/cmk/v1/tenant1-id/keyConfigurations/:keyConfigurationID/certificates",
     const { keyConfigurationID } = req.params;
     res.json(managementAndCryptoCerts(keyConfigurationID));
 });
-app.get("/cmk/v1/tenant1-id/tenants/keystores", (req, res) => {
+app.get("/cmk/v1/tenant1-id/tenantConfigurations/keystores", (req, res) => {
     res.json(generateKeyStores());
 });
 

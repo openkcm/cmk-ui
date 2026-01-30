@@ -1,4 +1,4 @@
-import { ActionTypes, ArtifactTypes, KeyCreationTypes, KeyStates, TaskStates, TaskStatus, SystemStatus, HYOKProviders, BYOKProviders } from 'kms/common/Enums';
+import { ActionTypes, ArtifactTypes, KeyCreationTypes, KeyStates, TaskStates, TaskStatus, SystemStatus, HYOKProviders, BYOKProviders, TaskStateTransitionAction, GroupRoles } from 'kms/common/Enums';
 
 export interface Config {
     apiBaseUrl: string
@@ -12,20 +12,50 @@ export interface System {
     status: SystemStatus
     keyConfigurationName: string
     keyConfigurationID: string
-};
+}
+export interface SystemRecoveryActions {
+    canCancel: true
+    canRetry: true
+}
+export interface SystemConfig {
+    system: {
+        identifier: {
+            displayName: 'GTID'
+        }
+        region: {
+            displayName: 'Region'
+        }
+        type: {
+            displayName: 'Type'
+        }
+        externalName: {
+            displayName: 'Name'
+        }
+        roleName: {
+            displayName: 'Role'
+        }
+        roleID: {
+            displayName: 'RoleID'
+        }
+    }
+}
 export interface Groups {
     id: string
     groups: Groups[]
     name: string
     edit: boolean
-};
+}
 export interface Group {
     name: string
     description: string
     id: string
     iamIdentifier: string
     role: string
-};
+}
+export interface GroupIAMExistance {
+    iamIdentifier: string
+    exists: boolean
+}
 export interface KeyConfig {
     name: string
     id: string
@@ -56,6 +86,7 @@ export interface Key {
     provider: string
     region: string
     type: KeyCreationTypes
+    accessDetails?: AccessDetails
     metadata: {
         createdBy: string
         createdAt: string
@@ -65,7 +96,7 @@ export interface Key {
         totalVersions: number
         primaryVersion: number
     }
-};
+}
 export interface KeyVersion {
     version: number
     state: KeyStates
@@ -74,14 +105,16 @@ export interface KeyVersion {
         createdAt: string
         updatedAt: string
     }
-};
+}
 export interface Label {
     id: string
     name: string
     value: string
-};
-
+}
 export interface Task {
+    availableTransitions: TaskStateTransitionAction[]
+    approverGroups: ApprovalGroup[]
+    decisions: TaskDecision[]
     id: string
     initiatorID: string
     initiatorName: string
@@ -89,14 +122,24 @@ export interface Task {
     actionType: ActionTypes
     artifactType: ArtifactTypes
     artifactID: string
-    parameters?: string
+    artifactName: string
     failureReason: string
+    parameters?: string
+    parametersResourceName: string
+    parametersResourceType: ArtifactTypes
     metadata: {
         createdAt: string
         updatedAt: string
     }
-}
+    expiresAt: string
+    approvalSummary: {
+        approved: number
+        pending: number
+        rejected: number
+        targetScore: number
 
+    }
+}
 export interface Approver {
     id: string
     name: string
@@ -115,7 +158,8 @@ export interface AWSAccessDetails {
     roleArn: string
     trustAnchorArn: string
     profileArn: string
-};
+    isEditable?: boolean
+}
 export interface AccessDetails {
     management: AWSAccessDetails
     crypto: Record<string, AWSAccessDetails>
@@ -156,5 +200,61 @@ export interface KeystoreResponse {
     hyok: {
         allow: boolean
         providers: HYOKProviders[]
+    }
+}
+export interface UserData {
+    identifier: string
+    email: string
+    givenName: string
+    familyName: string
+    role: string
+}
+
+export interface WorkflowParams {
+    artifactType: ArtifactTypes
+    artifactID: string
+    actionType: ActionTypes
+    parameters?: string // will extend later
+}
+
+export interface ApprovalGroup {
+    description: string
+    iamIdentifier: string
+    id: string
+    name: string
+    role: GroupRoles
+}
+
+export interface TaskDecision {
+    decision: TaskStatus
+    id: string
+    name: string
+}
+
+export interface TenantsResponse {
+    value: TenantsList[]
+    count: number
+}
+export interface TenantsList {
+    id: string
+    name?: string
+}
+
+export interface RoleBasedAccessData {
+    keyConfig: {
+        canView: boolean
+        canManage: boolean
+    }
+    systems: {
+        canView: boolean
+        canManage: boolean
+    }
+    tasks: {
+        canView: boolean
+        canManage: boolean
+    }
+    userGroups: {
+        canView: boolean
+        canManage: boolean
     }
 }

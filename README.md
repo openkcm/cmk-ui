@@ -20,7 +20,6 @@ Using Visual Studio Code and enabling the following extensions is recommended:
 - `lokalise.i18n-ally`
 - `dbaeumer.vscode-eslint` (this will be auto configured, don't change any settings)
 - `waderyan.gitblame`
-- `ms-playwright.playwright`
 - `SonarSource.sonarlint-vscode` (this will require you to log in with your SonarQube credentials. The project will be pre-populated)
 - `jorgesanux.ui5-icon-explorer`
 - `luizmz94.ui5-icons-symbols`
@@ -36,7 +35,7 @@ The API base URL is set in `webapp/config/config.json`. Modify the `apiBaseUrl` 
 ```bash
 npm install
 ```
-4. To start the local development server, run `npm start`. Using a 3rd party webserver is NOT supported due to using UI5 middleware. If using the mock server, remember to start that separately [as shown here](https://github.tools.sap/kms/ui/edit/main/README.md#local-api):
+4. To start the local development server, run `npm start`. Using a 3rd party webserver is NOT supported due to using UI5 middleware. If using the mock server, remember to start that separately [as shown here](https://github.com/openkcm/cmk-ui/blob/main/README.md#local-api):
 5. Application will start on port 8081
 6. If using a local CMK API instance and are using MacOS, run `npm run startchrome` to open a Chrome instance with web security turned off. Using a normal Chrome browser will result in CORS errors.
 
@@ -115,7 +114,7 @@ Before you begin, ensure you have the following installed on your system:
 
 #### Prerequisites - create k3d cluster
 Pull cmk project
-- [https://github.tools.sap/kms/cmk.git](https://github.tools.sap/kms/cmk.git)
+- [https://github.com/openkcm/cmk](https://github.com/openkcm/cmk)
 
 Follow instructions from README.md, to install cmk cluster
 run

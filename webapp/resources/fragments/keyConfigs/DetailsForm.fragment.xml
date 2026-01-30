@@ -14,6 +14,7 @@
                 <Title text="{i18n>details}" />
                 <ToolbarSpacer />
                 <Button icon="sap-icon://edit" text="{i18n>edit}" type="Ghost"
+                    visible="{= ${roleBasedAccess>/keyConfig/canManage}}"
                     press="onEditDetailsPress">
                     <customData>
                         <core:CustomData
@@ -94,7 +95,7 @@
                     <forms:FormElement label="{i18n>createdOn}">
                         <forms:fields>
                             <Text
-                                text="{path:'oneWay>/keyConfig/metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC">
+                                text="{path:'oneWay>/keyConfig/metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{ UTC: true, source:{pattern: 'yyyy-MM-dd\'T\'HH:mm:ss.SSSSSSX'}}} UTC">
                                 <customData>
                                     <core:CustomData
                                         key="testId"
