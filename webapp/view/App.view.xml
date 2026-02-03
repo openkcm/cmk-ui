@@ -11,6 +11,7 @@
                     id="sideNavigationToggleButton"
                     icon="sap-icon://menu2"
                     type="Transparent"
+                    visible="{= !${twoWay>/isForbidden}}"
                     press=".onSideNavButtonPress">
                     <layoutData>
                         <OverflowToolbarLayoutData priority="NeverOverflow" />
@@ -22,16 +23,6 @@
                             writeToDom="true" />
                     </customData>
                 </Button>
-                <Image height="1.5rem"
-                    class="sapUiSmallMarginBegin"
-                    src="https://www.sap.com/dam/application/shared/logos/sap-logo-svg.svg">
-                    <customData>
-                        <core:CustomData
-                            key="testId"
-                            value="shellBar-homeIcon"
-                            writeToDom="true" />
-                    </customData>
-                </Image>
                 <Title
                     text="{i18n>appTitle}"
                     level="H2" />
@@ -55,7 +46,7 @@
                             writeToDom="true" />
                     </customData>
                 </MenuButton> -->
-                <Avatar initials="KM" displaySize="XS" press="onUserNamePress">
+                <Avatar initials="{twoWay>/userInitials}" displaySize="XS" press="onUserNamePress" visible="{= !${twoWay>/isForbidden}}">
                     <layoutData>
                         <OverflowToolbarLayoutData priority="NeverOverflow" />
                     </layoutData>
@@ -71,12 +62,14 @@
         <tnt:sideContent>
             <tnt:SideNavigation
                 selectedKey="{twoWay>/selectedKey}"
+                visible="{= !${twoWay>/isForbidden}}"
                 itemSelect="onNavigationClick">
                 <tnt:NavigationList>
                     <tnt:NavigationListItem
                         text="{i18n>sideContentKeyConfiguration}"
                         icon="sap-icon://key"
-                        key="keyConfigs">
+                        key="keyConfigs"
+                        visible="{= ${roleBasedAccess>/keyConfig/canView}}">
                         <tnt:customData>
                             <core:CustomData
                                 key="testId"
@@ -87,7 +80,8 @@
                     <tnt:NavigationListItem
                         text="{i18n>sideContentSystems}"
                         icon="sap-icon://it-system"
-                        key="systems">
+                        key="systems"
+                        visible="{= ${roleBasedAccess>/systems/canView}}">
                         <tnt:customData>
                             <core:CustomData
                                 key="testId"
@@ -98,7 +92,8 @@
                     <tnt:NavigationListItem
                         text="{i18n>sideContentTasks}"
                         icon="sap-icon://task"
-                        key="tasks">
+                        key="tasks"
+                        visible="{= ${roleBasedAccess>/tasks/canView}}">
                         <tnt:customData>
                             <core:CustomData
                                 key="testId"
@@ -107,9 +102,10 @@
                         </tnt:customData>
                     </tnt:NavigationListItem>
                     <tnt:NavigationListItem
-                        text="{i18n>sideContentGroupManagement}"
+                        text="{i18n>sideContentUserGroups}"
                         icon="sap-icon://employee"
-                        key="groups">
+                        key="groups"
+                        visible="{= ${roleBasedAccess>/userGroups/canView}}">
                         <tnt:customData>
                             <core:CustomData
                                 key="testId"

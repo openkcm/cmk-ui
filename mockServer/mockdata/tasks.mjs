@@ -2,7 +2,7 @@ import Chance from "chance";
 const chance = new Chance();
 export default (taskId) => {
     const states = ['REJECTED', 'WAIT_APPROVAL', 'WAIT_CONFIRMATION'];
-    const actionTypes = ['UPDATE_STATE', 'UPDATE_PRIMARY_KEY', 'UPDATE_KEY_CONFIGURATION', 'DELETE'];
+    const actionTypes = ['UPDATE_STATE', 'UPDATE_PRIMARY_KEY', 'LINK', 'UNLINK', 'SWITCH', 'DELETE'];
     const artifactTypes = ['KEY', 'KEY_CONFIGURATION', 'SYSTEM'];
     const generateTasks = (count) => {
         const response = Array.from({ length: count }, () => (

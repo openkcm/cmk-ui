@@ -16,7 +16,8 @@
                     text="{parts: ['i18n>keysWithCount', 'oneWay>/keysCount'], formatter: 'formatMessage'}"
                     level="H2" />
                 <ToolbarSpacer />
-                <MenuButton text="{i18n>add}" icon="sap-icon://add" type="Ghost">
+                <MenuButton text="{i18n>add}" icon="sap-icon://add" type="Ghost"
+                    visible="{= ${roleBasedAccess>/keyConfig/canManage}}">
                     <menu>
                         <Menu class="sapUiSizeCompact">
                             <MenuItem text="{i18n>sapManaged}"
@@ -73,7 +74,7 @@
     <IllustratedMessage
         enableVerticalResponsiveness="false"
         title="{i18n>noKeys}"
-        description="{i18n>createKeyHint}"
+        description="{= ${roleBasedAccess>/keyConfig/canManage} ? ${i18n>createKeyHint} : ' '}"
         illustrationType="sapIllus-NoFilterResults"
         illustrationSize="Dialog" />
 </core:FragmentDefinition>

@@ -9,10 +9,10 @@ import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
 import { Button$PressEvent } from 'sap/m/Button';
 import Dialog from 'sap/m/Dialog';
 import Fragment from 'sap/ui/core/Fragment';
-import MessageToast from 'sap/m/MessageToast';
 import EventBus from 'sap/ui/core/EventBus';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
-import { EventChannelIds, EventIDs } from 'kms/common/Enums';
+import { ActionTypes, ArtifactTypes, EventChannelIds, EventIDs, WorkflowStatus } from 'kms/common/Enums';
+import Workflow from 'kms/component/Workflow';
 
 interface SystemsResponse {
     value: System[]
@@ -29,6 +29,7 @@ interface KeyConfigsResponse {
 export default class Systems extends BaseController {
     private api: Api;
     private connectTargetSystem: Dialog | undefined;
+    private workflowComponent: Workflow | undefined;
     private readonly connectSystemModel = new JSONModel({});
 
     private readonly oneWayModel = new JSONModel({
@@ -91,9 +92,9 @@ export default class Systems extends BaseController {
         }
     }
 
-    private updateSystemsTable(filter = false): void {
+    public updateSystemsTable(): void {
         this.oneWayModel.setProperty('/systemsTableUpdating', true);
-        this.getSystems(filter).catch((error: unknown) => {
+        this.getSystems().catch((error: unknown) => {
             console.error(error);
         }).finally(() => {
             this.oneWayModel.setProperty('/systemsTableUpdating', false);
@@ -118,29 +119,41 @@ export default class Systems extends BaseController {
         this.paginationModel.setProperty('/currentPage', this.currentPage);
     }
 
-    private async getSystems(filter = false): Promise<void> {
+    private async getSystems(): Promise<void> {
         this.getView()?.setBusy(true);
         try {
-            let systems;
-            if (filter) {
-                const selectedRegion = this.filterModel.getProperty('/selectedRegion') as string;
-                const selectedType = this.filterModel.getProperty('/selectedType') as string;
-                const selectedKeyConfig = this.filterModel.getProperty('/selectedKeyConfig') as string;
-                const params: Record<string, string | number | boolean> = { $top: this.top, $skip: this.skip };
-                if (selectedRegion !== 'all') params.region = selectedRegion;
-                if (selectedType !== 'all') params.type = selectedType;
-                if (selectedKeyConfig !== 'all') params.keyConfigurationID = selectedKeyConfig;
-                systems = await this.api.get<SystemsResponse>('systems', params);
+            const params: Record<string, string | number | boolean> = {
+                $top: this.top,
+                $skip: this.skip
+            };
+
+            const selectedRegion = this.filterModel.getProperty('/selectedRegion') as string;
+            const selectedType = this.filterModel.getProperty('/selectedType') as string;
+            const selectedKeyConfig = this.filterModel.getProperty('/selectedKeyConfig') as string;
+
+            const filters: string[] = [];
+            if (selectedRegion !== 'all') {
+                filters.push(`region eq '${selectedRegion}'`);
             }
-            else {
-                systems = await this.api.get<SystemsResponse>('systems', { $top: this.top, $skip: this.skip });
+            if (selectedType !== 'all') {
+                filters.push(`type eq '${selectedType}'`);
             }
+            if (selectedKeyConfig !== 'all') {
+                filters.push(`keyConfigurationID eq '${selectedKeyConfig}'`);
+            }
+
+            if (filters.length > 0) {
+                params.$filter = filters.join(' and ');
+            }
+
+            const systems = await this.api.get<SystemsResponse>('systems', params);
             if (!systems) {
                 return;
             }
             this.oneWayModel.setProperty('/systems', systems.value);
             this.oneWayModel.setProperty('/systemsCount', systems.count || 0);
-            if (!filter) {
+
+            if (filters.length === 0) {
                 this.setFilterData(systems.value);
             }
             this.paginationModel.setProperty('/totalPages', Math.ceil(systems.count / this.top));
@@ -188,7 +201,7 @@ export default class Systems extends BaseController {
 
     public applyFilters(): void {
         this.resetPagination();
-        this.updateSystemsTable(true);
+        this.updateSystemsTable();
     }
 
     public onSystemPress(event: ListItemBase$PressEvent): void {
@@ -234,12 +247,16 @@ export default class Systems extends BaseController {
                 controller: this
             }) as Dialog;
             // TODO:Perhaps it is better to have this filter in the backend.
-            const keyConfigsData = keyConfigs.value.filter((keyConfig: KeyConfig) => keyConfig?.canConnectSystems);
+            const keyConfigsData = keyConfigs?.value.filter((keyConfig: KeyConfig) => keyConfig?.canConnectSystems);
             this.connectTargetSystem.addStyleClass('sapUiSizeCompact');
             this.connectTargetSystem.setModel(component.getModel('i18n'), 'i18n');
             this.connectSystemModel.setData(selectedSystem);
             this.connectTargetSystem.setModel(this.connectSystemModel, 'connectSystemModel');
             this.connectSystemModel.setProperty('/KeyConfigList', keyConfigsData);
+            this.connectSystemModel.setProperty('/workflowStatus', undefined);
+            this.resetActionButtons();
+            this.workflowComponent = new Workflow('workflowComponent');
+            this.workflowComponent.init();
             this.connectTargetSystem.open();
         }
         else {
@@ -258,10 +275,7 @@ export default class Systems extends BaseController {
         const keyConfigId: string = this.connectSystemModel.getProperty('/selectedKeyConfig') as string;
         try {
             await this.api.patch(`systems/${systemId}/link`, { keyConfigurationID: keyConfigId });
-            MessageToast.show(this.getText('keyConfigConnectSystemSuccessfully'));
-            this.connectTargetSystem?.close();
-            this.connectTargetSystem?.destroy();
-            this.connectTargetSystem = undefined;
+            this.onConnectSystemCancelPress();
             this.updateSystemsTable();
         }
         catch (error) {
@@ -271,5 +285,56 @@ export default class Systems extends BaseController {
         finally {
             this.getView()?.setBusy(false);
         }
+    }
+
+    public async onConnectSystemSendForApprovalPress(): Promise<void> {
+        const selectedKeyConfigId: string = this.connectSystemModel.getProperty('/selectedKeyConfig') as string;
+        const workflowParams = {
+            artifactType: ArtifactTypes.SYSTEM,
+            artifactID: this.connectSystemModel.getProperty('/id') as string,
+            actionType: ActionTypes.LINK,
+            parameters: selectedKeyConfigId
+        };
+        await this.workflowComponent?.createWorkflow(workflowParams);
+        this.onConnectSystemCancelPress();
+        this.updateSystemsTable();
+    }
+
+    public async onSelectedKeyConfigChange(): Promise<void> {
+        this.resetActionButtons();
+        const selectedKeyConfigId: string = this.connectSystemModel.getProperty('/selectedKeyConfig') as string;
+
+        const workflowParams = {
+            artifactType: ArtifactTypes.SYSTEM,
+            artifactID: this.connectSystemModel.getProperty('/id') as string,
+            actionType: ActionTypes.LINK,
+            parameters: selectedKeyConfigId
+        };
+
+        await this.workflowComponent?.checkWorkflowStatus(workflowParams, {
+            onWorkflowExists: () => {
+                this.resetActionButtons();
+                this.connectSystemModel.setProperty('/workflowStatus', WorkflowStatus.WORKFLOW_ALREADY_EXISTS);
+            },
+            onWorkflowNotRequired: () => {
+                this.connectSystemModel.setProperty('/showApprovalButton', false);
+                this.connectSystemModel.setProperty('/showConnectButton', true);
+                this.connectSystemModel.setProperty('/workflowStatus', WorkflowStatus.WORKFLOW_NOT_REQUIRED);
+            },
+            onWorkflowRequired: () => {
+                this.connectSystemModel.setProperty('/showApprovalButton', true);
+                this.connectSystemModel.setProperty('/showConnectButton', false);
+                this.connectSystemModel.setProperty('/workflowStatus', WorkflowStatus.WORKFLOW_REQUIRED);
+            },
+            onError: () => {
+                this.connectSystemModel.setProperty('/workflowStatus', WorkflowStatus.ERROR);
+                this.resetActionButtons();
+            }
+        });
+    }
+
+    private resetActionButtons(): void {
+        this.connectSystemModel.setProperty('/showApprovalButton', false);
+        this.connectSystemModel.setProperty('/showConnectButton', false);
     }
 }

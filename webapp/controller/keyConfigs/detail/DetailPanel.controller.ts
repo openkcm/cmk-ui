@@ -4,13 +4,15 @@ import BindingMode from 'sap/ui/model/BindingMode';
 import Api from 'kms/services/Api.service';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import EventBus from 'sap/ui/core/EventBus';
-import { Key, KeyVersion } from 'kms/common/Types';
+import { AWSAccessDetails, Key, KeyVersion, SystemRecoveryActions, WorkflowParams } from 'kms/common/Types';
 import { isUUIDValid, copyToClipboard, showErrorMessage } from 'kms/common/Helpers';
 import { Button$PressEvent } from 'sap/m/Button';
 import * as Formatter from 'kms/common/Formatters';
 import MessageToast from 'sap/m/MessageToast';
-import { EventChannelIds, EventIDs } from 'kms/common/Enums';
+import { ActionTypes, ArtifactTypes, EventChannelIds, EventIDs } from 'kms/common/Enums';
 import { AxiosError } from 'axios';
+import MessageBox from 'sap/m/MessageBox';
+import Workflow from 'kms/component/Workflow';
 
 interface KeyPatchPayload {
     name: string
@@ -30,6 +32,7 @@ export default class DetailPanel extends BaseController {
     private api: Api;
     private readonly oneWayModel = new JSONModel({
         edit: false as boolean,
+        cryptoInEditMode: false as boolean,
         selectedKey: {} as Key,
         keyVersions: [] as KeyVersion[]
     });
@@ -42,6 +45,7 @@ export default class DetailPanel extends BaseController {
     private idType: string | undefined;
     private keyConfigId: string | undefined;
     private eventBus = EventBus.getInstance();
+    private workflowComponent: Workflow | undefined;
 
     public onInit(): void {
         super.onInit();
@@ -116,6 +120,37 @@ export default class DetailPanel extends BaseController {
     private setKeyDetailsToModel(key: Key): void {
         this.twoWayModel.setProperty('/selectedKey/customerHeld', key?.type === this.Enums.KeyCreationTypes.HYOK);
         this.twoWayModel.setProperty('/selectedKey/enabled', key?.state === this.Enums.KeyStates.ENABLED);
+        const managementARNs = key?.accessDetails?.management;
+        const cryptoARNs = key?.accessDetails?.crypto;
+        let managementARNsArray: { key: string, value: AWSAccessDetails }[] = [];
+        let cryptoARNsArray: { key: string, value: AWSAccessDetails }[] = [];
+        if (managementARNs) {
+            managementARNsArray = [{ key: 'management', value: managementARNs }];
+            this.twoWayModel.setProperty('/selectedKey/accessDetails/managementARNsArray', managementARNsArray);
+        }
+        if (cryptoARNs) {
+            Object.entries(cryptoARNs).forEach(([key, value]) => {
+                cryptoARNsArray = [...cryptoARNsArray, { key: key, value: value }];
+            });
+
+            this.twoWayModel.setProperty('/selectedKey/accessDetails/cryptoARNsArray', cryptoARNsArray);
+        }
+    }
+
+    private async getSystemRecoveryActions(systemsID: string): Promise<void> {
+        this.getView()?.setBusy(true);
+        try {
+            const recoveryActions = await this.api.get<SystemRecoveryActions>(`systems/${systemsID}/recoveryActions`);
+            this.oneWayModel.setProperty('/selectedSystem/canCancel', recoveryActions?.canCancel);
+            this.oneWayModel.setProperty('/selectedSystem/canRetry', recoveryActions?.canRetry);
+        }
+        catch (error) {
+            console.error(error);
+            showErrorMessage(error as AxiosError, this.getText('errorSystemRecoveryActions'));
+        }
+        finally {
+            this.getView()?.setBusy(false);
+        }
     }
 
     private async getSystemDetails(): Promise<void> {
@@ -123,6 +158,9 @@ export default class DetailPanel extends BaseController {
             const selectedSystem = await this.api.get(`systems/${this.id}`);
             if (selectedSystem) {
                 this.oneWayModel.setProperty('/selectedSystem', selectedSystem);
+                this.getSystemRecoveryActions(this.id).catch((error: unknown) => {
+                    console.error(error);
+                });
             }
             else {
                 console.error('System not found');
@@ -140,12 +178,145 @@ export default class DetailPanel extends BaseController {
         }
     };
 
+    public async onSystemDisconnectPress(): Promise<void> {
+        const workflowParams = {
+            artifactType: ArtifactTypes.SYSTEM,
+            artifactID: this.id,
+            actionType: ActionTypes.UNLINK
+        } as WorkflowParams;
+
+        this.workflowComponent = new Workflow('workflowComponent');
+        this.workflowComponent.init();
+        await this.workflowComponent?.checkWorkflowStatus(workflowParams, {
+            onWorkflowNotRequired: () => {
+                MessageBox.confirm(this.getText('confirmDisconnectSystem'), {
+                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onClose: async (action: unknown) => {
+                        if (action === MessageBox.Action.YES) {
+                            await this.disconnectSystem(this.id);
+                        }
+                    }
+                });
+            },
+            onWorkflowRequired: () => {
+                MessageBox.confirm(this.getText('confirmDisconnectSystemWorkflowCreation'), {
+                    actions: [this.getText('sendForApproval'), MessageBox.Action.NO],
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onClose: async (action: unknown) => {
+                        if (action === this.getText('sendForApproval')) {
+                            await this.workflowComponent?.createWorkflow(workflowParams);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    private async disconnectSystem(systemsID: string): Promise<void> {
+        this.getView()?.setBusy(true);
+        try {
+            await this.api.delete(`systems/${systemsID}/link`);
+            MessageToast.show(this.getText('systemDisconnectedSuccessfully'));
+            await this.getSystemDetails();
+            this.eventBus.publish(EventChannelIds.SYSTEMS, EventIDs.LOAD_SYSTEMS);
+        }
+        catch (error) {
+            console.error(error);
+            showErrorMessage(error as AxiosError, this.getText('errorDisconnectingSystem'));
+        }
+        finally {
+            this.getView()?.setBusy(false);
+        }
+    }
+
+    public onSystemCancelPress(): void {
+        MessageBox.confirm(this.getText('confirmSystemCancel'), {
+            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            onClose: async (action: unknown) => {
+                if (action === MessageBox.Action.YES) {
+                    await this.performSystemRecovery(this.id, 'CANCEL');
+                }
+            }
+        });
+    }
+
+    public onSystemRetryPress(): void {
+        MessageBox.confirm(this.getText('confirmSystemRetry'), {
+            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            onClose: async (action: unknown) => {
+                if (action === MessageBox.Action.YES) {
+                    await this.performSystemRecovery(this.id, 'RETRY');
+                }
+            }
+        });
+    }
+
+    private async performSystemRecovery(systemsID: string, action: string): Promise<void> {
+        this.getView()?.setBusy(true);
+        const payload = {
+            action: action
+        };
+        try {
+            await this.api.post(`systems/${systemsID}/recoveryActions`, payload);
+            MessageToast.show(this.getText('systemRecoveredSuccessfully'));
+            await this.getSystemDetails();
+        }
+        catch (error) {
+            console.error(error);
+            showErrorMessage(error as AxiosError, this.getText('errorRecoveringSystem'));
+        }
+        finally {
+            this.getView()?.setBusy(false);
+        }
+    }
+
     public onEditDetailsPress(): void {
         this.oneWayModel.setProperty('/edit', true);
     }
 
     public onCancelEditPress(): void {
         this.oneWayModel.setProperty('/edit', false);
+    }
+
+    public onEditHYOKCryptoDetailsPress(): void {
+        this.oneWayModel.setProperty('/cryptoInEditMode', true);
+    }
+
+    public onCancelHYOKCryptoEdit(): void {
+        this.oneWayModel.setProperty('/cryptoInEditMode', false);
+    }
+
+    public async onSaveHYOKCryptoDetailsPress(): Promise<void> {
+        this.getView()?.setBusy(true);
+        this.oneWayModel.setProperty('/cryptoInEditMode', false);
+        let cryptoPayload = {};
+        const cryptoARNsArray = this.twoWayModel.getProperty('/selectedKey/accessDetails/cryptoARNsArray') as { key: string, value: AWSAccessDetails }[] | undefined;
+        cryptoARNsArray?.forEach((cryptoItem) => {
+            cryptoPayload = {
+                ...cryptoPayload, [cryptoItem.key]: { roleArn: cryptoItem?.value?.roleArn, trustAnchorArn: cryptoItem?.value?.trustAnchorArn, profileArn: cryptoItem?.value?.profileArn }
+            };
+        });
+        const payload = {
+            accessDetails: {
+                crypto: { ...cryptoPayload }
+            }
+        };
+        try {
+            await this.api.patch<Key>(`keys/${this.id}`, payload);
+            this.getKeyDetails().catch((error: unknown) => {
+                console.error(error);
+            });
+        }
+        catch (error) {
+            console.error('Error saving crypto details', error);
+            showErrorMessage(error as AxiosError, this.getText('errorSavingKeyDetails'));
+        }
+        finally {
+            this.getView()?.setBusy(false);
+        }
     }
 
     public async onRotateNowPress(): Promise<void> {

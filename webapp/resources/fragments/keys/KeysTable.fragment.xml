@@ -20,7 +20,8 @@
                     text="{parts: ['i18n>keysWithCount', 'oneWay>/keysCount'], formatter: 'formatMessage'}"
                     level="H2" />
                 <ToolbarSpacer />
-                <MenuButton text="{i18n>add}" icon="sap-icon://add" type="Ghost">
+                <MenuButton text="{i18n>add}" icon="sap-icon://add" type="Ghost"
+                    visible="{= ${roleBasedAccess>/keyConfig/canManage}}">
                     <menu>
                         <Menu class="sapUiSizeCompact">
                             <MenuItem text="{i18n>sapManaged}"
@@ -51,7 +52,14 @@
                                         itemSelectionMode="None">
                                         <items>
                                             <MenuItem text="{oneWay>}"
-                                                press=".handleCreateKeyRoute('HYOK', ${oneWay>})" />
+                                                press=".handleCreateKeyRoute('HYOK', ${oneWay>})">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="createHyok-awsButton"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </MenuItem>
                                         </items>
                                     </MenuItemGroup>
                                 </items>
@@ -126,7 +134,7 @@
                 vAlign="Middle"
                 minScreenWidth="Large"
                 demandPopin="true"
-                visible="{= ${oneWay>/keys}.length > 0 }">
+                visible="{= ${oneWay>/keys}.length > 0 &amp;&amp; ${roleBasedAccess>/keyConfig/canManage} }">
                 <Text text="{i18n>actions}" wrapping="false" />
             </Column>
         </columns>
@@ -152,7 +160,7 @@
                         </Label>
                     </VBox>
                     <Text
-                        text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-ddTHH:mm:ssXXX'}}} UTC"
+                        text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-dd\'T\'HH:mm:ss.SSSSSSX'}}} UTC"
                         wrapping="false">
                         <customData>
                             <core:CustomData
@@ -184,7 +192,7 @@
                                     </MenuItem>
                                     <MenuItem press="onKeyTableEnablePress"
                                         text="{i18n>enable}"
-                                        visible="{= ${oneWay>state} === 'DISABLED'}"
+                                        visible="{parts: ['oneWay>type', 'oneWay>state'], formatter: 'commonFormatter.setEnableMenuItemVisible'}"
                                         icon="sap-icon://log">
                                         <customData>
                                             <core:CustomData
@@ -195,7 +203,7 @@
                                     </MenuItem>
                                     <MenuItem press="onKeyTableDisablePress"
                                         text="{i18n>disable}"
-                                        visible="{= ${oneWay>state} === 'ENABLED'}"
+                                        visible="{parts: ['oneWay>type', 'oneWay>state'], formatter: 'commonFormatter.setDisableMenuItemVisible'}"
                                         icon="sap-icon://log">
                                         <customData>
                                             <core:CustomData

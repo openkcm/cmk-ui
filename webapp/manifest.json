@@ -90,21 +90,9 @@
                     ]
                 },
                 {
-                    "pattern": "{tenantId}/systems",
-                    "name": "systems",
-                    "target": "systems"
-                },
-                {
                     "pattern": "{tenantId}/tasks",
                     "name": "tasks",
                     "target": "tasks"
-                },
-                {
-                    "pattern": "{tenantId}/tasks",
-                    "name": "tasks",
-                    "target": [
-                        "tasks"
-                    ]
                 },
                 {
                     "pattern": "{tenantId}/tasks/{taskId}",
@@ -133,11 +121,14 @@
                     "target": "settings"
                 },
                 {
+                    "pattern": "{tenantId}/forbidden?errorCode={errorCode}",
+                    "name": "forbidden",
+                    "target": "forbidden"
+                },
+                {
                     "pattern": "{tenantId}/systems",
                     "name": "systems",
-                    "target": [
-                        "systems"
-                    ]
+                    "target": "systems"
                 },
                 {
                     "pattern": "{tenantId}/systems/{systemId}",
@@ -149,6 +140,12 @@
                 }
             ],
             "targets": {
+                "forbidden": {
+                    "viewId": "forbidden",
+                    "viewName": "Forbidden",
+                    "viewLevel": 1,
+                    "controlAggregation": "pages"
+                },
                 "keyConfigs": {
                     "viewId": "keyConfigs",
                     "viewName": "keyConfigs.KeyConfigs"

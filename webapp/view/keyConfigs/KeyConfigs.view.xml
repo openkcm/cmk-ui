@@ -54,6 +54,7 @@
                         icon="sap-icon://add"
                         type="Emphasized"
                         text="{i18n>createConfiguration}"
+                        visible="{= ${roleBasedAccess>/keyConfig/canManage}}"
                         press="onCreateConfigPress">
                         <customData>
                             <core:CustomData

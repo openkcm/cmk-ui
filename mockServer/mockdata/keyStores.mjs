@@ -1,9 +1,7 @@
-import Chance from "chance";
-const chance = new Chance();
 export default () => {
 
     const generateKeyStores = () => {
-        const response = {
+        return  {
             default: {
                 allowManaged: true,
                 allowBYOK: true,
@@ -18,7 +16,6 @@ export default () => {
                 ]
             }
         }
-        return response;
     };
     return generateKeyStores();
 }

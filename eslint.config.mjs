@@ -18,6 +18,7 @@ export default tseslint.config(
     },
     rules: {
       "@typescript-eslint/prefer-nullish-coalescing": "off",
+      "@typescript-eslint/unified-signatures": "off",
       "@typescript-eslint/no-unnecessary-condition": "off",
       "@stylistic/quotes": ["error", "single", { avoidEscape: true }],
       "@stylistic/indent": ["error", 4],
@@ -28,7 +29,6 @@ export default tseslint.config(
   {
     ignores: [
       "eslint.config.mjs",
-      "playwright.config.ts",
       "environment.d.ts",
       "mockServer/**/*",
       "mock.mjs",

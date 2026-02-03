@@ -94,10 +94,11 @@ export default class Group extends BaseController {
         this.getView()?.setBusy(true);
         try {
             const groups = await this.api.get<GroupsResponse>('groups', { $top: this.top, $skip: this.skip });
-            const groupsData = groups.value;
+            const groupsData = groups?.value;
             this.oneWayModel.setProperty('/groupsData', groupsData);
-            this.oneWayModel.setProperty('/groupsCount', groups.count || 0);
-            this.paginationModel.setProperty('/totalPages', Math.ceil(groups.count / this.top));
+            this.oneWayModel.setProperty('/groupsCount', groups?.count || 0);
+            const totalCount = groups?.count ?? 0;
+            this.paginationModel.setProperty('/totalPages', Math.ceil(totalCount / this.top));
             this.paginationModel.setProperty('/currentPage', this.currentPage);
 
             this.createGroupModel.setData({
@@ -244,6 +245,7 @@ export default class Group extends BaseController {
 
         MessageBox.confirm(this.getText('confirmGroupDelete'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onClose: async (action: unknown) => {
                 if (action === MessageBox.Action.YES) {
                     this.getView()?.setBusy(true);

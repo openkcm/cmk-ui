@@ -18,6 +18,7 @@
                 <ToolbarSpacer />
                 <Button text="{i18n>connect}" icon="sap-icon://chain-link" type="Ghost"
                     enabled="{= ${oneWay>/keyConfig/canConnectSystems}}"
+                    visible="{= ${roleBasedAccess>/keyConfig/canManage} }"
                     press="onConnectSystemPress">
                     <customData>
                         <core:CustomData
@@ -32,7 +33,7 @@
     <IllustratedMessage
         enableVerticalResponsiveness="false"
         title="{= ${oneWay>/keyConfig/canConnectSystems}? ${i18n>noSystems}: ${i18n>connectSystemsDisabled} }"
-        description="{= ${oneWay>/keyConfig/canConnectSystems}? ${i18n>connectSystemHint}: ${i18n>connectSystemDisabledTooltip} }"
+        description="{= ${roleBasedAccess>/keyConfig/canManage} ? (${oneWay>/keyConfig/canConnectSystems} ? ${i18n>connectSystemHint}: ${i18n>connectSystemDisabledTooltip}):' '}"
         illustrationType="sapIllus-NoColumnsSet"
         illustrationSize="Dialog" />
 

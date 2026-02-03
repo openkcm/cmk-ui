@@ -8,17 +8,17 @@
     xmlns:core="sap.ui.core"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:dataHelp="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
-    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    core:require="{ formatMessage: 'sap/base/strings/formatMessage', commonFormatter: 'kms/common/Formatters'  }">
     <ObjectPageLayout>
         <headerTitle>
             <ObjectPageDynamicHeaderTitle>
                 <expandedHeading>
                     <m:HBox alignContent="Center" alignItems="Center">
                         <m:Title
-                            text="{= ${oneWay>/type} === 'key' ? ${oneWay>/selectedKey/name} : ${oneWay>/selectedSystem/name}}" />
+                            text="{= ${oneWay>/type} === 'key' ? ${oneWay>/selectedKey/name} : ${oneWay>/selectedSystem/properties/externalName}}" />
                         <tnt:InfoLabel
                             icon="sap-icon://favorite"
-                            visible="{= !!${oneWay>/selectedKey/isPrimary}}"
+                            visible="{= !!${oneWay>/selectedKey/isPrimary} &amp;&amp; ${oneWay>/type} !== 'system'}"
                             class="sapUiTinyMarginBegin"
                             text="{i18n>primary}"
                             displayOnly="true"
@@ -28,10 +28,10 @@
                 <snappedHeading>
                     <m:HBox alignContent="Center" alignItems="Center">
                         <m:Title
-                            text="{= ${oneWay>/type} === 'key' ? ${oneWay>/selectedKey/name} : ${oneWay>/selectedSystem/name}}" />
+                            text="{= ${oneWay>/type} === 'key' ? ${oneWay>/selectedKey/name} : ${oneWay>/selectedSystem/properties/externalName}}" />
                         <tnt:InfoLabel
                             icon="sap-icon://favorite"
-                            visible="{= !!${oneWay>/selectedKey/isPrimary}}"
+                            visible="{= !!${oneWay>/selectedKey/isPrimary} &amp;&amp; ${oneWay>/type} !== 'system'}"
                             class="sapUiTinyMarginBegin"
                             text="{i18n>primary}"
                             displayOnly="true"
@@ -90,6 +90,7 @@
                     <m:Button
                         icon="sap-icon://decline"
                         type="Transparent"
+                        tooltip="Close"
                         press="onDetailsClosePress">
                         <m:customData>
                             <core:CustomData
@@ -98,6 +99,22 @@
                                 writeToDom="true" />
                         </m:customData>
                     </m:Button>
+                    <m:OverflowToolbar style="Clear"
+                        visible="{= ${oneWay>/type} === 'system' &amp;&amp; ${roleBasedAccess>/systems/canManage}}">
+                        <m:ToolbarSpacer />
+                        <ObjectPageHeaderActionButton text="{i18n>cancel}"
+                            visible="{= !!${oneWay>/selectedSystem/canCancel} &amp;&amp; ${oneWay>/selectedSystem/status} === 'FAILED'}"
+                            press="onSystemCancelPress"
+                            hideText="false" type="Reject" />
+                        <ObjectPageHeaderActionButton text="{i18n>retry}"
+                            visible="{= !!${oneWay>/selectedSystem/canRetry} &amp;&amp; ${oneWay>/selectedSystem/status} === 'FAILED'}"
+                            press="onSystemRetryPress"
+                            hideText="false" type="Emphasized" />
+                        <ObjectPageHeaderActionButton text="{i18n>disconnect}" hideText="false"
+                            visible="{= ${oneWay>/selectedSystem/status} !== 'FAILED'}"
+                            press="onSystemDisconnectPress"
+                            type="Reject" />
+                    </m:OverflowToolbar>
                 </actions>
             </ObjectPageDynamicHeaderTitle>
         </headerTitle>
@@ -125,7 +142,81 @@
                     </ObjectPageSubSection>
                 </subSections>
             </ObjectPageSection>
-            <!-- TEMP: versions section is temporarily hidden for HYOK as there is not concept
+            <ObjectPageSection titleUppercase="false" id="hyokManagementDetailsSection"
+                visible="{= ${oneWay>/type} === 'key' &amp;&amp; ${oneWay>/selectedKey/type} === 'HYOK' }"
+                title="{i18n>managementRole}"
+                showTitle="false">
+                <subSections>
+                    <ObjectPageSubSection>
+                        <m:VBox items="{twoWay>/selectedKey/accessDetails/managementARNsArray}">
+                            <core:Fragment
+                                fragmentName="kms.resources.fragments.keys.HyokManagementRoleDetailsForm"
+                                type="XML" />
+                        </m:VBox>
+                    </ObjectPageSubSection>
+                </subSections>
+            </ObjectPageSection>
+            <ObjectPageSection titleUppercase="false" id="hyokCryptoDetailsSection"
+                visible="{= ${oneWay>/type} === 'key' &amp;&amp; ${oneWay>/selectedKey/type} === 'HYOK' }"
+                title="{i18n>cryptoRole}"
+                showTitle="false">
+                <subSections>
+                    <ObjectPageSubSection>
+                        <m:VBox>
+                            <m:HBox justifyContent="End"
+                                visible="{parts: ['twoWay>/selectedKey/accessDetails/cryptoARNsArray'], formatter: 'commonFormatter.isCryptoDetailEditable'}">
+                                <m:HBox visible="{= !${oneWay>/cryptoInEditMode}}">
+                                    <m:Button
+                                        icon="sap-icon://edit"
+                                        type="Ghost"
+                                        text="{i18n>edit}"
+                                        press="onEditHYOKCryptoDetailsPress">
+                                        <m:customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="section-editButton"
+                                                writeToDom="true" />
+                                        </m:customData>
+                                    </m:Button>
+                                </m:HBox>
+                                <m:HBox visible="{= ${oneWay>/cryptoInEditMode}}">
+                                    <m:Button
+                                        icon="sap-icon://save"
+                                        type="Emphasized"
+                                        text="{i18n>save}"
+                                        press="onSaveHYOKCryptoDetailsPress"
+                                        class="sapUiSmallMarginEnd">
+                                        <m:customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="section-editButton"
+                                                writeToDom="true" />
+                                        </m:customData>
+                                    </m:Button>
+                                    <m:Button
+                                        icon="sap-icon://cancel"
+                                        type="Ghost"
+                                        text="{i18n>cancel}"
+                                        press="onCancelHYOKCryptoEdit">
+                                        <m:customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="section-editButton"
+                                                writeToDom="true" />
+                                        </m:customData>
+                                    </m:Button>
+                                </m:HBox>
+                            </m:HBox>
+                            <m:VBox items="{twoWay>/selectedKey/accessDetails/cryptoARNsArray}">
+                                <core:Fragment
+                                    fragmentName="kms.resources.fragments.keys.HyokCryptoRoleDetailsForm"
+                                    type="XML" />
+                            </m:VBox>
+                        </m:VBox>
+                    </ObjectPageSubSection>
+                </subSections>
+            </ObjectPageSection>
+            <!-- TEMP: versions section is temporarily hidden for HYOK as there is no concept
             proof for HYOK rotation yet -->
             <ObjectPageSection titleUppercase="false" id="detailPanelObjectPageSectionVersions"
                 visible="{= ${oneWay>/type} === 'key' &amp;&amp; ${oneWay>/selectedKey/type} !== 'HYOK' }"

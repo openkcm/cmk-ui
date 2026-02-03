@@ -247,6 +247,12 @@
                                                         key="{model>name}"
                                                         text="{model>name}">
                                                     </core:Item>
+                                                    <customData>
+                                                        <core:CustomData
+                                                            key="testId"
+                                                            value="hyokAddCryptoCert-certsComboBox"
+                                                            writeToDom="true" />
+                                                    </customData>
                                                 </MultiComboBox>
                                             </HBox>
                                         </VBox>
@@ -270,7 +276,7 @@
                                                     <customData>
                                                         <core:CustomData
                                                             key="testId"
-                                                            value="HYOKKeyCreationWizard-editDetailsButton"
+                                                            value="hyokKeyCreationWizard-editDetailsButton"
                                                             writeToDom="true" />
                                                     </customData>
                                                 </Button>
@@ -311,7 +317,7 @@
                                                     <customData>
                                                         <core:CustomData
                                                             key="testId"
-                                                            value="HYOKKeyCreationWizard-editKeySourceButton"
+                                                            value="hyokKeyCreationWizard-editKeySourceButton"
                                                             writeToDom="true" />
                                                     </customData>
                                                 </Button>
@@ -345,7 +351,14 @@
                                                     text="{i18n>trustAnchorARN}:" />
                                                 <Input
                                                     value="{model>/hyokAWSManagementCertObj/trustAnchorARN}"
-                                                    editable='false' />
+                                                    editable='false'>
+                                                    <customData>
+                                                        <core:CustomData
+                                                            key="testId"
+                                                            value="hyokAWSManagementCertObj-trustAnchorARN-Input"
+                                                            writeToDom="true" />
+                                                    </customData>
+                                                    </Input>
                                                 <Label
                                                     class="sapUiTinyMarginTop"
                                                     text="{i18n>roleARN}:" />
@@ -371,7 +384,14 @@
                                                 <Title text="3. {i18n>cryptoRole}" />
                                                 <ToolbarSpacer />
                                                 <Button press=".onNavBackToStepPress(2)"
-                                                    text="{i18n>edit}" />
+                                                    text="{i18n>edit}">
+                                                    <customData>
+                                                        <core:CustomData
+                                                            key="testId"
+                                                            value="hyokKeyCreationWizard-backButton"
+                                                            writeToDom="true" />
+                                                    </customData>
+                                                </Button>
                                             </Toolbar>
                                         </form:toolbar>
                                         <form:content>
@@ -388,17 +408,38 @@
                                                         class="sapUiTinyMarginTop"
                                                         text="{i18n>trustAnchorARN}:" />
                                                     <Input value="{model>trustAnchorCryptoARN}"
-                                                        editable='false' />
+                                                        editable='false'>
+                                                        <customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="trustAnchor-ArnInput"
+                                                                writeToDom="true" />
+                                                        </customData>
+                                                    </Input>
                                                     <Label
                                                         class="sapUiTinyMarginTop"
                                                         text="{i18n>roleARN}:" />
                                                     <Input value="{model>roleCryptoARN}"
-                                                        editable='false' />
+                                                        editable='false'>
+                                                        <customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="trustAnchor-roleInput"
+                                                                writeToDom="true" />
+                                                        </customData>
+                                                    </Input>
                                                     <Label
                                                         class="sapUiTinyMarginTop"
                                                         text="{i18n>profileARN}:" />
                                                     <Input value="{model>rootCryptoCA}"
-                                                        editable='false' />
+                                                        editable='false'>
+                                                        <customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="trustAnchor-profileInput"
+                                                                writeToDom="true" />
+                                                        </customData>
+                                                    </Input>
                                                 </VBox>
                                             </VBox>
                                         </form:content>
@@ -414,13 +455,20 @@
                     <ToolbarSpacer />
                     <Button text="{i18n>addKey}" type="Emphasized"
                         visible="{= !!${model>/reviewMode}}"
-                        press="onKeyCreationWizardSubmitPress" />
+                        press="onKeyCreationWizardSubmitPress">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="hyokKeyCreationWizard-reviewButton"
+                                writeToDom="true" />
+                        </customData>
+                        </Button>
                     <Button text="{i18n>cancel}" type="Transparent"
                         press="onKeyCreationWizardCancelPress">
                         <customData>
                             <core:CustomData
                                 key="testId"
-                                value="HYOKKeyCreationWizard-cancelButton"
+                                value="hyokKeyCreationWizard-cancelButton"
                                 writeToDom="true" />
                         </customData>
                     </Button>

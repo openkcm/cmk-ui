@@ -1,7 +1,7 @@
 import BaseController from 'kms/controller/BaseController';
 import JSONModel from 'sap/ui/model/json/JSONModel';
 import BindingMode from 'sap/ui/model/BindingMode';
-import { KeyConfig, Key, System, MangedKeyPayload, HyokKeyPayload, KeystoreResponse } from 'kms/common/Types';
+import { KeyConfig, Key, System, MangedKeyPayload, HyokKeyPayload, KeystoreResponse, WorkflowParams } from 'kms/common/Types';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import Api from 'kms/services/Api.service';
 import MessageBox from 'sap/m/MessageBox';
@@ -15,16 +15,17 @@ import EventBus from 'sap/ui/core/EventBus';
 import { Button$PressEvent } from 'sap/m/Button';
 import Filter from 'sap/ui/model/Filter';
 import FilterOperator from 'sap/ui/model/FilterOperator';
-import { SelectDialog$ConfirmEvent, SelectDialog$LiveChangeEvent } from 'sap/m/SelectDialog';
 import ListBinding from 'sap/ui/model/ListBinding';
-import Context from 'sap/ui/model/Context';
 import MultiInput, { MultiInput$TokenUpdateEvent } from 'sap/m/MultiInput';
 import Token from 'sap/m/Token';
-import { BYOKProviders, EventChannelIds, EventIDs, HYOKProviders, KeyCreationTypes } from 'kms/common/Enums';
+import { ActionTypes, ArtifactTypes, BYOKProviders, EventChannelIds, EventIDs, HYOKProviders, KeyCreationTypes, SystemStatus } from 'kms/common/Enums';
 import KeyCreation from 'kms/component/KeyCreation';
 import HyokKeyRegistration from 'kms/component/HyokKeyCreation';
 import { AxiosError } from 'axios';
 import { zipSync, strToU8 } from 'fflate';
+import Workflow from 'kms/component/Workflow';
+import List from 'sap/m/List';
+import { SearchField$LiveChangeEvent } from 'sap/m/SearchField';
 
 interface KeyConfigPatchPayload {
     name: string
@@ -88,6 +89,7 @@ export default class KeyConfigDetail extends BaseController {
     private readonly keyCreationModel = new JSONModel({});
     private readonly connectSystemModel = new JSONModel({});
     private connectSystemPopover: Dialog | undefined;
+    private workflowComponent: Workflow | undefined;
     private readonly switchKeyConfigModel = new JSONModel({});
     private readonly importKeyModel = new JSONModel({});
     private switchKeyConfigDialog: Dialog | undefined;
@@ -183,6 +185,18 @@ export default class KeyConfigDetail extends BaseController {
             console.error('View or component is undefined');
             return;
         }
+
+        if (!this.oneWayModel.getProperty('/allSystems')) {
+            try {
+                await this.updateSystemsTable();
+            }
+            catch (error) {
+                console.error('Error loading systems data:', error);
+                showErrorMessage(error as AxiosError, this.getText('errorFetchingSystems'));
+                return;
+            }
+        }
+
         if (!this.connectSystemPopover) {
             this.connectSystemPopover = await Fragment.load({
                 id: view?.getId() || '',
@@ -192,12 +206,14 @@ export default class KeyConfigDetail extends BaseController {
             this.connectSystemPopover.addStyleClass('sapUiSizeCompact');
             this.connectSystemPopover.setModel(component.getModel('i18n'), 'i18n');
             this.connectSystemPopover.setModel(this.connectSystemModel, 'model');
+            await this.resetConnectSystemModel();
+            this.workflowComponent = new Workflow('workflowComponent');
+            this.workflowComponent.init();
             this.connectSystemPopover.open();
-            this.resetConnectSystemModel();
         }
         else {
+            await this.resetConnectSystemModel();
             this.connectSystemPopover.open();
-            this.resetConnectSystemModel();
         }
     }
 
@@ -243,24 +259,58 @@ export default class KeyConfigDetail extends BaseController {
     public onConnectSystemsCancelPress(): void {
         this.connectSystemPopover?.destroy();
         this.connectSystemPopover = undefined;
-        this.resetConnectSystemModel();
     }
 
-    public async onConnectSystemsConfirmPress(event: SelectDialog$ConfirmEvent): Promise<void> {
-        const systems = event.getParameter('selectedContexts') as Context[];
-        const selectedSystemIds = systems.map(system => (system.getObject() as System).id);
-        if (selectedSystemIds.length === 0) {
+    public async onConnectSystemsConfirmPress(): Promise<void> {
+        const view = this.getView();
+        if (!view) {
+            console.error('View is undefined');
+            return;
+        }
+        const list = Fragment.byId(view.getId(), 'connectSystemsList') as List;
+        const selectedItem = list.getSelectedItem();
+
+        if (!selectedItem) {
+            MessageToast.show(this.getText('noSystemSelected'));
+            return;
+        }
+        // Get the data object from the selected item's binding context
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const bindingContext = selectedItem.getBindingContext('model')!;
+        const selectedSystem = bindingContext.getObject() as System;
+        const selectedSystemId = selectedSystem.id;
+
+        if (!selectedSystemId) {
             MessageToast.show(this.getText('noChangesWereMade'));
             return;
         }
-        const patchPromises: Promise<void>[] = [];
-        selectedSystemIds.forEach((systemId) => {
-            patchPromises.push(this.api.patch(`systems/${systemId}/link`, { keyConfigurationID: this.keyConfigId }));
+        const workflowParams = {
+            artifactType: ArtifactTypes.SYSTEM,
+            artifactID: selectedSystemId,
+            actionType: ActionTypes.LINK,
+            parameters: this.keyConfigId
+        } as WorkflowParams;
+
+        await this.workflowComponent?.checkWorkflowStatus(workflowParams, {
+            onWorkflowExists: () => {
+                this.getView()?.setBusy(false);
+                this.onConnectSystemsCancelPress();
+            }, onWorkflowNotRequired: () => {
+                void this.connectSystem(selectedSystemId);
+            },
+            onWorkflowRequired: () => {
+                void this.createWorkflowForSystemConnection(selectedSystemId, workflowParams);
+            },
+            onError: () => {
+                this.getView()?.setBusy(false);
+                this.onConnectSystemsCancelPress();
+            }
         });
-        this.getView()?.setBusy(true);
+    }
+
+    private async connectSystem(systemId: string): Promise<void> {
         try {
-            await Promise.all(patchPromises);
-            MessageToast.show(this.getText('systemsConnectedSuccessfully'));
+            await this.api.patch(`systems/${systemId}/link`, { keyConfigurationID: this.keyConfigId });
         }
         catch (error) {
             console.error(error);
@@ -273,11 +323,46 @@ export default class KeyConfigDetail extends BaseController {
         }
     }
 
-    public onSearchConnectSystems(event: SelectDialog$LiveChangeEvent): void {
-        const value = event.getParameter('value');
-        const filter = new Filter('name', FilterOperator.Contains, value);
-        const binding = event.getParameter('itemsBinding') as ListBinding;
-        binding.filter([filter]);
+    private async createWorkflowForSystemConnection(systemId: string, workflowParams: WorkflowParams): Promise<void> {
+        try {
+            await this.workflowComponent?.createWorkflow(workflowParams);
+        }
+        finally {
+            await this.getKeyConfigData();
+            this.getView()?.setBusy(false);
+            this.onConnectSystemsCancelPress();
+        }
+    }
+
+    public onSearchConnectSystems(event: SearchField$LiveChangeEvent): void {
+        // Get the search query from the event
+        const query = event.getParameter('newValue');
+
+        // Get the list control and its binding with type casting
+        const list = this.byId('connectSystemsList') as List;
+        const binding = list.getBinding('items') as ListBinding;
+
+        if (!binding) {
+            return;
+        }
+
+        const filters: Filter[] = [];
+
+        if (query && query.length > 0) {
+            // Define the individual filters
+            const filterExternalName = new Filter('properties/externalName', FilterOperator.Contains, query);
+            const filterIdentifier = new Filter('identifier', FilterOperator.Contains, query);
+            const filterRegion = new Filter('region', FilterOperator.Contains, query);
+            // Combine with 'and: false' to create an OR logic
+            const combinedFilter = new Filter({
+                filters: [filterExternalName, filterIdentifier, filterRegion],
+                and: false
+            });
+
+            filters.push(combinedFilter);
+        }
+        // Apply the filter array to the binding
+        binding.filter(filters);
     }
 
     private async getKeyConfigData(): Promise<void> {
@@ -375,7 +460,7 @@ export default class KeyConfigDetail extends BaseController {
 
     private async getkeystoreSettings() {
         try {
-            return await this.api.get<KeystoreResponse>('tenants/keystores');
+            return await this.api.get<KeystoreResponse>('tenantConfigurations/keystores');
         }
         catch (error) {
             console.error(error);
@@ -385,7 +470,12 @@ export default class KeyConfigDetail extends BaseController {
 
     private async getConnectedSystems() {
         try {
-            return await this.api.get<KeyResponse>('systems', { keyConfigurationID: this.keyConfigId, $top: this.top, $skip: this.systemsSkip });
+            const payload = {
+                $filter: `keyConfigurationID eq '${this.keyConfigId}'`,
+                $top: this.top,
+                $skip: this.systemsSkip
+            };
+            return await this.api.get<KeyResponse>('systems', payload);
         }
         catch (error) {
             console.error(error);
@@ -396,6 +486,21 @@ export default class KeyConfigDetail extends BaseController {
     private async getAllSystems() {
         try {
             return await this.api.get<SystemsResponse>('systems');
+        }
+        catch (error) {
+            console.error(error);
+            showErrorMessage(error as AxiosError, this.getText('errorFetchingSystems'));
+        }
+    }
+
+    private async getAllSystemAvailableForConnection() {
+        try {
+            const payload = {
+                $filter: `status eq '${SystemStatus.DISCONNECTED}'`,
+                $top: this.top,
+                $skip: this.systemsSkip
+            };
+            return await this.api.get<SystemsResponse>('systems', payload);
         }
         catch (error) {
             console.error(error);
@@ -567,6 +672,7 @@ export default class KeyConfigDetail extends BaseController {
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
         MessageBox.confirm(this.getText('confirmMakePrimaryConfirmation'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onClose: async (action: unknown) => {
                 if (action === MessageBox.Action.YES) {
                     await this.makeKeyPrimary(selectedKey);
@@ -614,7 +720,7 @@ export default class KeyConfigDetail extends BaseController {
             }
             this.importKeyModel.setData(selectedKey);
             this.importKeyDialog.setModel(this.importKeyModel, 'importKeyModel');
-            this.importKeyModel.setProperty('/wrappingAlgorithm', importParams.wrappingAlgorithm);
+            this.importKeyModel.setProperty('/wrappingAlgorithm', importParams?.wrappingAlgorithm);
             this.resetImportKeyModel();
             this.importKeyDialog.open();
             this.getView()?.setBusy(false);
@@ -703,6 +809,7 @@ export default class KeyConfigDetail extends BaseController {
         }
         MessageBox.confirm(this.getText('confirmKeyDeletion'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onClose: async (action: unknown) => {
                 if (action === MessageBox.Action.YES) {
                     await this.deleteKey(selectedKey.id);
@@ -721,6 +828,7 @@ export default class KeyConfigDetail extends BaseController {
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
         MessageBox.confirm(this.getText('confirmKeyDisable'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onClose: async (action: unknown) => {
                 if (action === MessageBox.Action.YES) {
                     await this.disableKey(selectedKey.id);
@@ -739,6 +847,7 @@ export default class KeyConfigDetail extends BaseController {
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
         MessageBox.confirm(this.getText('confirmKeyEnable'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onClose: async (action: unknown) => {
                 if (action === MessageBox.Action.YES) {
                     await this.enableKey(selectedKey.id);
@@ -747,19 +856,46 @@ export default class KeyConfigDetail extends BaseController {
         });
     }
 
-    public onSystemsTableDisconnectPress(event: Button$PressEvent): void {
+    public async onSystemsTableDisconnectPress(event: Button$PressEvent): Promise<void> {
         const path = event.getSource().getBindingContext('oneWay')?.getPath();
         if (!path) {
             console.error('Binding context path is undefined');
             return;
         }
         const selectedSystem = this.oneWayModel.getProperty(path) as System;
-        MessageBox.confirm(this.getText('confirmDisconnectSystem'), {
-            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-            onClose: async (action: unknown) => {
-                if (action === MessageBox.Action.YES) {
-                    await this.disconnectSystem(selectedSystem.id);
-                }
+        const workflowParams = {
+            artifactType: ArtifactTypes.SYSTEM,
+            artifactID: selectedSystem.id,
+            actionType: ActionTypes.UNLINK
+        } as WorkflowParams;
+        this.workflowComponent = new Workflow('workflowComponent');
+        this.workflowComponent.init();
+        await this.workflowComponent?.checkWorkflowStatus(workflowParams, {
+            onWorkflowNotRequired: () => {
+                MessageBox.confirm(this.getText('confirmDisconnectSystem'), {
+                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onClose: async (action: unknown) => {
+                        if (action === MessageBox.Action.YES) {
+                            await this.disconnectSystem(selectedSystem.id);
+                        }
+                    }
+                });
+            },
+            onWorkflowRequired: () => {
+                MessageBox.confirm(this.getText('confirmDisconnectSystemWorkflowCreation'), {
+                    actions: [this.getText('sendForApproval'), MessageBox.Action.NO],
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onClose: async (action: unknown) => {
+                        if (action === this.getText('sendForApproval')) {
+                            await this.workflowComponent?.createWorkflow(workflowParams);
+                            await this.getKeyConfigData();
+                        }
+                    }
+                });
+            },
+            onError: () => {
+                void this.getKeyConfigData();
             }
         });
     }
@@ -859,8 +995,8 @@ export default class KeyConfigDetail extends BaseController {
         try {
             const importParams = await this.getWrappingParams(key);
             this._downloadPublicKeyFile({
-                publicKey: importParams.publicKey,
-                wrappingAlgorithm: importParams.wrappingAlgorithm as { name: string, hashFunction: string }
+                publicKey: importParams?.publicKey || '',
+                wrappingAlgorithm: importParams?.wrappingAlgorithm as { name: string, hashFunction: string }
             }, key);
             MessageToast.show(this.getText('keyDownloadedSuccessfully'));
         }
@@ -903,7 +1039,7 @@ export default class KeyConfigDetail extends BaseController {
         }
     }
 
-    private async getWrappingParams(key: Key): Promise<{ publicKey: string, wrappingAlgorithm: object }> {
+    private async getWrappingParams(key: Key): Promise<{ publicKey: string, wrappingAlgorithm: object } | undefined> {
         const importParams = await this.api.get<{ publicKey: string, wrappingAlgorithm: object }>(`keys/${key.id}/importParams`);
         return importParams;
     }
@@ -938,6 +1074,7 @@ export default class KeyConfigDetail extends BaseController {
         }
         MessageBox.confirm(this.getText('confirmKeyConfigDelete'), {
             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onClose: async (action: unknown) => {
                 if (action === MessageBox.Action.YES) {
                     this.getView()?.setBusy(true);
@@ -960,11 +1097,16 @@ export default class KeyConfigDetail extends BaseController {
         });
     }
 
-    private resetConnectSystemModel() {
-        const allSystems = this.oneWayModel.getProperty('/allSystems') as System[];
-        const connectedSystems = this.oneWayModel.getProperty('/systems') as System[];
-        const filteredSystems = allSystems?.filter(system =>
-            !connectedSystems?.some(connectedSystem => connectedSystem.id === system.id)
+    private async resetConnectSystemModel() {
+        const availbleSystemsForConnectionResponse = await this.getAllSystemAvailableForConnection();
+        const connectedSystems = this.oneWayModel.getProperty('/systems') as System[] || [];
+
+        const availbleSystemsForConnection = availbleSystemsForConnectionResponse?.value ?? [];
+        // As only DISCONNECTED sytems are listed, the systems connected to this
+        // keyConfig are already filtered out in the process
+        // This manual filtering is just a safety net to filter out any connected systems to this key config
+        const filteredSystems = availbleSystemsForConnection?.filter((system: System) =>
+            !connectedSystems.some(connectedSystem => connectedSystem.id === system.id)
         );
         this.connectSystemModel.setProperty('/systemsList', filteredSystems);
     }
@@ -980,7 +1122,7 @@ export default class KeyConfigDetail extends BaseController {
         }
         const selectedSystem = this.oneWayModel.getProperty(path) as System;
         const keyConfigs = await this.api.get<KeyConfigsResponse>('keyConfigurations', {});
-        const filteredKeyConfigs = keyConfigs.value.filter(keyConfig => keyConfig.id !== this.keyConfigId);
+        const filteredKeyConfigs = keyConfigs?.value.filter(keyConfig => keyConfig.id !== this.keyConfigId);
         const connectedKeyConfig = this.oneWayModel.getProperty('/keyConfig') as KeyConfig;
 
         if (!this.switchKeyConfigDialog) {
@@ -1014,7 +1156,6 @@ export default class KeyConfigDetail extends BaseController {
         const keyConfigId: string = this.switchKeyConfigModel.getProperty('/selectedKeyConfig') as string;
         try {
             await this.api.patch(`systems/${systemId}/link`, { keyConfigurationID: keyConfigId });
-            MessageToast.show(this.getText('keyConfigConnectSystemSuccessfully'));
             this.onSwitchKeyConfigCancelPress();
         }
         catch (error) {

@@ -9,6 +9,9 @@
 		"noImplicitAny": true,
 		"strictNullChecks": true,
 		"strictPropertyInitialization": false,
+		"sourceMap": false,
+		"inlineSourceMap": false,
+		"declaration": false,
 		"rootDir": "./",
 		"types": [
 			"@openui5/types",

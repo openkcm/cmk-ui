@@ -1,4 +1,4 @@
-#
+Makefile#
 # Envs
 #
 
@@ -8,12 +8,12 @@ UI_DEV_TARGET := dev
 UI_TEST_TARGET := test
 IMAGE_NAME := $(UI_APP_NAME)-$(UI_DEV_TARGET):$(TAG)
 DOCKERFILE_DIR := .
-DOCKERFILE_NAME := Dockerfile
+DOCKERFILE_NAME := Dockerfile.dev
 CONTEXT_DIR := .
 NAMESPACE := ui
 CLUSTER_NAME := cmkcluster
 CHART_VALUES :=
-
+CHART_DIR ?= ./charts
 #
 # Docker commands
 #
@@ -36,17 +36,18 @@ docker-dev-run:
 
 # Target to build helm chart
 build-helm:
-	helm dependency build ./charts
+	helm dependency build $(CHAR_DIR)
+
 
 # Target to apply helm chart
 apply-helm-chart:
 	@echo "Applying Helm chart."
-	helm upgrade --install $(CHART_NAME) $(CHART_DIR) --values $(CHART_VALUES)
+	helm upgrade --install $(CHART_NAME) $(CHART_DIR) --values $(CHART_VALUES) --namespace $(NAMESPACE) --create-namespace
 
 # Target to apply UI helm chart
 apply-ui-helm-chart:
 	@echo "Applying UI Helm chart."
-	@$(MAKE) apply-helm-chart CHART_NAME=ui CHART_DIR=./charts APPLY_NAMESPACE=$(NAMESPACE)
+	@$(MAKE) apply-helm-chart CHART_NAME=ui NAMESPACE=ui
 
 # Target to port forward UI app from cluster port 8080 to local port 80
 port-forward: wait-for-svc-cmk
@@ -71,7 +72,7 @@ wait-for-svc-cmk:
 # k3d commands
 #
 
-.PHONY: k3d-import-image k3d-build-helm k3d-import-ui-image k3d-apply-ui-helm-chart k3d-start-ui
+.PHONY: k3d-import-image k3d-build-helm k3d-import-ui-image k3d-start-ui
 
 # Target to build helm chart for k3d
 k3d-build-helm: build-helm
@@ -86,12 +87,8 @@ k3d-import-ui-image:
 	@echo "Importing UI image within k3d."
 	@$(MAKE) k3d-import-image APPLY_IMAGE_NAME=$(IMAGE_NAME)
 
-# Target to apply UI helm chart on k3d
-k3d-apply-ui-helm-chart:
-	@$(MAKE) apply-ui-helm-chart CHART_VALUES=./deployments/k3d/values.yaml
-
 # Target to start UI locally on k3d
-k3d-start-ui: docker-dev-build k3d-import-ui-image k3d-apply-ui-helm-chart port-forward
+k3d-start-ui: docker-dev-build k3d-import-ui-image apply-ui-helm-chart port-forward
 
 #
 # Gardener commands
@@ -101,7 +98,3 @@ k3d-start-ui: docker-dev-build k3d-import-ui-image k3d-apply-ui-helm-chart port-
 
 # Target to build helm chart for Gardener
 gardener-build-helm: build-helm
-
-# Target to apply UI helm chart on Gardener
-gardener-apply-ui-helm-chart:
-	@$(MAKE) apply-ui-helm-chart CHART_VALUES=./deployments/gardener/values.yaml
