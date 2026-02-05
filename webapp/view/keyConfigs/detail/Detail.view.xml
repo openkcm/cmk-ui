@@ -41,6 +41,10 @@
                             </m:customData>
                         </m:Button>
                     </m:HBox>
+                    <m:HBox justifyContent="Start" alignContent="Center" alignItems="Center">
+                        <m:Label text="{i18n>description}:" design="Bold" visible="{= !!${oneWay>/keyConfig/description}}"/>
+                        <m:Label text="{oneWay>/keyConfig/description}" visible="{= !!${oneWay>/keyConfig/description}}"/>
+                    </m:HBox>
                 </expandedContent>
                 <actions>
                     <m:Button
