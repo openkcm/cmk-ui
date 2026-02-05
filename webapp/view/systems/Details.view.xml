@@ -24,12 +24,10 @@
                     <m:OverflowToolbar style="Clear"
                         visible="{=  ${roleBasedAccess>/systems/canManage}}">
                         <m:ToolbarSpacer />
-                        <!-- @Todo TEMP: Revert after demo -->
-                        <!-- <ObjectPageHeaderActionButton text="{i18n>switchKeyConfiguration}"
-                        visible="{= !!${oneWay>/selectedSystem/keyConfigurationID} &amp;&amp;
-                    ${oneWay>/selectedSystem/status} !== 'FAILED'}"
-                        press="onSwitchKeyConfigPress"
-                        hideText="false" /> -->
+                        <ObjectPageHeaderActionButton text="{i18n>switchKeyConfiguration}"
+                            visible="{= !!${oneWay>/selectedSystem/keyConfigurationID} &amp;&amp; ${oneWay>/selectedSystem/status} !== 'FAILED'}"
+                            press="onSwitchKeyConfigPress"
+                            hideText="false" />
                         <ObjectPageHeaderActionButton text="{i18n>cancel}"
                             visible="{= !!${oneWay>/selectedSystem/canCancel} &amp;&amp; ${oneWay>/selectedSystem/status} === 'FAILED'}"
                             press="onSystemCancelPress"
