@@ -13,7 +13,7 @@
                 width="100%"
                 class="sapUiContentPadding">
                 <MessageStrip
-                    text="{i18n>connnectSystemMessageStrip}"
+                    text="{i18n>connnectSystemNeedsApprovalMessage}"
                     showIcon="true"
                     showCloseButton="false"
                     class="sapUiMediumMarginBottom">
@@ -26,19 +26,6 @@
                         class="sapUiSmallMarginBegin sapUiSmallMarginTop" />
                     <Label text="{switchKeyConfigModel>/connectedKeyConfig/id}"
                         class="sapUiSmallMarginBegin" />
-                    <VBox class="sapUiSmallMarginBegin sapUiSmallMarginTop sapUiSmallMarginBottom">
-                        <Label text="{i18n>description}:" />
-                        <TextArea value="{switchKeyConfigModel>/connectedKeyConfig/description}"
-                            width="95%"
-                            editable="false">
-                            <customData>
-                                <core:CustomData
-                                    key="testId"
-                                    value="switchKeyConfig-descriptionText"
-                                    writeToDom="true" />
-                            </customData>
-                        </TextArea>
-                    </VBox>
                 </VBox>
                 <HBox justifyContent="Center" alignContent="Center"
                     class="sapUiSmallMarginTop sapUiSmallMarginBottom">
