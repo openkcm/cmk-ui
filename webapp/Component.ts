@@ -4,14 +4,14 @@ import IllustrationPool from 'sap/m/IllustrationPool';
 import Theming from 'sap/ui/core/Theming';
 import { loadConfig, loadYAMLConfig } from './utils/Config';
 import * as yaml from 'js-yaml';
-import Api from './services/Api.service';
+import Api, { ApiAccessError } from './services/Api.service';
 import Ora from './services/Ora.service';
-import MessageBox from 'sap/m/MessageBox';
 import ResourceModel from 'sap/ui/model/resource/ResourceModel';
 import Core from 'sap/ui/core/Core';
 import Auth from './services/Auth.service';
 import { RoleBasedAccessData, TenantsList, UserData } from './common/Types';
 import { UserRoles } from './common/Enums';
+import SplashScreen from './utils/SplashScreen';
 /**
  * @namespace kms
  */
@@ -38,10 +38,12 @@ export default class Component extends UIComponent {
         Core.setModel(i18nModel, 'i18n');
 
         try {
+            SplashScreen.updateStatus('Loading configuration...');
             const config = await loadConfig();
             Auth.init(config.apiBaseUrl);
             Api.init(config.apiBaseUrl);
 
+            SplashScreen.updateStatus('Loading resources...');
             const yamlText = await loadYAMLConfig();
             const doc = yaml.load(yamlText);
             Ora.init(doc as object);
@@ -52,10 +54,12 @@ export default class Component extends UIComponent {
             const tenantId = tenantIdMatch?.[1];
             if (!tenantId) {
                 console.error('No tenant ID found in URL. Cannot start the application.');
-                // Show the restriction page
+                SplashScreen.showError('No tenant ID found in URL.');
                 return;
             }
             Api.updateTenantId(tenantId);
+
+            SplashScreen.updateStatus('Authenticating...');
             const [tenantsResponse, userInfo] = await Promise.all([
                 api.getTenantsForTenant(),
                 api.get<UserData>('userInfo')
@@ -72,26 +76,23 @@ export default class Component extends UIComponent {
             }
             const tenants = tenantsResponse?.value;
 
+            SplashScreen.updateStatus('Initializing application...');
             this.setGlobalModel(tenants ?? [], tenantId, userInfo);
 
             this.setInitialTheme();
             this.registerIllustrationSet();
+
+            // Hide splash screen after successful initialization
+            SplashScreen.hide();
         }
         catch (error) {
-            const datetime = new Date().toISOString().split('.')[0];
-            MessageBox.error('Failed to initialize API service. Contact an administrator with the details below if the problem persists.', {
-                title: 'Initialization Error',
-                details: `<p><strong>Error Details:</strong></p>
-                          <ul>
-                              <li><strong>Error Message: </strong>${JSON.stringify(error)}</li>
-                              <li><strong>Timestamp (UTC): </strong>${datetime}</li>
-                          </ul>`,
-                actions: [MessageBox.Action.CLOSE],
-                onClose: () => {
-                    location.reload();
-                },
-                styleClass: 'sapUiUserSelectable'
-            });
+            console.error('Initialization error:', error);
+            if (error instanceof ApiAccessError) {
+                SplashScreen.showError(error.message);
+            }
+            else {
+                SplashScreen.showError('Failed to initialize application. Contact an administrator if the problem persists.');
+            }
             throw error;
         }
     }

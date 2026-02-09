@@ -36,8 +36,7 @@ export default class App extends BaseController {
             selectedTenant: '',
             userInitials: '',
             userName: '',
-            userEmail: '',
-            isForbidden: false
+            userEmail: ''
         }
     );
 
@@ -45,8 +44,13 @@ export default class App extends BaseController {
 
     public onInit(): void {
         super.onInit();
+        const view = this.getView();
+        if (view) {
+            view.setBusy(true);
+            view.setBusyIndicatorDelay(0);
+        }
 
-        const component = this.getOwnerComponent() as Component;
+        const component = this.getOwnerComponent() as Component & { getInitialSetupFinishedPromise: () => Promise<void> };
 
         component.getInitialSetupFinishedPromise().then(() => {
             this.toolPage = this.byId('kmsApp') as ToolPage;
@@ -77,8 +81,14 @@ export default class App extends BaseController {
             // If a route matches immediately, onRouteChange will trigger correctly
             this.getRouter().initialize();
             this.handleDefaultNavigation(selectedTenantId);
+            if (view) {
+                view.setBusy(false);
+            }
         }).catch((error: unknown) => {
             console.error('Setup failed:', error);
+            if (view) {
+                view.setBusy(false);
+            }
         });
     }
 
@@ -145,12 +155,6 @@ export default class App extends BaseController {
         const selectedTenant = tenants.find(tenant => tenant.id === routeArgs?.tenantId);
         this.twoWayModel.setProperty('/selectedTenantName', selectedTenant ? selectedTenant.name : '');
         const defaultHomePage = this.twoWayModel.getProperty('/defaulHomePage') as string;
-        if (routeName === 'forbidden') {
-            this.setForbiddenState(true);
-        }
-        else {
-            this.setForbiddenState(false);
-        }
         const navigateToDefaultHomePage = (): void => {
             this.twoWayModel.setProperty('/selectedKey', defaultHomePage);
             this.navigateToSelectedPage();
@@ -205,9 +209,6 @@ export default class App extends BaseController {
                 }
 
                 break;
-            case 'forbidden':
-                this.twoWayModel.setProperty('/selectedKey', 'forbidden');
-                break;
             case 'settings':
                 this.twoWayModel.setProperty('/selectedKey', 'settings');
                 break;
@@ -218,9 +219,6 @@ export default class App extends BaseController {
     }
 
     public onNavigationClick(): void {
-        if (this.isForbidden()) {
-            return;
-        }
         this.navigateToSelectedPage();
     }
 
@@ -251,9 +249,6 @@ export default class App extends BaseController {
     }
 
     public onTenantChanged(event: Menu$ItemSelectedEvent): void {
-        if (this.isForbidden()) {
-            return;
-        }
         const item = event.getParameter('item');
         if (item instanceof MenuItem) {
             const selectedTenant = item.getKey();
@@ -264,15 +259,6 @@ export default class App extends BaseController {
             Api.updateTenantId(selectedTenant || '');
             this.navigateToSelectedPage();
         }
-    }
-
-    private isForbidden(): boolean {
-        return this.twoWayModel.getProperty('/isForbidden') as boolean;
-    }
-
-    private setForbiddenState(isForbidden: boolean): void {
-        this.twoWayModel.setProperty('/isForbidden', isForbidden);
-        this.twoWayModel.setProperty('/selectedKey', 'forbidden');
     }
 
     private navigateToSelectedPage(): void {
