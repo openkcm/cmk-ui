@@ -4,6 +4,16 @@ import type { TenantsResponse, UserData } from 'kms/common/Types';
 import { getErrorCode } from 'kms/common/Helpers';
 import Constants from 'kms/common/Constants';
 
+// Custom error class for API errors that should be shown on splash screen
+export class ApiAccessError extends Error {
+    public readonly errorCode: string;
+    constructor(message: string, errorCode: string) {
+        super(message);
+        this.name = 'ApiAccessError';
+        this.errorCode = errorCode;
+    }
+}
+
 /**
  * @namespace kms
  */
@@ -62,14 +72,12 @@ export default class Api {
                 catch (e: unknown) {
                     console.error('Login initiation failed:', e);
                     this.isLoginInProgress = false;
-                    this.navigateToForbidden('AUTHENTICATION_FAILED');
-                    return;
+                    throw new ApiAccessError('Authentication failed. Please try again or contact an administrator.', 'AUTHENTICATION_FAILED');
                 }
             }
             else {
-                console.warn('Subsequent authentication error detected. Redirecting to forbidden page.');
-                this.navigateToForbidden('AUTHENTICATION_FAILED');
-                return;
+                console.warn('Subsequent authentication error detected.');
+                throw new ApiAccessError('Authentication failed. Please try again or contact an administrator.', 'AUTHENTICATION_FAILED');
             }
         }
         else if (isForbiddenError) {
@@ -93,27 +101,16 @@ export default class Api {
         const errorCode = getErrorCode(error);
         switch (errorCode) {
             case Constants.FORBIDDEN_ERROR_CODES.MULTIPLE_ROLES_NOT_ALLOWED:
-                this.navigateToForbidden('MULTIPLE_ROLES_NOT_ALLOWED');
-                break;
+                throw new ApiAccessError('Access denied: Multiple roles are not allowed for this user.', 'MULTIPLE_ROLES_NOT_ALLOWED');
             case Constants.FORBIDDEN_ERROR_CODES.NO_TENANT_ACCESS:
-                this.navigateToForbidden('NO_TENANT_ACCESS');
-                break;
+                throw new ApiAccessError('Access denied: You do not have access to this tenant.', 'NO_TENANT_ACCESS');
             case Constants.FORBIDDEN_ERROR_CODES.AUTHENTICATION_FAILED:
-                this.navigateToForbidden('AUTHENTICATION_FAILED');
-                break;
+                throw new ApiAccessError('Authentication failed. Please try again or contact an administrator.', 'AUTHENTICATION_FAILED');
             case Constants.FORBIDDEN_ERROR_CODES.FORBIDDEN:
-                this.navigateToForbidden('FORBIDDEN');
-                break;
+                throw new ApiAccessError('Access denied: You do not have permission to access this resource.', 'FORBIDDEN');
             default:
                 throw error;
         }
-    }
-
-    private navigateToForbidden(errCode: string): void {
-        const hash = window.location.hash;
-        const tenantIdMatch = /#\/([^/]+)/.exec(hash);
-        const tenantId = tenantIdMatch ? tenantIdMatch[1] : this.tenantId;
-        window.location.hash = `/${tenantId ?? ''}/forbidden?errorCode=${errCode}`;
     }
 
     public static init(baseUrl: string): void {

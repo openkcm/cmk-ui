@@ -1,17 +1,141 @@
 <!DOCTYPE html>
 <html lang="en" xml:lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Key Management Service</title>
+    <link rel="shortcut icon" href="https://www.sap.com/dam/application/shared/logos/sap-logo-svg.svg">
+    <link rel="apple-touch-icon" href="https://www.sap.com/dam/application/shared/logos/sap-logo-svg.svg">
+    
+    <!-- Inline splash screen styles - renders immediately -->
+    <style id="kms-splash-styles">
+        #kms-splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #fafafa; /* sapBackgroundColor - Horizon Light */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.3s ease-out;
+        }
+        
+        /* Dark mode support - Horizon Dark */
+        @media (prefers-color-scheme: dark) {
+            #kms-splash-screen {
+                background-color: #12171c; /* sapBackgroundColor - Horizon Dark */
+            }
+            #kms-splash-screen .splash-title {
+                color: #eaecee; /* sapTextColor - Horizon Dark */
+            }
+            #kms-splash-screen .splash-subtitle {
+                color: #a9b4be; /* sapContent_LabelColor - Horizon Dark */
+            }
+            #kms-splash-screen .splash-loader {
+                border-color: #354a5f; /* sapContent_ForegroundBorderColor - Horizon Dark */
+                border-top-color: #0070f2; /* sapBrandColor - Horizon Dark */
+            }
+            #kms-splash-screen.splash-error .splash-subtitle {
+                color: #f53232; /* sapNegativeTextColor - Horizon Dark */
+            }
+        }
+        
+        #kms-splash-screen .splash-loader {
+            width: 44px;
+            height: 44px;
+            border: 3px solid #e5e5e5; /* sapContent_ForegroundBorderColor - Horizon Light */
+            border-top-color: #0070f2; /* sapBrandColor - Horizon Light */
+            border-radius: 50%;
+            animation: splash-spin 1.2s linear infinite;
+        }
+        
+        #kms-splash-screen .splash-title {
+            margin-top: 1.5rem;
+            font-family: "72", "72full", Arial, Helvetica, sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1d2d3e; /* sapTextColor - Horizon Light */
+            letter-spacing: normal;
+        }
+        
+        #kms-splash-screen .splash-subtitle {
+            margin-top: 0.5rem;
+            font-family: "72", "72full", Arial, Helvetica, sans-serif;
+            font-size: 0.875rem;
+            font-weight: 400;
+            color: #556b82; /* sapContent_LabelColor - Horizon Light */
+        }
+        
+        #kms-splash-screen.splash-error .splash-subtitle {
+            color: #aa0808; /* sapNegativeTextColor - Horizon Light */
+        }
+        
+        #kms-splash-screen .splash-error-icon {
+            display: none;
+            width: 44px;
+            height: 44px;
+            color: #aa0808; /* sapNegativeColor - Horizon Light */
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            #kms-splash-screen .splash-error-icon {
+                color: #f53232; /* sapNegativeColor - Horizon Dark */
+            }
+        }
+        
+        #kms-splash-screen.splash-error .splash-loader {
+            display: none;
+        }
+        
+        #kms-splash-screen.splash-error .splash-error-icon {
+            display: block;
+        }
+        
+        @keyframes splash-spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        #kms-splash-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        /* Hide main container until ready */
+        #container[data-loading="true"] {
+            visibility: hidden;
+            height: 0;
+            overflow: hidden;
+        }
+    </style>
+    
     <script id="sap-ui-bootstrap" src="../../../../../../resources/sap-ui-core.js" data-sap-ui-theme="sap_horizon"
         data-sap-ui-resourceroots='{
             "kms": "./"
         }' data-sap-ui-oninit="module:sap/ui/core/ComponentSupport" data-sap-ui-compatVersion="edge"
         data-sap-ui-async="true" data-sap-ui-appCacheBuster="./">
-        </script>
+    </script>
+
 </head>
+
 <body class="sapUiBody">
-    <div data-sap-ui-component data-name="kms" data-id="container" data-settings='{"id" : "kms"}'></div>
+    <!-- Splash screen - visible immediately -->
+    <div id="kms-splash-screen" role="status" aria-live="polite" aria-label="Application loading">
+        <div class="splash-loader" aria-hidden="true"></div>
+        <!-- Error icon (SAP icon font not available yet, using SVG) -->
+        <svg class="splash-error-icon" aria-hidden="true" viewBox="0 0 512 512" fill="currentColor">
+            <path d="M256 48C141.31 48 48 141.31 48 256s93.31 208 208 208 208-93.31 208-208S370.69 48 256 48zm0 319.91a20 20 0 1 1 20-20 20 20 0 0 1-20 20zm21.72-201.15-5.74 122a16 16 0 0 1-32 0l-5.74-122a21.73 21.73 0 0 1 21.5-22.69h.21a21.74 21.74 0 0 1 21.73 22.7z"/>
+        </svg>
+        <div class="splash-title">Key Management Service</div>
+        <div class="splash-subtitle">Loading application...</div>
+    </div>
+    
+    <!-- Main app container - hidden until ready -->
+    <div data-sap-ui-component data-name="kms" data-id="container" data-settings='{"id" : "kms"}' data-loading="true"></div>
 </body>
+
 </html>
