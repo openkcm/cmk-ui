@@ -1,7 +1,8 @@
-<mvc:View
-    controllerName="kms.controller.Settings"
-    xmlns="sap.m"
-    xmlns:f="sap.f"
+<mvc:View xmlns:core="sap.ui.core"
+          controllerName="kms.controller.Settings"
+          xmlns:l="sap.ui.layout" xmlns="sap.m"
+          xmlns:f="sap.f"
+          xmlns:cd="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
     xmlns:mvc="sap.ui.core.mvc">
     <f:DynamicPage>
         <f:title>
@@ -15,6 +16,42 @@
             </f:DynamicPageTitle>
         </f:title>
         <f:content>
+            <Panel height="95%">
+                <l:Splitter>
+                    <VBox>
+                        <VBox class="sapUiSmallMarginBegin sapUiSmallMarginTop">
+                            <Title text="{i18n>selectLanguage}" />
+                            <RadioButtonGroup id="languageRadioButtonGroup" columns="5"
+                                              select="onSelectedLanguageChanged"
+                                              class="sapUiMediumMarginBottom"
+                                              selectedIndex="{oneWay>/selectedLanguageIndex}">
+                                <RadioButton id="DE" text="{i18n>german}" cd:language="DE" />
+                                <RadioButton id="EN" text="{i18n>englishUS}" cd:language="EN" />
+                                <RadioButton id="ZH" text="{i18n>chinese}" cd:language="ZH" />
+                                <RadioButton id="FR" text="{i18n>french}" cd:language="FR" />
+                                <customData>
+                                    <core:CustomData
+                                            key="help-id"
+                                            value="settings-radioButtonGroup-languages"
+                                            writeToDom="true" />
+                                </customData>
+                            </RadioButtonGroup>
+                            <Button text="{i18n>switchLanguage}" type="Emphasized"
+                                    press="onLanguageChanged">
+                                <customData>
+                                    <core:CustomData
+                                            key="help-id"
+                                            value="settings-button-changeLanguage"
+                                            writeToDom="true" />
+                                </customData>
+                            </Button>
+                        </VBox>
+                        <layoutData>
+                            <l:SplitterLayoutData size="auto" />
+                        </layoutData>
+                    </VBox>
+                </l:Splitter>
+            </Panel>
         </f:content>
     </f:DynamicPage>
 </mvc:View>
