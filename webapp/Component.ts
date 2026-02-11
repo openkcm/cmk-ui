@@ -10,6 +10,7 @@ import MessageBox from 'sap/m/MessageBox';
 import ResourceModel from 'sap/ui/model/resource/ResourceModel';
 import Core from 'sap/ui/core/Core';
 import Auth from './services/Auth.service';
+import { initLanguageConfig } from 'kms/common/Language.Helpers';
 import { RoleBasedAccessData, TenantsList, UserData } from './common/Types';
 import { UserRoles } from './common/Enums';
 /**
@@ -36,7 +37,7 @@ export default class Component extends UIComponent {
         // The method below is deprecated but there is no acceptable alternative to set a global model, so this is needed for now
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         Core.setModel(i18nModel, 'i18n');
-
+        initLanguageConfig();
         try {
             const config = await loadConfig();
             Auth.init(config.apiBaseUrl);
