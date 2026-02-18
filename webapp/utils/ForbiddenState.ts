@@ -14,6 +14,7 @@ export default class ForbiddenStateService {
 
     private constructor() {
         this.model = new JSONModel({
+            errorTitle: '',
             errorCode: '',
             errorMessage: '',
             loginButtonVisible: false,
@@ -39,8 +40,11 @@ export default class ForbiddenStateService {
      */
     public setForbiddenState(errorCode: string): void {
         const errorMessage = this.getErrorMessage(errorCode);
-        const showLoginButton = errorCode === Constants.FORBIDDEN_ERROR_CODES.AUTHENTICATION_FAILED;
+        const errorTitle = this.getErrorTitle(errorCode);
+        const loginSupportedErrorCodes = [Constants.FORBIDDEN_ERROR_CODES.AUTHENTICATION_FAILED, Constants.FORBIDDEN_ERROR_CODES.MULTIPLE_UNSUCCESSFUL_LOGIN_ATTEMPTS, Constants.FORBIDDEN_ERROR_CODES.LOGGED_OUT];
+        const showLoginButton = loginSupportedErrorCodes.includes(errorCode);
 
+        this.model.setProperty('/errorTitle', errorTitle);
         this.model.setProperty('/errorCode', errorCode);
         this.model.setProperty('/errorMessage', errorMessage);
         this.model.setProperty('/loginButtonVisible', showLoginButton);
@@ -54,6 +58,7 @@ export default class ForbiddenStateService {
     }
 
     public clearForbiddenState(): void {
+        this.model.setProperty('/errorTitle', '');
         this.model.setProperty('/errorCode', '');
         this.model.setProperty('/errorMessage', '');
         this.model.setProperty('/loginButtonVisible', false);
@@ -64,23 +69,30 @@ export default class ForbiddenStateService {
         return this.model.getProperty('/isForbidden') as boolean || false;
     }
 
-    /**
-     * Returns the current error message from the forbidden state model.
-     */
     public getForbiddenErrorMessage(): string {
         return this.model.getProperty('/errorMessage') as string || '';
     }
 
-    /**
-     * Returns the current error code from the forbidden state model.
-     */
     public getForbiddenErrorCode(): string {
         return this.model.getProperty('/errorCode') as string || '';
     }
 
-    /**
-     * Resolves a forbidden error code to a user-facing i18n message.
-     */
+    private getErrorTitle(errorCode: string): string {
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        const i18nModel = Core.getModel('i18n') as ResourceModel;
+        const resourceBundle = i18nModel?.getResourceBundle() as ResourceBundle;
+
+        switch (errorCode) {
+            case Constants.FORBIDDEN_ERROR_CODES.MULTIPLE_UNSUCCESSFUL_LOGIN_ATTEMPTS:
+            case Constants.FORBIDDEN_ERROR_CODES.AUTHENTICATION_FAILED:
+                return resourceBundle?.getText('authenticationFailTitle') || 'Unable to Authenticate';
+            case Constants.FORBIDDEN_ERROR_CODES.LOGGED_OUT:
+                return resourceBundle?.getText('loggedOutTitle') || 'Logged Out';
+            default:
+                return resourceBundle?.getText('notAuthorised') || 'Not Authorised';
+        }
+    }
+
     private getErrorMessage(errorCode: string): string {
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         const i18nModel = Core.getModel('i18n') as ResourceModel;
@@ -97,6 +109,8 @@ export default class ForbiddenStateService {
                 return resourceBundle?.getText('permissionDeniedZeroRoles') || 'Zero roles not allowed';
             case Constants.FORBIDDEN_ERROR_CODES.MULTIPLE_UNSUCCESSFUL_LOGIN_ATTEMPTS:
                 return resourceBundle?.getText('multipleUnsuccessfulLoginAttempts') || 'Multiple unsuccessful login attempts';
+            case Constants.FORBIDDEN_ERROR_CODES.LOGGED_OUT:
+                return resourceBundle?.getText('loggedOutMessage') || 'You have been logged out';
             default:
                 return resourceBundle?.getText('forbiddenDescription') || 'Access forbidden';
         }

@@ -9,7 +9,7 @@
         <f:content>
             <VBox alignItems="Center" justifyContent="Center">
                 <IllustratedMessage enableVerticalResponsiveness="false"
-                    title="{i18n>notAuthorised}"
+                    title="{forbidden>/errorTitle}"
                     description="{forbidden>/errorMessage}"
                     enableDefaultTitleAndDescription="false"
                     illustrationType="sapIllus-UnableToLoad"

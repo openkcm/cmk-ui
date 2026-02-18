@@ -28,7 +28,6 @@ export default class Api {
     private tenants: TenantsResponse | undefined;
     private tenantId: string | undefined;
     private tenantName: string | undefined;
-    private readonly csrfCookieBaseName: string = 'CSRF';
     private userInfo: UserData | undefined;
     private static setAxiosHeaderCSRFCookie: (tenantID: string) => void;
     private hasHandledFirstAuthError = false;
@@ -47,9 +46,14 @@ export default class Api {
             this.axiosInstance.defaults.headers['Content-Type'] = contentType;
         };
         Api.setAxiosHeaderCSRFCookie = (tenantId: string) => {
-            const csrfCookieName = `${this.csrfCookieBaseName}-${tenantId}`;
-            this.axiosInstance.defaults.headers['X-CSRF-Token'] = Auth.getCsrfTokenFromCookie(csrfCookieName);
+            this.axiosInstance.defaults.headers['X-CSRF-Token'] = Auth.getCsrfTokenFromCookie(tenantId);
         };
+    }
+
+    public static init(baseUrl: string): void {
+        if (!Api.instance) {
+            Api.instance = new Api(baseUrl);
+        }
     }
 
     private handleError(error: unknown): void {
@@ -58,16 +62,13 @@ export default class Api {
         const isAuthenticationError = apiError?.status === 401;
         const isForbiddenError = apiError?.status === 403;
         if (isAuthenticationError) {
-            const setForbiddenState = (forbiddenErrorCode: string): void => {
-                ForbiddenStateService.getInstance().setForbiddenState(forbiddenErrorCode);
-            };
             console.warn('Authentication error detected. Initiating login process.');
             try {
-                Auth.handle401Error(this.tenantId || '', setForbiddenState);
+                Auth.handle401Error(this.tenantId || '');
             }
             catch (e: unknown) {
                 console.error('Login initiation failed:', e);
-                setForbiddenState(Constants.FORBIDDEN_ERROR_CODES.AUTHENTICATION_FAILED);
+                ForbiddenStateService.getInstance().setForbiddenState(Constants.FORBIDDEN_ERROR_CODES.AUTHENTICATION_FAILED);
             }
             // If forbidden state was set (e.g. max login attempts or the catch block for handle401Error), throw so callers can handle it
             if (ForbiddenStateService.getInstance().isForbidden()) {
@@ -106,12 +107,6 @@ export default class Api {
             forbiddenService.getForbiddenErrorMessage(),
             forbiddenService.getForbiddenErrorCode()
         );
-    }
-
-    public static init(baseUrl: string): void {
-        if (!Api.instance) {
-            Api.instance = new Api(baseUrl);
-        }
     }
 
     public static getInstance(): Api {
