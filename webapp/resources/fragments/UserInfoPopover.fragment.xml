@@ -95,7 +95,7 @@
                         icon="sap-icon://official-service"
                         key="legal">
                     </tnt:NavigationListItem>
-                </tnt:NavigationList>
+                </tnt:NavigationList> -->
                 <HBox justifyContent="End" class="sapUiSmallMarginEnd">
                     <Button
                         text="{i18n>signOut}"
@@ -109,7 +109,7 @@
                                 writeToDom="true" />
                         </customData>
                     </Button>
-                </HBox> -->
+                </HBox>
             </VBox>
         </content>
     </ResponsivePopover>
