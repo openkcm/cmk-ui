@@ -1,0 +1,22 @@
+{  
+   "collections":[  
+      {  
+         "collectionName":"CMK_UI",
+         "folders":[
+            {
+               "startingFolderPath":"**/i18n/**",
+               "sourceFilters":[
+                  "*i18n_en.properties"
+               ]
+            }
+         ]
+      }
+   ],
+   "defaultConfiguration":{
+      "xlfFolderPath":"./XLF",
+      "targetFolderPath":".",
+      "pseudoLocFolderPath":".",
+      "oneQFolderPath":".",
+      "targetFileNamingConvention":"[filename]_[langCode].[extension]"
+   }
+}
