@@ -147,6 +147,34 @@ ui:
   # https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
   topologySpreadConstraints: []
 
+  # This section is for configuring PodDisruptionBudget to ensure high availability during voluntary disruptions
+  # More information can be found here: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+  podDisruptionBudget:
+    # Specifies whether a PodDisruptionBudget should be created
+    enabled: false
+
+    # Minimum number of pods that must be available during disruptions
+    # Can be an absolute number (e.g., 2) or a percentage (e.g., "50%")
+    # Note: Only one of minAvailable or maxUnavailable can be set
+    minAvailable: 1
+
+    # Maximum number of pods that can be unavailable during disruptions
+    # Can be an absolute number (e.g., 1) or a percentage (e.g., "25%")
+    # Note: Only one of minAvailable or maxUnavailable can be set
+    # maxUnavailable: 1
+
+    # Annotations to add to the PodDisruptionBudget resource
+    annotations: {}
+
+    # Additional labels to add to the selector for matching pods
+    # These will be combined with the standard selector labels from ui.selectorLabels
+    additionalSelectorLabels: {}
+
+    # Specifies the policy for handling unhealthy pods during eviction (Kubernetes 1.26+)
+    # Valid values: IfHealthyBudget, AlwaysAllow
+    # More info: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#unhealthy-pod-eviction-policy
+    # unhealthyPodEvictionPolicy: IfHealthyBudget
+
 # This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets:
   - name: "registry-access"
