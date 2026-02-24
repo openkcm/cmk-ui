@@ -5,11 +5,10 @@ import ResponsivePopover from 'sap/m/ResponsivePopover';
 import { Avatar$PressEvent } from 'sap/m/Avatar';
 import { Router$RouteMatchedEvent } from 'sap/ui/core/routing/Router';
 import ToolPage from 'sap/tnt/ToolPage';
-import { Menu$ItemSelectedEvent } from 'sap/m/Menu';
+import { ComboBox$ChangeEvent } from 'sap/m/ComboBox';
 import Api from 'kms/services/Api.service';
 import MessageBox from 'sap/m/MessageBox';
 import Component from 'kms/Component';
-import MenuItem from 'sap/m/MenuItem';
 import { RoleBasedAccessData, UserData } from 'kms/common/Types';
 import { UserRoles } from 'kms/common/Enums';
 /**
@@ -250,20 +249,22 @@ export default class App extends BaseController {
         }
     }
 
-    public onTenantChanged(event: Menu$ItemSelectedEvent): void {
-        if (this.isForbidden()) {
+    public onTenantChanged(event: ComboBox$ChangeEvent): void {
+        const comboBox = event.getSource();
+        const selectedKey = comboBox.getSelectedKey();
+
+        if (!selectedKey) {
             return;
         }
-        const item = event.getParameter('item');
-        if (item instanceof MenuItem) {
-            const selectedTenant = item.getKey();
-            const selectedTenantName = item.getText();
-            this.twoWayModel.setProperty('/selectedTenant', selectedTenant);
-            this.twoWayModel.setProperty('/selectedTenantName', selectedTenantName);
-            this.api = Api.getInstance();
-            Api.updateTenantId(selectedTenant || '');
-            this.navigateToSelectedPage();
-        }
+
+        const selectedItem = comboBox.getSelectedItem();
+        const selectedTenantName = selectedItem?.getText() || '';
+
+        this.twoWayModel.setProperty('/selectedTenant', selectedKey);
+        this.twoWayModel.setProperty('/selectedTenantName', selectedTenantName);
+
+        Api.updateTenantId(selectedKey);
+        this.navigateToSelectedPage();
     }
 
     private isForbidden(): boolean {
