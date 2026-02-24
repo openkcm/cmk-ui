@@ -4,15 +4,16 @@ import IllustrationPool from 'sap/m/IllustrationPool';
 import Theming from 'sap/ui/core/Theming';
 import { loadConfig, loadYAMLConfig } from './utils/Config';
 import * as yaml from 'js-yaml';
-import Api from './services/Api.service';
+import Api, { ApiAccessError } from './services/Api.service';
 import Ora from './services/Ora.service';
-import MessageBox from 'sap/m/MessageBox';
 import ResourceModel from 'sap/ui/model/resource/ResourceModel';
 import Core from 'sap/ui/core/Core';
 import Auth from './services/Auth.service';
 import { initLanguageConfig } from 'kms/common/Language.Helpers';
 import { RoleBasedAccessData, TenantsList, UserData } from './common/Types';
 import { UserRoles } from './common/Enums';
+import SplashScreen from './utils/SplashScreen';
+import ForbiddenStateService from './utils/ForbiddenState';
 /**
  * @namespace kms
  */
@@ -23,8 +24,12 @@ export default class Component extends UIComponent {
     };
 
     private initialSetupPromise: Promise<void>;
+    private forbiddenService: ForbiddenStateService;
 
     public init(): void {
+        this.forbiddenService = ForbiddenStateService.getInstance();
+        this.setModel(this.forbiddenService.getModel(), 'forbidden');
+
         this.initialSetupPromise = this.doGlobalSetup();
         super.init();
     }
@@ -42,33 +47,51 @@ export default class Component extends UIComponent {
             const config = await loadConfig();
             Auth.init(config.apiBaseUrl);
             Api.init(config.apiBaseUrl);
+            const api = Api.getInstance();
 
             const yamlText = await loadYAMLConfig();
             const doc = yaml.load(yamlText);
             Ora.init(doc as object);
 
-            const api = Api.getInstance();
             const currentUrl = window.location.hash;
             const tenantIdMatch = /#\/([^/]+)/.exec(currentUrl);
             const tenantId = tenantIdMatch?.[1];
             if (!tenantId) {
                 console.error('No tenant ID found in URL. Cannot start the application.');
-                // Show the restriction page
-                return;
+                SplashScreen.showError('Missing tenant context. Please ensure you are accessing the application through a valid tenant URL.');
+                throw new Error('No tenant ID found in URL. Cannot start the application.');
             }
             Api.updateTenantId(tenantId);
-            const [tenantsResponse, userInfo] = await Promise.all([
-                api.getTenantsForTenant(),
-                api.get<UserData>('userInfo')
-            ]);
+
+            let tenantsResponse, userInfo;
+            try {
+                [tenantsResponse, userInfo] = await Promise.all([
+                    api.getTenantsForTenant(),
+                    api.get<UserData>('userInfo')
+                ]);
+            }
+            catch (error) {
+                if (error instanceof ApiAccessError) {
+                    throw error;
+                }
+                console.warn('Setup interrupted, likely due to auth redirect:', error);
+                return;
+            }
+
+            if (this.forbiddenService.isForbidden()) {
+                SplashScreen.hide();
+                this.forbiddenService.navigateToForbidden(tenantId);
+                return;
+            }
+
+            this.forbiddenService.clearForbiddenState();
+
             if (!userInfo) {
                 console.error('Failed to fetch user information.');
-                // Show the restriction page
                 return;
             }
             if (!tenantsResponse?.value || tenantsResponse.value.length === 0) {
                 console.error('No tenants found for this user.');
-                // Show the restriction page
                 return;
             }
             const tenants = tenantsResponse?.value;
@@ -77,24 +100,34 @@ export default class Component extends UIComponent {
 
             this.setInitialTheme();
             this.registerIllustrationSet();
+
+            if (this.isOnForbiddenPage()) {
+                this.forbiddenService.navigateToHome(tenantId);
+            }
+
+            SplashScreen.hide();
         }
         catch (error) {
-            const datetime = new Date().toISOString().split('.')[0];
-            MessageBox.error('Failed to initialize API service. Contact an administrator with the details below if the problem persists.', {
-                title: 'Initialization Error',
-                details: `<p><strong>Error Details:</strong></p>
-                          <ul>
-                              <li><strong>Error Message: </strong>${JSON.stringify(error)}</li>
-                              <li><strong>Timestamp (UTC): </strong>${datetime}</li>
-                          </ul>`,
-                actions: [MessageBox.Action.CLOSE],
-                onClose: () => {
-                    location.reload();
-                },
-                styleClass: 'sapUiUserSelectable'
-            });
+            console.error('Initialization error:', error);
+            if (this.forbiddenService.isForbidden()) {
+                SplashScreen.hide();
+                const tenantIdMatch = /#\/([^/]+)/.exec(window.location.hash);
+                const tenantId = tenantIdMatch?.[1] || '';
+                this.forbiddenService.navigateToForbidden(tenantId);
+                return;
+            }
+            if (error instanceof ApiAccessError) {
+                SplashScreen.showError(error.message);
+            }
+            else {
+                SplashScreen.showError('Failed to initialize application. Contact an administrator if the problem persists.');
+            }
             throw error;
         }
+    }
+
+    private isOnForbiddenPage(): boolean {
+        return window.location.hash.includes('/forbidden');
     }
 
     public getInitialSetupFinishedPromise(): Promise<void> {
