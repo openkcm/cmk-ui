@@ -11,7 +11,8 @@ import MessageBox from 'sap/m/MessageBox';
 import Component from 'kms/Component';
 import MenuItem from 'sap/m/MenuItem';
 import { RoleBasedAccessData, UserData } from 'kms/common/Types';
-import { UserRoles } from 'kms/common/Enums';
+import { GroupRoles, UserRoles } from 'kms/common/Enums';
+import { setGroupRole } from 'kms/common/Formatters';
 /**
  * @namespace kms
  */
@@ -97,7 +98,7 @@ export default class App extends BaseController {
     }
 
     private setUserInitials(userInfo: UserData): void {
-        let initials = '';
+        let initials: string;
         const firstName = userInfo?.givenName?.trim() || '';
         const lastName = userInfo?.familyName?.trim() || '';
 
@@ -113,7 +114,6 @@ export default class App extends BaseController {
         else {
             initials = 'KM';
         }
-
         this.twoWayModel.setProperty('/userInitials', initials);
     }
 
@@ -121,9 +121,11 @@ export default class App extends BaseController {
         const firstName = userInfo.givenName?.trim() || '';
         const lastName = userInfo.familyName?.trim() || '';
         const fullName = [firstName, lastName].filter(Boolean).join(' ') || 'User';
+        const role = userInfo.role as GroupRoles;
 
         this.twoWayModel.setProperty('/userName', fullName);
         this.twoWayModel.setProperty('/userEmail', userInfo.email || '');
+        this.twoWayModel.setProperty('/userRole', setGroupRole(role));
     }
 
     public onRouteChange(event: Router$RouteMatchedEvent): void {

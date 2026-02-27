@@ -82,9 +82,9 @@ export function setSystemStatusColor(status: SystemStatus | undefined): string |
     }
 }
 export function formatCert(rootCA: string, subject: string): string {
-    const cert = `Root CA:\n ${rootCA}\nSubject:\n${subject}`;
-    return cert;
+    return `Root CA:\n ${rootCA}\nSubject:\n${subject}`;
 }
+
 export function setGroupRole(role: GroupRoles): string {
     switch (role) {
         case GroupRoles.KEY_ADMINISTRATOR:
