@@ -6,7 +6,7 @@ import { System, KeyConfig, WorkflowParams, SystemRecoveryActions } from 'kms/co
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import { Button$PressEvent } from 'sap/m/Button';
 import MessageBox from 'sap/m/MessageBox';
-import { copyToClipboard, showErrorMessage } from 'kms/common/Helpers';
+import { copyToClipboard, getErrorCode, showErrorMessage } from 'kms/common/Helpers';
 import EventBus from 'sap/ui/core/EventBus';
 import MessageToast from 'sap/m/MessageToast';
 import Dialog from 'sap/m/Dialog';
@@ -14,6 +14,7 @@ import Fragment from 'sap/ui/core/Fragment';
 import { ActionTypes, ArtifactTypes, EventChannelIds, EventIDs } from 'kms/common/Enums';
 import { AxiosError } from 'axios';
 import Workflow from 'kms/component/Workflow';
+import Constants from 'kms/common/Constants';
 interface KeyConfigsResponse {
     value: KeyConfig[]
     count: number
@@ -71,7 +72,12 @@ export default class Systems extends BaseController {
         }
         catch (error) {
             console.error('Error fetching system details', error);
-            showErrorMessage(error as AxiosError, this.getText('errorFetchingSystemDetails'));
+            if (getErrorCode(error as AxiosError) === Constants.API_ERROR_CODES.KEY_CONFIGURATION_NOT_FOUND) {
+                showErrorMessage(error as AxiosError, this.getText('keyConfigurationNotFound'));
+            }
+            else {
+                showErrorMessage(error as AxiosError, this.getText('errorFetchingSystemDetails'));
+            }
         }
         finally {
             this.getView()?.setBusy(false);
