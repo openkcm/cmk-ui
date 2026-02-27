@@ -27,25 +27,24 @@
                     text="{i18n>appTitle}"
                     level="H2" />
                 <ToolbarSpacer />
-                <!-- KMS20-2751 TEMPORARY -->
-                <!-- <MenuButton
-                    text="{= ${twoWay>/selectedTenantName} ? ${twoWay>/selectedTenantName} : ${i18n>invalidTenant}}"
-                    type="{= ${twoWay>/selectedTenantName} ? 'Transparent' : 'Reject'}"
-                    icon="{= ${twoWay>/selectedTenantName} ? '' : 'sap-icon://warning'}"
-                    class="sapUiTinyMarginEnd">
-                    <menu>
-                        <Menu items="{oneWay>/tenants}" itemSelected="onTenantChanged"
-                            class="sapUiSizeCompact">
-                            <MenuItem key="{oneWay>id}" text="{oneWay>name}" />
-                        </Menu>
-                    </menu>
+                <ComboBox
+                    selectedKey="{selectedTenant>/selectedTenant}"
+                    valueState="{= ${selectedTenant>/selectedTenant} ? 'None' : 'Error'}"
+                    valueStateText="{i18n>invalidTenant}"
+                    change="onTenantChanged"
+                    class="sapUiTinyMarginEnd"
+                    items="{
+                        path: 'tenants>/tenants',
+                        sorter: { path: 'region', group: true }
+                     }">
+                    <core:ListItem key="{tenants>id}" text="{= ${tenants>id} + ' [' + ${tenants>region} + ']'}" />
                     <customData>
                         <core:CustomData
                             key="testId"
-                            value="shellBar-tenantMenuButton"
+                            value="shellBar-tenantComboBox"
                             writeToDom="true" />
                     </customData>
-                </MenuButton> -->
+                </ComboBox>
                 <Avatar initials="{twoWay>/userInitials}" displaySize="XS" press="onUserNamePress" visible="{= !${twoWay>/isForbidden}}">
                     <layoutData>
                         <OverflowToolbarLayoutData priority="NeverOverflow" />
