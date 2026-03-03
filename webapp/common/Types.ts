@@ -3,6 +3,10 @@ import { ActionTypes, ArtifactTypes, KeyCreationTypes, KeyStates, TaskStates, Ta
 export interface Config {
     apiBaseUrl: string
 }
+export interface SystemMetadata {
+    ErrorCode: string
+    ErrorMessage: string
+}
 export interface System {
     id: string
     identifier: string
@@ -12,6 +16,7 @@ export interface System {
     status: SystemStatus
     keyConfigurationName: string
     keyConfigurationID: string
+    Metadata?: SystemMetadata
 }
 export interface SystemRecoveryActions {
     canCancel: true
