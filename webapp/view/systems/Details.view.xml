@@ -1,6 +1,8 @@
 <mvc:View controllerName="kms.controller.systems.Detail"
     xmlns:m="sap.m" xmlns="sap.uxap" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core"
-    xmlns:dataHelp="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
+    xmlns:form="sap.ui.layout.form"
+    xmlns:dataHelp="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+    core:require="{ commonFormatter: 'kms/common/Formatters' }">
     <ObjectPageLayout showTitleInHeaderContent="true" upperCaseAnchorBar="false">
         <headerTitle>
             <ObjectPageDynamicHeaderTitle>
@@ -59,6 +61,31 @@
                             <core:Fragment
                                 fragmentName="kms.resources.fragments.systems.DetailsForm"
                                 type="XML" />
+                        </m:VBox>
+                    </ObjectPageSubSection>
+                </subSections>
+            </ObjectPageSection>
+            <ObjectPageSection titleUppercase="false" id="systemsObjectPageSectionError"
+                title="{i18n>errorDetails}"
+                visible="{parts: ['oneWay>/selectedSystem/status'], formatter: 'commonFormatter.isErrorStatus'}">
+                <subSections>
+                    <ObjectPageSubSection>
+                        <m:VBox class="sapUiSmallMargin">
+                            <m:MessageStrip
+                                text="{parts: ['oneWay>/selectedSystem/status', 'oneWay>/selectedSystem/metadata/errorMessage'], formatter: 'commonFormatter.formatErrorDetails'}"
+                                type="Error"
+                                showIcon="true"
+                                showCloseButton="false"
+                                class="sapUiSmallMarginBottom" />
+                            <form:SimpleForm editable="false"
+                                layout="ResponsiveGridLayout"
+                                labelSpanXL="3" labelSpanL="3" labelSpanM="3" labelSpanS="12"
+                                emptySpanXL="4" emptySpanL="4" emptySpanM="4" emptySpanS="0">
+                                <m:Label text="{i18n>errorCode}" />
+                                <m:Text text="{oneWay>/selectedSystem/metadata/errorCode}" />
+                                <m:Label text="{i18n>errorMessage}" />
+                                <m:Text text="{oneWay>/selectedSystem/metadata/errorMessage}" />
+                            </form:SimpleForm>
                         </m:VBox>
                     </ObjectPageSubSection>
                 </subSections>
