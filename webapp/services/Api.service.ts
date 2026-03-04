@@ -61,27 +61,16 @@ export default class Api {
         const isAuthenticationError = apiError?.status === 401;
         const isForbiddenError = apiError?.status === 403;
         if (isAuthenticationError) {
-            if (this.isLoginInProgress) {
-                console.warn('Authentication error while login in progress. Ignoring.');
+            const handleForbiddenError = (forbiddenErrorCode: string): void => {
+                this.navigateToForbidden(forbiddenErrorCode);
+            };
+            console.warn('Authentication error detected. Initiating login process.');
+            try {
+                Auth.handle401Error(this.tenantId || '', handleForbiddenError);
                 return;
             }
-            if (!this.hasHandledFirstAuthError) {
-                console.warn('Authentication error detected. Initiating login process.');
-                this.isLoginInProgress = true;
-                try {
-                    Auth.initiateLogin(this.tenantId || '', false);
-                    this.hasHandledFirstAuthError = true;
-                    return;
-                }
-                catch (e: unknown) {
-                    console.error('Login initiation failed:', e);
-                    this.isLoginInProgress = false;
-                    this.navigateToForbidden('AUTHENTICATION_FAILED');
-                    return;
-                }
-            }
-            else {
-                console.warn('Subsequent authentication error detected. Redirecting to forbidden page.');
+            catch (e: unknown) {
+                console.error('Login initiation failed:', e);
                 this.navigateToForbidden('AUTHENTICATION_FAILED');
                 return;
             }
@@ -128,6 +117,9 @@ export default class Api {
                 return resourceBundle?.getText('permissionDeniedAuthenticationFailed') || 'Authentication failed';
             case Constants.FORBIDDEN_ERROR_CODES.ZERO_ROLES_NOT_ALLOWED:
                 return resourceBundle?.getText('permissionDeniedZeroRoles') || 'Zero roles not allowed';
+            case Constants.FORBIDDEN_ERROR_CODES.MULTIPLE_UNSUCCESSFUL_LOGIN_ATTEMPTS:
+                return resourceBundle?.getText('multipleUnsuccessfulLoginAttempts') || 'Multiple Unsuccessfull login attempts';
+            // errorTitle = this.getText('authenticationFailTitle');
             default:
                 return resourceBundle?.getText('forbiddenDescription') || 'Access forbidden';
         }
