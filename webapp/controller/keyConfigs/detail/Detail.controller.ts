@@ -102,6 +102,8 @@ export default class KeyConfigDetail extends BaseController {
     private systemsCurrentPage: number;
     private readonly keysPaginationModel = new JSONModel({});
     private readonly systemsPaginationModel = new JSONModel({});
+    private readonly keyCreatePopoverComp = new KeyCreation('keyCreatePopover');
+    private readonly hyokRegistrationPopoverComp = new HyokKeyRegistration('hyokRegistrationPopover');
 
     public onInit(): void {
         super.onInit();
@@ -240,13 +242,11 @@ export default class KeyConfigDetail extends BaseController {
         switch (keyType) {
             case KeyCreationTypes.SYSTEM_MANAGED:
             case KeyCreationTypes.BYOK: {
-                const keyCreatePopover = new KeyCreation('keyCreatePopover');
-                keyCreatePopover.openKeyCreationWizard(keyParams, this, createKey);
+                this.keyCreatePopoverComp.openKeyCreationWizard(keyParams, this, createKey);
                 break;
             }
             case KeyCreationTypes.HYOK: {
-                const keyCreatePopover = new HyokKeyRegistration('hyokRegistrationPopover');
-                keyCreatePopover.openHyokKeyCreationWizard(keyParams, this, this.api, createKey);
+                this.hyokRegistrationPopoverComp.openHyokKeyCreationWizard(keyParams, this, this.api, createKey);
                 break;
             }
             default: {
