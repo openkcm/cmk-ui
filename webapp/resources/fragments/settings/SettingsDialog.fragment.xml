@@ -1,0 +1,145 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:cd="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
+    <Dialog
+        id="settingsDialog"
+        title="{i18n>sideContentSettings}"
+        contentWidth="60rem"
+        contentHeight="40rem"
+        draggable="true"
+        resizable="true"
+        verticalScrolling="false"
+        horizontalScrolling="false">
+        <content>
+            <FlexBox direction="Row" fitContainer="true" renderType="Bare">
+                <!-- Left Navigation List -->
+                <List
+                    id="settingsNavList"
+                    width="15rem"
+                    mode="SingleSelectMaster"
+                    defaultTransitionName="slide"
+                    selectionChange="onSettingsNavSelect">
+                    <layoutData>
+                        <FlexItemData shrinkFactor="0" />
+                    </layoutData>
+                    <items>
+                        <StandardListItem
+                            title="{i18n>languageSettings}"
+                            icon="sap-icon://world"
+                            type="Active"
+                            selected="true"
+                            description="{oneWay>/selectedLanguageName}"
+                            cd:key="language">
+                            <customData>
+                                <core:CustomData key="help-id" value="settings-nav-language" writeToDom="true" />
+                            </customData>
+                        </StandardListItem>
+                        <StandardListItem
+                            title="{i18n>workflowSettings}"
+                            icon="sap-icon://workflow-tasks"
+                            type="Active"
+                            description="{= ${oneWay>/workflowEnabled} ? ${i18n>enabled} : ${i18n>disabled}}"
+                            cd:key="workflow">
+                            <customData>
+                                <core:CustomData key="help-id" value="settings-nav-workflow" writeToDom="true" />
+                            </customData>
+                        </StandardListItem>
+                    </items>
+                </List>
+                <!-- Right Content Area -->
+                <NavContainer id="settingsNavContainer" defaultTransitionName="show">
+                    <layoutData>
+                        <FlexItemData growFactor="1" baseSize="0%" />
+                    </layoutData>
+                    <!-- Language Settings Page -->
+                    <Page id="languageSettingsPage" showHeader="false" enableScrolling="true">
+                        <ObjectHeader title="{i18n>languageSettings}" backgroundDesign="Solid"/>
+                        <content>
+                            <VBox class="sapUiSmallMargin">
+                                <Panel>
+                                    <RadioButtonGroup id="languageRadioButtonGroup" columns="3" select="onSelectedLanguageChanged" class="sapUiSmallMarginBottom" selectedIndex="{oneWay>/selectedLanguageIndex}">
+                                        <RadioButton id="DE" text="{i18n>german}" cd:language="DE" />
+                                        <RadioButton id="EN" text="{i18n>englishUS}" cd:language="EN" />
+                                        <RadioButton id="ZH" text="{i18n>chinese}" cd:language="ZH" />
+                                        <RadioButton id="FR" text="{i18n>french}" cd:language="FR" />
+                                        <RadioButton id="JA" text="{i18n>japanese}" cd:language="JA" />
+                                        <RadioButton id="PT" text="{i18n>portuguese}" cd:language="PT" />
+                                        <RadioButton id="ES" text="{i18n>spanish}" cd:language="ES" />
+                                        <customData>
+                                            <core:CustomData key="help-id" value="settings-radioButtonGroup-languages" writeToDom="true" />
+                                        </customData>
+                                    </RadioButtonGroup>
+                                    <Button text="{i18n>switchLanguage}" type="Emphasized" press="onLanguageChanged">
+                                        <customData>
+                                            <core:CustomData key="help-id" value="settings-button-changeLanguage" writeToDom="true" />
+                                        </customData>
+                                    </Button>
+                                </Panel>
+                            </VBox>
+                        </content>
+                    </Page>
+                    <!-- Workflow Settings Page -->
+                    <Page id="workflowSettingsPage" showHeader="false" enableScrolling="true">
+                        <ObjectHeader title="{i18n>workflowSettings}" titleLevel="H3" class="sapUiNoContentPadding" backgroundDesign="Solid"/>
+                        <content>
+                            <VBox class="sapUiSmallMargin">
+                                <Panel>
+                                    <content>
+                                        <form:SimpleForm editable="true" layout="ResponsiveGridLayout" labelSpanXL="4" labelSpanL="4" labelSpanM="5" labelSpanS="12" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="1" columnsL="1" columnsM="1">
+                                            <form:content>
+                                                <Label text="{i18n>workflowEnabled}" />
+                                                <Switch state="{workflow>/enabled}" customTextOn="{i18n>yes}" customTextOff="{i18n>no}" enabled="{= ${oneWay>/canEditWorkflowSettings} &amp;&amp; ${oneWay>/canEditWorkflowEnabled} }">
+                                                    <customData>
+                                                        <core:CustomData key="help-id" value="settings-switch-workflowEnabled" writeToDom="true" />
+                                                    </customData>
+                                                </Switch>
+                                                <Label text="{i18n>minimumApprovals}" />
+                                                <StepInput value="{workflow>/minimumApprovals}" min="1" step="1" width="10rem" enabled="{oneWay>/canEditWorkflowSettings}">
+                                                    <customData>
+                                                        <core:CustomData key="help-id" value="settings-input-minimumApprovals" writeToDom="true" />
+                                                    </customData>
+                                                </StepInput>
+                                                <Label text="{i18n>defaultExpiryPeriodDays}" />
+                                                <StepInput value="{workflow>/defaultExpiryPeriodDays}" min="1" step="1" width="10rem" enabled="{oneWay>/canEditWorkflowSettings}">
+                                                    <customData>
+                                                        <core:CustomData key="help-id" value="settings-input-defaultExpiryPeriodDays" writeToDom="true" />
+                                                    </customData>
+                                                </StepInput>
+                                                <Label text="{i18n>maxExpiryPeriodDays}" />
+                                                <StepInput value="{workflow>/maxExpiryPeriodDays}" min="1" step="1" width="10rem" enabled="{oneWay>/canEditWorkflowSettings}">
+                                                    <customData>
+                                                        <core:CustomData key="help-id" value="settings-input-maxExpiryPeriodDays" writeToDom="true" />
+                                                    </customData>
+                                                </StepInput>
+                                                <Label text="{i18n>retentionPeriodDays}" />
+                                                <StepInput value="{workflow>/retentionPeriodDays}" min="1" step="1" width="10rem" enabled="{oneWay>/canEditWorkflowSettings}">
+                                                    <customData>
+                                                        <core:CustomData key="help-id" value="settings-input-retentionPeriodDays" writeToDom="true" />
+                                                    </customData>
+                                                </StepInput>
+                                            </form:content>
+                                        </form:SimpleForm>
+                                    </content>
+                                </Panel>
+                                <Button text="{i18n>saveWorkflowSettings}" type="Emphasized" press="onSaveWorkflowSettings" visible="{oneWay>/canEditWorkflowSettings}" enabled="{oneWay>/hasWorkflowSettingsChanges}">
+                                    <customData>
+                                        <core:CustomData key="help-id" value="settings-button-saveWorkflowSettings" writeToDom="true" />
+                                    </customData>
+                                </Button>
+                            </VBox>
+                        </content>
+                    </Page>
+                </NavContainer>
+            </FlexBox>
+        </content>
+        <buttons>
+            <Button text="{i18n>close}" press="onCloseSettingsDialog">
+                <customData>
+                    <core:CustomData key="help-id" value="settings-button-close" writeToDom="true" />
+                </customData>
+            </Button>
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>
