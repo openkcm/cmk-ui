@@ -257,4 +257,8 @@ export interface RoleBasedAccessData {
         canView: boolean
         canManage: boolean
     }
+    settings: {
+        canView: boolean
+        canManage: boolean
+    }
 }
