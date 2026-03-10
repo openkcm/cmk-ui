@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.5](https://github.com/openkcm/cmk-ui/compare/v0.0.4...v0.0.5) (2026-03-10)
+
+
+### Bug Fixes
+
+* chart updates ([5af30cf](https://github.com/openkcm/cmk-ui/commit/5af30cf733f24fdf40e685a43c386e64623563dd))
+
 ## [0.0.4](https://github.com/openkcm/cmk-ui/compare/v0.0.3...v0.0.4) (2026-03-10)
 
 
