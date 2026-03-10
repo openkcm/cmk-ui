@@ -2,9 +2,9 @@ name: Helm
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
     paths:
-      - "charts/**"
+      - 'charts/**'
 
 permissions:
   packages: write
