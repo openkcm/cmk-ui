@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.2](https://github.com/openkcm/cmk-ui/compare/v0.0.1...v0.0.2) (2026-03-10)
+
+
+### Bug Fixes
+
+* update the release.automatic.yaml ([#46](https://github.com/openkcm/cmk-ui/issues/46)) ([4ea2caa](https://github.com/openkcm/cmk-ui/commit/4ea2caad4ec0bdbd6cd0643128f0d6b4e746c738))
+
 ## 0.0.1 (2026-03-10)
 
 
