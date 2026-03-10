@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.4](https://github.com/openkcm/cmk-ui/compare/v0.0.3...v0.0.4) (2026-03-10)
+
+
+### Bug Fixes
+
+* update the Dockerfile Node default version ([#50](https://github.com/openkcm/cmk-ui/issues/50)) ([babf782](https://github.com/openkcm/cmk-ui/commit/babf782262bb226e9f53796ddbc6118fdcba2ed6))
+
 ## [0.0.3](https://github.com/openkcm/cmk-ui/compare/v0.0.2...v0.0.3) (2026-03-10)
 
 
