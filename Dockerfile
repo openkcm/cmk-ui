@@ -1,9 +1,7 @@
-# Stage 1: Build environment
 ARG NODE_VERSION=22.2.0
 FROM node:${NODE_VERSION}-alpine AS build
 
-# Pass the NPM version as a build argument from the Taskfile
-ARG NPM_VERSION=10.8.0
+ARG NPM_VERSION=11.11.0
 
 WORKDIR /app
 
