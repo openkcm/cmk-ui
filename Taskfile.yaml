@@ -1,0 +1,12 @@
+version: 3
+
+includes:
+  shared:
+    taskfile: hack/common/Taskfile_service.yaml
+    flatten: true
+    excludes: [] # put task names in here which are overwritten in this file
+    vars:
+      CODE_DIRS: '{{.ROOT_DIR}}/...'
+      CHART_COMPONENTS: 'cmk-ui'
+      SINGLE_IMAGE_NAME: 'cmk-ui'
+      IMG_COMPONENTS: 'cmk-ui'
