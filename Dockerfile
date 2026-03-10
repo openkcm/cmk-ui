@@ -24,7 +24,7 @@ RUN npm run build
 RUN npm prune --production
 
 # Stage 2: Production environment
-FROM nginx:1.29.1-alpine3.22-slim AS production
+FROM nginx:1.29.3-alpine3.22-slim AS production
 
 # Clean default static files
 RUN rm -rf /usr/share/nginx/html/*
