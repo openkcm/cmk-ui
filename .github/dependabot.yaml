@@ -4,17 +4,17 @@
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 version: 2
 updates:
-  - package-ecosystem: gomod
+  - package-ecosystem: npm
     directory: /
     reviewers:
-      - "openkcm/go-maintainers"
+      - "openkcm/cmk-ui-team"
     schedule:
       interval: weekly
     commit-message:
       prefix: "fix"
       include: "scope"
     groups:
-      gomod-group:
+      npm-group:
         applies-to: version-updates
         patterns:
           - "*"
@@ -25,7 +25,7 @@ updates:
   - package-ecosystem: docker
     directory: /
     reviewers:
-      - "openkcm/go-maintainers"
+      - "openkcm/cmk-ui-team"
     schedule:
       interval: weekly
     commit-message:
@@ -43,7 +43,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     reviewers:
-      - "openkcm/go-maintainers"
+      - "openkcm/cmk-ui-team"
     schedule:
       interval: weekly
     commit-message:
