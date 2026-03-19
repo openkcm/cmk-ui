@@ -45,6 +45,16 @@
                         </customData>
                     </Label>
                 </HBox>
+                <HBox justifyContent="Center" alignContent="Center">
+                    <Label text="{twoWay>/userRole}">
+                        <customData>
+                            <core:CustomData
+                                    key="testId"
+                                    value="userInfoPopover-userRole"
+                                    writeToDom="true" />
+                        </customData>
+                    </Label>
+                </HBox>
                 <!-- <tnt:NavigationList id="userInfoNavList" class="sapUiTinyMarginTop"
                     itemSelect="onUserInfoListSelect">
                     <tnt:NavigationListItem
