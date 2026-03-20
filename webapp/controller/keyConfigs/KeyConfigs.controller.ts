@@ -255,7 +255,7 @@ export default class Keys extends BaseController {
     private async getGroups(): Promise<void> {
         this.getView()?.setBusy(true);
         try {
-            const groups = await this.api.get<GroupsResponse>('groups', { $top: this.top, $skip: this.skip });
+            const groups = await this.api.get<GroupsResponse>('groups');
             const groupsData = groups?.value;
             this.oneWayModel.setProperty('/groupsData', groupsData);
         }
