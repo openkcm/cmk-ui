@@ -1,8 +1,22 @@
 import axios, { AxiosInstance, AxiosError, AxiosResponse } from 'axios';
 import Auth from './Auth.service';
+import ForbiddenStateService from '../utils/ForbiddenState';
 import type { TenantsResponse, UserData } from 'kms/common/Types';
 import { getErrorCode } from 'kms/common/Helpers';
 import Constants from 'kms/common/Constants';
+import ResourceBundle from 'sap/base/i18n/ResourceBundle';
+import ResourceModel from 'sap/ui/model/resource/ResourceModel';
+import Core from 'sap/ui/core/Core';
+
+// Custom error class for API errors that should be shown on splash screen
+export class ApiAccessError extends Error {
+    public readonly errorCode: string;
+    constructor(message: string, errorCode: string) {
+        super(message);
+        this.name = 'ApiAccessError';
+        this.errorCode = errorCode;
+    }
+}
 
 /**
  * @namespace kms
@@ -91,29 +105,44 @@ export default class Api {
 
     private handleForbiddenError(error: AxiosError): void {
         const errorCode = getErrorCode(error);
+        const errorMessage = this.getForbiddenErrorMessage(errorCode);
+        const showLoginButton = errorCode === Constants.FORBIDDEN_ERROR_CODES.AUTHENTICATION_FAILED;
+
+        const forbiddenService = ForbiddenStateService.getInstance();
+        forbiddenService.setForbiddenState(errorCode, errorMessage, showLoginButton);
+
+        throw new ApiAccessError(errorMessage, errorCode);
+    }
+
+    private getForbiddenErrorMessage(errorCode: string): string {
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        const i18nModel = Core.getModel('i18n') as ResourceModel;
+        const resourceBundle = i18nModel?.getResourceBundle() as ResourceBundle;
+
         switch (errorCode) {
             case Constants.FORBIDDEN_ERROR_CODES.MULTIPLE_ROLES_NOT_ALLOWED:
-                this.navigateToForbidden('MULTIPLE_ROLES_NOT_ALLOWED');
-                break;
+                return resourceBundle?.getText('permissionDeniedMultipleRoles') || 'Multiple roles not allowed';
             case Constants.FORBIDDEN_ERROR_CODES.NO_TENANT_ACCESS:
-                this.navigateToForbidden('NO_TENANT_ACCESS');
-                break;
+                return resourceBundle?.getText('permissionDeniedNoRole') || 'No tenant access';
             case Constants.FORBIDDEN_ERROR_CODES.AUTHENTICATION_FAILED:
-                this.navigateToForbidden('AUTHENTICATION_FAILED');
-                break;
-            case Constants.FORBIDDEN_ERROR_CODES.FORBIDDEN:
-                this.navigateToForbidden('FORBIDDEN');
-                break;
+                return resourceBundle?.getText('permissionDeniedAuthenticationFailed') || 'Authentication failed';
+            case Constants.FORBIDDEN_ERROR_CODES.ZERO_ROLES_NOT_ALLOWED:
+                return resourceBundle?.getText('permissionDeniedZeroRoles') || 'Zero roles not allowed';
             default:
-                throw error;
+                return resourceBundle?.getText('forbiddenDescription') || 'Access forbidden';
         }
     }
 
     private navigateToForbidden(errCode: string): void {
+        const errorMessage = this.getForbiddenErrorMessage(errCode);
+        const showLoginButton = errCode === Constants.FORBIDDEN_ERROR_CODES.AUTHENTICATION_FAILED;
+
+        const forbiddenService = ForbiddenStateService.getInstance();
+        forbiddenService.setForbiddenState(errCode, errorMessage, showLoginButton);
         const hash = window.location.hash;
         const tenantIdMatch = /#\/([^/]+)/.exec(hash);
         const tenantId = tenantIdMatch ? tenantIdMatch[1] : this.tenantId;
-        window.location.hash = `/${tenantId ?? ''}/forbidden?errorCode=${errCode}`;
+        forbiddenService.navigateToForbidden(tenantId || '');
     }
 
     public static init(baseUrl: string): void {

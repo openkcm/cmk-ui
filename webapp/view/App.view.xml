@@ -11,7 +11,6 @@
                     id="sideNavigationToggleButton"
                     icon="sap-icon://menu2"
                     type="Transparent"
-                    visible="{= !${twoWay>/isForbidden}}"
                     press=".onSideNavButtonPress">
                     <layoutData>
                         <OverflowToolbarLayoutData priority="NeverOverflow" />
@@ -46,7 +45,7 @@
                             writeToDom="true" />
                     </customData>
                 </MenuButton> -->
-                <Avatar initials="{twoWay>/userInitials}" displaySize="XS" press="onUserNamePress" visible="{= !${twoWay>/isForbidden}}">
+                <Avatar initials="{twoWay>/userInitials}" displaySize="XS" press="onUserNamePress">
                     <layoutData>
                         <OverflowToolbarLayoutData priority="NeverOverflow" />
                     </layoutData>
@@ -62,7 +61,6 @@
         <tnt:sideContent>
             <tnt:SideNavigation
                 selectedKey="{twoWay>/selectedKey}"
-                visible="{= !${twoWay>/isForbidden}}"
                 itemSelect="onNavigationClick">
                 <tnt:NavigationList>
                     <tnt:NavigationListItem

@@ -121,7 +121,7 @@
                     "target": "settings"
                 },
                 {
-                    "pattern": "{tenantId}/forbidden?errorCode={errorCode}",
+                    "pattern": "{tenantId}/forbidden",
                     "name": "forbidden",
                     "target": "forbidden"
                 },

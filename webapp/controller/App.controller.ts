@@ -13,6 +13,7 @@ import MenuItem from 'sap/m/MenuItem';
 import { RoleBasedAccessData, UserData } from 'kms/common/Types';
 import { GroupRoles, UserRoles } from 'kms/common/Enums';
 import { setGroupRole } from 'kms/common/Formatters';
+import ForbiddenStateService from '../utils/ForbiddenState';
 /**
  * @namespace kms
  */
@@ -46,6 +47,11 @@ export default class App extends BaseController {
 
     public onInit(): void {
         super.onInit();
+        const view = this.getView();
+        if (view) {
+            view.setBusy(true);
+            view.setBusyIndicatorDelay(0);
+        }
 
         const component = this.getOwnerComponent() as Component;
 
@@ -78,8 +84,14 @@ export default class App extends BaseController {
             // If a route matches immediately, onRouteChange will trigger correctly
             this.getRouter().initialize();
             this.handleDefaultNavigation(selectedTenantId);
+            if (view) {
+                view.setBusy(false);
+            }
         }).catch((error: unknown) => {
             console.error('Setup failed:', error);
+            if (view) {
+                view.setBusy(false);
+            }
         });
     }
 
@@ -147,6 +159,15 @@ export default class App extends BaseController {
         const selectedTenant = tenants.find(tenant => tenant.id === routeArgs?.tenantId);
         this.twoWayModel.setProperty('/selectedTenantName', selectedTenant ? selectedTenant.name : '');
         const defaultHomePage = this.twoWayModel.getProperty('/defaulHomePage') as string;
+
+        if (this.isForbidden() && routeName !== 'forbidden') {
+            this.getRouter().navTo('forbidden', {
+                tenantId: routeArgs?.tenantId
+            });
+            this.getView()?.setBusy(false);
+            return;
+        }
+
         if (routeName === 'forbidden') {
             this.setForbiddenState(true);
         }
@@ -269,12 +290,14 @@ export default class App extends BaseController {
     }
 
     private isForbidden(): boolean {
-        return this.twoWayModel.getProperty('/isForbidden') as boolean;
+        return ForbiddenStateService.getInstance().isForbidden();
     }
 
     private setForbiddenState(isForbidden: boolean): void {
         this.twoWayModel.setProperty('/isForbidden', isForbidden);
-        this.twoWayModel.setProperty('/selectedKey', 'forbidden');
+        if (isForbidden) {
+            this.twoWayModel.setProperty('/selectedKey', 'forbidden');
+        }
     }
 
     private navigateToSelectedPage(): void {

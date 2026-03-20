@@ -21,7 +21,6 @@ export default class Auth {
 
     static initiateLogin(tenantId: string, retry: boolean): void {
         this.setAuthEndpoint(tenantId);
-        window.location.href = Auth.authEndpoint;
         if (retry) {
             const returnToPath = `${window.location.origin}${window.location.pathname}#/${tenantId}/keyConfigs`;
             window.location.href = `${this.baseAuthUrl}/sm/auth?tenant_id=${encodeURIComponent(tenantId)}&request_uri=${encodeURIComponent(returnToPath)}`;
