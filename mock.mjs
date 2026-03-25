@@ -111,9 +111,8 @@ app.get("/cmk/v1/tenant1-id/groups", (req, res) => {
     res.json(groups());
 });
 
-app.get("/cmk/v1/tenant1-id/user/:id?", (req, res) => {
-    const { id } = req.params;
-    res.json(user(id));
+app.get("/cmk/v1/tenant1-id/userInfo", (req, res) => {
+    res.json(user());
 });
 
 app.get("/cmk/v1/tenant1-id/workflows/:taskId?", (req, res) => {
