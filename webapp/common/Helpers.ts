@@ -5,6 +5,7 @@ import { AxiosError } from 'axios';
 import Core from 'sap/ui/core/Core';
 import ResourceBundle from 'sap/base/i18n/ResourceBundle';
 import ResourceModel from 'sap/ui/model/resource/ResourceModel';
+import ForbiddenStateService from 'kms/utils/ForbiddenState';
 interface ErrorResponse {
     error: {
         message: string
@@ -124,6 +125,11 @@ export function getErrorDataMessage(error: AxiosError): string | undefined {
 }
 
 export function showErrorMessage(error: AxiosError, userMessage: string | undefined, i18nKey?: string): void {
+    // Don't show error dialogs when navigating to the forbidden page
+    if (ForbiddenStateService.getInstance().isForbidden()) {
+        return;
+    }
+
     const requestID: string = getRequestId(error);
     const statusCode = getErrorStatus(error);
     const datetime = convertDateToUTC(new Date());
@@ -136,11 +142,11 @@ export function showErrorMessage(error: AxiosError, userMessage: string | undefi
     MessageBox.error(errorMessage, {
         title: 'Error',
         details: '<p><strong>' + 'Error Details:' + '</strong></p>'
-          + '<ul>'
-          + '<li><strong>' + 'Request ID: ' + '</strong>' + ' ' + requestID + '</li>'
-          + '<li><strong>' + 'Timestamp (UTC): ' + '</strong>' + datetime + '</li>'
-          + '<li><strong>' + 'Support Page: ' + '</strong>' + "<a href='https://support.sap.com/'>https://support.sap.com<a/>" + '</li>'
-          + '</ul>',
+            + '<ul>'
+            + '<li><strong>' + 'Request ID: ' + '</strong>' + ' ' + requestID + '</li>'
+            + '<li><strong>' + 'Timestamp (UTC): ' + '</strong>' + datetime + '</li>'
+            + '<li><strong>' + 'Support Page: ' + '</strong>' + "<a href='https://support.sap.com/'>https://support.sap.com<a/>" + '</li>'
+            + '</ul>',
         styleClass: 'sapUiUserSelectable'
     });
 }

@@ -48,7 +48,7 @@ export default class Auth {
         return this.csrfToken;
     }
 
-    static handle401Error(tenantId: string, navigateToForbidden: (code: string) => void): void {
+    static handle401Error(tenantId: string, onForbidden: (code: string) => void): void {
         const timeWindow = 30000; // 30 seconds in milliseconds
         const loginAttemptsData = sessionStorage.getItem(Auth.loginSessionStorageKey);
         const now = Date.now();
@@ -61,7 +61,7 @@ export default class Auth {
         }
 
         if (tracker.count >= Auth.maxLoginAttempts) {
-            navigateToForbidden(Constants.FORBIDDEN_ERROR_CODES.MULTIPLE_UNSUCCESSFUL_LOGIN_ATTEMPTS);
+            onForbidden(Constants.FORBIDDEN_ERROR_CODES.MULTIPLE_UNSUCCESSFUL_LOGIN_ATTEMPTS);
         }
         else {
             tracker.count++;

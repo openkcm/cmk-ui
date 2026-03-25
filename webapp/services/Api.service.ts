@@ -4,9 +4,6 @@ import ForbiddenStateService from '../utils/ForbiddenState';
 import type { TenantsResponse, UserData } from 'kms/common/Types';
 import { getErrorCode } from 'kms/common/Helpers';
 import Constants from 'kms/common/Constants';
-import ResourceBundle from 'sap/base/i18n/ResourceBundle';
-import ResourceModel from 'sap/ui/model/resource/ResourceModel';
-import Core from 'sap/ui/core/Core';
 
 // Custom error class for API errors that should be shown on splash screen
 export class ApiAccessError extends Error {
@@ -61,19 +58,27 @@ export default class Api {
         const isAuthenticationError = apiError?.status === 401;
         const isForbiddenError = apiError?.status === 403;
         if (isAuthenticationError) {
-            const handleForbiddenError = (forbiddenErrorCode: string): void => {
-                this.navigateToForbidden(forbiddenErrorCode);
+            const setForbiddenState = (forbiddenErrorCode: string): void => {
+                ForbiddenStateService.getInstance().setForbiddenState(forbiddenErrorCode);
             };
             console.warn('Authentication error detected. Initiating login process.');
             try {
-                Auth.handle401Error(this.tenantId || '', handleForbiddenError);
-                return;
+                Auth.handle401Error(this.tenantId || '', setForbiddenState);
             }
             catch (e: unknown) {
                 console.error('Login initiation failed:', e);
-                this.navigateToForbidden('AUTHENTICATION_FAILED');
-                return;
+                setForbiddenState(Constants.FORBIDDEN_ERROR_CODES.AUTHENTICATION_FAILED);
             }
+            // If forbidden state was set (e.g. max login attempts or the catch block for handle401Error), throw so callers can handle it
+            if (ForbiddenStateService.getInstance().isForbidden()) {
+                const forbiddenService = ForbiddenStateService.getInstance();
+                throw new ApiAccessError(
+                    forbiddenService.getForbiddenErrorMessage(),
+                    forbiddenService.getForbiddenErrorCode()
+                );
+            }
+            // Otherwise, a login redirect was initiated — just return
+            return;
         }
         else if (isForbiddenError) {
             const e = new Error(JSON.stringify({
@@ -94,47 +99,13 @@ export default class Api {
 
     private handleForbiddenError(error: AxiosError): void {
         const errorCode = getErrorCode(error);
-        const errorMessage = this.getForbiddenErrorMessage(errorCode);
-        const showLoginButton = errorCode === Constants.FORBIDDEN_ERROR_CODES.AUTHENTICATION_FAILED;
-
         const forbiddenService = ForbiddenStateService.getInstance();
-        forbiddenService.setForbiddenState(errorCode, errorMessage, showLoginButton);
+        forbiddenService.setForbiddenState(errorCode);
 
-        throw new ApiAccessError(errorMessage, errorCode);
-    }
-
-    private getForbiddenErrorMessage(errorCode: string): string {
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        const i18nModel = Core.getModel('i18n') as ResourceModel;
-        const resourceBundle = i18nModel?.getResourceBundle() as ResourceBundle;
-
-        switch (errorCode) {
-            case Constants.FORBIDDEN_ERROR_CODES.MULTIPLE_ROLES_NOT_ALLOWED:
-                return resourceBundle?.getText('permissionDeniedMultipleRoles') || 'Multiple roles not allowed';
-            case Constants.FORBIDDEN_ERROR_CODES.NO_TENANT_ACCESS:
-                return resourceBundle?.getText('permissionDeniedNoRole') || 'No tenant access';
-            case Constants.FORBIDDEN_ERROR_CODES.AUTHENTICATION_FAILED:
-                return resourceBundle?.getText('permissionDeniedAuthenticationFailed') || 'Authentication failed';
-            case Constants.FORBIDDEN_ERROR_CODES.ZERO_ROLES_NOT_ALLOWED:
-                return resourceBundle?.getText('permissionDeniedZeroRoles') || 'Zero roles not allowed';
-            case Constants.FORBIDDEN_ERROR_CODES.MULTIPLE_UNSUCCESSFUL_LOGIN_ATTEMPTS:
-                return resourceBundle?.getText('multipleUnsuccessfulLoginAttempts') || 'Multiple Unsuccessfull login attempts';
-            // errorTitle = this.getText('authenticationFailTitle');
-            default:
-                return resourceBundle?.getText('forbiddenDescription') || 'Access forbidden';
-        }
-    }
-
-    private navigateToForbidden(errCode: string): void {
-        const errorMessage = this.getForbiddenErrorMessage(errCode);
-        const showLoginButton = errCode === Constants.FORBIDDEN_ERROR_CODES.AUTHENTICATION_FAILED;
-
-        const forbiddenService = ForbiddenStateService.getInstance();
-        forbiddenService.setForbiddenState(errCode, errorMessage, showLoginButton);
-        const hash = window.location.hash;
-        const tenantIdMatch = /#\/([^/]+)/.exec(hash);
-        const tenantId = tenantIdMatch ? tenantIdMatch[1] : this.tenantId;
-        forbiddenService.navigateToForbidden(tenantId || '');
+        throw new ApiAccessError(
+            forbiddenService.getForbiddenErrorMessage(),
+            forbiddenService.getForbiddenErrorCode()
+        );
     }
 
     public static init(baseUrl: string): void {

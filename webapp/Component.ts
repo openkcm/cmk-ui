@@ -14,6 +14,7 @@ import { RoleBasedAccessData, TenantsList, UserData } from './common/Types';
 import { UserRoles } from './common/Enums';
 import SplashScreen from './utils/SplashScreen';
 import ForbiddenStateService from './utils/ForbiddenState';
+import ResourceBundle from 'sap/base/i18n/ResourceBundle';
 /**
  * @namespace kms
  */
@@ -56,10 +57,11 @@ export default class Component extends UIComponent {
             const currentUrl = window.location.hash;
             const tenantIdMatch = /#\/([^/]+)/.exec(currentUrl);
             const tenantId = tenantIdMatch?.[1];
+
             if (!tenantId) {
                 console.error('No tenant ID found in URL. Cannot start the application.');
-                SplashScreen.showError('Missing tenant context. Please ensure you are accessing the application through a valid tenant URL.');
-                throw new Error('No tenant ID found in URL. Cannot start the application.');
+                this.showSplashScreenError('errorNoTenantSelected');
+                return;
             }
             Api.updateTenantId(tenantId);
 
@@ -71,20 +73,10 @@ export default class Component extends UIComponent {
                 ]);
             }
             catch (error) {
-                if (error instanceof ApiAccessError) {
-                    throw error;
-                }
-                console.warn('Setup interrupted, likely due to auth redirect:', error);
-                return;
+                // the error is thrown to and handled in the outer catch block
+                console.error('Error during initial tenant and user setup');
+                throw error;
             }
-
-            if (this.forbiddenService.isForbidden()) {
-                SplashScreen.hide();
-                this.forbiddenService.navigateToForbidden(tenantId);
-                return;
-            }
-
-            this.forbiddenService.clearForbiddenState();
 
             if (!userInfo) {
                 console.error('Failed to fetch user information.');
@@ -100,34 +92,25 @@ export default class Component extends UIComponent {
 
             this.setInitialTheme();
             this.registerIllustrationSet();
-
-            if (this.isOnForbiddenPage()) {
-                this.forbiddenService.navigateToHome(tenantId);
-            }
-
             SplashScreen.hide();
         }
         catch (error) {
             console.error('Initialization error:', error);
+            // If forbidden state was set (e.g. 403 during init), hide splash and throw error.
+            // Let App.controller catch block handle the navigation after router is initialized
             if (this.forbiddenService.isForbidden()) {
                 SplashScreen.hide();
-                const tenantIdMatch = /#\/([^/]+)/.exec(window.location.hash);
-                const tenantId = tenantIdMatch?.[1] || '';
-                this.forbiddenService.navigateToForbidden(tenantId);
-                return;
+                throw error;
             }
+
             if (error instanceof ApiAccessError) {
-                SplashScreen.showError(error.message);
+                this.showSplashScreenError(error.message);
             }
             else {
-                SplashScreen.showError('Failed to initialize application. Contact an administrator if the problem persists.');
+                this.showSplashScreenError('errorAppInitializationFail');
             }
             throw error;
         }
-    }
-
-    private isOnForbiddenPage(): boolean {
-        return window.location.hash.includes('/forbidden');
     }
 
     public getInitialSetupFinishedPromise(): Promise<void> {
@@ -197,5 +180,13 @@ export default class Component extends UIComponent {
             setURI: sap.ui.require.toUrl('sap/tnt/themes/base/illustrations')
         };
         IllustrationPool.registerIllustrationSet(tntSet, false, []);
+    }
+
+    private showSplashScreenError(errorMessageI8nKey: string) {
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        const i18nModel = Core.getModel('i18n') as ResourceModel;
+        const resourceBundle = i18nModel?.getResourceBundle() as ResourceBundle;
+        const errorMessage = resourceBundle?.getText(errorMessageI8nKey);
+        SplashScreen.showError(errorMessage || 'Something went wrong. Try again later');
     }
 }
