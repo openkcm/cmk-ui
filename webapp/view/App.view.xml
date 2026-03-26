@@ -26,6 +26,19 @@
                     text="{i18n>appTitle}"
                     level="H2" />
                 <ToolbarSpacer />
+                <ObjectStatus
+                    text="{twoWay>/selectedTenantRole}"
+                    visible="{= !!${twoWay>/selectedTenantRole}}"
+                    state="Information"
+                    inverted="true"
+                    class="sapUiTinyMarginEnd">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="shellBar-tenantRole"
+                            writeToDom="true" />
+                    </customData>
+                </ObjectStatus>
                 <!-- KMS20-2751 TEMPORARY -->
                 <!-- <MenuButton
                     text="{= ${twoWay>/selectedTenantName} ? ${twoWay>/selectedTenantName} : ${i18n>invalidTenant}}"
