@@ -62,6 +62,11 @@ export default class App extends BaseController {
             this.setModel(this.twoWayModel, 'twoWay');
 
             this.api = Api.getInstance();
+            const tenantsModel = component?.getModel('tenants');
+            if (tenantsModel && tenantsModel instanceof JSONModel) {
+                const tenantsData = tenantsModel.getData() as { tenants: { id: string, name: string, role?: string }[] };
+                this.oneWayModel.setProperty('/tenants', tenantsData?.tenants || []);
+            }
             const userInfoModel = component?.getModel('userInfo');
             let userInfo: UserData | undefined;
             if (userInfoModel && userInfoModel instanceof JSONModel) {
@@ -75,6 +80,8 @@ export default class App extends BaseController {
             const selectedTenantId = selectedTenantModel?.getProperty('/selectedTenant') as string;
             this.twoWayModel.setProperty('/selectedTenant', selectedTenantId);
             this.twoWayModel.setProperty('/selectedTenantName', selectedTenantModel?.getProperty('/selectedTenantName'));
+            const selectedTenantRole = selectedTenantModel?.getProperty('/selectedTenantRole') as string;
+            this.twoWayModel.setProperty('/selectedTenantRole', setGroupRole(selectedTenantRole as GroupRoles));
             this.twoWayModel.setProperty('/defaulHomePage', this.getDefaulHomePage(userInfo));
 
             // Setup the listener first
@@ -155,9 +162,10 @@ export default class App extends BaseController {
             console.error('Invalid tenant', error);
             MessageBox.error(this.getText('invalidTenantError'));
         }
-        const tenants = this.oneWayModel.getProperty('/tenants') as { id: string, name: string }[];
+        const tenants = this.oneWayModel.getProperty('/tenants') as { id: string, name: string, role?: string }[];
         const selectedTenant = tenants.find(tenant => tenant.id === routeArgs?.tenantId);
         this.twoWayModel.setProperty('/selectedTenantName', selectedTenant ? selectedTenant.name : '');
+        this.twoWayModel.setProperty('/selectedTenantRole', selectedTenant?.role ? setGroupRole(selectedTenant.role as GroupRoles) : '');
         const defaultHomePage = this.twoWayModel.getProperty('/defaulHomePage') as string;
 
         if (this.isForbidden() && routeName !== 'forbidden') {

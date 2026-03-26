@@ -142,7 +142,8 @@ export default class Component extends UIComponent {
         this.setModel(new JSONModel({
             selectedKey: '',
             selectedTenant: selectedTenantId,
-            selectedTenantName: selectedTenant?.name || ''
+            selectedTenantName: selectedTenant?.name || '',
+            selectedTenantRole: selectedTenant?.role || ''
         }), 'selectedTenant');
         const roleBasedAccessModelData: RoleBasedAccessData = {
             keyConfig: {

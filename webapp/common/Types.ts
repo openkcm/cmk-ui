@@ -238,6 +238,7 @@ export interface TenantsResponse {
 export interface TenantsList {
     id: string
     name?: string
+    role?: string
 }
 
 export interface RoleBasedAccessData {
