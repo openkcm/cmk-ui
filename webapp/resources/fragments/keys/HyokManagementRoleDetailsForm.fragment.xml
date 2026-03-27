@@ -17,22 +17,29 @@
         <forms:formContainers>
             <forms:FormContainer>
                 <forms:formElements>
-                    <forms:FormElement label="{i18n>trustAnchorARN}">
+                    <forms:FormElement label="{i18n>trustAnchorARN}" visible="{= ${oneWay>/selectedKey/provider} === 'AWS' }">
                         <forms:fields>
-                            <Text text="{twoWay>value/trustAnchorArn}" wrapping="true">
-                            </Text>
+                            <Text text="{twoWay>value/trustAnchorArn}" wrapping="true"/>
                         </forms:fields>
                     </forms:FormElement>
-                    <forms:FormElement label="{i18n>roleARN}">
+                    <forms:FormElement label="{i18n>roleARN}" visible="{= ${oneWay>/selectedKey/provider} === 'AWS' }">
                         <forms:fields>
-                            <Text text="{twoWay>value/roleArn}" wrapping="true">
-                            </Text>
+                            <Text text="{twoWay>value/roleArn}" wrapping="true"/>
                         </forms:fields>
                     </forms:FormElement>
-                    <forms:FormElement label="{i18n>profileARN}">
+                    <forms:FormElement label="{i18n>profileARN}" visible="{= ${oneWay>/selectedKey/provider} === 'AWS' }">
                         <forms:fields>
-                            <Text text="{twoWay>value/profileArn}" wrapping="true">
-                            </Text>
+                            <Text text="{twoWay>value/profileArn}" wrapping="true"/>
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>applicationId}" visible="{= ${oneWay>/selectedKey/provider} === 'FORTANIX' }">
+                        <forms:fields>
+                            <Text text="{twoWay>value/applicationId}" wrapping="true"/>
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>host}" visible="{= ${oneWay>/selectedKey/provider} === 'FORTANIX' }">
+                        <forms:fields>
+                            <Text text="{twoWay>value/host}" wrapping="true"/>
                         </forms:fields>
                     </forms:FormElement>
                 </forms:formElements>

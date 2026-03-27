@@ -147,7 +147,6 @@ export default class KeyConfigDetail extends BaseController {
         this.resetPagination();
         const routeName = event.getParameter('name');
         this.oneWayModel.setProperty('/keyConfigDetail', routeName === 'keyConfigDetail');
-        this.setHyokProviders();
         const routeArgs = event.getParameter('arguments') as { 'tenantId': string, 'keyConfigId'?: string, '?query': { connectSystem?: string, createKey?: string, keyType?: KeyCreationTypes, keySubtype?: HYOKProviders | BYOKProviders } };
         const queryParams = routeArgs['?query'] as { connectSystem?: string, createKey?: string, keyType?: KeyCreationTypes, keySubtype?: HYOKProviders | BYOKProviders };
         this.keyConfigId = routeArgs.keyConfigId || '';
@@ -425,8 +424,7 @@ export default class KeyConfigDetail extends BaseController {
     private async updateKeysTable() {
         this.oneWayModel.setProperty('/keysTableUpdating', true);
         const keys = await this.getKeys();
-        const keystoreSettings = await this.getkeystoreSettings();
-        this.oneWayModel.setProperty('/keystoreSettings', keystoreSettings);
+        await this.setKeystoreProviders();
         this.oneWayModel.setProperty('/keys', keys?.value);
         this.oneWayModel.setProperty('/keysCount', keys?.count || 0);
         this.keysPaginationModel.setProperty('/totalPages', Math.ceil((keys?.count ?? 0) / this.top));
@@ -455,16 +453,6 @@ export default class KeyConfigDetail extends BaseController {
         catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorFetchingKeyDetails'));
-        }
-    }
-
-    private async getkeystoreSettings() {
-        try {
-            return await this.api.get<KeystoreResponse>('tenantConfigurations/keystores');
-        }
-        catch (error) {
-            console.error(error);
-            showErrorMessage(error as AxiosError, this.getText('errorFetchingKeystoreDetails'));
         }
     }
 
@@ -1172,12 +1160,18 @@ export default class KeyConfigDetail extends BaseController {
         await copyToClipboard(event);
     }
 
-    private setHyokProviders(): void {
-        // @TODO Fetch the HYOK providers from the API when available
-        // For now, we are using a static list
-        const hyokProviders = [
-            HYOKProviders.AWS
-        ];
-        this.oneWayModel.setProperty('/hyokProviders', hyokProviders);
+    private async setKeystoreProviders(): Promise<void> {
+        try {
+            const keystoreSettings = await this.api.get<KeystoreResponse>('tenantConfigurations/keystores');
+            this.oneWayModel.setProperty('/keystoreSettings', keystoreSettings);
+            if (keystoreSettings) {
+                const hyokProviders = keystoreSettings.hyok.providers;
+                this.oneWayModel.setProperty('/hyokProviders', hyokProviders);
+            }
+        }
+        catch (error) {
+            console.error(error);
+            showErrorMessage(error as AxiosError, this.getText('errorFetchingKeystoreDetails'));
+        }
     }
 }

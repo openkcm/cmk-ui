@@ -157,6 +157,7 @@ export interface MangedKeyPayload {
     description: string
     algorithm: string
     region: string
+    provider: string
     enabled: boolean
 }
 export interface AWSAccessDetails {
@@ -165,9 +166,13 @@ export interface AWSAccessDetails {
     profileArn: string
     isEditable?: boolean
 }
+export interface FortanixAccessDetails {
+    host: string
+    applicationId: string
+}
 export interface AccessDetails {
-    management: AWSAccessDetails
-    crypto: Record<string, AWSAccessDetails>
+    management: AWSAccessDetails | FortanixAccessDetails
+    crypto: Record<string, AWSAccessDetails | FortanixAccessDetails>
 }
 export interface HyokKeyPayload {
     name: string
@@ -179,7 +184,7 @@ export interface HyokKeyPayload {
     provider: HYOKProviders | BYOKProviders
     accessDetails: AccessDetails
 }
-export interface AWScertificates {
+export interface hyokCertificates {
     name: string
     rootCA: string
     subject: string
@@ -189,12 +194,13 @@ export interface hyokAWSManagementCertInput {
     roleARN: string | null
     rootCA: string | null
 }
-export interface hyokAWSCryptoCertInput {
+export interface hyokCryptoCertInput {
     selectedCryptoRolesCertKeys?: string[]
-    selectedCryptoCerts?: AWScertificates[]
+    selectedCryptoCerts?: hyokCertificates[]
     trustAnchorCryptoARN: string | null
     roleCryptoARN: string | null
     rootCryptoCA: string | null
+    cryptoApplicationId: string | null
 }
 export interface KeystoreResponse {
     default: {
