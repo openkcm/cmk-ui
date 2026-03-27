@@ -152,6 +152,7 @@ export interface MangedKeyPayload {
     description: string
     algorithm: string
     region: string
+    provider: string
     enabled: boolean
 }
 export interface AWSAccessDetails {

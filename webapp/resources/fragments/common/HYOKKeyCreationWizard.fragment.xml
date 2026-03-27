@@ -31,11 +31,10 @@
                             <content>
                                 <Wizard id="HYOKKeyCreationWizard"
                                     class="sapUiResponsivePadding--header sapUiResponsivePadding--content"
-                                    complete="finishAndReviewHYOKKeyCreation"
-                                >
+                                    complete="finishAndReviewHYOKKeyCreation">
                                     <WizardStep id="HYOKKeyARNStep"
                                         title="{i18n>keyDetails}"
-                                        validated="{= ${model>/keyARN}.length > 0  &amp;&amp; ${model>/keyName}.length > 0 }"
+                                        validated="{= (${model>/keyARN}.length > 0  &amp;&amp; ${model>/keyName}.length > 0) || (${model>/nativeId}.length > 0  &amp;&amp; ${model>/keyName}.length > 0) }"
                                         activate="">
                                         <VBox width="100%">
                                             <Label text="{i18n>keyName}:" required="true" />
@@ -48,15 +47,26 @@
                                                         writeToDom="true" />
                                                 </customData>
                                             </Input>
-                                            <Label text="{i18n>keyARN}:" required="true"
+                                            <Label visible="{= ${model>/keySubType} === 'AWS' }" text="{i18n>keyARN}:" required="true"
                                                 class="sapUiSmallMarginTop" />
-                                            <Input value="{model>/keyARN}"
+                                            <Input visible="{= ${model>/keySubType} === 'AWS' }" value="{model>/keyARN}"
                                                 valueLiveUpdate="true">
                                                 <customData>
                                                     <core:CustomData
                                                         key="testId"
                                                         value="hyokArn-Input"
                                                         writeToDom="true" />
+                                                </customData>
+                                            </Input>
+                                            <Label visible="{= ${model>/keySubType} === 'FORTANIX' }" text="{i18n>fortanixKeyName}:" required="true"
+                                                   class="sapUiSmallMarginTop" />
+                                            <Input visible="{= ${model>/keySubType} === 'FORTANIX' }" value="{model>/nativeId}"
+                                                   valueLiveUpdate="true">
+                                                <customData>
+                                                    <core:CustomData
+                                                            key="testId"
+                                                            value="fortanixKeyName-Input"
+                                                            writeToDom="true" />
                                                 </customData>
                                             </Input>
                                             <Label text="{i18n>keyDescription}:"
@@ -73,7 +83,7 @@
                                         </VBox>
                                     </WizardStep>
                                     <WizardStep id="HYOKManagementRoleStep"
-                                        validated="{model>/hyokManagementRoleStepValid}"
+                                                validated="{= (${model>/hyokManagementRoleStepValid}) || (${model>/host}.length > 0  &amp;&amp; ${model>/applicationId}.length > 0) }"
                                         activate=""
                                         title="{i18n>managementRole}">
                                         <VBox width="100%">
@@ -95,14 +105,36 @@
                                                         wrapping="true" />
                                                 </VBox>
                                             </VBox>
-                                            <Label
-                                                class="sapUiTinyMarginTop"
-                                                text="{i18n>trustAnchorARN}:"
-                                                required="true" />
-                                            <Input
-                                                value="{model>/hyokAWSManagementCertObj/trustAnchorARN}"
-                                                liveChange="setManagementCertStepValidation"
-                                                valueLiveUpdate="true">
+                                            <Label visible="{= ${model>/keySubType} === 'FORTANIX' }" text="{i18n>host}:" required="true"
+                                                   class="sapUiSmallMarginTop" />
+                                            <Input visible="{= ${model>/keySubType} === 'FORTANIX' }" value="{model>/hyokAWSManagementCertObj/host}"
+                                                   valueLiveUpdate="true">
+                                                <customData>
+                                                    <core:CustomData
+                                                            key="testId"
+                                                            value="fortanixHost-Input"
+                                                            writeToDom="true" />
+                                                </customData>
+                                            </Input>
+                                            <Label visible="{= ${model>/keySubType} === 'FORTANIX' }" text="{i18n>applicationId}:" required="true"
+                                                   class="sapUiSmallMarginTop" />
+                                            <Input visible="{= ${model>/keySubType} === 'FORTANIX' }" value="{model>/hyokAWSManagementCertObj/applicationId}"
+                                                   valueLiveUpdate="true">
+                                                <customData>
+                                                    <core:CustomData
+                                                            key="testId"
+                                                            value="applicationId-Input"
+                                                            writeToDom="true" />
+                                                </customData>
+                                            </Input>
+                                            <Label visible="{= ${model>/keySubType} === 'AWS' }"
+                                                   class="sapUiTinyMarginTop"
+                                                   text="{i18n>trustAnchorARN}:"
+                                                   required="true" />
+                                            <Input visible="{= ${model>/keySubType} === 'AWS' }"
+                                                   value="{model>/hyokAWSManagementCertObj/trustAnchorARN}"
+                                                   liveChange="setManagementCertStepValidation"
+                                                   valueLiveUpdate="true">
                                                 <customData>
                                                     <core:CustomData
                                                         key="testId"
@@ -110,13 +142,14 @@
                                                         writeToDom="true" />
                                                 </customData>
                                             </Input>
-                                            <Label
-                                                class="sapUiTinyMarginTop"
-                                                text="{i18n>roleARN}:"
-                                                required="true" />
-                                            <Input value="{model>/hyokAWSManagementCertObj/roleARN}"
-                                                liveChange="setManagementCertStepValidation"
-                                                valueLiveUpdate="true">
+                                            <Label visible="{= ${model>/keySubType} === 'AWS' }"
+                                                   class="sapUiTinyMarginTop"
+                                                   text="{i18n>roleARN}:"
+                                                   required="true" />
+                                            <Input visible="{= ${model>/keySubType} === 'AWS' }"
+                                                   value="{model>/hyokAWSManagementCertObj/roleARN}"
+                                                   liveChange="setManagementCertStepValidation"
+                                                   valueLiveUpdate="true">
                                                 <customData>
                                                     <core:CustomData
                                                         key="testId"
@@ -124,13 +157,14 @@
                                                         writeToDom="true" />
                                                 </customData>
                                             </Input>
-                                            <Label
-                                                class="sapUiTinyMarginTop"
+                                            <Label visible="{= ${model>/keySubType} === 'AWS' }"
+                                                   class="sapUiTinyMarginTop"
                                                 text="{i18n>profileARN}:"
                                                 required="true" />
-                                            <Input value="{model>/hyokAWSManagementCertObj/rootCA}"
-                                                liveChange="setManagementCertStepValidation"
-                                                valueLiveUpdate="true">
+                                            <Input visible="{= ${model>/keySubType} === 'AWS' }"
+                                                   value="{model>/hyokAWSManagementCertObj/rootCA}"
+                                                   liveChange="setManagementCertStepValidation"
+                                                   valueLiveUpdate="true">
                                                 <customData>
                                                     <core:CustomData
                                                         key="testId"
@@ -175,12 +209,10 @@
 
                                                         </VBox>
                                                         <VBox class="sapUiLargeMarginBottom">
-                                                            <Label
+                                                            <Label visible="{= ${model>/keySubType} === 'AWS' }"
                                                                 class="sapUiTinyMarginTop"
                                                                 text="{i18n>trustAnchorARN}:" />
-                                                            <Input
-                                                                value="{model>trustAnchorCryptoARN}"
-                                                            >
+                                                            <Input visible="{= ${model>/keySubType} === 'AWS' }" value="{model>trustAnchorCryptoARN}">
                                                                 <customData>
                                                                     <core:CustomData
                                                                         key="testId"
@@ -188,10 +220,10 @@
                                                                         writeToDom="true" />
                                                                 </customData>
                                                             </Input>
-                                                            <Label
+                                                            <Label visible="{= ${model>/keySubType} === 'AWS' }"
                                                                 class="sapUiTinyMarginTop"
                                                                 text="{i18n>roleARN}:" />
-                                                            <Input
+                                                            <Input visible="{= ${model>/keySubType} === 'AWS' }"
                                                                 value="{model>roleCryptoARN}">
                                                                 <customData>
                                                                     <core:CustomData
@@ -200,10 +232,10 @@
                                                                         writeToDom="true" />
                                                                 </customData>
                                                             </Input>
-                                                            <Label
+                                                            <Label visible="{= ${model>/keySubType} === 'AWS' }"
                                                                 class="sapUiTinyMarginTop"
                                                                 text="{i18n>profileARN}:" />
-                                                            <Input
+                                                            <Input visible="{= ${model>/keySubType} === 'AWS' }"
                                                                 value="{model>rootCryptoCA}">
                                                                 <customData>
                                                                     <core:CustomData
@@ -212,8 +244,19 @@
                                                                         writeToDom="true" />
                                                                 </customData>
                                                             </Input>
+                                                            <Label visible="{= ${model>/keySubType} === 'FORTANIX' }"
+                                                                   class="sapUiTinyMarginTop"
+                                                                   text="{i18n>applicationId}:" />
+                                                            <Input visible="{= ${model>/keySubType} === 'FORTANIX' }"
+                                                                   value="{model>cryptoApplicationId}">
+                                                                <customData>
+                                                                    <core:CustomData
+                                                                            key="testId"
+                                                                            value="{= ${rootCryptoCA}-${rootCryptoCA-Input}}"
+                                                                            writeToDom="true" />
+                                                                </customData>
+                                                            </Input>
                                                         </VBox>
-
                                                     </VBox>
                                                     <Button
                                                         icon="sap-icon://decline"
@@ -227,10 +270,10 @@
                                                     </Button>
                                                 </HBox>
                                             </items>
-
                                         </VBox>
                                         <VBox visible="{= !!${model>/allowAddMoreCryptoCert}}">
-                                            <Text text="{i18n>addCertARNs}" />
+                                            <Text visible="{= ${model>/keySubType} === 'AWS' }" text="{i18n>addCertARNs}" />
+                                            <Text visible="{= ${model>/keySubType} === 'FORTANIX' }" text="{i18n>addCertApplications}" />
                                             <HBox width="100%"
                                                 class="sapUiMarginTop"
                                                 alighnItems="Center"
@@ -286,11 +329,9 @@
                                             <Label text="{i18n>keyName}" />
                                             <Input value="{model>/keyName}"
                                                 editable="false" />
-                                            <Label text="{i18n>keyARN}" />
-                                            <Input value="{model>/keyARN}"
-                                                editable="false" />
-                                            <Label text="{i18n>keyDescription}:"
-                                                class="sapUiTinyMarginTop" />
+                                            <Label text="{i18n>keyARN}" visible="{= ${model>/keySubType} === 'AWS' }"/>
+                                            <Input value="{model>/keyARN}" visible="{= ${model>/keySubType} === 'AWS' }" editable="false" />
+                                            <Label text="{i18n>keyDescription}:" class="sapUiTinyMarginTop" />
                                             <TextArea editable="false" value="{model>/description}"
                                                 rows="4"
                                                 width="100%">
@@ -346,10 +387,10 @@
                                                             wrapping="true" />
                                                     </VBox>
                                                 </VBox>
-                                                <Label
+                                                <Label visible="{= ${model>/keySubType} === 'AWS' }"
                                                     class="sapUiTinyMarginTop"
                                                     text="{i18n>trustAnchorARN}:" />
-                                                <Input
+                                                <Input visible="{= ${model>/keySubType} === 'AWS' }"
                                                     value="{model>/hyokAWSManagementCertObj/trustAnchorARN}"
                                                     editable='false'>
                                                     <customData>
@@ -359,19 +400,18 @@
                                                             writeToDom="true" />
                                                     </customData>
                                                     </Input>
-                                                <Label
+                                                <Label visible="{= ${model>/keySubType} === 'AWS' }"
                                                     class="sapUiTinyMarginTop"
                                                     text="{i18n>roleARN}:" />
-                                                <Input
+                                                <Input visible="{= ${model>/keySubType} === 'AWS' }"
                                                     value="{model>/hyokAWSManagementCertObj/roleARN}"
                                                     editable='false' />
-                                                <Label
+                                                <Label visible="{= ${model>/keySubType} === 'AWS' }"
                                                     class="sapUiTinyMarginTop"
                                                     text="{i18n>profileARN}:" />
-                                                <Input
+                                                <Input visible="{= ${model>/keySubType} === 'AWS' }"
                                                     value="{model>/hyokAWSManagementCertObj/rootCA}"
                                                     editable='false' />
-
                                             </VBox>
                                         </form:content>
                                     </form:SimpleForm>
@@ -396,7 +436,6 @@
                                         </form:toolbar>
                                         <form:content>
                                             <VBox items="{model>/hyokAWSCryptoCertObj}">
-
                                                 <VBox width="100%" class="sapUiSmallMarginBottom">
                                                     <Label text="{i18n>cryptoCerts}:" />
                                                     <List
