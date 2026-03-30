@@ -258,3 +258,8 @@ export interface RoleBasedAccessData {
         canManage: boolean
     }
 }
+
+export interface ILoginTracker {
+    count: number
+    lastAttemptTime: number
+}

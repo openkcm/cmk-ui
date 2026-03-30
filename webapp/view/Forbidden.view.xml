@@ -5,14 +5,6 @@
     xmlns:mvc="sap.ui.core.mvc">
     <f:DynamicPage>
         <f:title>
-            <f:DynamicPageTitle>
-                <f:heading>
-                    <Title text="Forbidden" />
-                </f:heading>
-                <f:snappedTitleOnMobile>
-                    <Title text="Forbidden" />
-                </f:snappedTitleOnMobile>
-            </f:DynamicPageTitle>
         </f:title>
         <f:content>
             <VBox alignItems="Center" justifyContent="Center">
@@ -23,7 +15,7 @@
                     illustrationType="sapIllus-UnableToLoad"
                     illustrationSize="Scene">
                 </IllustratedMessage>
-                <Button 
+                <Button
                     text="{i18n>retryLogin}"
                     type="Emphasized"
                     press=".onRetryLogin"

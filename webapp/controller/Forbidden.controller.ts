@@ -25,7 +25,7 @@ export default class Forbidden extends BaseController {
         const tenantId = this.getTenantIdFromHash();
         if (tenantId) {
             ForbiddenStateService.getInstance().clearForbiddenState();
-            Auth.initiateLogin(tenantId, true);
+            Auth.initiateLogin(tenantId);
         }
     }
 

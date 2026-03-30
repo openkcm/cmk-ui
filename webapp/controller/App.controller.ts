@@ -14,6 +14,7 @@ import { RoleBasedAccessData, UserData } from 'kms/common/Types';
 import { GroupRoles, UserRoles } from 'kms/common/Enums';
 import { setGroupRole } from 'kms/common/Formatters';
 import ForbiddenStateService from '../utils/ForbiddenState';
+import EventBus from 'sap/ui/core/EventBus';
 /**
  * @namespace kms
  */
@@ -77,18 +78,36 @@ export default class App extends BaseController {
             this.twoWayModel.setProperty('/selectedTenantName', selectedTenantModel?.getProperty('/selectedTenantName'));
             this.twoWayModel.setProperty('/defaulHomePage', this.getDefaulHomePage(userInfo));
 
-            // Setup the listener first
+            // Listen for forbidden state changes from any API call
+            EventBus.getInstance().subscribe(
+                ForbiddenStateService.FORBIDDEN_EVENT_CHANNEL,
+                ForbiddenStateService.FORBIDDEN_EVENT_ID,
+                this.onForbiddenStateChanged.bind(this)
+            );
+
+            // Step 1: Setup the listener first
             this.getRouter().attachRouteMatched(this.onRouteChange.bind(this));
 
-            // Next start the router, This triggers the URL matching and loads the sub-views
+            // Step 2 : Next start the router, This triggers the URL matching and loads the sub-views
             // If a route matches immediately, onRouteChange will trigger correctly
             this.getRouter().initialize();
-            this.handleDefaultNavigation(selectedTenantId);
+
             if (view) {
                 view.setBusy(false);
             }
         }).catch((error: unknown) => {
             console.error('Setup failed:', error);
+            // NOTE: On first-time initialization, a 403 error can occur before the EventBus listener
+            // is attached, so we need to check the forbidden state explicitly here.
+            if (ForbiddenStateService.getInstance().isForbidden()) {
+                this.getRouter().attachRouteMatched(this.onRouteChange.bind(this));
+                this.getRouter().initialize();
+
+                const hash = window.location.hash;
+                const tenantIdMatch = /#\/([^/]+)/.exec(hash);
+                const tenantId = tenantIdMatch?.[1] || '';
+                this.getRouter().navTo('forbidden', { tenantId });
+            }
             if (view) {
                 view.setBusy(false);
             }
@@ -286,6 +305,13 @@ export default class App extends BaseController {
             this.api = Api.getInstance();
             Api.updateTenantId(selectedTenant || '');
             this.navigateToSelectedPage();
+        }
+    }
+
+    private onForbiddenStateChanged(): void {
+        const tenantId = this.twoWayModel.getProperty('/selectedTenant') as string;
+        if (tenantId) {
+            this.getRouter().navTo('forbidden', { tenantId });
         }
     }
 
