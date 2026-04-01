@@ -52,8 +52,9 @@ export default class Auth {
         const timeWindow = 30000; // 30 seconds in milliseconds
         const loginAttemptsData = sessionStorage.getItem(Auth.loginSessionStorageKey);
         const now = Date.now();
-        const defaultData = { count: 0, lastAttemptTime: 0 };
-        let tracker = (loginAttemptsData ? JSON.parse(loginAttemptsData) : defaultData) as ILoginTracker;
+        const defaultData: ILoginTracker = { count: 0, lastAttemptTime: 0 };
+        const parsed: unknown = loginAttemptsData ? JSON.parse(loginAttemptsData) : undefined;
+        let tracker: ILoginTracker = parsed ? parsed as ILoginTracker : defaultData;
 
         // Reset tracker if the last attempt was a long time ago
         if (now - tracker.lastAttemptTime > timeWindow) {

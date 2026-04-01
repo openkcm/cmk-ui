@@ -142,11 +142,11 @@ export function showErrorMessage(error: AxiosError, userMessage: string | undefi
     MessageBox.error(errorMessage, {
         title: 'Error',
         details: '<p><strong>' + 'Error Details:' + '</strong></p>'
-            + '<ul>'
-            + '<li><strong>' + 'Request ID: ' + '</strong>' + ' ' + requestID + '</li>'
-            + '<li><strong>' + 'Timestamp (UTC): ' + '</strong>' + datetime + '</li>'
-            + '<li><strong>' + 'Support Page: ' + '</strong>' + "<a href='https://support.sap.com/'>https://support.sap.com<a/>" + '</li>'
-            + '</ul>',
+          + '<ul>'
+          + '<li><strong>' + 'Request ID: ' + '</strong>' + ' ' + requestID + '</li>'
+          + '<li><strong>' + 'Timestamp (UTC): ' + '</strong>' + datetime + '</li>'
+          + '<li><strong>' + 'Support Page: ' + '</strong>' + "<a href='https://support.sap.com/'>https://support.sap.com<a/>" + '</li>'
+          + '</ul>',
         styleClass: 'sapUiUserSelectable'
     });
 }
