@@ -143,6 +143,10 @@ export default class Component extends UIComponent {
             userGroups: {
                 canView: this.hasRole(userInfo, UserRoles.TENANT_AUDITOR) || this.hasRole(userInfo, UserRoles.KEY_ADMINISTRATOR) || this.hasRole(userInfo, UserRoles.TENANT_ADMINISTRATOR),
                 canManage: this.hasRole(userInfo, UserRoles.TENANT_ADMINISTRATOR)
+            },
+            settings: {
+                canView: this.hasRole(userInfo, UserRoles.TENANT_AUDITOR) || this.hasRole(userInfo, UserRoles.KEY_ADMINISTRATOR) || this.hasRole(userInfo, UserRoles.TENANT_ADMINISTRATOR),
+                canManage: this.hasRole(userInfo, UserRoles.TENANT_ADMINISTRATOR)
             }
         };
         const roleBasedAccessModel = new JSONModel(roleBasedAccessModelData);

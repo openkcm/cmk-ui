@@ -112,22 +112,6 @@
                         </tnt:customData>
                     </tnt:NavigationListItem>
                 </tnt:NavigationList>
-                <tnt:fixedItem>
-                    <tnt:NavigationList>
-                        <tnt:NavigationListItem
-                            text="{i18n>sideContentSettings}"
-                            icon="sap-icon://settings"
-                            key="settings"
-                            href="#/settings">
-                            <tnt:customData>
-                                <core:CustomData
-                                    key="testId"
-                                    value="sideContent-settingsItem"
-                                    writeToDom="true" />
-                            </tnt:customData>
-                        </tnt:NavigationListItem>
-                    </tnt:NavigationList>
-                </tnt:fixedItem>
             </tnt:SideNavigation>
         </tnt:sideContent>
         <tnt:mainContents>

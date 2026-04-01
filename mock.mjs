@@ -138,5 +138,27 @@ app.get("/cmk/v1/tenant1-id/tenantConfigurations/keystores", (req, res) => {
     res.json(generateKeyStores());
 });
 
+let workflowSettings = {
+    enabled: true,
+    minimumApprovals: 2,
+    retentionPeriodDays: 30,
+    defaultExpiryPeriodDays: 7,
+    maxExpiryPeriodDays: 30
+};
+
+app.get("/cmk/v1/tenant1-id/tenantConfigurations/workflow", (req, res) => {
+    res.json(workflowSettings);
+});
+
+app.patch("/cmk/v1/tenant1-id/tenantConfigurations/workflow", (req, res) => {
+    workflowSettings = { ...workflowSettings, ...req.body };
+    res.status(200).json(workflowSettings);
+});
+
+app.get("/cmk/v1/tenant1-id/tenantInfo", (req, res) => {
+    res.json({
+        role: "TEST"
+    });
+});
 
 app.listen(3000, () => console.log("API Server running..."));

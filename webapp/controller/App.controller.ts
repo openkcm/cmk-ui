@@ -250,9 +250,6 @@ export default class App extends BaseController {
             case 'forbidden':
                 this.twoWayModel.setProperty('/selectedKey', 'forbidden');
                 break;
-            case 'settings':
-                this.twoWayModel.setProperty('/selectedKey', 'settings');
-                break;
             default:
                 this.twoWayModel.setProperty('/selectedKey', defaultHomePage);
         }
