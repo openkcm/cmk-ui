@@ -1,5 +1,6 @@
 <mvc:View controllerName="kms.controller.systems.Detail"
     xmlns:m="sap.m" xmlns="sap.uxap" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
     xmlns:dataHelp="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
     <ObjectPageLayout showTitleInHeaderContent="true" upperCaseAnchorBar="false">
         <headerTitle>
@@ -59,6 +60,31 @@
                             <core:Fragment
                                 fragmentName="kms.resources.fragments.systems.DetailsForm"
                                 type="XML" />
+                        </m:VBox>
+                    </ObjectPageSubSection>
+                </subSections>
+            </ObjectPageSection>
+            <ObjectPageSection titleUppercase="false" id="systemsObjectPageSectionError"
+                title="{i18n>errorDetails}"
+                visible="{= ${oneWay>/selectedSystem/status} === 'FAILED'}">
+                <subSections>
+                    <ObjectPageSubSection>
+                        <m:VBox class="sapUiSmallMargin">
+                            <m:MessageStrip
+                                text="{oneWay>/selectedSystem/Metadata/ErrorMessage}"
+                                type="Error"
+                                showIcon="true"
+                                showCloseButton="false"
+                                class="sapUiSmallMarginBottom" />
+                            <form:SimpleForm editable="false"
+                                layout="ResponsiveGridLayout"
+                                labelSpanXL="3" labelSpanL="3" labelSpanM="3" labelSpanS="12"
+                                emptySpanXL="4" emptySpanL="4" emptySpanM="4" emptySpanS="0">
+                                <m:Label text="{i18n>errorCode}" />
+                                <m:Text text="{oneWay>/selectedSystem/Metadata/ErrorCode}" />
+                                <m:Label text="{i18n>errorMessage}" />
+                                <m:Text text="{oneWay>/selectedSystem/Metadata/ErrorMessage}" />
+                            </form:SimpleForm>
                         </m:VBox>
                     </ObjectPageSubSection>
                 </subSections>
