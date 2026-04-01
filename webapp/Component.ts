@@ -10,7 +10,7 @@ import ResourceModel from 'sap/ui/model/resource/ResourceModel';
 import Core from 'sap/ui/core/Core';
 import Auth from './services/Auth.service';
 import { initLanguageConfig } from 'kms/common/Language.Helpers';
-import { RoleBasedAccessData, TenantsList, UserData } from './common/Types';
+import { RoleBasedAccessData, TenantsResponse, TenantsList, UserData } from './common/Types';
 import { UserRoles } from './common/Enums';
 import SplashScreen from './utils/SplashScreen';
 import ForbiddenStateService from './utils/ForbiddenState';
@@ -67,10 +67,37 @@ export default class Component extends UIComponent {
 
             let tenantsResponse, userInfo;
             try {
-                [tenantsResponse, userInfo] = await Promise.all([
+                // Use Promise.allSettled to avoid race conditions:
+                // If one call returns 500 and another returns 403, Promise.all would reject
+                // on the first error, potentially missing the 403 forbidden state.
+                // Promise.allSettled waits for both to complete, so we can detect 403 reliably.
+                const results = await Promise.allSettled([
                     api.getTenantsForTenant(),
                     api.get<UserData>('userInfo')
                 ]);
+
+                const [tenantsResult, userInfoResult] = results;
+
+                // If forbidden state was set by either promise call (e.g. 403), prioritize it
+                if (this.forbiddenService.isForbidden()) {
+                    const forbiddenRejection = results.find(
+                        r => r.status === 'rejected' && r.reason instanceof ApiAccessError
+                    ) as PromiseRejectedResult | undefined;
+                    throw forbiddenRejection?.reason ?? new ApiAccessError(
+                        this.forbiddenService.getForbiddenErrorMessage(),
+                        this.forbiddenService.getForbiddenErrorCode()
+                    );
+                }
+
+                // If either call failed (non-403), throw the first error
+                const firstFailure = results.find((r): r is PromiseRejectedResult => r.status === 'rejected');
+                if (firstFailure) {
+
+                    throw firstFailure.reason;
+                }
+
+                tenantsResponse = (tenantsResult as PromiseFulfilledResult<TenantsResponse | undefined>).value;
+                userInfo = (userInfoResult as PromiseFulfilledResult<UserData | undefined>).value;
             }
             catch (error) {
                 // the error is thrown to and handled in the outer catch block
@@ -103,12 +130,12 @@ export default class Component extends UIComponent {
                 throw error;
             }
 
-            if (error instanceof ApiAccessError) {
-                this.showSplashScreenError(error.message);
-            }
-            else {
-                this.showSplashScreenError('errorAppInitializationFail');
-            }
+            // if (error instanceof ApiAccessError) {
+            //     this.showSplashScreenError(error.message);
+            // }
+            // else {
+            //     this.showSplashScreenError('errorAppInitializationFail');
+            // }
             throw error;
         }
     }
