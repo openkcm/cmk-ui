@@ -108,6 +108,10 @@ export default class HyokKeyRegistration extends BaseController {
             this.keyCreationModel.setData({
                 keyARN: '' as string,
                 keyName: '' as string,
+                nativeId: '' as string,
+                host: '' as string,
+                applicationId: '' as string,
+                keySubType: this.subtype as string,
                 hyokManagementRoleStepValid: false as boolean,
                 managementRolesCerts: certs?.hyokAWSManagementCerts,
                 cryptoRolesCerts: certs?.cryptoRolesCerts,
@@ -175,7 +179,7 @@ export default class HyokKeyRegistration extends BaseController {
     }
 
     public getManagedKeyCreationPayload(): MangedKeyPayload {
-        const payload = {
+        return {
             name: this.keyCreationModel.getProperty('/name') as string,
             keyConfigurationID: this.keyConfigId,
             type: this.type,
@@ -185,7 +189,6 @@ export default class HyokKeyRegistration extends BaseController {
             provider: this.keyCreationModel.getProperty('/provider') as string,
             enabled: this.keyCreationModel.getProperty('/enabled') as boolean
         };
-        return payload;
     }
 
     public getHYOKAWSKeyCreationPayload(): HyokKeyPayload {
@@ -204,7 +207,6 @@ export default class HyokKeyRegistration extends BaseController {
                     profileArn: this.keyCreationModel.getProperty('/hyokAWSManagementCertObj/rootCA') as string
                 },
                 crypto: this.getCryptoPayload()
-
             }
         };
         return payload;
