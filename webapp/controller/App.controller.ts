@@ -15,6 +15,7 @@ import { GroupRoles, UserRoles } from 'kms/common/Enums';
 import { setGroupRole } from 'kms/common/Formatters';
 import ForbiddenStateService from '../utils/ForbiddenState';
 import EventBus from 'sap/ui/core/EventBus';
+import Auth from 'kms/services/Auth.service';
 /**
  * @namespace kms
  */
@@ -313,6 +314,10 @@ export default class App extends BaseController {
         if (tenantId) {
             this.getRouter().navTo('forbidden', { tenantId });
         }
+    }
+
+    public onSignOutPress(): void {
+        void Auth.secureLogout(this.tenantId);
     }
 
     private isForbidden(): boolean {

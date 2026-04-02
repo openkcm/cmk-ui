@@ -4,12 +4,13 @@
 
 import Constants from 'kms/common/Constants';
 import { ILoginTracker } from 'kms/common/Types';
+import ForbiddenStateService from '../utils/ForbiddenState';
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export default class Auth {
     private static authEndpoint: string;
     private static baseAuthUrl: string;
-    private static csrfToken: string;
+    private static csrfCookieBaseName = 'CSRF';
     private static loginSessionStorageKey = 'myapp_session_login_attempts';
     private static maxLoginAttempts = 4;
     // Intentionally empty so that no instances of this class can be created
@@ -29,8 +30,10 @@ export default class Auth {
         window.location.href = Auth.authEndpoint;
     }
 
-    static getCsrfTokenFromCookie(cookieName: string): string {
-        const cookieNameSearchString = cookieName + '=';
+    static getCsrfTokenFromCookie(tenantId: string): string {
+        const csrfCookieName = `${Auth.csrfCookieBaseName}-${tenantId}`;
+        const cookieNameSearchString = csrfCookieName + '=';
+        let csrfToken = '';
 
         // Decode the entire cookie string and clean up whitespace
         // Crucial for handling URL-encoded values.
@@ -42,13 +45,44 @@ export default class Auth {
                 cookie = cookie.substring(1);
             }
             if (cookie.startsWith(cookieNameSearchString)) {
-                this.csrfToken = cookie.substring(cookieNameSearchString.length, cookie.length);
+                csrfToken = cookie.substring(cookieNameSearchString.length, cookie.length);
             }
         });
-        return this.csrfToken;
+        return csrfToken;
     }
 
-    static handle401Error(tenantId: string, onForbidden: (code: string) => void): void {
+    static async secureLogout(tenantId: string): Promise<void> {
+        const logoutUrl = `${this.baseAuthUrl}/sm/logout`;
+        try {
+            const response = await fetch(logoutUrl, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': this.getCsrfTokenFromCookie(tenantId),
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            });
+            // change this with actual response stuatus check
+            if (!response.ok) {
+                // eslint-disable-next-line @typescript-eslint/no-base-to-string, @typescript-eslint/restrict-template-expressions
+                throw new Error(`Logout failed with status: ${response}`);
+            }
+            this.postLogoutClearance();
+            ForbiddenStateService.getInstance().setForbiddenState(Constants.FORBIDDEN_ERROR_CODES.LOGGED_OUT);
+        }
+        catch (error) {
+            console.error('Logout Error:', error);
+            this.postLogoutClearance();
+            ForbiddenStateService.getInstance().setForbiddenState(Constants.FORBIDDEN_ERROR_CODES.LOGGED_OUT);
+        }
+    }
+
+    static postLogoutClearance(): void {
+        localStorage.clear();
+        sessionStorage.clear();
+    }
+
+    static handle401Error(tenantId: string): void {
         const timeWindow = 30000; // 30 seconds in milliseconds
         const loginAttemptsData = sessionStorage.getItem(Auth.loginSessionStorageKey);
         const now = Date.now();
@@ -61,7 +95,7 @@ export default class Auth {
         }
 
         if (tracker.count >= Auth.maxLoginAttempts) {
-            onForbidden(Constants.FORBIDDEN_ERROR_CODES.MULTIPLE_UNSUCCESSFUL_LOGIN_ATTEMPTS);
+            ForbiddenStateService.getInstance().setForbiddenState(Constants.FORBIDDEN_ERROR_CODES.MULTIPLE_UNSUCCESSFUL_LOGIN_ATTEMPTS);
         }
         else {
             tracker.count++;

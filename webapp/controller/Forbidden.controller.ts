@@ -16,9 +16,9 @@ export default class Forbidden extends BaseController {
         const forbiddenModel = forbiddenService.getModel();
 
         const errorMessage = forbiddenModel.getProperty('/errorMessage') as string;
-        if (!errorMessage) {
-            forbiddenModel.setProperty('/errorMessage', this.getText('forbiddenDescription'));
-        }
+        forbiddenModel.setProperty('/errorMessage', errorMessage || this.getText('forbiddenDescription'));
+        const errorTitle = forbiddenModel.getProperty('/errorTitle') as string;
+        forbiddenModel.setProperty('/errorTitle', errorTitle || this.getText('notAuthorised'));
     }
 
     public onRetryLogin(): void {
