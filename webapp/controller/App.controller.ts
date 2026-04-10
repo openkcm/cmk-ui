@@ -88,7 +88,10 @@ export default class App extends BaseController {
             // Step 1: Setup the listener first
             this.getRouter().attachRouteMatched(this.onRouteChange.bind(this));
 
-            // Step 2 : Next start the router, This triggers the URL matching and loads the sub-views
+            // Step 2: Handle URLs that don't match any route (e.g. #/{tenantId} with no sub-route)
+            this.getRouter().attachBypassed(this.onBypassed.bind(this));
+
+            // Step 3: Next start the router, This triggers the URL matching and loads the sub-views
             // If a route matches immediately, onRouteChange will trigger correctly
             this.getRouter().initialize();
 
@@ -101,6 +104,7 @@ export default class App extends BaseController {
             // is attached, so we need to check the forbidden state explicitly here.
             if (ForbiddenStateService.getInstance().isForbidden()) {
                 this.getRouter().attachRouteMatched(this.onRouteChange.bind(this));
+                this.getRouter().attachBypassed(this.onBypassed.bind(this));
                 this.getRouter().initialize();
 
                 const hash = window.location.hash;
@@ -114,17 +118,11 @@ export default class App extends BaseController {
         });
     }
 
-    private handleDefaultNavigation(selectedTenantId: string): void {
-        const currentHash = window.location.hash;
-        const hashParts = currentHash.slice(1).split('/');
-        const routeName = hashParts[2];
-        const defaulHomePage = this.twoWayModel.getProperty('/defaulHomePage') as string;
-        // If no specific route is provided, navigate to the default home page
-
-        if (currentHash === '' || routeName === '' || routeName === undefined) {
-            this.getRouter().navTo(defaulHomePage, {
-                tenantId: selectedTenantId
-            });
+    private onBypassed(): void {
+        const tenantId = this.twoWayModel.getProperty('/selectedTenant') as string;
+        if (tenantId) {
+            const defaulHomePage = this.twoWayModel.getProperty('/defaulHomePage') as string;
+            this.getRouter().navTo(defaulHomePage, { tenantId });
         }
     }
 
