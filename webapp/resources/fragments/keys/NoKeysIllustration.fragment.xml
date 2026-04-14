@@ -22,7 +22,7 @@
                         <Menu class="sapUiSizeCompact">
                             <MenuItem text="{i18n>sapManaged}"
                                 press=".handleCreateKeyRoute('SYSTEM_MANAGED')"
-                                visible="{= !!${oneWay>/keystoreSettings/default/allowManaged} }">
+                                visible="{= !!${oneWay>/keystoreSettings/sapManaged/allow }}">
                                 <customData>
                                     <core:CustomData
                                         key="testId"
@@ -32,7 +32,7 @@
                             </MenuItem>
                             <MenuItem text="{i18n>byok}"
                                 press=".handleCreateKeyRoute('BYOK')"
-                                visible="{= !!${oneWay>/keystoreSettings/default/allowManaged} }">
+                                visible="{= !!${oneWay>/keystoreSettings/byok/allow} }">
                                 <customData>
                                     <core:CustomData
                                         key="testId"

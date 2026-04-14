@@ -56,6 +56,7 @@ interface KeyCreationParams {
     keyConfigId: string
     keyType: KeyCreationTypes
     keySubtype: HYOKProviders | BYOKProviders
+    keystoreSettings?: KeystoreResponse
 }
 /**
  * @namespace kms
@@ -227,10 +228,12 @@ export default class KeyConfigDetail extends BaseController {
             return;
         }
 
+        const keystoreSettings = this.oneWayModel.getProperty('/keystoreSettings') as KeystoreResponse;
         const keyParams = {
             keyConfigId: this.keyConfigId,
             keyType,
-            keySubtype
+            keySubtype,
+            keystoreSettings
         } as KeyCreationParams;
         const createKey = async (payload: MangedKeyPayload | HyokKeyPayload) => {
             await this.api.post('keys', payload);
@@ -512,8 +515,21 @@ export default class KeyConfigDetail extends BaseController {
         try {
             const tags = await this.api.get<TagsResponse>(`keyConfigurations/${this.keyConfigId}/tags`);
             this.oneWayModel.setProperty('/tags', tags?.value);
-            const fnValidator = function (args: { text: string }): Token {
-                const text = args.text;
+            const fnValidator = function (args: { text: string }): Token | null {
+                const text = args.text?.trim();
+                if (!text || text.length === 0) {
+                    MessageToast.show('Tag cannot be empty');
+                    return null;
+                }
+                if (text.length > 128) {
+                    MessageToast.show('Tag must be 128 characters or fewer');
+                    return null;
+                }
+                const currentTags = tags?.value || [];
+                if (currentTags.includes(text)) {
+                    MessageToast.show('Tag already exists');
+                    return null;
+                }
                 return new Token({ key: text, text: text });
             };
             const tagsInput = this.byId('tagsMultiInput') as MultiInput;
@@ -527,15 +543,33 @@ export default class KeyConfigDetail extends BaseController {
     }
 
     public async onTagsUpdate(event: MultiInput$TokenUpdateEvent): Promise<void> {
-        const tags = this.oneWayModel.getProperty('/tags') as [];
+        const tags = this.oneWayModel.getProperty('/tags') as string[];
 
         const removedTokens = event.getParameter('removedTokens');
         const addedTokens = event.getParameter('addedTokens');
-        const removedTags = removedTokens?.map(token => token.getKey()) as [];
-        const addedTags = addedTokens?.map(token => token.getKey()) as [];
-        const updatedTags = tags?.filter(tag => !removedTags.includes(tag)) || [] as [];
-        updatedTags?.push(...addedTags);
-        this.oneWayModel.setProperty('/tags', updatedTags || tags);
+        const removedTags = removedTokens?.map(token => token.getKey()) as string[];
+        const addedTags = addedTokens?.map(token => token.getKey().trim()).filter(tag => tag.length > 0) as string[];
+
+        // Validate: no duplicates
+        const uniqueAddedTags = addedTags.filter(tag => !tags?.includes(tag));
+        if (uniqueAddedTags.length < addedTags.length) {
+            MessageToast.show(this.getText('duplicateTagsIgnored'));
+        }
+
+        // Validate: tag length
+        const validTags = uniqueAddedTags.filter(tag => tag.length <= 128);
+        if (validTags.length < uniqueAddedTags.length) {
+            MessageToast.show(this.getText('tagsTooLongIgnored'));
+        }
+
+        const updatedTags = tags?.filter(tag => !removedTags.includes(tag)) || [];
+        updatedTags.push(...validTags);
+
+        if (updatedTags.length === tags?.length && validTags.length === 0 && removedTags.length === 0) {
+            return; // No actual changes
+        }
+
+        this.oneWayModel.setProperty('/tags', updatedTags);
 
         const payload = {
             tags: updatedTags
