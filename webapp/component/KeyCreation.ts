@@ -167,12 +167,10 @@ export default class KeyCreation extends BaseController {
     }
 
     public async onKeyCreationWizardSubmitPress(): Promise<void> {
-        let payload: MangedKeyPayload = {} as (MangedKeyPayload);
         this.keyCreatePopover?.setBusy(false);
-        payload = this.getManagedKeyCreationPayload();
 
         try {
-            await this.onKeyCreateCallBackfnc(payload);
+            await this.onKeyCreateCallBackfnc(this.getManagedKeyCreationPayload());
             this.keyCreatePopover?.close();
             this.keyCreatePopover?.destroy();
             this.keyCreatePopover = undefined;
@@ -188,16 +186,16 @@ export default class KeyCreation extends BaseController {
     }
 
     public getManagedKeyCreationPayload(): MangedKeyPayload {
-        const payload = {
+        return {
             name: this.keyCreationModel.getProperty('/name') as string,
             keyConfigurationID: this.keyConfigId,
             type: this.type,
             description: this.keyCreationModel.getProperty('/description') as string,
             algorithm: this.keyCreationModel.getProperty('/algorithm') as string,
             region: this.keyCreationModel.getProperty('/region') as string,
+            provider: this.keyCreationModel.getProperty('/provider') as string,
             enabled: this.keyCreationModel.getProperty('/enabled') as boolean
         };
-        return payload;
     }
 
     private closeKeyCreationWizard(): void {
