@@ -6,6 +6,8 @@ import Model from 'sap/ui/model/Model';
 import Router from 'sap/ui/core/routing/Router';
 import { Link$PressEvent } from 'sap/m/Link';
 import { getText } from 'kms/common/Helpers';
+import SettingsDialogHandler from 'kms/controller/settings/SettingsDialog.controller';
+
 /**
  * @namespace kms
  */
@@ -14,6 +16,7 @@ export default class BaseController extends Controller {
     public Constants: typeof Constants;
     public test: string;
     public tenantId: string;
+    private settingsDialogHandler: SettingsDialogHandler | null = null;
 
     public onInit(): void {
         this.Enums = Enums;
@@ -45,5 +48,15 @@ export default class BaseController extends Controller {
 
     public onBreadCrumbLinkPress(event: Link$PressEvent, pageName: string, params?: object): void {
         this.getRouter().navTo(pageName, { tenantId: this.tenantId, ...params });
+    }
+
+    public async onOpenSettingsDialog(): Promise<void> {
+        const view = this.getView();
+        if (!view) return;
+
+        if (!this.settingsDialogHandler) {
+            this.settingsDialogHandler = new SettingsDialogHandler(view);
+        }
+        await this.settingsDialogHandler.open();
     }
 }
