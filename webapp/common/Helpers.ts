@@ -124,7 +124,7 @@ export function getErrorDataMessage(error: AxiosError): string | undefined {
     }
 }
 
-export function showErrorMessage(error: AxiosError, userMessage: string | undefined, i18nKey?: string): void {
+export function showErrorMessage(error: AxiosError, userMessage: string | undefined, i18nKey?: string, additionalInfo?: string): void {
     // Don't show error dialogs when navigating to the forbidden page
     if (ForbiddenStateService.getInstance().isForbidden()) {
         return;
@@ -139,13 +139,19 @@ export function showErrorMessage(error: AxiosError, userMessage: string | undefi
         errorMessage = getText('genericError');
     }
 
+    const additionalInfoHtml = additionalInfo
+        ? '<li><strong>' + getText('errorAdditionalInfo') + '</strong>' + ' ' + additionalInfo + '</li>'
+        : '';
+
     MessageBox.error(errorMessage, {
-        title: 'Error',
-        details: '<p><strong>' + 'Error Details:' + '</strong></p>'
+        title: getText('errorTitle'),
+        details: '<p><strong>' + getText('errorDetailsHeader') + '</strong></p>'
+            // eslint-disable-next-line @stylistic/indent-binary-ops
             + '<ul>'
-            + '<li><strong>' + 'Request ID: ' + '</strong>' + ' ' + requestID + '</li>'
-            + '<li><strong>' + 'Timestamp (UTC): ' + '</strong>' + datetime + '</li>'
-            + '<li><strong>' + 'Support Page: ' + '</strong>' + "<a href='https://support.sap.com/'>https://support.sap.com<a/>" + '</li>'
+            + '<li><strong>' + getText('errorRequestId') + '</strong>' + ' ' + requestID + '</li>'
+            + '<li><strong>' + getText('errorTimestamp') + '</strong>' + datetime + '</li>'
+            + additionalInfoHtml
+            + '<li><strong>' + getText('errorSupportPage') + '</strong>' + "<a href='https://support.sap.com/'>https://support.sap.com<a/>" + '</li>'
             + '</ul>',
         styleClass: 'sapUiUserSelectable'
     });
