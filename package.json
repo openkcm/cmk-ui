@@ -6,7 +6,7 @@
   "description": "OpenKCM CMK UI",
   "dependencies": {
     "@eslint/js": "^10.0.1",
-    "@openui5/types": "^1.146.0",
+    "@openui5/types": "^1.147.0",
     "@types/axios": "^0.14.4",
     "@ui5/cli": "^4.0.51",
     "axios": "^1.15.0",
@@ -37,17 +37,17 @@
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.10.0",
     "@types/js-yaml": "^4.0.9",
-    "@types/node": "^25.5.2",
+    "@types/node": "^25.6.0",
     "@types/qunit": "^2.19.13",
     "@ui5/linter": "^1.20.18",
     "@ui5/middleware-code-coverage": "^2.0.3",
     "@ui5/ts-interface-generator": "^0.10.5",
     "babel-plugin-istanbul": "^8.0.0",
     "chance": "^1.1.13",
-    "dotenv": "^17.4.1",
+    "dotenv": "^17.4.2",
     "eslint": "^10.2.0",
     "express": "^5.2.1",
-    "typescript-eslint": "^8.58.1",
+    "typescript-eslint": "^8.58.2",
     "ui5-test-runner": "^5.13.1"
   }
 }
