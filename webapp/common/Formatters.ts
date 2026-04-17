@@ -187,3 +187,24 @@ export function appendNameToLabelText(labelText: string): string {
 export function isCryptoDetailEditable(cryptoARNsArray: { key: string, value: AWSAccessDetails }[]): boolean {
     return cryptoARNsArray?.some(cryptoARN => cryptoARN.value.isEditable);
 }
+
+export function formatErrorDetails(status: string, errorMessage: string): string {
+    switch (status as SystemStatus) {
+        case SystemStatus.FAILED:
+            if (errorMessage) {
+                return errorMessage;
+            }
+            return getText('errorGeneric');
+        case SystemStatus.DISCONNECTED:
+            if (errorMessage) {
+                return errorMessage;
+            }
+            return getText('disconnected');
+        default:
+            return '';
+    }
+}
+
+export function isErrorStatus(status: string): boolean {
+    return status === SystemStatus.FAILED;
+}
