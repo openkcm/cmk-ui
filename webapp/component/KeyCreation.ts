@@ -167,9 +167,8 @@ export default class KeyCreation extends BaseController {
     }
 
     public async onKeyCreationWizardSubmitPress(): Promise<void> {
-        let payload: MangedKeyPayload = {} as (MangedKeyPayload);
         this.keyCreatePopover?.setBusy(false);
-        payload = this.getManagedKeyCreationPayload();
+        const payload: MangedKeyPayload = this.getManagedKeyCreationPayload();
 
         try {
             await this.onKeyCreateCallBackfnc(payload);

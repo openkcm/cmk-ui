@@ -82,15 +82,13 @@ export default class Tasks extends BaseController {
     };
 
     private setTaskDescription(task: Task): string {
-        let description = '';
         const parameterDescription = task.parameters ? ` ${this.getText('to')} ${this.getText(task?.parametersResourceType)}: ${task.parametersResourceName}` : '';
 
-        description = `${task.initiatorName} ${this.getText('requestsApprovalFor')}  ${this.getText(task?.actionType)} ${task.artifactType}: ${task.artifactName} ${parameterDescription}.`;
+        const description = `${task.initiatorName} ${this.getText('requestsApprovalFor')}  ${this.getText(task?.actionType)} ${task.artifactType}: ${task.artifactName} ${parameterDescription}.`;
         return description;
     }
 
     private setTaskActionButtonData(task: Task): void {
-        let taskTransitionActions = [] as TaskTransitionActionsObj[];
         const transitionKeysObjMap: Record<string, TaskTransitionActionsObj> = {
             CONFIRM: {
                 key: TaskStateTransitionAction.CONFIRM,
@@ -113,7 +111,7 @@ export default class Tasks extends BaseController {
                 buttonType: 'Reject'
             }
         };
-        taskTransitionActions = task.availableTransitions?.map((transition) => {
+        const taskTransitionActions = task.availableTransitions?.map((transition) => {
             return transitionKeysObjMap[transition];
         });
         this.oneWayModel.setProperty('/taskTransitionActions', taskTransitionActions);
