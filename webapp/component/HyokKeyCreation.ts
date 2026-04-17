@@ -154,9 +154,8 @@ export default class HyokKeyRegistration extends BaseController {
     }
 
     public async onKeyCreationWizardSubmitPress(): Promise<void> {
-        let payload: HyokKeyPayload = {} as (HyokKeyPayload);
         this.keyCreatePopover?.setBusy(true);
-        payload = this.getHYOKAWSKeyCreationPayload();
+        const payload: HyokKeyPayload = this.getHYOKAWSKeyCreationPayload();
 
         try {
             await this.onKeyCreateCallBackfnc(payload);
@@ -189,8 +188,7 @@ export default class HyokKeyRegistration extends BaseController {
     }
 
     public getHYOKAWSKeyCreationPayload(): HyokKeyPayload {
-        let payload = {} as HyokKeyPayload;
-        payload = {
+        const payload: HyokKeyPayload = {
             name: this.keyCreationModel.getProperty('/keyName') as string,
             nativeId: this.keyCreationModel.getProperty('/keyARN') as string,
             description: this.keyCreationModel.getProperty('/description') as string,

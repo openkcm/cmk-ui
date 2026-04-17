@@ -122,15 +122,14 @@ export default class DetailPanel extends BaseController {
         this.twoWayModel.setProperty('/selectedKey/enabled', key?.state === this.Enums.KeyStates.ENABLED);
         const managementARNs = key?.accessDetails?.management;
         const cryptoARNs = key?.accessDetails?.crypto;
-        let managementARNsArray: { key: string, value: AWSAccessDetails }[] = [];
-        let cryptoARNsArray: { key: string, value: AWSAccessDetails }[] = [];
         if (managementARNs) {
-            managementARNsArray = [{ key: 'management', value: managementARNs }];
+            const managementARNsArray: { key: string, value: AWSAccessDetails }[] = [{ key: 'management', value: managementARNs }];
             this.twoWayModel.setProperty('/selectedKey/accessDetails/managementARNsArray', managementARNsArray);
         }
         if (cryptoARNs) {
+            const cryptoARNsArray: { key: string, value: AWSAccessDetails }[] = [];
             Object.entries(cryptoARNs).forEach(([key, value]) => {
-                cryptoARNsArray = [...cryptoARNsArray, { key: key, value: value }];
+                cryptoARNsArray.push({ key: key, value: value });
             });
 
             this.twoWayModel.setProperty('/selectedKey/accessDetails/cryptoARNsArray', cryptoARNsArray);
