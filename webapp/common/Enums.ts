@@ -113,6 +113,11 @@ export enum GroupRoles {
     TENANT_AUDITOR = 'TENANT_AUDITOR'
 }
 
+export enum ProtectedGroups {
+    TENANT_ADMINISTRATOR = 'TenantAdministrator',
+    TENANT_AUDITOR = 'TenantAuditor'
+}
+
 export const StateColors = {
     GREEN: IndicationColor.Indication14,
     BLUE: IndicationColor.Indication15,

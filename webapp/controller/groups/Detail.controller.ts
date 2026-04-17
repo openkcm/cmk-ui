@@ -17,6 +17,7 @@ interface IamResponse {
 interface GroupPayload {
     name: string
     description: string
+    IAMIdentifier: string
 }
 
 /**
@@ -121,12 +122,25 @@ export default class GroupDetail extends BaseController {
         }
     };
 
+    public onGroupIamIdentifierChanged(event: Input$LiveChangeEvent): void {
+        const newIamIdentifier = event.getParameter('value') ?? '';
+        const iamIdentifier = this.oneWayModel.getProperty('/groupData/iamIdentifier') as string;
+        if (newIamIdentifier === iamIdentifier) {
+            this.oneWayModel.setProperty('/groupValid', false);
+        }
+        else {
+            this.oneWayModel.setProperty('/groupValid', true);
+            this.oneWayModel.setProperty('/newIamIdentifier', newIamIdentifier);
+        }
+    };
+
     public async onGroupSavePress(): Promise<void> {
         this.getView()?.setBusy(true);
 
         const payload: GroupPayload = {
             name: this.oneWayModel.getProperty('/newGroupName') as string,
-            description: this.oneWayModel.getProperty('/newGroupDescription') as string
+            description: this.oneWayModel.getProperty('/newGroupDescription') as string,
+            IAMIdentifier: this.oneWayModel.getProperty('/newIamIdentifier') as string
         };
         try {
             await this.api.patch(`groups/${this.groupId}`, payload);
