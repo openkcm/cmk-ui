@@ -22,7 +22,7 @@
         <f:header>
             <f:DynamicPageHeader>
                 <f:content>
-                    <kms:FilterBar id="systemsFilterBar" search="applyFilters"
+                    <kms:FilterBar id="systemsFilterBar"
                         reset="onResetFilters">
                         <kms:FilterBarItem label="{i18n>region}">
                             <ComboBox

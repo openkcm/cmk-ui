@@ -45,7 +45,6 @@ export default class FilterBar extends Control {
         },
         defaultAggregation: 'filters',
         events: {
-            search: {},
             reset: {}
         }
     };
@@ -56,11 +55,6 @@ export default class FilterBar extends Control {
         render: (rm: RenderManager, control: FilterBar) => {
             rm.openStart('div', control);
             rm.openEnd();
-            const goButtonCustomData = new CustomData({
-                key: 'testId',
-                value: 'filterBar-goButton',
-                writeToDom: true
-            });
             const resetButtonCustomData = new CustomData({
                 key: 'testId',
                 value: 'filterBar-resetButton',
@@ -69,11 +63,6 @@ export default class FilterBar extends Control {
             const toolbar = new HBox({
                 justifyContent: 'End',
                 items: [
-                    new Button({
-                        text: 'Go',
-                        type: 'Emphasized',
-                        press: () => control.fireEvent('search')
-                    }).addStyleClass('sapUiTinyMargin').addCustomData(goButtonCustomData),
                     new Button({
                         text: 'Reset',
                         press: () => control.fireEvent('reset')
