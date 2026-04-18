@@ -67,7 +67,7 @@
                                 <Menu class="sapUiSizeCompact">
                                     <MenuItem text="{i18n>sapManaged}"
                                         press=".onKeyConfigDashboardCreateSAPKeyPress($event, 'SYSTEM_MANAGED', ${oneWay>})"
-                                        visible="{= !!${oneWay>/keystoreSettings/default/allowManaged} }">
+                                        visible="{= !!${oneWay>/keystoreSettings/sapManaged/allow }}">
                                         <customData>
                                             <core:CustomData
                                                 key="testId"
@@ -76,7 +76,7 @@
                                         </customData>
                                     </MenuItem>
                                     <MenuItem text="{i18n>byok}"
-                                        visible="{= !!${oneWay>/keystoreSettings/default/allowManaged} }"
+                                        visible="{= !!${oneWay>/keystoreSettings/byok/allow} }"
                                         press=".onKeyConfigDashboardCreateSAPKeyPress($event, 'BYOK', ${oneWay>})">
                                         <customData>
                                             <core:CustomData

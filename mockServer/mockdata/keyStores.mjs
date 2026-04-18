@@ -2,11 +2,11 @@ export default () => {
 
     const generateKeyStores = () => {
         return  {
-            default: {
-                allowManaged: true,
-                allowBYOK: true,
+            byok: {
+                allow: true,
                 supportedRegions: [
-                    "eu10"
+                    "eu-central-1",
+                    "us-east-1"
                 ]
             },
             hyok: {

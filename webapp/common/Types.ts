@@ -192,14 +192,16 @@ export interface hyokAWSCryptoCertInput {
     rootCryptoCA: string | null
 }
 export interface KeystoreResponse {
-    default: {
-        allowManaged: boolean
-        allowBYOK: boolean
+    byok: {
+        allow: boolean
         supportedRegions: string[]
     }
     hyok: {
         allow: boolean
         providers: HYOKProviders[]
+    }
+    sapManaged: {
+        allow: boolean
     }
 }
 export interface UserData {
