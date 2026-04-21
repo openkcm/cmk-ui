@@ -358,7 +358,7 @@
                                                             value="hyokAWSManagementCertObj-trustAnchorARN-Input"
                                                             writeToDom="true" />
                                                     </customData>
-                                                    </Input>
+                                                </Input>
                                                 <Label
                                                     class="sapUiTinyMarginTop"
                                                     text="{i18n>roleARN}:" />
@@ -462,7 +462,7 @@
                                 value="hyokKeyCreationWizard-reviewButton"
                                 writeToDom="true" />
                         </customData>
-                        </Button>
+                    </Button>
                     <Button text="{i18n>cancel}" type="Transparent"
                         press="onKeyCreationWizardCancelPress">
                         <customData>
