@@ -30,7 +30,8 @@
 	},
 	"exclude": [
 		"./mockServer/**/*",
-		"./webapp/coverage/**/*"
+		"./webapp/coverage/**/*",
+		"./webapp/js/**/*"
 	],
 	"include": [
 		"./webapp/**/*",
