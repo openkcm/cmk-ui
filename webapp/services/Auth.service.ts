@@ -52,7 +52,7 @@ export default class Auth {
     }
 
     static async secureLogout(tenantId: string, onloginError: (error: unknown) => void): Promise<void> {
-        const logoutUrl = `${this.baseAuthUrl}/sm/logout/tenant_id=${tenantId}`;
+        const logoutUrl = `${this.baseAuthUrl}/sm/logout?tenant_id=${tenantId}`;
         try {
             const response = await fetch(logoutUrl, {
                 method: 'GET',
