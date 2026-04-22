@@ -60,8 +60,17 @@ export default class Auth {
                     'X-CSRF-TOKEN': this.getCsrfTokenFromCookie(tenantId),
                     'Content-Type': 'application/json'
                 },
-                credentials: 'include'
+                credentials: 'include',
+                redirect: 'manual'
             });
+
+            if (response.type === 'opaqueredirect') {
+                this.postLogoutClearance();
+                ForbiddenStateService.getInstance().setForbiddenState(Constants.FORBIDDEN_ERROR_CODES.LOGGED_OUT);
+                window.location.href = logoutUrl;
+                return;
+            }
+
             // The fetch API only throws on network-level failures (e.g., DNS resolution failure, no internet connection).
             // HTTP error responses such as 400 Bad Request are not thrown — they resolve normally with response.ok === false.
             // Therefore, this catch block only handles network errors, not server-side error responses.
