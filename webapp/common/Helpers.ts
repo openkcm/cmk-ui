@@ -28,7 +28,11 @@ export function getText(key: string, params?: string | string[] | number | numbe
     const paramsType = typeof params;
     // The method below is deprecated but there is no acceptable alternative to set a global model, so this is needed for now
     // eslint-disable-next-line @typescript-eslint/no-deprecated
-    const resourceBundle = (Core.getModel('i18n') as ResourceModel).getResourceBundle() as ResourceBundle;
+    const resourceModel = Core.getModel('i18n') as ResourceModel;
+    if (!resourceModel) {
+        return key;
+    }
+    const resourceBundle = resourceModel.getResourceBundle() as ResourceBundle;
     let formattedText: string | undefined = '';
     if (key && typeof key === 'string') {
         switch (paramsType) {
