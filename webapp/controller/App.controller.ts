@@ -323,12 +323,8 @@ export default class App extends BaseController {
 
     public onSignOutPress(): void {
         const tenantId = (this.twoWayModel.getProperty('/selectedTenant') as string) || this.tenantId || /#\/([^/]+)/.exec(window.location.hash)?.[1] || '';
-        const showLogoutError = (error: unknown) => {
-            const additionalErrorInfo = error instanceof Error ? error.message : String(error);
 
-            showErrorMessage(error as AxiosError, this.getText('logoutFailedMessage'), undefined, additionalErrorInfo);
-        };
-        void Auth.secureLogout(tenantId, showLogoutError);
+        Auth.secureLogout(tenantId);
     }
 
     private isForbidden(): boolean {

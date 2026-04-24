@@ -51,41 +51,10 @@ export default class Auth {
         return csrfToken;
     }
 
-    static async secureLogout(tenantId: string, onloginError: (error: unknown) => void): Promise<void> {
+    static secureLogout(tenantId: string): void {
         const logoutUrl = `${this.baseAuthUrl}/sm/logout?tenant_id=${tenantId}`;
-        try {
-            const response = await fetch(logoutUrl, {
-                method: 'GET',
-                headers: {
-                    'X-CSRF-TOKEN': this.getCsrfTokenFromCookie(tenantId),
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include',
-                redirect: 'manual'
-            });
-
-            if (response.type === 'opaqueredirect') {
-                this.postLogoutClearance();
-                ForbiddenStateService.getInstance().setForbiddenState(Constants.FORBIDDEN_ERROR_CODES.LOGGED_OUT);
-                window.location.href = logoutUrl;
-                return;
-            }
-
-            // The fetch API only throws on network-level failures (e.g., DNS resolution failure, no internet connection).
-            // HTTP error responses such as 400 Bad Request are not thrown — they resolve normally with response.ok === false.
-            // Therefore, this catch block only handles network errors, not server-side error responses.
-            if (!response.ok) {
-                const errorBody = await response.text();
-                throw new Error(errorBody || `Logout failed with status: ${String(response.status)} ${response.statusText}`);
-            }
-            this.postLogoutClearance();
-            ForbiddenStateService.getInstance().setForbiddenState(Constants.FORBIDDEN_ERROR_CODES.LOGGED_OUT);
-        }
-        catch (error) {
-            console.error('Logout Error:', error);
-            this.postLogoutClearance();
-            onloginError(error);
-        }
+        this.postLogoutClearance();
+        window.location.href = logoutUrl;
     }
 
     static postLogoutClearance(): void {
