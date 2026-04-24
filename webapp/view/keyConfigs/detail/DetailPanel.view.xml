@@ -163,48 +163,66 @@
                 <subSections>
                     <ObjectPageSubSection>
                         <m:VBox>
-                            <m:HBox justifyContent="End"
-                                visible="{parts: ['twoWay>/selectedKey/accessDetails/cryptoARNsArray'], formatter: 'commonFormatter.isCryptoDetailEditable'}">
-                                <m:HBox visible="{= !${oneWay>/cryptoInEditMode}}">
+                            <m:HBox>
+                                <m:HBox>
                                     <m:Button
-                                        icon="sap-icon://edit"
+                                        icon="sap-icon://add"
                                         type="Ghost"
-                                        text="{i18n>edit}"
-                                        press="onEditHYOKCryptoDetailsPress">
+                                        text="{i18n>add}"
+                                        press="onAddHYOKCryptoDetailsPress">
                                         <m:customData>
                                             <core:CustomData
                                                 key="testId"
-                                                value="section-editButton"
+                                                value="section-addButton"
                                                 writeToDom="true" />
                                         </m:customData>
                                     </m:Button>
                                 </m:HBox>
-                                <m:HBox visible="{= ${oneWay>/cryptoInEditMode}}">
-                                    <m:Button
-                                        icon="sap-icon://save"
-                                        type="Emphasized"
-                                        text="{i18n>save}"
-                                        press="onSaveHYOKCryptoDetailsPress"
-                                        class="sapUiSmallMarginEnd">
-                                        <m:customData>
-                                            <core:CustomData
-                                                key="testId"
-                                                value="section-editButton"
-                                                writeToDom="true" />
-                                        </m:customData>
-                                    </m:Button>
-                                    <m:Button
-                                        icon="sap-icon://cancel"
-                                        type="Ghost"
-                                        text="{i18n>cancel}"
-                                        press="onCancelHYOKCryptoEdit">
-                                        <m:customData>
-                                            <core:CustomData
-                                                key="testId"
-                                                value="section-editButton"
-                                                writeToDom="true" />
-                                        </m:customData>
-                                    </m:Button>
+                                <m:HBox justifyContent="End"
+                                    visible="{parts: ['twoWay>/selectedKey/accessDetails/cryptoARNsArray'], formatter: 'commonFormatter.isCryptoDetailEditable'}">
+
+
+                                    <m:HBox visible="{= !${oneWay>/cryptoInEditMode}}">
+                                        <m:Button
+                                            icon="sap-icon://edit"
+                                            type="Ghost"
+                                            text="{i18n>edit}"
+                                            press="onEditHYOKCryptoDetailsPress">
+                                            <m:customData>
+                                                <core:CustomData
+                                                    key="testId"
+                                                    value="section-editButton"
+                                                    writeToDom="true" />
+                                            </m:customData>
+                                        </m:Button>
+                                    </m:HBox>
+                                    <m:HBox visible="{= ${oneWay>/cryptoInEditMode}}">
+                                        <m:Button
+                                            icon="sap-icon://save"
+                                            type="Emphasized"
+                                            text="{i18n>save}"
+                                            press="onSaveHYOKCryptoDetailsPress"
+                                            class="sapUiSmallMarginEnd">
+                                            <m:customData>
+                                                <core:CustomData
+                                                    key="testId"
+                                                    value="section-editButton"
+                                                    writeToDom="true" />
+                                            </m:customData>
+                                        </m:Button>
+                                        <m:Button
+                                            icon="sap-icon://cancel"
+                                            type="Ghost"
+                                            text="{i18n>cancel}"
+                                            press="onCancelHYOKCryptoEdit">
+                                            <m:customData>
+                                                <core:CustomData
+                                                    key="testId"
+                                                    value="section-editButton"
+                                                    writeToDom="true" />
+                                            </m:customData>
+                                        </m:Button>
+                                    </m:HBox>
                                 </m:HBox>
                             </m:HBox>
                             <m:VBox items="{twoWay>/selectedKey/accessDetails/cryptoARNsArray}">

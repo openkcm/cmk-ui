@@ -1,0 +1,413 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    core:require="{commonFormatter: 'kms/common/Formatters' }">
+    <Dialog
+        escapeHandler=".onAddCryptoCertsDialogCancelPress"
+        showHeader="false"
+        verticalScrolling="true"
+        contentHeight="70%"
+        contentWidth="40%">
+        <f:DynamicPage
+            toggleHeaderOnTitleClick="false"
+            class="sapUiNoContentPadding"
+            showFooter="true">
+            <f:title>
+                <f:DynamicPageTitle>
+                    <f:heading>
+                        <Title text="{i18n>addCryptoCertsTitle}" />
+                    </f:heading>
+                </f:DynamicPageTitle>
+            </f:title>
+            <f:content>
+                <VBox class="sapUiSmallMargin">
+                    <!-- Already added cert entries (committed) -->
+                    <Panel headerText="{i18n>addedCryptoCerts}"
+                        visible="{addCryptoModel>/hasCommittedCerts}"
+                        class="sapUiSmallMarginBottom">
+                        <VBox items="{addCryptoModel>/newCryptoCertGroups}">
+                            <items>
+                                <HBox class="sapUiSmallMarginBottom">
+                                    <VBox width="100%">
+                                        <HBox alignItems="Center">
+                                            <core:Icon src="sap-icon://accept"
+                                                color="#107E3E"
+                                                class="sapUiSmallMarginEnd" />
+                                            <Title level="H5"
+                                                text="{addCryptoModel>selectedCertName}" />
+                                        </HBox>
+                                        <VBox class="sapUiTinyMarginTop">
+                                            <Label text="{i18n>trustAnchorARN}:" />
+                                            <Text text="{addCryptoModel>trustAnchorCryptoARN}" />
+                                            <Label text="{i18n>roleARN}:"
+                                                class="sapUiTinyMarginTop" />
+                                            <Text text="{addCryptoModel>roleCryptoARN}" />
+                                            <Label text="{i18n>profileARN}:"
+                                                class="sapUiTinyMarginTop" />
+                                            <Text text="{addCryptoModel>rootCryptoCA}" />
+                                        </VBox>
+                                    </VBox>
+                                    <Button
+                                        icon="sap-icon://decline"
+                                        type="Transparent"
+                                        press="onRemoveNewCryptoCertGroup">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="addCryptoCerts-removeButton"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </Button>
+                                </HBox>
+                            </items>
+                        </VBox>
+                    </Panel>
+
+                    <!-- Current cert selection + ARN input area -->
+                    <Panel headerText="{i18n>addNewCryptoCerts}"
+                        visible="{= !!${addCryptoModel>/allowAddMoreCryptoCert}}">
+
+                        <!-- Step 1: Select a certificate -->
+                        <VBox visible="{= !${addCryptoModel>/certSelected}}"
+                            class="sapUiSmallMarginBottom">
+                            <Text text="{i18n>selectCryptoCert}"
+                                class="sapUiSmallMarginBottom" />
+                            <Select
+                                selectedKey="{addCryptoModel>/currentSelectedCertKey}"
+                                change="onCryptoCertSelected"
+                                forceSelection="false"
+                                width="100%"
+                                items="{
+                                    path: 'addCryptoModel>/availableCryptoCertsSelectionList'
+                                }">
+                                <core:Item
+                                    key="{addCryptoModel>name}"
+                                    text="{addCryptoModel>name}" />
+                                <customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="addCryptoCerts-certSelect"
+                                        writeToDom="true" />
+                                </customData>
+                            </Select>
+                        </VBox>
+
+                        <!-- Step 2: Show selected cert details + ARN inputs -->
+                        <VBox visible="{= !!${addCryptoModel>/certSelected}}">
+                            <!-- Selected cert info -->
+                            <HBox alignItems="Center"
+                                class="sapUiSmallMarginBottom">
+                                <Title level="H5"
+                                    text="{addCryptoModel>/currentCert/name}" />
+                            </HBox>
+                            <VBox class="sapUiSmallMarginBottom">
+                                <Label text="{i18n>rootCALabel}:" />
+                                <Text text="{addCryptoModel>/currentCert/rootCA}"
+                                    wrapping="true" />
+                                <Label text="{i18n>subject}:"
+                                    class="sapUiTinyMarginTop" />
+                                <Text text="{addCryptoModel>/currentCert/subject}"
+                                    wrapping="true" />
+                            </VBox>
+
+                            <!-- ARN Inputs -->
+                            <VBox class="sapUiSmallMarginBottom">
+                                <Label text="{i18n>trustAnchorARN}:"
+                                    class="sapUiTinyMarginTop" />
+                                <Input
+                                    value="{addCryptoModel>/currentTrustAnchorARN}"
+                                    placeholder="{i18n>trustAnchorARN}">
+                                    <customData>
+                                        <core:CustomData
+                                            key="testId"
+                                            value="addCryptoCerts-trustAnchorARN-Input"
+                                            writeToDom="true" />
+                                    </customData>
+                                </Input>
+                                <Label text="{i18n>roleARN}:"
+                                    class="sapUiTinyMarginTop" />
+                                <Input
+                                    value="{addCryptoModel>/currentRoleARN}"
+                                    placeholder="{i18n>roleARN}">
+                                    <customData>
+                                        <core:CustomData
+                                            key="testId"
+                                            value="addCryptoCerts-roleARN-Input"
+                                            writeToDom="true" />
+                                    </customData>
+                                </Input>
+                                <Label text="{i18n>profileARN}:"
+                                    class="sapUiTinyMarginTop" />
+                                <Input
+                                    value="{addCryptoModel>/currentProfileARN}"
+                                    placeholder="{i18n>profileARN}">
+                                    <customData>
+                                        <core:CustomData
+                                            key="testId"
+                                            value="addCryptoCerts-profileARN-Input"
+                                            writeToDom="true" />
+                                    </customData>
+                                </Input>
+                            </VBox>
+
+                            <!-- Add + Cancel buttons for current cert -->
+                            <HBox justifyContent="End"
+                                class="sapUiSmallMarginTop">
+                                <Button text="{i18n>add}"
+                                    type="Emphasized"
+                                    press="onCommitCurrentCert"
+                                    class="sapUiSmallMarginEnd">
+                                    <customData>
+                                        <core:CustomData
+                                            key="testId"
+                                            value="addCryptoCerts-addCertButton"
+                                            writeToDom="true" />
+                                    </customData>
+                                </Button>
+                                <Button text="{i18n>cancel}"
+                                    type="Transparent"
+                                    press="onCancelCurrentCertSelection">
+                                    <customData>
+                                        <core:CustomData
+                                            key="testId"
+                                            value="addCryptoCerts-cancelCertButton"
+                                            writeToDom="true" />
+                                    </customData>
+                                </Button>
+                            </HBox>
+                        </VBox>
+                    </Panel>
+
+                    <!-- No more certs available message -->
+                    <MessageStrip
+                        visible="{addCryptoModel>/showAllCertsAssignedMessage}"
+                        text="{i18n>allCryptoCertsAssigned}"
+                        type="Information"
+                        showIcon="true"
+                        class="sapUiSmallMarginTop" />
+                </VBox>
+            </f:content>
+            <f:footer>
+                <OverflowToolbar>
+                    <ToolbarSpacer />
+                    <Button text="{i18n>save}" type="Emphasized"
+                        enabled="{addCryptoModel>/hasCommittedCerts}"
+                        press="onAddCryptoCertsSubmitPress">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="addCryptoCerts-saveButton"
+                                writeToDom="true" />
+                        </customData>
+                    </Button>
+                    <Button text="{i18n>cancel}" type="Transparent"
+                        press="onAddCryptoCertsDialogCancelPress">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="addCryptoCerts-cancelButton"
+                                writeToDom="true" />
+                        </customData>
+                    </Button>
+                </OverflowToolbar>
+            </f:footer>
+        </f:DynamicPage>
+    </Dialog>
+
+
+    <Dialog
+        escapeHandler=".onAddCryptoCertsDialogCancelPress"
+        showHeader="false"
+        verticalScrolling="true"
+        contentHeight="80%"
+        contentWidth="40%">
+        <f:DynamicPage
+            stickySubheaderProvider="cryptoAddWizard"
+            toggleHeaderOnTitleClick="false"
+            class="sapUiNoContentPadding"
+            showFooter="true">
+            <f:title>
+                <f:DynamicPageTitle>
+                    <f:heading>
+                        <Title text="{i18n>HYOKKeyCreationWizard}" />
+                    </f:heading>
+                </f:DynamicPageTitle>
+            </f:title>
+            <f:content>
+                <f:content>
+                    <VBox class="sapUiSmallMargin">
+                        <!-- Already added cert entries (committed) -->
+                        <Panel headerText="{i18n>addedCryptoCerts}"
+                            visible="{addCryptoModel>/hasCommittedCerts}"
+                            class="sapUiSmallMarginBottom">
+                            <VBox items="{addCryptoModel>/newCryptoCertGroups}">
+                                <items>
+                                    <HBox class="sapUiSmallMarginBottom">
+                                        <VBox width="100%">
+                                            <HBox alignItems="Center">
+                                                <core:Icon src="sap-icon://accept"
+                                                    color="#107E3E"
+                                                    class="sapUiSmallMarginEnd" />
+                                                <Title level="H5"
+                                                    text="{addCryptoModel>selectedCertName}" />
+                                            </HBox>
+                                            <VBox class="sapUiTinyMarginTop">
+                                                <Label text="{i18n>trustAnchorARN}:" />
+                                                <Text text="{addCryptoModel>trustAnchorCryptoARN}" />
+                                                <Label text="{i18n>roleARN}:"
+                                                    class="sapUiTinyMarginTop" />
+                                                <Text text="{addCryptoModel>roleCryptoARN}" />
+                                                <Label text="{i18n>profileARN}:"
+                                                    class="sapUiTinyMarginTop" />
+                                                <Text text="{addCryptoModel>rootCryptoCA}" />
+                                            </VBox>
+                                        </VBox>
+                                        <Button
+                                            icon="sap-icon://decline"
+                                            type="Transparent"
+                                            press="onRemoveNewCryptoCertGroup">
+                                            <customData>
+                                                <core:CustomData
+                                                    key="testId"
+                                                    value="addCryptoCerts-removeButton"
+                                                    writeToDom="true" />
+                                            </customData>
+                                        </Button>
+                                    </HBox>
+                                </items>
+                            </VBox>
+                        </Panel>
+
+                        <!-- Current cert selection + ARN input area -->
+                        <Panel headerText="{i18n>addNewCryptoCerts}"
+                            visible="{= !!${addCryptoModel>/allowAddMoreCryptoCert}}">
+
+                            <!-- Step 1: Select a certificate -->
+                            <VBox visible="{= !${addCryptoModel>/certSelected}}"
+                                class="sapUiSmallMarginBottom">
+                                <Text text="{i18n>selectCryptoCert}"
+                                    class="sapUiSmallMarginBottom" />
+                                <Select
+                                    selectedKey="{addCryptoModel>/currentSelectedCertKey}"
+                                    change="onCryptoCertSelected"
+                                    forceSelection="false"
+                                    width="100%"
+                                    items="{
+                                        path: 'addCryptoModel>/availableCryptoCertsSelectionList'
+                                    }">
+                                    <core:Item
+                                        key="{addCryptoModel>name}"
+                                        text="{addCryptoModel>name}" />
+                                    <customData>
+                                        <core:CustomData
+                                            key="testId"
+                                            value="addCryptoCerts-certSelect"
+                                            writeToDom="true" />
+                                    </customData>
+                                </Select>
+                            </VBox>
+
+                            <!-- Step 2: Show selected cert details + ARN inputs -->
+                            <VBox visible="{= !!${addCryptoModel>/certSelected}}">
+                                <!-- Selected cert info -->
+                                <HBox alignItems="Center"
+                                    class="sapUiSmallMarginBottom">
+                                    <Title level="H5"
+                                        text="{addCryptoModel>/currentCert/name}" />
+                                </HBox>
+                                <VBox class="sapUiSmallMarginBottom">
+                                    <Label text="{i18n>rootCALabel}:" />
+                                    <Text text="{addCryptoModel>/currentCert/rootCA}"
+                                        wrapping="true" />
+                                    <Label text="{i18n>subject}:"
+                                        class="sapUiTinyMarginTop" />
+                                    <Text text="{addCryptoModel>/currentCert/subject}"
+                                        wrapping="true" />
+                                </VBox>
+
+                                <!-- ARN Inputs -->
+                                <VBox class="sapUiSmallMarginBottom">
+                                    <Label text="{i18n>trustAnchorARN}:"
+                                        class="sapUiTinyMarginTop" />
+                                    <Input
+                                        value="{addCryptoModel>/currentTrustAnchorARN}"
+                                        placeholder="{i18n>trustAnchorARN}">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="addCryptoCerts-trustAnchorARN-Input"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </Input>
+                                    <Label text="{i18n>roleARN}:"
+                                        class="sapUiTinyMarginTop" />
+                                    <Input
+                                        value="{addCryptoModel>/currentRoleARN}"
+                                        placeholder="{i18n>roleARN}">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="addCryptoCerts-roleARN-Input"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </Input>
+                                    <Label text="{i18n>profileARN}:"
+                                        class="sapUiTinyMarginTop" />
+                                    <Input
+                                        value="{addCryptoModel>/currentProfileARN}"
+                                        placeholder="{i18n>profileARN}">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="addCryptoCerts-profileARN-Input"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </Input>
+                                </VBox>
+
+                                <!-- Add + Cancel buttons for current cert -->
+                                <HBox justifyContent="End"
+                                    class="sapUiSmallMarginTop">
+                                    <Button text="{i18n>add}"
+                                        type="Emphasized"
+                                        press="onCommitCurrentCert"
+                                        class="sapUiSmallMarginEnd">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="addCryptoCerts-addCertButton"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </Button>
+                                    <Button text="{i18n>cancel}"
+                                        type="Transparent"
+                                        press="onCancelCurrentCertSelection">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="addCryptoCerts-cancelCertButton"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </Button>
+                                </HBox>
+                            </VBox>
+                        </Panel>
+
+                        <!-- No more certs available message -->
+                        <MessageStrip
+                            visible="{addCryptoModel>/showAllCertsAssignedMessage}"
+                            text="{i18n>allCryptoCertsAssigned}"
+                            type="Information"
+                            showIcon="true"
+                            class="sapUiSmallMarginTop" />
+                    </VBox>
+                </f:content>
+            </f:content>
+            <f:footer>
+
+            </f:footer>
+        </f:DynamicPage>
+    </Dialog>
+</core:FragmentDefinition>

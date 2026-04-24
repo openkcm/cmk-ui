@@ -13,6 +13,7 @@ import { ActionTypes, ArtifactTypes, EventChannelIds, EventIDs } from 'kms/commo
 import { AxiosError } from 'axios';
 import MessageBox from 'sap/m/MessageBox';
 import Workflow from 'kms/component/Workflow';
+import HyokCryptoRoleAdd from 'kms/component/HyokCryptoRoleAdd';
 
 interface KeyPatchPayload {
     name: string
@@ -46,6 +47,7 @@ export default class DetailPanel extends BaseController {
     private keyConfigId: string | undefined;
     private eventBus = EventBus.getInstance();
     private workflowComponent: Workflow | undefined;
+    private addCryptoComponent: HyokCryptoRoleAdd | undefined = new HyokCryptoRoleAdd('hyokCryptoRole');
 
     public onInit(): void {
         super.onInit();
@@ -379,5 +381,22 @@ export default class DetailPanel extends BaseController {
         else {
             await this.getSystemDetails();
         }
+    }
+
+    public onAddHYOKCryptoDetailsPress(): void {
+        const selectedKey = this.twoWayModel.getProperty('/selectedKey') as Key;
+        const existingCrypto = selectedKey?.accessDetails?.crypto;
+        this.addCryptoComponent?.openAddCryptoCertsDialog(
+            {
+                keyId: this.id,
+                keyConfigId: this.keyConfigId ?? '',
+                existingCrypto: existingCrypto
+            },
+            this,
+            this.api,
+            async () => {
+                await this.getKeyDetails();
+            }
+        );
     }
 }
