@@ -172,8 +172,7 @@
                             visible="{= ${oneWay>status} !== 'FAILED'}">
                             <menu>
                                 <Menu class="sapUiSizeCompact">
-                                    <!-- @Todo TEMP: Revert after demo -->
-                                    <!-- <MenuItem text="{i18n>switchKeyConfiguration}"
+                                    <MenuItem text="{i18n>switchKeyConfiguration}"
                                         press="onSwitchKeyConfigPress">
                                         <customData>
                                             <core:CustomData
@@ -181,7 +180,7 @@
                                                 value="systemsTable-switchKeyConfigMenuItem"
                                                 writeToDom="true" />
                                         </customData>
-                                    </MenuItem> -->
+                                    </MenuItem>
                                     <MenuItem
                                         press="onSystemsTableDisconnectPress"
                                         visible="{= !!${oneWay>keyConfigurationID} &amp;&amp; ${oneWay>status} !== 'FAILED'}"
