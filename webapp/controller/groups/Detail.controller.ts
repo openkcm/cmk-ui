@@ -17,6 +17,7 @@ interface IamResponse {
 interface GroupPayload {
     name: string
     description: string
+    IAMIdentifier: string
 }
 
 /**
@@ -28,6 +29,7 @@ export default class GroupDetail extends BaseController {
 
     private readonly oneWayModel = new JSONModel();
     private eventBus = EventBus.getInstance();
+    private originalIamIdentifier = '';
 
     public onInit(): void {
         super.onInit();
@@ -55,6 +57,7 @@ export default class GroupDetail extends BaseController {
         try {
             const group = await this.api.get<Group>(`groups/${this.groupId}`);
             this.oneWayModel.setProperty('/groupData', group);
+            this.originalIamIdentifier = group?.iamIdentifier || '';
             this.groupIAMCheck(group?.iamIdentifier).catch((error: unknown) => {
                 console.error(error);
             });
@@ -92,41 +95,76 @@ export default class GroupDetail extends BaseController {
     };
 
     public onGroupEditDetailsPress(): void {
+        this.originalIamIdentifier = this.oneWayModel.getProperty('/groupData/iamIdentifier') as string || '';
         this.oneWayModel.setProperty('/editMode', true);
     };
 
     public onGroupCancelPress(): void {
+        this.oneWayModel.setProperty('/groupData/iamIdentifier', this.originalIamIdentifier);
+        this.oneWayModel.setProperty('/iamIdentifierValueState', 'None');
+        this.oneWayModel.setProperty('/iamIdentifierValueStateText', '');
         this.oneWayModel.setProperty('/editMode', false);
+        this.oneWayModel.setProperty('/groupValid', false);
     };
 
     public onGroupNameChanged(event: Input$LiveChangeEvent): void {
         const newGroupName = event.getParameter('value') ?? '';
-        const groupName = this.oneWayModel.getProperty('/groupData/name') as string;
         const { valueState, valueStateText } = setNameValueState(newGroupName);
         this.oneWayModel.setProperty('/groupNameValueState', valueState);
         this.oneWayModel.setProperty('/groupNameValueStateText', valueStateText);
-        this.oneWayModel.setProperty('/groupValid', newGroupName !== groupName && valueState === 'None');
         this.oneWayModel.setProperty('/newGroupName', newGroupName);
+        this.validateGroupForm();
     };
 
     public onGroupDescriptionChanged(event: TextArea$LiveChangeEvent): void {
         const newGroupDescription = event.getParameter('value');
-        const groupDescription = this.oneWayModel.getProperty('/groupData/description') as string;
-        if (newGroupDescription === groupDescription) {
-            this.oneWayModel.setProperty('/groupValid', false);
+        this.oneWayModel.setProperty('/newGroupDescription', newGroupDescription);
+        this.validateGroupForm();
+    };
+
+    public onGroupIamIdentifierChanged(event: Input$LiveChangeEvent): void {
+        const newIamIdentifier = event.getParameter('value') ?? '';
+        this.oneWayModel.setProperty('/newIamIdentifier', newIamIdentifier);
+
+        if (!newIamIdentifier.trim()) {
+            this.oneWayModel.setProperty('/iamIdentifierValueState', 'Error');
+            this.oneWayModel.setProperty('/iamIdentifierValueStateText', this.getText('iamIdentifierRequired'));
         }
         else {
-            this.oneWayModel.setProperty('/groupValid', true);
-            this.oneWayModel.setProperty('/newGroupDescription', newGroupDescription);
+            this.oneWayModel.setProperty('/iamIdentifierValueState', 'None');
+            this.oneWayModel.setProperty('/iamIdentifierValueStateText', '');
         }
+
+        this.validateGroupForm();
     };
+
+    private validateGroupForm(): void {
+        const currentName = this.oneWayModel.getProperty('/groupData/name') as string;
+        const currentDescription = this.oneWayModel.getProperty('/groupData/description') as string;
+
+        const newName = this.oneWayModel.getProperty('/newGroupName') as string | undefined;
+        const newDescription = this.oneWayModel.getProperty('/newGroupDescription') as string | undefined;
+        const newIamIdentifier = this.oneWayModel.getProperty('/newIamIdentifier') as string | undefined;
+
+        const nameValueState = this.oneWayModel.getProperty('/groupNameValueState') as string;
+        const iamIdentifierValueState = this.oneWayModel.getProperty('/iamIdentifierValueState') as string;
+        const hasValidationErrors = nameValueState === 'Error' || iamIdentifierValueState === 'Error';
+        const nameChanged = newName !== undefined && newName !== currentName;
+        const descriptionChanged = newDescription !== undefined && newDescription !== currentDescription;
+        const iamIdentifierChanged = newIamIdentifier !== undefined && newIamIdentifier !== this.originalIamIdentifier;
+
+        const hasChanges = nameChanged || descriptionChanged || iamIdentifierChanged;
+
+        this.oneWayModel.setProperty('/groupValid', hasChanges && !hasValidationErrors);
+    }
 
     public async onGroupSavePress(): Promise<void> {
         this.getView()?.setBusy(true);
 
         const payload: GroupPayload = {
-            name: this.oneWayModel.getProperty('/newGroupName') as string,
-            description: this.oneWayModel.getProperty('/newGroupDescription') as string
+            name: (this.oneWayModel.getProperty('/newGroupName') as string) || (this.oneWayModel.getProperty('/groupData/name') as string),
+            description: (this.oneWayModel.getProperty('/newGroupDescription') as string) ?? (this.oneWayModel.getProperty('/groupData/description') as string),
+            IAMIdentifier: (this.oneWayModel.getProperty('/newIamIdentifier') as string) ?? (this.oneWayModel.getProperty('/groupData/iamIdentifier') as string)
         };
         try {
             await this.api.patch(`groups/${this.groupId}`, payload);
@@ -142,6 +180,10 @@ export default class GroupDetail extends BaseController {
         }
         finally {
             this.oneWayModel.setProperty('/editMode', false);
+            this.oneWayModel.setProperty('/groupValid', false);
+            this.oneWayModel.setProperty('/newGroupName', undefined);
+            this.oneWayModel.setProperty('/newGroupDescription', undefined);
+            this.oneWayModel.setProperty('/newIamIdentifier', undefined);
             this.getView()?.setBusy(false);
             this.getRouter().navTo('groupDetail', {
                 tenantId: this.tenantId,
@@ -152,6 +194,7 @@ export default class GroupDetail extends BaseController {
 
     public onCancel(): void {
         this.oneWayModel.setProperty('/editMode', false);
+        this.oneWayModel.setProperty('/groupValid', false);
         this.getRouter().navTo('groups', {
             tenantId: this.tenantId
         });
