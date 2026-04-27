@@ -3,7 +3,7 @@ import JSONModel from 'sap/ui/model/json/JSONModel';
 import Dialog from 'sap/m/Dialog';
 import NavContainer from 'sap/m/NavContainer';
 import Storage from 'sap/ui/util/Storage';
-import { List$SelectionChangeEvent } from 'sap/m/List';
+import { ListBase$SelectionChangeEvent } from 'sap/m/ListBase';
 import { RadioButtonGroup$SelectEvent } from 'sap/m/RadioButtonGroup';
 import { setLanguage } from 'kms/common/Language.Helpers';
 import MessageToast from 'sap/m/MessageToast';
@@ -84,7 +84,7 @@ export default class SettingsDialogHandler {
         this.settingsDialog?.close();
     }
 
-    public onSettingsNavSelect(event: List$SelectionChangeEvent): void {
+    public onSettingsNavSelect(event: ListBase$SelectionChangeEvent): void {
         const selectedItem = event.getParameter('listItem');
         const selectedKey = selectedItem?.data('key') as string;
 
@@ -106,7 +106,7 @@ export default class SettingsDialogHandler {
     public onLanguageChanged(): void {
         const selectedLanguageIndex: number = this.settingsOneWayModel.getProperty('/selectedLanguageIndex') as number;
         const selectedLanguage = Object.entries(languageMapping)
-            .find(([_, value]) => value === selectedLanguageIndex);
+            .find(([, value]) => value === selectedLanguageIndex);
         if (!selectedLanguage) {
             throw new Error('Invalid language index');
         }

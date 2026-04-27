@@ -16,8 +16,6 @@ import { setGroupRole } from 'kms/common/Formatters';
 import ForbiddenStateService from '../utils/ForbiddenState';
 import EventBus from 'sap/ui/core/EventBus';
 import Auth from 'kms/services/Auth.service';
-import { showErrorMessage } from 'kms/common/Helpers';
-import { AxiosError } from 'axios';
 /**
  * @namespace kms
  */
