@@ -1,4 +1,3 @@
-
 import Fragment from 'sap/ui/core/Fragment';
 import JSONModel from 'sap/ui/model/json/JSONModel';
 import Dialog from 'sap/m/Dialog';
@@ -30,19 +29,19 @@ const languageNames: Record<string, string> = {
 };
 
 interface WorkflowSettings {
-    enabled: boolean;
-    minimumApprovals: number;
-    defaultExpiryPeriodDays: number;
-    maxExpiryPeriodDays: number;
-    retentionPeriodDays: number;
+    enabled: boolean
+    minimumApprovals: number
+    defaultExpiryPeriodDays: number
+    maxExpiryPeriodDays: number
+    retentionPeriodDays: number
 }
 
 interface TenantInfo {
-    role: string;
+    role: string
 }
 
 interface RoleBasedAccessSettings {
-    canManage: boolean;
+    canManage: boolean
 }
 
 export default class SettingsDialogHandler {
@@ -125,11 +124,11 @@ export default class SettingsDialogHandler {
         }
         const currentSettings = this.settingsWorkflowModel.getData() as WorkflowSettings;
         return (
-            currentSettings.enabled !== this.originalWorkflowSettings.enabled ||
-            currentSettings.minimumApprovals !== this.originalWorkflowSettings.minimumApprovals ||
-            currentSettings.defaultExpiryPeriodDays !== this.originalWorkflowSettings.defaultExpiryPeriodDays ||
-            currentSettings.maxExpiryPeriodDays !== this.originalWorkflowSettings.maxExpiryPeriodDays ||
-            currentSettings.retentionPeriodDays !== this.originalWorkflowSettings.retentionPeriodDays
+            currentSettings.enabled !== this.originalWorkflowSettings.enabled
+            || currentSettings.minimumApprovals !== this.originalWorkflowSettings.minimumApprovals
+            || currentSettings.defaultExpiryPeriodDays !== this.originalWorkflowSettings.defaultExpiryPeriodDays
+            || currentSettings.maxExpiryPeriodDays !== this.originalWorkflowSettings.maxExpiryPeriodDays
+            || currentSettings.retentionPeriodDays !== this.originalWorkflowSettings.retentionPeriodDays
         );
     }
 
