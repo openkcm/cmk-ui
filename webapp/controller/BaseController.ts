@@ -43,7 +43,7 @@ export default class BaseController extends Controller {
         return getText(key, params);
     }
 
-    public onBreadCrumbLinkPress(event: Link$PressEvent, pageName: string, params?: object): void {
+    public onBreadCrumbLinkPress(_event: Link$PressEvent, pageName: string, params?: object): void {
         this.getRouter().navTo(pageName, { tenantId: this.tenantId, ...params });
     }
 }

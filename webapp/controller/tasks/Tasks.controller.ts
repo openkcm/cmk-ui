@@ -85,13 +85,13 @@ export default class Tasks extends BaseController {
         });
     }
 
-    private async onNextPage() {
+    public async onNextPage() {
         this.currentPage++;
         this.skip += 10;
         await this.getTasks();
     }
 
-    private async onPreviousPage() {
+    public async onPreviousPage() {
         this.currentPage--;
         this.skip -= 10;
         await this.getTasks();

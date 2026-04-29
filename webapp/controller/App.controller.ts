@@ -22,7 +22,6 @@ import { AxiosError } from 'axios';
  * @namespace kms
  */
 export default class App extends BaseController {
-    private api: Api;
     private userPopover: ResponsivePopover | undefined;
     private readonly oneWayModel = new JSONModel(
         {
@@ -65,7 +64,6 @@ export default class App extends BaseController {
             this.setModel(this.oneWayModel, 'oneWay');
             this.setModel(this.twoWayModel, 'twoWay');
 
-            this.api = Api.getInstance();
             const userInfoModel = component?.getModel('userInfo');
             let userInfo: UserData | undefined;
             if (userInfoModel && userInfoModel instanceof JSONModel) {
@@ -303,7 +301,6 @@ export default class App extends BaseController {
             const selectedTenantName = item.getText();
             this.twoWayModel.setProperty('/selectedTenant', selectedTenant);
             this.twoWayModel.setProperty('/selectedTenantName', selectedTenantName);
-            this.api = Api.getInstance();
             Api.updateTenantId(selectedTenant || '');
             this.navigateToSelectedPage();
         }

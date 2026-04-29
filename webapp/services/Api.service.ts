@@ -30,8 +30,6 @@ export default class Api {
     private tenantName: string | undefined;
     private userInfo: UserData | undefined;
     private static setAxiosHeaderCSRFCookie: (tenantID: string) => void;
-    private hasHandledFirstAuthError = false;
-    private isLoginInProgress = false;
 
     constructor(baseUrl: string) {
         this.baseURL = baseUrl;

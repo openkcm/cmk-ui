@@ -206,5 +206,5 @@ export function formatErrorDetails(status: string, errorMessage: string): string
 }
 
 export function isErrorStatus(status: string): boolean {
-    return status === SystemStatus.FAILED;
+    return (status as SystemStatus) === SystemStatus.FAILED;
 }

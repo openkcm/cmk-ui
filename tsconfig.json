@@ -10,6 +10,8 @@
 		"noImplicitAny": true,
 		"strictNullChecks": true,
 		"strictPropertyInitialization": false,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
 		"sourceMap": false,
 		"inlineSourceMap": false,
 		"declaration": false,

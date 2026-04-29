@@ -83,13 +83,13 @@ export default class Keys extends BaseController {
         this.oneWayModel.setProperty('/hyokProviders', hyokProviders);
     }
 
-    private async onNextPage(): Promise<void> {
+    public async onNextPage(): Promise<void> {
         this.currentPage++;
         this.skip += 10;
         await this.setKeyConfigs();
     }
 
-    private async onPreviousPage(): Promise<void> {
+    public async onPreviousPage(): Promise<void> {
         this.currentPage--;
         this.skip -= 10;
         await this.setKeyConfigs();

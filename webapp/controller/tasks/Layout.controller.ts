@@ -1,15 +1,12 @@
 import BaseController from 'kms/controller/BaseController';
 import BindingMode from 'sap/ui/model/BindingMode';
 import JSONModel from 'sap/ui/model/json/JSONModel';
-import Api from 'kms/services/Api.service';
 import { Router$RouteMatchedEvent } from 'sap/ui/core/routing/Router';
 
 /**
  * @namespace kms
  */
 export default class Tasks extends BaseController {
-    private api: Api;
-
     private readonly oneWayModel = new JSONModel({});
 
     public onInit(): void {
@@ -23,7 +20,6 @@ export default class Tasks extends BaseController {
     public onRouteMatched(event: Router$RouteMatchedEvent): void {
         const routeName = event.getParameter('name');
         const routeArgs = event.getParameter('arguments') as { tenantId: string };
-        this.api = Api.getInstance();
         this.tenantId = routeArgs?.tenantId;
         if (routeName && typeof routeName === 'string') {
             if (routeName === 'tasks') {

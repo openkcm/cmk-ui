@@ -101,13 +101,13 @@ export default class Systems extends BaseController {
         });
     }
 
-    private onNextPage() {
+    public onNextPage() {
         this.currentPage++;
         this.skip += 10;
         this.updateSystemsTable();
     }
 
-    private onPreviousPage() {
+    public onPreviousPage() {
         this.currentPage--;
         this.skip -= 10;
         this.updateSystemsTable();

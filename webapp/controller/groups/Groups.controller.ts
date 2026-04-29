@@ -72,13 +72,13 @@ export default class Group extends BaseController {
         });
     }
 
-    private async onNextPage() {
+    public async onNextPage() {
         this.currentPage++;
         this.skip += 10;
         await this.setGroups();
     }
 
-    private async onPreviousPage() {
+    public async onPreviousPage() {
         this.currentPage--;
         this.skip -= 10;
         await this.setGroups();

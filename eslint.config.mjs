@@ -20,6 +20,12 @@ export default tseslint.config(
       "@typescript-eslint/prefer-nullish-coalescing": "off",
       "@typescript-eslint/unified-signatures": "off",
       "@typescript-eslint/no-unnecessary-condition": "off",
+      "@typescript-eslint/no-unused-vars": ["error", {
+        vars: "all",
+        args: "after-used",
+        ignoreRestSiblings: true,
+      }],
+      "no-unused-private-class-members": "error",
       "@stylistic/quotes": ["error", "single", { avoidEscape: true }],
       "@stylistic/indent": ["error", 4],
       "@stylistic/semi": ["error", "always"],

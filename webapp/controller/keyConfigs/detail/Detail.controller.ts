@@ -299,7 +299,7 @@ export default class KeyConfigDetail extends BaseController {
                 void this.connectSystem(selectedSystemId);
             },
             onWorkflowRequired: () => {
-                void this.createWorkflowForSystemConnection(selectedSystemId, workflowParams);
+                void this.createWorkflowForSystemConnection(workflowParams);
             },
             onError: () => {
                 this.getView()?.setBusy(false);
@@ -323,7 +323,7 @@ export default class KeyConfigDetail extends BaseController {
         }
     }
 
-    private async createWorkflowForSystemConnection(systemId: string, workflowParams: WorkflowParams): Promise<void> {
+    private async createWorkflowForSystemConnection(workflowParams: WorkflowParams): Promise<void> {
         try {
             await this.workflowComponent?.createWorkflow(workflowParams);
         }
@@ -389,25 +389,25 @@ export default class KeyConfigDetail extends BaseController {
     }
 
     //* We have two tables one for Keys and one for Systems, hence two sets of navigation functions *//
-    private async onKeysNextPage() {
+    public async onKeysNextPage() {
         this.keysCurrentPage++;
         this.keysSkip += 10;
         await this.updateKeysTable();
     }
 
-    private async onKeysPreviousPage() {
+    public async onKeysPreviousPage() {
         this.keysCurrentPage--;
         this.keysSkip -= 10;
         await this.updateKeysTable();
     }
 
-    private async onSystemsNextPage() {
+    public async onSystemsNextPage() {
         this.systemsCurrentPage++;
         this.systemsSkip += 10;
         await this.updateSystemsTable();
     }
 
-    private async onSystemsPreviousPage() {
+    public async onSystemsPreviousPage() {
         this.systemsCurrentPage--;
         this.systemsSkip -= 10;
         await this.updateSystemsTable();
