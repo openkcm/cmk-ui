@@ -1,0 +1,114 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:l="sap.ui.layout"
+>
+    <Dialog
+        id="addCryptoCertsDialog"
+        title="{i18n>addCryptoCertsTitle}"
+        contentWidth="36rem"
+        escapeHandler=".onCancelAddCryptoCerts"
+    >
+        <content>
+            <VBox class="sapUiSmallMargin">
+                <MessageStrip
+                    id="allCertsAssignedStrip"
+                    text="{i18n>allCryptoCertsAssigned}"
+                    type="Information"
+                    showIcon="true"
+                    visible="{addCryptoCertsModel>/allCertsAssigned}"
+                    class="sapUiSmallMarginBottom"
+                />
+                <VBox visible="{= !${addCryptoCertsModel>/allCertsAssigned}}">
+                    <Text text="{i18n>selectCryptoCert}" class="sapUiSmallMarginBottom" />
+                    <VBox items="{addCryptoCertsModel>/newCryptoCertEntries}"
+                        class="sapUiSmallMarginBottom">
+                        <VBox class="sapUiSmallMarginBottom">
+                            <HBox alignItems="Center">
+                                <VBox width="100%">
+                                    <VBox width="100%" items="{addCryptoCertsModel>selectedCerts}"
+                                        class="sapUiSmallMarginBottom">
+                                        <VBox class="sapUiTinyMarginBottom">
+                                            <Label text="{i18n>name}:" />
+                                            <Text text="{addCryptoCertsModel>name}" wrapping="true" />
+                                            <Label text="{i18n>rootCALabel}:"
+                                                class="sapUiTinyMarginTop" />
+                                            <Text text="{addCryptoCertsModel>rootCA}"
+                                                wrapping="true" />
+                                            <Label text="{i18n>subject}:" class="sapUiTinyMarginTop" />
+                                            <Text text="{addCryptoCertsModel>subject}"
+                                                wrapping="true" />
+                                        </VBox>
+                                    </VBox>
+                                    <Label text="{i18n>trustAnchorARN}:" class="sapUiTinyMarginTop"
+                                        required="true" />
+                                    <Input
+                                        value="{addCryptoCertsModel>trustAnchorArn}"
+                                        valueLiveUpdate="true"
+                                        liveChange=".onAddCryptoCertLiveChange"
+                                    />
+                                    <Label text="{i18n>roleARN}:" class="sapUiTinyMarginTop"
+                                        required="true" />
+                                    <Input
+                                        value="{addCryptoCertsModel>roleArn}"
+                                        valueLiveUpdate="true"
+                                        liveChange=".onAddCryptoCertLiveChange"
+                                    />
+                                    <Label text="{i18n>profileARN}:" class="sapUiTinyMarginTop"
+                                        required="true" />
+                                    <Input
+                                        value="{addCryptoCertsModel>profileArn}"
+                                        valueLiveUpdate="true"
+                                        liveChange=".onAddCryptoCertLiveChange"
+                                    />
+                                </VBox>
+                                <Button
+                                    icon="sap-icon://decline"
+                                    type="Transparent"
+                                    press=".onRemoveNewCryptoCertEntry"
+                                    class="sapUiSmallMarginBegin"
+                                />
+                            </HBox>
+                        </VBox>
+                    </VBox>
+                    <VBox visible="{addCryptoCertsModel>/canAddMore}">
+                        <HBox width="100%" alignItems="Center" class="sapUiSmallMarginTop">
+                            <MultiComboBox
+                                id="addCryptoCertsMultiComboBox"
+                                items="{
+                                    path: 'addCryptoCertsModel>/availableCerts'
+                                }"
+                                selectedKeys="{addCryptoCertsModel>/selectedCertKeys}"
+                                showSelectAll="false"
+                                selectionFinish=".onAddCryptoCertSelectionFinish"
+                                width="100%"
+                                placeholder="{i18n>selectCryptoCert}"
+                            >
+                                <core:Item
+                                    key="{addCryptoCertsModel>name}"
+                                    text="{addCryptoCertsModel>name}"
+                                />
+                            </MultiComboBox>
+                        </HBox>
+                    </VBox>
+                </VBox>
+            </VBox>
+        </content>
+        <beginButton>
+            <Button
+                text="{i18n>save}"
+                type="Emphasized"
+                press=".onSaveAddCryptoCerts"
+                enabled="{addCryptoCertsModel>/saveEnabled}"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="{i18n>cancel}"
+                type="Transparent"
+                press=".onCancelAddCryptoCerts"
+            />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>
