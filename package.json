@@ -9,7 +9,7 @@
     "@openui5/types": "^1.146.0",
     "@types/axios": "^0.14.4",
     "@ui5/cli": "^4.0.51",
-    "axios": "^1.15.0",
+    "axios": "^1.17.0",
     "cors": "^2.8.6",
     "fflate": "^0.8.2",
     "http-server": "^14.1.1",
