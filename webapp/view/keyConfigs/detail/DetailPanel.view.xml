@@ -142,6 +142,31 @@
                     </ObjectPageSubSection>
                 </subSections>
             </ObjectPageSection>
+            <ObjectPageSection titleUppercase="false" id="detailPanelObjectPageSectionSystemError"
+                title="{i18n>errorDetails}"
+                visible="{= ${oneWay>/type} === 'system' &amp;&amp; ${oneWay>/selectedSystem/status} === 'FAILED'}">
+                <subSections>
+                    <ObjectPageSubSection>
+                        <m:VBox class="sapUiSmallMargin">
+                            <m:MessageStrip
+                                text="{parts: ['oneWay>/selectedSystem/status', 'oneWay>/selectedSystem/metadata/errorMessage'], formatter: 'commonFormatter.formatErrorDetails'}"
+                                type="Error"
+                                showIcon="true"
+                                showCloseButton="false"
+                                class="sapUiSmallMarginBottom" />
+                            <forms:SimpleForm editable="false"
+                                layout="ResponsiveGridLayout"
+                                labelSpanXL="3" labelSpanL="3" labelSpanM="3" labelSpanS="12"
+                                emptySpanXL="4" emptySpanL="4" emptySpanM="4" emptySpanS="0">
+                                <m:Label text="{i18n>errorCode}" />
+                                <m:Text text="{oneWay>/selectedSystem/metadata/errorCode}" />
+                                <m:Label text="{i18n>errorMessage}" />
+                                <m:Text text="{oneWay>/selectedSystem/metadata/errorMessage}" />
+                            </forms:SimpleForm>
+                        </m:VBox>
+                    </ObjectPageSubSection>
+                </subSections>
+            </ObjectPageSection>
             <ObjectPageSection titleUppercase="false" id="hyokManagementDetailsSection"
                 visible="{= ${oneWay>/type} === 'key' &amp;&amp; ${oneWay>/selectedKey/type} === 'HYOK' }"
                 title="{i18n>managementRole}"
