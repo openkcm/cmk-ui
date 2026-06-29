@@ -1,13 +1,12 @@
 <core:FragmentDefinition xmlns="sap.m"
-    xmlns:core="sap.ui.core"
-    xmlns:layout="sap.ui.layout"
-    xmlns:forms="sap.ui.layout.form">
+                         xmlns:core="sap.ui.core"
+                         xmlns:forms="sap.ui.layout.form">
     <forms:Form width="100%">
         <forms:layout>
             <forms:ColumnLayout
-                columnsM="1"
-                columnsL="1"
-                columnsXL="1" />
+                    columnsM="1"
+                    columnsL="1"
+                    columnsXL="1" />
         </forms:layout>
         <forms:toolbar>
             <OverflowToolbar>
@@ -16,7 +15,7 @@
         </forms:toolbar>
         <forms:formContainers>
             <forms:FormContainer
-                visible="{= !${oneWay>/cryptoInEditMode}}">
+                    visible="{= !${oneWay>/cryptoInEditMode} &amp;&amp; ${oneWay>/selectedKey/provider} === 'AWS'}">
                 <forms:formElements>
                     <forms:FormElement label="{i18n>trustAnchorARN}">
                         <forms:fields>
@@ -33,13 +32,22 @@
                             <Text text="{twoWay>value/profileArn}" wrapping="true" />
                         </forms:fields>
                     </forms:FormElement>
-
+                </forms:formElements>
+            </forms:FormContainer>
+            <forms:FormContainer
+                    visible="{= !${oneWay>/cryptoInEditMode} &amp;&amp; ${oneWay>/selectedKey/provider} === 'FORTANIX'}">
+                <forms:formElements>
+                    <forms:FormElement label="{i18n>applicationId}">
+                        <forms:fields>
+                            <Text text="{twoWay>value/applicationId}" wrapping="true" />
+                        </forms:fields>
+                    </forms:FormElement>
                 </forms:formElements>
             </forms:FormContainer>
             <!-- Important: this part will be uncommented once the story to make HYOK EDITABLE is
             implemented -->
             <forms:FormContainer
-                visible="{= ${oneWay>/cryptoInEditMode} &amp;&amp; ${twoWay>value/isEditable}}">
+                    visible="{= ${oneWay>/cryptoInEditMode} &amp;&amp; ${twoWay>value/isEditable} &amp;&amp; ${oneWay>/selectedKey/provider} === 'AWS'}">
                 <forms:formElements>
                     <forms:FormElement label="{i18n>trustAnchorARN}">
                         <forms:fields>
@@ -56,11 +64,18 @@
                             <Input value="{twoWay>value/profileArn}" />
                         </forms:fields>
                     </forms:FormElement>
-
+                </forms:formElements>
+            </forms:FormContainer>
+            <forms:FormContainer
+                    visible="{= ${oneWay>/cryptoInEditMode} &amp;&amp; ${twoWay>value/isEditable} &amp;&amp; ${oneWay>/selectedKey/provider} === 'FORTANIX'}">
+                <forms:formElements>
+                    <forms:FormElement label="{i18n>applicationId}">
+                        <forms:fields>
+                            <Input value="{twoWay>value/applicationId}" />
+                        </forms:fields>
+                    </forms:FormElement>
                 </forms:formElements>
             </forms:FormContainer>
         </forms:formContainers>
     </forms:Form>
-
-
 </core:FragmentDefinition>
