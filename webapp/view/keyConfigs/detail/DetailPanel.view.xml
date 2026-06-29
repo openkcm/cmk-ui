@@ -41,7 +41,7 @@
                 <expandedContent>
                     <m:VBox visible="{= ${oneWay>/type} === 'key'}">
                         <m:Label
-                            text="{oneWay>/selectedKey/provider} • {oneWay>/selectedKey/region}" />
+                            text="{oneWay>/selectedKey/type} • {oneWay>/selectedKey/provider} • {oneWay>/selectedKey/region}" />
                         <m:HBox justifyContent="Start" alignContent="Center" alignItems="Center">
                             <m:Label text="{oneWay>/selectedKey/id}" />
                             <m:Button icon="sap-icon://copy" type="Transparent"
