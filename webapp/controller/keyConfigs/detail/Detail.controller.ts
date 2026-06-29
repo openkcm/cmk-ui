@@ -149,7 +149,7 @@ export default class KeyConfigDetail extends BaseController {
         this.oneWayModel.setProperty('/keyConfigDetail', routeName === 'keyConfigDetail');
         this.setHyokProviders();
         const routeArgs = event.getParameter('arguments') as { 'tenantId': string, 'keyConfigId'?: string, '?query': { connectSystem?: string, createKey?: string, keyType?: KeyCreationTypes, keySubtype?: HYOKProviders | BYOKProviders } };
-        const queryParams = routeArgs['?query'] as { connectSystem?: string, createKey?: string, keyType?: KeyCreationTypes, keySubtype?: HYOKProviders | BYOKProviders };
+        const queryParams = routeArgs['?query'];
         this.keyConfigId = routeArgs.keyConfigId || '';
 
         this.api = Api.getInstance();
@@ -578,7 +578,7 @@ export default class KeyConfigDetail extends BaseController {
         const keyConfig = this.twoWayModel.getProperty('/keyConfig') as KeyConfig;
         const payload = {
             name: keyConfig.name
-        } as KeyConfigPatchPayload;
+        };
 
         try {
             await this.patchKeyConfigData(payload);

@@ -175,19 +175,13 @@ export default class Group extends BaseController {
     };
 
     public async onGroupCreationCreatePress(): Promise<void> {
-        interface GroupPostPayload {
-            name: string
-            description: string
-            role: string
-        }
-
         const name = this.createGroupModel.getProperty('/name') as string;
         const description = this.createGroupModel.getProperty('/description') as string;
         const newGroup = {
             name: name,
             description: description,
             role: 'KEY_ADMINISTRATOR'
-        } as GroupPostPayload;
+        };
 
         this.getView()?.setBusy(true);
         try {
