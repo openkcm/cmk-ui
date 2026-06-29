@@ -1,15 +1,11 @@
 <core:FragmentDefinition
     xmlns="sap.m"
-    xmlns:core="sap.ui.core"
-    xmlns:form="sap.ui.layout.form"
-    xmlns:l="sap.ui.layout"
->
+    xmlns:core="sap.ui.core">
     <Dialog
         id="addCryptoCertsDialog"
         title="{i18n>addCryptoCertsTitle}"
         contentWidth="36rem"
-        escapeHandler=".onCancelAddCryptoCerts"
-    >
+        escapeHandler=".onCancelAddCryptoCerts">
         <content>
             <VBox class="sapUiSmallMargin">
                 <MessageStrip
@@ -18,8 +14,7 @@
                     type="Information"
                     showIcon="true"
                     visible="{addCryptoCertsModel>/allCertsAssigned}"
-                    class="sapUiSmallMarginBottom"
-                />
+                    class="sapUiSmallMarginBottom"/>
                 <VBox visible="{= !${addCryptoCertsModel>/allCertsAssigned}}">
                     <Text text="{i18n>selectCryptoCert}" class="sapUiSmallMarginBottom" />
                     <VBox items="{addCryptoCertsModel>/newCryptoCertEntries}"
@@ -41,34 +36,35 @@
                                                 wrapping="true" />
                                         </VBox>
                                     </VBox>
-                                    <Label text="{i18n>trustAnchorARN}:" class="sapUiTinyMarginTop"
-                                        required="true" />
-                                    <Input
-                                        value="{addCryptoCertsModel>trustAnchorArn}"
-                                        valueLiveUpdate="true"
-                                        liveChange=".onAddCryptoCertLiveChange"
-                                    />
-                                    <Label text="{i18n>roleARN}:" class="sapUiTinyMarginTop"
-                                        required="true" />
-                                    <Input
-                                        value="{addCryptoCertsModel>roleArn}"
-                                        valueLiveUpdate="true"
-                                        liveChange=".onAddCryptoCertLiveChange"
-                                    />
-                                    <Label text="{i18n>profileARN}:" class="sapUiTinyMarginTop"
-                                        required="true" />
-                                    <Input
-                                        value="{addCryptoCertsModel>profileArn}"
-                                        valueLiveUpdate="true"
-                                        liveChange=".onAddCryptoCertLiveChange"
-                                    />
+                                    <VBox visible="{= ${addCryptoCertsModel>/provider} === 'AWS'}">
+                                        <Label text="{i18n>trustAnchorARN}:" class="sapUiTinyMarginTop"
+                                               required="true" />
+                                        <Input value="{addCryptoCertsModel>trustAnchorArn}"
+                                               valueLiveUpdate="true"
+                                               liveChange=".onAddCryptoCertLiveChange"/>
+                                        <Label text="{i18n>roleARN}:" class="sapUiTinyMarginTop"
+                                               required="true" />
+                                        <Input value="{addCryptoCertsModel>roleArn}"
+                                               valueLiveUpdate="true"
+                                               liveChange=".onAddCryptoCertLiveChange"/>
+                                        <Label text="{i18n>profileARN}:" class="sapUiTinyMarginTop"
+                                               required="true" />
+                                        <Input value="{addCryptoCertsModel>profileArn}"
+                                               valueLiveUpdate="true"
+                                               liveChange=".onAddCryptoCertLiveChange"/>
+                                    </VBox>
+                                    <VBox visible="{= ${addCryptoCertsModel>/provider} === 'FORTANIX'}">
+                                        <Label text="{i18n>applicationId}:" class="sapUiTinyMarginTop"
+                                               required="true" />
+                                        <Input value="{addCryptoCertsModel>applicationId}"
+                                               valueLiveUpdate="true"
+                                               liveChange=".onAddCryptoCertLiveChange"/>
+                                    </VBox>
                                 </VBox>
-                                <Button
-                                    icon="sap-icon://decline"
-                                    type="Transparent"
-                                    press=".onRemoveNewCryptoCertEntry"
-                                    class="sapUiSmallMarginBegin"
-                                />
+                                <Button icon="sap-icon://decline"
+                                        type="Transparent"
+                                        press=".onRemoveNewCryptoCertEntry"
+                                        class="sapUiSmallMarginBegin"/>
                             </HBox>
                         </VBox>
                     </VBox>
@@ -83,12 +79,10 @@
                                 showSelectAll="false"
                                 selectionFinish=".onAddCryptoCertSelectionFinish"
                                 width="100%"
-                                placeholder="{i18n>selectCryptoCert}"
-                            >
+                                placeholder="{i18n>selectCryptoCert}">
                                 <core:Item
                                     key="{addCryptoCertsModel>name}"
-                                    text="{addCryptoCertsModel>name}"
-                                />
+                                    text="{addCryptoCertsModel>name}"/>
                             </MultiComboBox>
                         </HBox>
                     </VBox>
@@ -100,15 +94,13 @@
                 text="{i18n>save}"
                 type="Emphasized"
                 press=".onSaveAddCryptoCerts"
-                enabled="{addCryptoCertsModel>/saveEnabled}"
-            />
+                enabled="{addCryptoCertsModel>/saveEnabled}"/>
         </beginButton>
         <endButton>
             <Button
                 text="{i18n>cancel}"
                 type="Transparent"
-                press=".onCancelAddCryptoCerts"
-            />
+                press=".onCancelAddCryptoCerts"/>
         </endButton>
     </Dialog>
 </core:FragmentDefinition>
