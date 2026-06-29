@@ -2,9 +2,9 @@ import { BYOKProviders, HYOKProviders, KeyCreationTypes } from 'kms/common/Enums
 import {
     MangedKeyPayload,
     HyokKeyPayload,
-    hyokCertificates,
-    hyokCryptoCertInput,
-    hyokAWSManagementCertInput,
+    HyokCertificates,
+    HyokCryptoCertInput,
+    HyokAWSManagementCertInput,
     AWSAccessDetails, FortanixAccessDetails
 } from 'kms/common/Types';
 import { getErrorContext, getErrorDataMessage, showErrorMessage } from 'kms/common/Helpers';
@@ -30,11 +30,11 @@ type KeyCreateCallBackFn = (payload: MangedKeyPayload | HyokKeyPayload) => Promi
 interface HYOKAWScertificates {
     tenantDefault: {
         count: number
-        value: hyokCertificates[]
+        value: HyokCertificates[]
     }
     crypto: {
         count: number
-        value: hyokCertificates[]
+        value: HyokCertificates[]
     }
 }
 
@@ -51,8 +51,8 @@ export default class HyokKeyRegistration extends BaseController {
     private subtype: HYOKProviders | BYOKProviders;
     private keyConfigId: string;
     private onKeyCreateCallBackfnc: KeyCreateCallBackFn;
-    private managementDefaultModel: hyokAWSManagementCertInput = { trustAnchorARN: null, roleARN: null, rootCA: null };
-    private cryptoDefaultModel: hyokCryptoCertInput = { trustAnchorCryptoARN: null, roleCryptoARN: null, rootCryptoCA: null, cryptoApplicationId: null, selectedCryptoRolesCertKeys: [], selectedCryptoCerts: [] };
+    private managementDefaultModel: HyokAWSManagementCertInput = { trustAnchorARN: null, roleARN: null, rootCA: null };
+    private cryptoDefaultModel: HyokCryptoCertInput = { trustAnchorCryptoARN: null, roleCryptoARN: null, rootCryptoCA: null, cryptoApplicationId: null, selectedCryptoRolesCertKeys: [], selectedCryptoCerts: [] };
 
     public openHyokKeyCreationWizard(keyCreationParams: KeyCreationParams, parentController: KeyConfigDetail, api: Api, onKeyCreateCallBackfnc: KeyCreateCallBackFn): void {
         this.type = keyCreationParams.keyType;
@@ -117,7 +117,7 @@ export default class HyokKeyRegistration extends BaseController {
 
     private resetModel() {
         this.keyCreatePopover?.setBusy(true);
-        this.getHYOKAWSCertificates().then((certs: { hyokAWSManagementCerts: hyokCertificates[], cryptoRolesCerts: hyokCertificates[] }) => {
+        this.getHYOKAWSCertificates().then((certs: { hyokAWSManagementCerts: HyokCertificates[], cryptoRolesCerts: HyokCertificates[] }) => {
             this.keyCreationModel.setData({
                 keyName: '' as string,
                 nativeId: '' as string,
@@ -129,9 +129,9 @@ export default class HyokKeyRegistration extends BaseController {
                 cryptoRolesCerts: certs?.cryptoRolesCerts,
                 availableCryptoCertsSelectionList: certs?.cryptoRolesCerts,
                 hyokAWSManagementCertObj: this.managementDefaultModel,
-                hyokCryptoCertObj: null as hyokCryptoCertInput[] | null,
+                hyokCryptoCertObj: null as HyokCryptoCertInput[] | null,
                 selectedCryptoRolesCertKeys: [] as string[],
-                selectedCryptoCertItems: [] as hyokCertificates[],
+                selectedCryptoCertItems: [] as HyokCertificates[],
                 allowAddMoreCryptoCert: true as boolean
             }, true);
         }).catch((err: unknown) => {
@@ -229,7 +229,7 @@ export default class HyokKeyRegistration extends BaseController {
     // this is only for AWS HYOK
     public addARNs(): void {
         this.keyCreatePopover?.setBusy(true);
-        let hyokCryptoCertObj = this.keyCreationModel.getProperty('/hyokCryptoCertObj') as hyokCryptoCertInput[] || [];
+        let hyokCryptoCertObj = this.keyCreationModel.getProperty('/hyokCryptoCertObj') as HyokCryptoCertInput[] || [];
         const selectedCryptoRolesCertKeys = this.keyCreationModel.getProperty('/selectedCryptoRolesCertKeys') as string[];
 
         // EDGE CASE: if no certs are selected (can happen if the user clicks outside the scope of the listed items), return
@@ -238,12 +238,12 @@ export default class HyokKeyRegistration extends BaseController {
             return;
         }
 
-        const allCryptoCerts = this.keyCreationModel.getProperty('/cryptoRolesCerts') as hyokCertificates[];
-        const selectedCryptoCerts = allCryptoCerts.filter((cert: hyokCertificates) => selectedCryptoRolesCertKeys.includes(cert.name));
+        const allCryptoCerts = this.keyCreationModel.getProperty('/cryptoRolesCerts') as HyokCertificates[];
+        const selectedCryptoCerts = allCryptoCerts.filter((cert: HyokCertificates) => selectedCryptoRolesCertKeys.includes(cert.name));
 
         hyokCryptoCertObj = [...hyokCryptoCertObj, { ...this.cryptoDefaultModel, selectedCryptoRolesCertKeys, selectedCryptoCerts }];
         this.keyCreationModel.setProperty('/hyokCryptoCertObj', hyokCryptoCertObj);
-        let availableCryptoCertsSelectionList = this.keyCreationModel.getProperty('/availableCryptoCertsSelectionList') as hyokCertificates[];
+        let availableCryptoCertsSelectionList = this.keyCreationModel.getProperty('/availableCryptoCertsSelectionList') as HyokCertificates[];
         availableCryptoCertsSelectionList = availableCryptoCertsSelectionList.filter(cert => !selectedCryptoRolesCertKeys.includes(cert.name));
 
         this.keyCreationModel.setProperty('/availableCryptoCertsSelectionList', availableCryptoCertsSelectionList);
@@ -256,7 +256,7 @@ export default class HyokKeyRegistration extends BaseController {
     }
 
     public setManagementCertStepValidation(): void {
-        const hyokAWSManagementCertObj = this.keyCreationModel.getProperty('/hyokAWSManagementCertObj') as hyokAWSManagementCertInput;
+        const hyokAWSManagementCertObj = this.keyCreationModel.getProperty('/hyokAWSManagementCertObj') as HyokAWSManagementCertInput;
         const managementRolesComplete
             = (hyokAWSManagementCertObj?.trustAnchorARN ?? '').length > 0
               && (hyokAWSManagementCertObj?.roleARN ?? '').length > 0
@@ -276,13 +276,13 @@ export default class HyokKeyRegistration extends BaseController {
         const index = parseInt(lastSegment, 10);
 
         // Remove item at 'index' from 'hyokCryptoCertObj'
-        const hyokCryptoCertObj = this.keyCreationModel.getProperty('/hyokCryptoCertObj') as hyokCryptoCertInput[];
-        const removedCerts = hyokCryptoCertObj[index].selectedCryptoCerts as hyokCertificates[] | [];
+        const hyokCryptoCertObj = this.keyCreationModel.getProperty('/hyokCryptoCertObj') as HyokCryptoCertInput[];
+        const removedCerts = hyokCryptoCertObj[index].selectedCryptoCerts as HyokCertificates[] | [];
         const newArray = hyokCryptoCertObj.filter((_, i) => i !== index);
         this.keyCreationModel.setProperty('/hyokCryptoCertObj', newArray);
 
         // Add certs back to availableCryptoCertsSelectionList
-        let availableCryptoCertsSelectionList = this.keyCreationModel.getProperty('/availableCryptoCertsSelectionList') as hyokCertificates[] || [];
+        let availableCryptoCertsSelectionList = this.keyCreationModel.getProperty('/availableCryptoCertsSelectionList') as HyokCertificates[] || [];
         availableCryptoCertsSelectionList = [...availableCryptoCertsSelectionList, ...removedCerts];
         this.keyCreationModel.setProperty('/availableCryptoCertsSelectionList', availableCryptoCertsSelectionList);
         if (availableCryptoCertsSelectionList.length > 0) {
@@ -290,7 +290,7 @@ export default class HyokKeyRegistration extends BaseController {
         }
     }
 
-    private async getHYOKAWSCertificates(): Promise<{ hyokAWSManagementCerts: hyokCertificates[], cryptoRolesCerts: hyokCertificates[] }> {
+    private async getHYOKAWSCertificates(): Promise<{ hyokAWSManagementCerts: HyokCertificates[], cryptoRolesCerts: HyokCertificates[] }> {
         const hyokAWScertificates = await this.api.get<HYOKAWScertificates>(`keyConfigurations/${this.keyConfigId}/certificates`);
         return {
             hyokAWSManagementCerts: hyokAWScertificates?.tenantDefault?.value ?? [],
@@ -306,12 +306,12 @@ export default class HyokKeyRegistration extends BaseController {
 
     private getCryptoPayload(): Record<string, AWSAccessDetails | FortanixAccessDetails> {
         let cryptoPayload = {};
-        const hyokCryptoCertObj = this.keyCreationModel.getProperty('/hyokCryptoCertObj') as hyokCryptoCertInput[];
+        const hyokCryptoCertObj = this.keyCreationModel.getProperty('/hyokCryptoCertObj') as HyokCryptoCertInput[];
 
         if (!hyokCryptoCertObj || hyokCryptoCertObj?.length === 0) {
             return cryptoPayload;
         }
-        hyokCryptoCertObj?.forEach((cryptoCert: hyokCryptoCertInput) => {
+        hyokCryptoCertObj?.forEach((cryptoCert: HyokCryptoCertInput) => {
             if (this.subtype === HYOKProviders.AWS && (cryptoCert.roleCryptoARN === null || cryptoCert.trustAnchorCryptoARN === null || cryptoCert.rootCryptoCA === null || cryptoCert?.selectedCryptoRolesCertKeys?.length === 0)) {
                 return;
             }
