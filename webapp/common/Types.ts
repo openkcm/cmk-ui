@@ -169,6 +169,7 @@ export interface AWSAccessDetails {
 export interface FortanixAccessDetails {
     host: string
     applicationId: string
+    isEditable?: boolean
 }
 export interface AccessDetails {
     management: AWSAccessDetails | FortanixAccessDetails

@@ -225,10 +225,15 @@
                                     </m:HBox>
                                 </m:HBox>
                             </m:HBox>
-                            <m:VBox items="{twoWay>/selectedKey/accessDetails/cryptoARNsArray}">
+                            <m:VBox items="{twoWay>/selectedKey/accessDetails/cryptoARNsArray}" visible="{= !${oneWay>/cryptoInEditMode}}">
                                 <core:Fragment
                                     fragmentName="kms.resources.fragments.keys.HyokCryptoRoleDetailsForm"
                                     type="XML" />
+                            </m:VBox>
+                            <m:VBox items="{twoWay>/selectedKey/accessDetails/cryptoARNsArray}" visible="{= ${oneWay>/cryptoInEditMode}}">
+                                <core:Fragment
+                                        fragmentName="kms.resources.fragments.keys.HyokCryptoRoleDetailsEditableForm"
+                                        type="XML" />
                             </m:VBox>
                         </m:VBox>
                     </ObjectPageSubSection>
