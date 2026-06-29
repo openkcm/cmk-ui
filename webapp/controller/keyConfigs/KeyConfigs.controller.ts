@@ -269,12 +269,6 @@ export default class Keys extends BaseController {
     };
 
     public async onConfigCreationCreatePress(): Promise<void> {
-        interface KeyConfigPostPayload {
-            name: string
-            description: string
-            adminGroupID: string
-        }
-
         const name = this.createConfigModel.getProperty('/name') as string;
         const description = this.createConfigModel.getProperty('/description') as string;
         const adminGroup = this.createConfigModel.getProperty('/adminGroup') as string;
@@ -282,7 +276,7 @@ export default class Keys extends BaseController {
             name: name,
             description: description,
             adminGroupID: adminGroup
-        } as KeyConfigPostPayload;
+        };
 
         this.getView()?.setBusy(true);
         try {

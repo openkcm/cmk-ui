@@ -13,12 +13,6 @@ import { ActionTypes, ArtifactTypes, EventChannelIds, EventIDs } from 'kms/commo
 import { AxiosError } from 'axios';
 import MessageBox from 'sap/m/MessageBox';
 import Workflow from 'kms/component/Workflow';
-
-interface KeyPatchPayload {
-    name: string
-    description: string
-    enabled: boolean
-}
 interface KeyVersionResponse {
     value: KeyVersion[] | undefined
     count: number | undefined
@@ -343,7 +337,7 @@ export default class DetailPanel extends BaseController {
             name: key.name,
             description: key.description,
             enabled: key.enabled
-        } as KeyPatchPayload;
+        };
         try {
             await this.api.patch<Key>(`keys/${this.id}`, payload);
             this.oneWayModel.setProperty('/edit', false);
