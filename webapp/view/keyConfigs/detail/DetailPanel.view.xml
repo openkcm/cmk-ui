@@ -168,7 +168,7 @@
                                     id="addCryptoCertButton"
                                     icon="sap-icon://add"
                                     type="Emphasized"
-                                    text="{i18n>addCryptoCerts}"
+                                    text="{i18n>add}"
                                     press="onAddCryptoCertPress"
                                     visible="{= !${oneWay>/cryptoInEditMode}}"
                                     enabled="{oneWay>/addCryptoCertEnabled}"
