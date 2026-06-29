@@ -4,7 +4,7 @@ import BindingMode from 'sap/ui/model/BindingMode';
 import Api from 'kms/services/Api.service';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import EventBus from 'sap/ui/core/EventBus';
-import { AWSAccessDetails, Key, KeyVersion, SystemRecoveryActions, WorkflowParams } from 'kms/common/Types';
+import { AWSAccessDetails, FortanixAccessDetails, Key, KeyVersion, SystemRecoveryActions, WorkflowParams } from 'kms/common/Types';
 import { isUUIDValid, copyToClipboard, showErrorMessage } from 'kms/common/Helpers';
 import { Button$PressEvent } from 'sap/m/Button';
 import * as Formatter from 'kms/common/Formatters';
@@ -117,15 +117,14 @@ export default class DetailPanel extends BaseController {
         const managementARNs = key?.accessDetails?.management;
         const cryptoARNs = key?.accessDetails?.crypto;
         if (managementARNs) {
-            const managementARNsArray: { key: string, value: AWSAccessDetails }[] = [{ key: 'management', value: managementARNs }];
+            const managementARNsArray: { key: string, value: AWSAccessDetails | FortanixAccessDetails }[] = [{ key: 'management', value: managementARNs }];
             this.twoWayModel.setProperty('/selectedKey/accessDetails/managementARNsArray', managementARNsArray);
         }
         if (cryptoARNs) {
-            const cryptoARNsArray: { key: string, value: AWSAccessDetails }[] = [];
+            const cryptoARNsArray: { key: string, value: AWSAccessDetails | FortanixAccessDetails }[] = [];
             Object.entries(cryptoARNs).forEach(([key, value]) => {
                 cryptoARNsArray.push({ key: key, value: value });
             });
-
             this.twoWayModel.setProperty('/selectedKey/accessDetails/cryptoARNsArray', cryptoARNsArray);
         }
     }

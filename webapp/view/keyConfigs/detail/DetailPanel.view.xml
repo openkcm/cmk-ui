@@ -157,7 +157,7 @@
                 </subSections>
             </ObjectPageSection>
             <ObjectPageSection titleUppercase="false" id="hyokCryptoDetailsSection"
-                visible="{= ${oneWay>/type} === 'key' &amp;&amp; ${oneWay>/selectedKey/type} === 'HYOK' }"
+                visible="{= ${oneWay>/type} === 'key' &amp;&amp; ${oneWay>/selectedKey/type} === 'HYOK' &amp;&amp; ${twoWay>/selectedKey/accessDetails/cryptoARNsArray} &amp;&amp; ${twoWay>/selectedKey/accessDetails/cryptoARNsArray}.length > 0}"
                 title="{i18n>cryptoRole}"
                 showTitle="false">
                 <subSections>

@@ -88,7 +88,8 @@ export enum EventIDs {
 }
 
 export enum HYOKProviders {
-    AWS = 'AWS'
+    AWS = 'AWS',
+    FORTANIX = 'FORTANIX'
 }
 
 export enum BYOKProviders {
