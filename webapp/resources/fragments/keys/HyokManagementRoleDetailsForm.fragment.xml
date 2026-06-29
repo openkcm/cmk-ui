@@ -1,7 +1,7 @@
 <core:FragmentDefinition xmlns="sap.m"
                          xmlns:core="sap.ui.core"
-                         xmlns:layout="sap.ui.layout"
-                         xmlns:forms="sap.ui.layout.form">
+                         xmlns:forms="sap.ui.layout.form"
+                         core:require="{ commonFormatter: 'kms/common/Formatters' }">
     <forms:Form width="100%">
         <forms:layout>
             <forms:ColumnLayout
@@ -17,27 +17,27 @@
         <forms:formContainers>
             <forms:FormContainer>
                 <forms:formElements>
-                    <forms:FormElement label="{i18n>trustAnchorARN}" visible="{= ${oneWay>/selectedKey/provider} === 'AWS' }">
+                    <forms:FormElement label="{i18n>trustAnchorARN}" visible="{parts: ['oneWay>/selectedKey/provider'], formatter: 'commonFormatter.displayAWSField'}">
                         <forms:fields>
                             <Text text="{twoWay>value/trustAnchorArn}" wrapping="true"/>
                         </forms:fields>
                     </forms:FormElement>
-                    <forms:FormElement label="{i18n>roleARN}" visible="{= ${oneWay>/selectedKey/provider} === 'AWS' }">
+                    <forms:FormElement label="{i18n>roleARN}" visible="{parts: ['oneWay>/selectedKey/provider'], formatter: 'commonFormatter.displayAWSField'}">
                         <forms:fields>
                             <Text text="{twoWay>value/roleArn}" wrapping="true"/>
                         </forms:fields>
                     </forms:FormElement>
-                    <forms:FormElement label="{i18n>profileARN}" visible="{= ${oneWay>/selectedKey/provider} === 'AWS' }">
+                    <forms:FormElement label="{i18n>profileARN}" visible="{parts: ['oneWay>/selectedKey/provider'], formatter: 'commonFormatter.displayAWSField'}">
                         <forms:fields>
                             <Text text="{twoWay>value/profileArn}" wrapping="true"/>
                         </forms:fields>
                     </forms:FormElement>
-                    <forms:FormElement label="{i18n>applicationId}" visible="{= ${oneWay>/selectedKey/provider} === 'FORTANIX' }">
+                    <forms:FormElement label="{i18n>applicationId}" visible="{parts: ['oneWay>/selectedKey/provider'], formatter: 'commonFormatter.displayFortanixField'}">
                         <forms:fields>
                             <Text text="{twoWay>value/applicationId}" wrapping="true"/>
                         </forms:fields>
                     </forms:FormElement>
-                    <forms:FormElement label="{i18n>host}" visible="{= ${oneWay>/selectedKey/provider} === 'FORTANIX' }">
+                    <forms:FormElement label="{i18n>host}" visible="{parts: ['oneWay>/selectedKey/provider'], formatter: 'commonFormatter.displayFortanixField'}">
                         <forms:fields>
                             <Text text="{twoWay>value/host}" wrapping="true"/>
                         </forms:fields>

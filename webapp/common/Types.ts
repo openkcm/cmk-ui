@@ -184,19 +184,19 @@ export interface HyokKeyPayload {
     provider: HYOKProviders | BYOKProviders
     accessDetails: AccessDetails
 }
-export interface hyokCertificates {
+export interface HyokCertificates {
     name: string
     rootCA: string
     subject: string
 }
-export interface hyokAWSManagementCertInput {
+export interface HyokAWSManagementCertInput {
     trustAnchorARN: string | null
     roleARN: string | null
     rootCA: string | null
 }
-export interface hyokCryptoCertInput {
+export interface HyokCryptoCertInput {
     selectedCryptoRolesCertKeys?: string[]
-    selectedCryptoCerts?: hyokCertificates[]
+    selectedCryptoCerts?: HyokCertificates[]
     trustAnchorCryptoARN: string | null
     roleCryptoARN: string | null
     rootCryptoCA: string | null

@@ -1,5 +1,17 @@
 import { ValueState, IndicationColor } from 'sap/ui/core/library';
-import { TaskStates, SystemStatus, SystemType, GroupRoles, KeyStates, StateColors, KeyCreationTypes, WorkflowStatus, ActionTypes, ArtifactTypes } from './Enums';
+import {
+    TaskStates,
+    SystemStatus,
+    SystemType,
+    GroupRoles,
+    KeyStates,
+    StateColors,
+    KeyCreationTypes,
+    WorkflowStatus,
+    ActionTypes,
+    ArtifactTypes,
+    HYOKProviders
+} from './Enums';
 import { getText } from 'kms/common/Helpers';
 import { AWSAccessDetails } from './Types';
 
@@ -139,6 +151,14 @@ export function setEnableMenuItemVisible(keyType: KeyCreationTypes, keyState: Ke
 
 export function setDisableMenuItemVisible(keyType: KeyCreationTypes, keyState: KeyStates): boolean {
     return keyType !== KeyCreationTypes.HYOK && keyState === KeyStates.ENABLED;
+}
+
+export function displayFortanixField(keyProvider: string): boolean {
+    return (keyProvider as HYOKProviders === HYOKProviders.FORTANIX);
+}
+
+export function displayAWSField(keyProvider: string): boolean {
+    return (keyProvider as HYOKProviders === HYOKProviders.AWS);
 }
 
 export function setConnectSystemInfoMessageStripVisible(workflowStatus: string): boolean {
