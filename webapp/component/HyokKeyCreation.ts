@@ -121,6 +121,7 @@ export default class HyokKeyRegistration extends BaseController {
             this.keyCreationModel.setData({
                 keyName: '' as string,
                 nativeId: '' as string,
+                description: '' as string,
                 host: '' as string,
                 applicationId: '' as string,
                 keySubType: this.subtype as string,
