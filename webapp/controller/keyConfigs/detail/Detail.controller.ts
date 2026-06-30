@@ -18,7 +18,7 @@ import FilterOperator from 'sap/ui/model/FilterOperator';
 import ListBinding from 'sap/ui/model/ListBinding';
 import MultiInput, { MultiInput$TokenUpdateEvent } from 'sap/m/MultiInput';
 import Token from 'sap/m/Token';
-import { ActionTypes, ArtifactTypes, BYOKProviders, EventChannelIds, EventIDs, HYOKProviders, KeyCreationTypes, SystemStatus } from 'kms/common/Enums';
+import { ActionTypes, ArtifactTypes, BYOKProviders, EventChannelIds, EventIDs, HYOKProviders, KeyCreationTypes, KeyStates, SystemStatus } from 'kms/common/Enums';
 import KeyCreation from 'kms/component/KeyCreation';
 import HyokKeyRegistration from 'kms/component/HyokKeyCreation';
 import { AxiosError } from 'axios';
@@ -824,7 +824,10 @@ export default class KeyConfigDetail extends BaseController {
         this.importKeyDialog = undefined;
     }
 
-    // eslint-disable-next-line @typescript-eslint/require-await
+    private shouldUseWorkflowForKeyAction(key: Key): boolean {
+        return key?.type === KeyCreationTypes.BYOK && key?.isPrimary;
+    }
+
     public async onKeyTableDeletePress(event: Button$PressEvent): Promise<void> {
         const path = event.getSource().getBindingContext('oneWay')?.getPath();
         if (!path) {
@@ -838,18 +841,59 @@ export default class KeyConfigDetail extends BaseController {
                 return;
             }
         }
-        MessageBox.confirm(this.getText('confirmKeyDeletion'), {
-            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-            // eslint-disable-next-line @typescript-eslint/no-misused-promises
-            onClose: async (action: unknown) => {
-                if (action === MessageBox.Action.YES) {
-                    await this.deleteKey(selectedKey.id);
+
+        if (!this.shouldUseWorkflowForKeyAction(selectedKey)) {
+            MessageBox.confirm(this.getText('confirmKeyDeletion'), {
+                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                onClose: async (action: unknown) => {
+                    if (action === MessageBox.Action.YES) {
+                        await this.deleteKey(selectedKey.id);
+                    }
                 }
+            });
+            return;
+        }
+
+        const workflowParams = {
+            artifactType: ArtifactTypes.KEY,
+            artifactID: selectedKey.id,
+            actionType: ActionTypes.UPDATE_PRIMARY,
+            parameters: 'DELETE'
+        } as WorkflowParams;
+
+        const deleteKeyWorkflow = new Workflow('deleteKeyWorkflowComponent');
+        deleteKeyWorkflow.init();
+
+        await deleteKeyWorkflow.checkWorkflowStatus(workflowParams, {
+            onWorkflowNotRequired: () => {
+                MessageBox.confirm(this.getText('confirmKeyDeletion'), {
+                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onClose: async (action: unknown) => {
+                        if (action === MessageBox.Action.YES) {
+                            await this.deleteKey(selectedKey.id);
+                        }
+                    }
+                });
+            },
+            onWorkflowRequired: () => {
+                MessageBox.confirm(this.getText('confirmKeyDeletionWorkflowCreation'), {
+                    actions: [this.getText('sendForApproval'), MessageBox.Action.NO],
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onClose: async (action: unknown) => {
+                        if (action === this.getText('sendForApproval')) {
+                            await this.createWorkflowForKeyAction(workflowParams);
+                        }
+                    }
+                });
+            },
+            onError: () => {
+                void this.getKeyConfigData();
             }
         });
     }
 
-    // eslint-disable-next-line @typescript-eslint/require-await
     public async onKeyTableDisablePress(event: Button$PressEvent): Promise<void> {
         const path = event.getSource().getBindingContext('oneWay')?.getPath();
         if (!path) {
@@ -857,18 +901,59 @@ export default class KeyConfigDetail extends BaseController {
             return;
         }
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
-        MessageBox.confirm(this.getText('confirmKeyDisable'), {
-            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-            // eslint-disable-next-line @typescript-eslint/no-misused-promises
-            onClose: async (action: unknown) => {
-                if (action === MessageBox.Action.YES) {
-                    await this.disableKey(selectedKey.id);
+
+        if (!this.shouldUseWorkflowForKeyAction(selectedKey)) {
+            MessageBox.confirm(this.getText('confirmKeyDisable'), {
+                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                onClose: async (action: unknown) => {
+                    if (action === MessageBox.Action.YES) {
+                        await this.disableKey(selectedKey.id);
+                    }
                 }
+            });
+            return;
+        }
+
+        const workflowParams = {
+            artifactType: ArtifactTypes.KEY,
+            artifactID: selectedKey.id,
+            actionType: ActionTypes.UPDATE_STATE,
+            parameters: KeyStates.DISABLED
+        } as WorkflowParams;
+
+        const disableKeyWorkflow = new Workflow('disableKeyWorkflowComponent');
+        disableKeyWorkflow.init();
+
+        await disableKeyWorkflow.checkWorkflowStatus(workflowParams, {
+            onWorkflowNotRequired: () => {
+                MessageBox.confirm(this.getText('confirmKeyDisable'), {
+                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onClose: async (action: unknown) => {
+                        if (action === MessageBox.Action.YES) {
+                            await this.disableKey(selectedKey.id);
+                        }
+                    }
+                });
+            },
+            onWorkflowRequired: () => {
+                MessageBox.confirm(this.getText('confirmKeyDisableWorkflowCreation'), {
+                    actions: [this.getText('sendForApproval'), MessageBox.Action.NO],
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onClose: async (action: unknown) => {
+                        if (action === this.getText('sendForApproval')) {
+                            await this.createWorkflowForKeyAction(workflowParams);
+                        }
+                    }
+                });
+            },
+            onError: () => {
+                void this.getKeyConfigData();
             }
         });
     }
 
-    // eslint-disable-next-line @typescript-eslint/require-await
     public async onKeyTableEnablePress(event: Button$PressEvent): Promise<void> {
         const path = event.getSource().getBindingContext('oneWay')?.getPath();
         if (!path) {
@@ -876,15 +961,69 @@ export default class KeyConfigDetail extends BaseController {
             return;
         }
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
-        MessageBox.confirm(this.getText('confirmKeyEnable'), {
-            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-            // eslint-disable-next-line @typescript-eslint/no-misused-promises
-            onClose: async (action: unknown) => {
-                if (action === MessageBox.Action.YES) {
-                    await this.enableKey(selectedKey.id);
+
+        if (!this.shouldUseWorkflowForKeyAction(selectedKey)) {
+            MessageBox.confirm(this.getText('confirmKeyEnable'), {
+                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                onClose: async (action: unknown) => {
+                    if (action === MessageBox.Action.YES) {
+                        await this.enableKey(selectedKey.id);
+                    }
                 }
+            });
+            return;
+        }
+
+        const workflowParams = {
+            artifactType: ArtifactTypes.KEY,
+            artifactID: selectedKey.id,
+            actionType: ActionTypes.UPDATE_STATE,
+            parameters: KeyStates.ENABLED
+        } as WorkflowParams;
+
+        const enableKeyWorkflow = new Workflow('enableKeyWorkflowComponent');
+        enableKeyWorkflow.init();
+
+        await enableKeyWorkflow.checkWorkflowStatus(workflowParams, {
+            onWorkflowNotRequired: () => {
+                MessageBox.confirm(this.getText('confirmKeyEnable'), {
+                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onClose: async (action: unknown) => {
+                        if (action === MessageBox.Action.YES) {
+                            await this.enableKey(selectedKey.id);
+                        }
+                    }
+                });
+            },
+            onWorkflowRequired: () => {
+                MessageBox.confirm(this.getText('confirmKeyEnableWorkflowCreation'), {
+                    actions: [this.getText('sendForApproval'), MessageBox.Action.NO],
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onClose: async (action: unknown) => {
+                        if (action === this.getText('sendForApproval')) {
+                            await this.createWorkflowForKeyAction(workflowParams);
+                        }
+                    }
+                });
+            },
+            onError: () => {
+                void this.getKeyConfigData();
             }
         });
+    }
+
+    private async createWorkflowForKeyAction(workflowParams: WorkflowParams): Promise<void> {
+        const keyActionWorkflow = new Workflow('keyActionWorkflowComponent');
+        keyActionWorkflow.init();
+        try {
+            await keyActionWorkflow.createWorkflow(workflowParams);
+        }
+        finally {
+            await this.getKeyConfigData();
+            this.getView()?.setBusy(false);
+        }
     }
 
     public async onSystemsTableDisconnectPress(event: Button$PressEvent): Promise<void> {
