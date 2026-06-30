@@ -7,7 +7,8 @@ import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import { Button$PressEvent } from 'sap/m/Button';
 import { AxiosError } from 'axios';
 import { copyToClipboard, showErrorMessage } from 'kms/common/Helpers';
-import { EventChannelIds, EventIDs, TaskStates, TaskStateTransitionAction } from 'kms/common/Enums';
+import { setKeyStateText } from 'kms/common/Formatters';
+import { ActionTypes, EventChannelIds, EventIDs, TaskStates, TaskStateTransitionAction } from 'kms/common/Enums';
 import MessageToast from 'sap/m/MessageToast';
 import EventBus from 'sap/ui/core/EventBus';
 
@@ -82,9 +83,15 @@ export default class Tasks extends BaseController {
     };
 
     private setTaskDescription(task: Task): string {
-        const parameterDescription = task.parameters ? ` ${this.getText('to')} ${this.getText(task?.parametersResourceType)}: ${task.parametersResourceName}` : '';
+        let parameterDescription = '';
+        if (task.actionType === ActionTypes.UPDATE_STATE && task.parameters) {
+            parameterDescription = ` ${this.getText('to')} ${setKeyStateText(task.parameters)}`;
+        }
+        else if (task.parametersResourceType && task.parametersResourceName) {
+            parameterDescription = ` ${this.getText('to')} ${this.getText(task.parametersResourceType)}: ${task.parametersResourceName}`;
+        }
 
-        const description = `${task.initiatorName} ${this.getText('requestsApprovalFor')}  ${this.getText(task?.actionType)} ${task.artifactType}: ${task.artifactName} ${parameterDescription}.`;
+        const description = `${task.initiatorName} ${this.getText('requestsApprovalFor')} ${this.getText(task?.actionType)} ${this.getText(task?.artifactType)}: ${task.artifactName}${parameterDescription}.`;
         return description;
     }
 
