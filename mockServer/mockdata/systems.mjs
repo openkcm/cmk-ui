@@ -80,6 +80,17 @@ export default (systemId, keyConfigurationID, operation) => {
         type: "SYSTEM"
     }];
 
+    if (operation === 'filterOptions') {
+        const regions = [...new Set(systems.map(s => s.region).filter(Boolean))];
+        const types = [...new Set(systems.map(s => s.type).filter(Boolean))];
+        const keyConfigurationNames = [...new Set(systems.map(s => s.keyConfigurationName).filter(Boolean))];
+        return {
+            region: regions,
+            type: types,
+            keyConfigurationName: keyConfigurationNames
+        };
+    }
+
     if (systemId && !keyConfigurationID && operation === 'getSystems') {
         return systems.find(system => system.id === systemId);
     } else if(!systemId && !keyConfigurationID && operation === 'getSystems') {
