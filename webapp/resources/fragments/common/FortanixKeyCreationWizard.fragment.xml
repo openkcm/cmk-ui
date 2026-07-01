@@ -88,14 +88,42 @@
                                                         wrapping="true" />
                                                     <Label text='{i18n>rootCALabel}:'
                                                         class="sapUiTinyMarginTop" />
-                                                    <Text
-                                                        text="{model>rootCA}"
-                                                        wrapping="true" />
+                                                    <HBox alignItems="Center">
+                                                        <Text
+                                                            text="{model>rootCA}"
+                                                            wrapping="true"
+                                                            class="sapUiSmallMarginEnd" />
+                                                        <Button text="{i18n>downloadRootCACert}"
+                                                            press="onDownloadRootCA"
+                                                            enabled="{= !!${model>rootCA}}" />
+                                                    </HBox>
                                                     <Label text='{i18n>subject}:'
                                                         class="sapUiTinyMarginTop" />
                                                     <Text
-                                                        text="{model>subject}"
+                                                        text="{path: 'model>subject', formatter: 'commonFormatter.formatSubjectDN'}"
                                                         wrapping="true" />
+                                                    <HBox class="sapUiSmallMarginTop" wrap="Wrap">
+                                                        <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                            <Label text="{i18n>subjectCN}:" />
+                                                            <Text text="{path: 'model>subject/CN', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                        </VBox>
+                                                        <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                            <Label text="{i18n>subjectOU}:" />
+                                                            <Text text="{path: 'model>subject/OU', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" renderWhitespace="true" />
+                                                        </VBox>
+                                                        <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                            <Label text="{i18n>subjectO}:" />
+                                                            <Text text="{path: 'model>subject/O', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                        </VBox>
+                                                        <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                            <Label text="{i18n>subjectL}:" />
+                                                            <Text text="{path: 'model>subject/L', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                        </VBox>
+                                                        <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                            <Label text="{i18n>subjectC}:" />
+                                                            <Text text="{path: 'model>subject/C', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                        </VBox>
+                                                    </HBox>
                                                 </VBox>
                                             </VBox>
                                             <Label text="{i18n>host}:" required="true"
@@ -144,14 +172,42 @@
                                                                     <Label
                                                                         text='{i18n>rootCALabel}:'
                                                                         class="sapUiTinyMarginTop" />
-                                                                    <Text
-                                                                        text="{model>rootCA}"
-                                                                        wrapping="true" />
+                                                                    <HBox alignItems="Center">
+                                                                        <Text
+                                                                            text="{model>rootCA}"
+                                                                            wrapping="true"
+                                                                            class="sapUiSmallMarginEnd" />
+                                                                        <Button text="{i18n>downloadRootCACert}"
+                                                                            press="onDownloadRootCA"
+                                                                            enabled="{= !!${model>rootCA}}" />
+                                                                    </HBox>
                                                                     <Label text='{i18n>subject}:'
                                                                         class="sapUiTinyMarginTop" />
                                                                     <Text
-                                                                        text="{model>subject}"
+                                                                        text="{path: 'model>subject', formatter: 'commonFormatter.formatSubjectDN'}"
                                                                         wrapping="true" />
+                                                                    <HBox class="sapUiSmallMarginTop" wrap="Wrap">
+                                                                        <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                                            <Label text="{i18n>subjectCN}:" />
+                                                                            <Text text="{path: 'model>subject/CN', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                                        </VBox>
+                                                                        <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                                            <Label text="{i18n>subjectOU}:" />
+                                                                            <Text text="{path: 'model>subject/OU', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" renderWhitespace="true" />
+                                                                        </VBox>
+                                                                        <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                                            <Label text="{i18n>subjectO}:" />
+                                                                            <Text text="{path: 'model>subject/O', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                                        </VBox>
+                                                                        <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                                            <Label text="{i18n>subjectL}:" />
+                                                                            <Text text="{path: 'model>subject/L', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                                        </VBox>
+                                                                        <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                                            <Label text="{i18n>subjectC}:" />
+                                                                            <Text text="{path: 'model>subject/C', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                                        </VBox>
+                                                                    </HBox>
                                                                 </VBox>
                                                             </items>
                                                         </VBox>
@@ -284,14 +340,42 @@
                                                             wrapping="true" />
                                                         <Label text='{i18n>rootCALabel}:'
                                                             class="sapUiTinyMarginTop" />
-                                                        <Text
-                                                            text="{model>rootCA}"
-                                                            wrapping="true" />
+                                                        <HBox alignItems="Center">
+                                                            <Text
+                                                                text="{model>rootCA}"
+                                                                wrapping="true"
+                                                                class="sapUiSmallMarginEnd" />
+                                                            <Button text="{i18n>downloadRootCACert}"
+                                                                press="onDownloadRootCA"
+                                                                enabled="{= !!${model>rootCA}}" />
+                                                        </HBox>
                                                         <Label text='{i18n>subject}:'
                                                             class="sapUiTinyMarginTop" />
                                                         <Text
-                                                            text="{model>subject}"
+                                                            text="{path: 'model>subject', formatter: 'commonFormatter.formatSubjectDN'}"
                                                             wrapping="true" />
+                                                        <HBox class="sapUiSmallMarginTop" wrap="Wrap">
+                                                            <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                                <Label text="{i18n>subjectCN}:" />
+                                                                <Text text="{path: 'model>subject/CN', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                            </VBox>
+                                                            <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                                <Label text="{i18n>subjectOU}:" />
+                                                                <Text text="{path: 'model>subject/OU', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" renderWhitespace="true" />
+                                                            </VBox>
+                                                            <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                                <Label text="{i18n>subjectO}:" />
+                                                                <Text text="{path: 'model>subject/O', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                            </VBox>
+                                                            <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                                <Label text="{i18n>subjectL}:" />
+                                                                <Text text="{path: 'model>subject/L', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                            </VBox>
+                                                            <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                                <Label text="{i18n>subjectC}:" />
+                                                                <Text text="{path: 'model>subject/C', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                            </VBox>
+                                                        </HBox>
                                                     </VBox>
                                                 </VBox>
                                                 <Label class="sapUiTinyMarginTop"

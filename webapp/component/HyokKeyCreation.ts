@@ -265,6 +265,15 @@ export default class HyokKeyRegistration extends BaseController {
         this.keyCreationModel.setProperty('/hyokManagementRoleStepValid', managementRolesComplete);
     }
 
+    public onDownloadRootCA(event: Button$PressEvent): void {
+        const rootCA = event.getSource().getBindingContext('model')?.getProperty('rootCA') as string | undefined;
+        if (!rootCA) {
+            console.error('No Root CA URL available to download');
+            return;
+        }
+        window.open(rootCA, '_blank', 'noopener,noreferrer');
+    }
+
     public onRemoveCryptoCert(event: Button$PressEvent): void {
         const path = event.getSource().getBindingContext('model')?.getPath();
         if (!path) {

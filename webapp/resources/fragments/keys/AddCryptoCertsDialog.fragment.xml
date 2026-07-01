@@ -1,6 +1,7 @@
 <core:FragmentDefinition
     xmlns="sap.m"
-    xmlns:core="sap.ui.core">
+    xmlns:core="sap.ui.core"
+    core:require="{commonFormatter: 'kms/common/Formatters' }">
     <Dialog
         id="addCryptoCertsDialog"
         title="{i18n>addCryptoCertsTitle}"
@@ -29,11 +30,39 @@
                                             <Text text="{addCryptoCertsModel>name}" wrapping="true" />
                                             <Label text="{i18n>rootCALabel}:"
                                                 class="sapUiTinyMarginTop" />
-                                            <Text text="{addCryptoCertsModel>rootCA}"
-                                                wrapping="true" />
+                                            <HBox alignItems="Center">
+                                                <Text text="{addCryptoCertsModel>rootCA}"
+                                                    wrapping="true"
+                                                    class="sapUiSmallMarginEnd" />
+                                                <Button text="{i18n>downloadRootCACert}"
+                                                    press="onDownloadRootCA"
+                                                    enabled="{= !!${addCryptoCertsModel>rootCA}}" />
+                                            </HBox>
                                             <Label text="{i18n>subject}:" class="sapUiTinyMarginTop" />
-                                            <Text text="{addCryptoCertsModel>subject}"
+                                            <Text text="{path: 'addCryptoCertsModel>subject', formatter: 'commonFormatter.formatSubjectDN'}"
                                                 wrapping="true" />
+                                            <HBox class="sapUiSmallMarginTop" wrap="Wrap">
+                                                <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                    <Label text="{i18n>subjectCN}:" />
+                                                    <Text text="{path: 'addCryptoCertsModel>subject/CN', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                </VBox>
+                                                <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                    <Label text="{i18n>subjectOU}:" />
+                                                    <Text text="{path: 'addCryptoCertsModel>subject/OU', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" renderWhitespace="true" />
+                                                </VBox>
+                                                <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                    <Label text="{i18n>subjectO}:" />
+                                                    <Text text="{path: 'addCryptoCertsModel>subject/O', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                </VBox>
+                                                <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                    <Label text="{i18n>subjectL}:" />
+                                                    <Text text="{path: 'addCryptoCertsModel>subject/L', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                </VBox>
+                                                <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                    <Label text="{i18n>subjectC}:" />
+                                                    <Text text="{path: 'addCryptoCertsModel>subject/C', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                </VBox>
+                                            </HBox>
                                         </VBox>
                                     </VBox>
                                     <VBox visible="{= ${addCryptoCertsModel>/provider} === 'AWS'}">

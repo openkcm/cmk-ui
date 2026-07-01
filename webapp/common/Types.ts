@@ -190,10 +190,19 @@ export interface HyokKeyPayload {
     provider: HYOKProviders | BYOKProviders
     accessDetails: AccessDetails
 }
+export interface SubjectDN {
+    C?: string
+    CN?: string
+    L?: string
+    O?: string
+    OU?: string | string[]
+    ST?: string
+    [key: string]: string | string[] | undefined
+}
 export interface HyokCertificates {
     name: string
     rootCA: string
-    subject: string
+    subject: SubjectDN | string
 }
 export interface HyokAWSManagementCertInput {
     trustAnchorARN: string | null
