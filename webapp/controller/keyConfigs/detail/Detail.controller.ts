@@ -664,7 +664,8 @@ export default class KeyConfigDetail extends BaseController {
         const workflowParams = {
             artifactType: ArtifactTypes.KEY_CONFIGURATION,
             actionType: ActionTypes.UPDATE_PRIMARY,
-            parameters: selectedKey.id
+            parameters: selectedKey.id,
+            artifactID: this.keyConfigId
         } as WorkflowParams;
 
         const makePrimaryWorkflow = new Workflow('makePrimaryWorkflowComponent');
