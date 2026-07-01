@@ -7,7 +7,7 @@
         items="{
                     path: 'oneWay>/keyVersions',
                     sorter: {
-                        path: 'version',
+                        path: 'metadata/createdAt',
                         descending: true
                     }
                 }"
@@ -19,7 +19,8 @@
                     text="{parts: ['i18n>versionsWithCount', 'oneWay>/keyVersionsCount'], formatter: 'formatMessage'}"
                     level="H2" />
                 <ToolbarSpacer />
-                <MenuButton text="{i18n>rotate}" icon="sap-icon://synchronize" type="Ghost">
+                <MenuButton text="{i18n>rotate}" icon="sap-icon://synchronize" type="Ghost"
+                    visible="{= ${oneWay>/selectedKey/type} !== 'HYOK'}">
                     <menu>
                         <Menu class="sapUiSizeCompact">
                             <MenuItem text="{i18n>rotateNow}"
@@ -52,17 +53,41 @@
             </OverflowToolbar>
         </headerToolbar>
         <columns>
+
             <Column
                 vAlign="Middle"
                 hAlign="Begin"
                 minScreenWidth="XSmall"
-                demandPopin="false">
-                <Text text="{i18n>version}" />
+                demandPopin="true">
+                <Text text="" />
             </Column>
             <Column
                 vAlign="Middle"
                 hAlign="Begin"
                 minScreenWidth="XSmall"
+                width="8rem"
+                demandPopin="false">
+                <Text text="{i18n>nativeIdentifier}" />
+            </Column>
+            <Column
+                vAlign="Middle"
+                hAlign="Begin"
+                minScreenWidth="XSmall"
+                demandPopin="true"
+                width="8rem">
+                <Text text="{i18n>state}" />
+            </Column>
+            <Column
+                vAlign="Middle"
+                hAlign="Begin"
+                minScreenWidth="Small"
+                demandPopin="true">
+                <Text text="{i18n>rotationTime}" wrapping="true" />
+            </Column>
+            <Column
+                vAlign="Middle"
+                hAlign="Begin"
+                minScreenWidth="Small"
                 demandPopin="true">
                 <Text text="{i18n>createdOn}" wrapping="true" />
             </Column>
@@ -70,33 +95,18 @@
         <items>
             <ColumnListItem vAlign="Middle" type="Inactive">
                 <cells>
-                    <HBox alignItems="End" justifyContent="Start">
-                        <tnt:InfoLabel
-                            icon="sap-icon://favorite"
-                            visible="{= !!${oneWay>isPrimary}}"
-                            class="sapUiTinyMarginEnd"
-                            text="{oneWay>version} • {i18n>active}"
-                            displayOnly="true"
-                            colorScheme="5" />
-                        <Text text="{oneWay>version}" visible="{= !${oneWay>isPrimary}}">
-                            <customData>
-                                <core:CustomData
-                                    key="testId"
-                                    value="versionsTable-versionText"
-                                    writeToDom="true" />
-                            </customData>
-                        </Text>
-                    </HBox>
+                    <tnt:InfoLabel
+                    icon="sap-icon://favorite"
+                    visible="{= !!${oneWay>isPrimary}}"
+                    text="{i18n>active}"
+                    displayOnly="true"
+                    colorScheme="5"
+                    data:testId="versionsTable-activeMarker"
+                    xmlns:data="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1" />
                     <Text
-                        text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-dd\'T\'HH:mm:ss.SSSSSSX'}}} UTC"
-                        wrapping="true">
-                        <customData>
-                            <core:CustomData
-                                key="testId"
-                                value="versionsTable-createdOnText"
-                                writeToDom="true" />
-                        </customData>
-                    </Text>
+                        text="{oneWay>nativeID}"
+                        data:testId="versionsTable-nativeIdText"
+                        xmlns:data="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1" />
                     <VBox justifyContent="Center">
                         <tnt:InfoLabel
                             visible="{= ${oneWay>state} === 'ENABLED'}"
@@ -107,6 +117,26 @@
                             text="{i18n>disabled}"
                             colorScheme="2" />
                     </VBox>
+                    <Text
+                        text="{path:'oneWay>metadata/rotatedAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-dd\'T\'HH:mm:ss.SSSSSSX'}}} UTC"
+                        wrapping="true">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="versionsTable-rotationTimeText"
+                                writeToDom="true" />
+                        </customData>
+                    </Text>
+                    <Text
+                        text="{path:'oneWay>metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-dd\'T\'HH:mm:ss.SSSSSSX'}}} UTC"
+                        wrapping="true">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="versionsTable-createdOnText"
+                                writeToDom="true" />
+                        </customData>
+                    </Text>
                 </cells>
             </ColumnListItem>
         </items>
