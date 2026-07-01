@@ -26,7 +26,7 @@
                         <Menu class="sapUiSizeCompact">
                             <MenuItem text="{i18n>sapManaged}"
                                 press=".handleCreateKeyRoute('SYSTEM_MANAGED')"
-                                visible="{= !!${oneWay>/keystoreSettings/default/allowManaged} }">
+                                visible="{= !!${oneWay>/keystoreSettings/systemManaged/allow} }">
                                 <customData>
                                     <core:CustomData
                                         key="testId"
@@ -35,7 +35,7 @@
                                 </customData>
                             </MenuItem>
                             <MenuItem text="{i18n>byok}"
-                                visible="{= !!${oneWay>/keystoreSettings/default/allowManaged} }"
+                                visible="{= !!${oneWay>/keystoreSettings/byok/allow} }"
                                 press=".handleCreateKeyRoute('BYOK')">
                                 <customData>
                                     <core:CustomData
@@ -240,7 +240,7 @@
                                         </customData>
                                     </MenuItem>
                                     <MenuItem press="onBYOKDownloadPress" text="{i18n>download}"
-                                        visible="{= ${oneWay>type} === 'BYOK' }"
+                                        visible="{= ${oneWay>state} === 'PENDING_IMPORT' }"
                                         icon="sap-icon://download" />
                                     <customData>
                                         <core:CustomData

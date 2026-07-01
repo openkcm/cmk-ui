@@ -203,15 +203,21 @@ export interface HyokCryptoCertInput {
     rootCryptoCA: string | null
     cryptoApplicationId: string | null
 }
+export interface SupportedRegion {
+    name: string
+    technicalName: string
+}
 export interface KeystoreResponse {
-    default: {
-        allowManaged: boolean
-        allowBYOK: boolean
-        supportedRegions: string[]
+    byok: {
+        allow: boolean
+        supportedRegions: SupportedRegion[]
     }
     hyok: {
         allow: boolean
         providers: HYOKProviders[]
+    }
+    systemManaged: {
+        allow: boolean
     }
 }
 export interface UserData {
