@@ -22,6 +22,11 @@ export interface SystemRecoveryActions {
     canCancel: true
     canRetry: true
 }
+export interface SystemFilterOptions {
+    region: string[]
+    type: string[]
+    keyConfigurationName: string[]
+}
 export interface SystemConfig {
     system: {
         identifier: {

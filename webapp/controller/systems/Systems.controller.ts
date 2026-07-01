@@ -2,7 +2,7 @@ import BaseController from 'kms/controller/BaseController';
 import BindingMode from 'sap/ui/model/BindingMode';
 import JSONModel from 'sap/ui/model/json/JSONModel';
 import Api from 'kms/services/Api.service';
-import { System, KeyConfig } from 'kms/common/Types';
+import { System, KeyConfig, SystemFilterOptions } from 'kms/common/Types';
 import { showErrorMessage } from 'kms/common/Helpers';
 import { AxiosError } from 'axios';
 import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
@@ -82,6 +82,7 @@ export default class Systems extends BaseController {
         const routeArgs = event.getParameter('arguments') as { tenantId: string };
         this.api = Api.getInstance();
         this.tenantId = routeArgs?.tenantId;
+        void this.loadFilterOptions();
         this.updateSystemsTable();
     };
 
@@ -153,9 +154,6 @@ export default class Systems extends BaseController {
             this.oneWayModel.setProperty('/systems', systems.value);
             this.oneWayModel.setProperty('/systemsCount', systems.count || 0);
 
-            if (filters.length === 0) {
-                this.setFilterData(systems.value);
-            }
             this.paginationModel.setProperty('/totalPages', Math.ceil(systems.count / this.top));
             this.paginationModel.setProperty('/currentPage', this.currentPage);
         }
@@ -168,27 +166,28 @@ export default class Systems extends BaseController {
         }
     };
 
-    private setFilterData(systems: System[]): void {
-        this.filterModel.setProperty(
-            '/keyConfigs',
-            [
+    private async loadFilterOptions(): Promise<void> {
+        try {
+            const filterOptions = await this.api.get<SystemFilterOptions>('systems/filterOptions');
+            if (!filterOptions) {
+                return;
+            }
+            this.filterModel.setProperty('/regions', [
                 { key: 'all', text: this.getText('all') },
-                ...systems.map((system: System) => ({
-                    key: system.keyConfigurationID,
-                    text: system.keyConfigurationName
-                }))
-            ]
-        );
-        const regions = [
-            { key: 'all', text: this.getText('all') },
-            ...Array.from(new Set(systems.map((system: System) => system.region)))
-                .filter(region => region)
-                .map(region => ({
-                    key: region,
-                    text: region
-                }))
-        ];
-        this.filterModel.setProperty('/regions', regions);
+                ...filterOptions.region.map(region => ({ key: region, text: region }))
+            ]);
+            this.filterModel.setProperty('/types', [
+                { key: 'all', text: this.getText('all') },
+                ...filterOptions.type.map(type => ({ key: type, text: type }))
+            ]);
+            this.filterModel.setProperty('/keyConfigs', [
+                { key: 'all', text: this.getText('all') },
+                ...filterOptions.keyConfigurationName.map(name => ({ key: name, text: name }))
+            ]);
+        }
+        catch (error) {
+            console.error('Error fetching filter options', error);
+        }
     }
 
     public onResetFilters(): void {

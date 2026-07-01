@@ -82,6 +82,10 @@ app.patch("/cmk/v1/tenant1-id/keys/:id/versions/:id", (req, res) => {
     res.status(200).json({});
 });
 
+app.get("/cmk/v1/tenant1-id/systems/filterOptions", (req, res) => {
+    res.json(systems(null, null, 'filterOptions'));
+});
+
 app.get("/cmk/v1/tenant1-id/systems/:systemId?/recoveryActions", (req, res) => {
     const { systemId, keyConfigurationID } = req.params;
     res.json(systems(systemId, keyConfigurationID, 'recoveryActions', 'get'));
