@@ -110,7 +110,7 @@
                         <m:customData>
                             <core:CustomData
                                 key="testId"
-                                value="taskDetail-actionButton}"
+                                value="taskDetail-actionButton-{oneWay>key}"
                                 writeToDom="true" />
                         </m:customData>
                     </m:Button>

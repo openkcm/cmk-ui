@@ -73,6 +73,12 @@
                                                 validated="{= (${model>/host}.length > 0  &amp;&amp; ${model>/applicationId}.length > 0) }"
                                         activate=""
                                         title="{i18n>managementRole}">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="fortanixHyokWizard-managementRoleStep"
+                                                writeToDom="true" />
+                                        </customData>
                                         <VBox width="100%">
                                             <VBox width="100%" items="{model>/managementRolesCerts}">
                                                 <VBox width="100%" class="sapUiSmallMarginBottom">

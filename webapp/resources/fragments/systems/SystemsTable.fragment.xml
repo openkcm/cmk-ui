@@ -16,6 +16,12 @@
         inset="false"
         items="{oneWay>/systems}"
         busy="{oneWay>/systemsTableUpdating}">
+        <customData>
+            <core:CustomData
+                key="testId"
+                value="systemsTable"
+                writeToDom="true" />
+        </customData>
         <headerToolbar>
             <OverflowToolbar>
                 <Title
@@ -99,6 +105,12 @@
 
         <items>
             <ColumnListItem vAlign="Middle" type="Navigation" press="onSystemPress">
+                <customData>
+                    <core:CustomData
+                        key="testId"
+                        value="systemsTable-navigationItem"
+                        writeToDom="true" />
+                </customData>
                 <cells>
                     <ObjectIdentifier title="{oneWay>properties/externalName}"
                         text="{oneWay>region}">

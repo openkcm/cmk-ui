@@ -35,20 +35,48 @@
                         <ObjectPageHeaderActionButton text="{i18n>cancel}"
                             visible="{= !!${oneWay>/selectedSystem/canCancel} &amp;&amp; ${oneWay>/selectedSystem/status} === 'FAILED'}"
                             press="onSystemCancelPress"
-                            hideText="false" type="Reject" />
+                            hideText="false" type="Reject">
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="systemDetail-cancelButton"
+                                    writeToDom="true" />
+                            </customData>
+                        </ObjectPageHeaderActionButton>
                         <ObjectPageHeaderActionButton text="{i18n>retry}"
                             visible="{= !!${oneWay>/selectedSystem/canRetry} &amp;&amp; ${oneWay>/selectedSystem/status} === 'FAILED'}"
                             press="onSystemRetryPress"
-                            hideText="false" type="Emphasized" />
+                            hideText="false" type="Emphasized">
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="systemDetail-retryButton"
+                                    writeToDom="true" />
+                            </customData>
+                        </ObjectPageHeaderActionButton>
                         <ObjectPageHeaderActionButton text="{i18n>disconnect}" hideText="false"
                             visible="{= !!${oneWay>/selectedSystem/keyConfigurationID} &amp;&amp; ${oneWay>/selectedSystem/status} !== 'FAILED'}"
                             press="onSystemDisconnectPress"
-                            type="Reject" />
+                            type="Reject">
+                            <customData>
+                                <core:CustomData
+                                    key="testId"
+                                    value="systemDetail-disconnectButton"
+                                    writeToDom="true" />
+                            </customData>
+                        </ObjectPageHeaderActionButton>
                     </m:OverflowToolbar>
                 </actions>
                 <navigationActions>
                     <m:OverflowToolbarButton type="Transparent" icon="sap-icon://decline"
-                        press="onCancel" tooltip="Close" />
+                        press="onCancel" tooltip="Close">
+                        <m:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="systemDetail-closeButton"
+                                writeToDom="true" />
+                        </m:customData>
+                    </m:OverflowToolbarButton>
                 </navigationActions>
             </ObjectPageDynamicHeaderTitle>
         </headerTitle>
