@@ -56,7 +56,7 @@
                                                 <customData>
                                                     <core:CustomData
                                                         key="testId"
-                                                        value="createHyok-awsButton"
+                                                        value="createHyok-{oneWay>}Button"
                                                         writeToDom="true" />
                                                 </customData>
                                             </MenuItem>

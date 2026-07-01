@@ -8,6 +8,12 @@
         contextualWidth="Auto"
         popinLayout="GridSmall"
         items="{oneWay>/groupsData}">
+        <customData>
+            <core:CustomData
+                key="testId"
+                value="userGroupsTable"
+                writeToDom="true" />
+        </customData>
         <headerToolbar>
             <OverflowToolbar>
                 <Title
@@ -32,6 +38,12 @@
         </columns>
         <items>
             <ColumnListItem vAlign="Middle" type="Navigation" press="onUserPress">
+                <customData>
+                    <core:CustomData
+                        key="testId"
+                        value="userGroupsTable-navigationItem"
+                        writeToDom="true" />
+                </customData>
                 <cells>
                     <VBox>
                         <Input type="Text" value="{oneWay>name}" editable="true"

@@ -8,11 +8,25 @@
         <headerTitle>
             <ObjectPageDynamicHeaderTitle>
                 <expandedHeading>
-                    <m:Title text="{oneWay>/groupData/name}" wrapping="true" />
+                    <m:Title text="{oneWay>/groupData/name}" wrapping="true">
+                        <m:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="groupDetail-mainTitle"
+                                writeToDom="true" />
+                        </m:customData>
+                    </m:Title>
                 </expandedHeading>
                 <navigationActions>
                     <m:OverflowToolbarButton type="Transparent" icon="sap-icon://decline"
-                        press="onCancel" tooltip="Close" />
+                        press="onCancel" tooltip="Close">
+                        <m:customData>
+                            <core:CustomData
+                                key="testId"
+                                value="groupDetail-closeButton"
+                                writeToDom="true" />
+                        </m:customData>
+                    </m:OverflowToolbarButton>
                 </navigationActions>
             </ObjectPageDynamicHeaderTitle>
         </headerTitle>
@@ -30,7 +44,14 @@
                                 </forms:layout>
                                 <forms:toolbar>
                                     <m:OverflowToolbar>
-                                        <m:Title text="{i18n>details}" />
+                                        <m:Title text="{i18n>details}">
+                                            <m:customData>
+                                                <core:CustomData
+                                                    key="testId"
+                                                    value="groupDetail-detailsTitle"
+                                                    writeToDom="true" />
+                                            </m:customData>
+                                        </m:Title>
                                         <m:ToolbarSpacer />
                                         <m:Button icon="sap-icon://edit" text="{i18n>edit}"
                                             type="Ghost"
@@ -74,34 +95,136 @@
                                     <forms:FormContainer visible="{= !${oneWay>/editMode} }">
                                         <forms:formElements>
                                             <forms:FormElement label="{i18n>name}">
+                                                <forms:label>
+                                                    <m:Label text="{i18n>name}">
+                                                        <m:customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="groupDetail-nameLabel"
+                                                                writeToDom="true" />
+                                                        </m:customData>
+                                                    </m:Label>
+                                                </forms:label>
                                                 <forms:fields>
-                                                    <m:Text text="{oneWay>/groupData/name}" />
+                                                    <m:Text text="{oneWay>/groupData/name}">
+                                                        <m:customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="groupDetail-nameText"
+                                                                writeToDom="true" />
+                                                        </m:customData>
+                                                    </m:Text>
                                                 </forms:fields>
                                             </forms:FormElement>
                                             <forms:FormElement label="{i18n>uuid}">
+                                                <forms:label>
+                                                    <m:Label text="{i18n>uuid}">
+                                                        <m:customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="groupDetail-uuidLabel"
+                                                                writeToDom="true" />
+                                                        </m:customData>
+                                                    </m:Label>
+                                                </forms:label>
                                                 <forms:fields>
-                                                    <m:Text text="{oneWay>/groupData/id}" />
+                                                    <m:Text text="{oneWay>/groupData/id}">
+                                                        <m:customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="groupDetail-uuidText"
+                                                                writeToDom="true" />
+                                                        </m:customData>
+                                                    </m:Text>
                                                 </forms:fields>
                                             </forms:FormElement>
                                             <forms:FormElement label="{i18n>description}">
+                                                <forms:label>
+                                                    <m:Label text="{i18n>description}">
+                                                        <m:customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="groupDetail-descriptionLabel"
+                                                                writeToDom="true" />
+                                                        </m:customData>
+                                                    </m:Label>
+                                                </forms:label>
                                                 <forms:fields>
-                                                    <m:Text text="{oneWay>/groupData/description}" />
+                                                    <m:Text text="{oneWay>/groupData/description}">
+                                                        <m:customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="groupDetail-descriptionText"
+                                                                writeToDom="true" />
+                                                        </m:customData>
+                                                    </m:Text>
                                                 </forms:fields>
                                             </forms:FormElement>
                                             <forms:FormElement label="{i18n>systemsRole}">
+                                                <forms:label>
+                                                    <m:Label text="{i18n>systemsRole}">
+                                                        <m:customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="groupDetail-roleLabel"
+                                                                writeToDom="true" />
+                                                        </m:customData>
+                                                    </m:Label>
+                                                </forms:label>
                                                 <forms:fields>
                                                     <m:Text
-                                                        text="{parts: ['oneWay>/groupData/role'], formatter: 'commonFormatter.setGroupRole'}" />
+                                                        text="{parts: ['oneWay>/groupData/role'], formatter: 'commonFormatter.setGroupRole'}">
+                                                        <m:customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="groupDetail-roleText"
+                                                                writeToDom="true" />
+                                                        </m:customData>
+                                                    </m:Text>
                                                 </forms:fields>
                                             </forms:FormElement>
                                             <forms:FormElement label="{i18n>iamId}">
+                                                <forms:label>
+                                                    <m:Label text="{i18n>iamId}">
+                                                        <m:customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="groupDetail-iamIdLabel"
+                                                                writeToDom="true" />
+                                                        </m:customData>
+                                                    </m:Label>
+                                                </forms:label>
                                                 <forms:fields>
-                                                    <m:Text text="{oneWay>/groupData/iamIdentifier}" />
+                                                    <m:Text text="{oneWay>/groupData/iamIdentifier}">
+                                                        <m:customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="groupDetail-iamIdText"
+                                                                writeToDom="true" />
+                                                        </m:customData>
+                                                    </m:Text>
                                                 </forms:fields>
                                             </forms:FormElement>
                                             <forms:FormElement label="{i18n>groupIAMStatus}">
+                                                <forms:label>
+                                                    <m:Label text="{i18n>groupIAMStatus}">
+                                                        <m:customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="groupDetail-iamSyncedLabel"
+                                                                writeToDom="true" />
+                                                        </m:customData>
+                                                    </m:Label>
+                                                </forms:label>
                                                 <forms:fields>
-                                                    <m:Text text="{= ${oneWay>/groupData/groupInIAM} ? ${i18n>yes} : ${i18n>no} }" />
+                                                    <m:Text text="{= ${oneWay>/groupData/groupInIAM} ? ${i18n>yes} : ${i18n>no} }">
+                                                        <m:customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="groupDetail-iamSyncedText"
+                                                                writeToDom="true" />
+                                                        </m:customData>
+                                                    </m:Text>
                                                 </forms:fields>
                                             </forms:FormElement>
                                         </forms:formElements>

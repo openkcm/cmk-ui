@@ -73,6 +73,12 @@
                                         validated="{model>/hyokManagementRoleStepValid}"
                                         activate=""
                                         title="{i18n>managementRole}">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="awsHyokWizard-managementRoleStep"
+                                                writeToDom="true" />
+                                        </customData>
                                         <VBox width="100%">
                                             <VBox width="100%" items="{model>/managementRolesCerts}">
                                                 <VBox width="100%" class="sapUiSmallMarginBottom">
