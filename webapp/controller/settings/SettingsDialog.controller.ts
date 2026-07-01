@@ -36,10 +36,6 @@ interface WorkflowSettings {
     retentionPeriodDays: number
 }
 
-interface TenantInfo {
-    role: string
-}
-
 interface RoleBasedAccessSettings {
     canManage: boolean
 }
@@ -75,6 +71,7 @@ export default class SettingsDialogHandler {
         this.settingsOneWayModel.setProperty('/selectedLanguageName', languageNames[currentLanguage] || 'English (US)');
 
         this.setWorkflowSettingsEditability();
+        this.setWorkflowEnabledEditability();
         await this.loadWorkflowSettingsData();
 
         this.settingsDialog.open();
@@ -140,11 +137,16 @@ export default class SettingsDialogHandler {
         this.settingsOneWayModel.setProperty('/canEditWorkflowSettings', canEditWorkflowSettings);
     }
 
+    private setWorkflowEnabledEditability(): void {
+        const component = this.view.getController()?.getOwnerComponent?.();
+        const selectedTenantModel = component?.getModel('selectedTenant') as JSONModel;
+        const tenantRole = selectedTenantModel?.getProperty('/selectedTenantRole') as string;
+        const canEditWorkflowEnabled = tenantRole === 'TEST';
+        this.settingsOneWayModel.setProperty('/canEditWorkflowEnabled', canEditWorkflowEnabled);
+    }
+
     private async loadWorkflowSettingsData(): Promise<void> {
-        await Promise.all([
-            this.getWorkflowSettings(),
-            this.getTenantInfo()
-        ]);
+        await this.getWorkflowSettings();
     }
 
     private async getWorkflowSettings(): Promise<void> {
@@ -161,19 +163,6 @@ export default class SettingsDialogHandler {
         catch (error) {
             console.error('Error fetching workflow settings:', error);
             showErrorMessage(error as AxiosError, getText('errorFetchingWorkflowSettings'));
-        }
-    }
-
-    private async getTenantInfo(): Promise<void> {
-        try {
-            const api = Api.getInstance();
-            const tenantInfo = await api.get<TenantInfo>('tenants');
-            const canEditWorkflowEnabled = tenantInfo?.role === 'TEST';
-            this.settingsOneWayModel.setProperty('/canEditWorkflowEnabled', canEditWorkflowEnabled);
-        }
-        catch (error) {
-            console.error('Error fetching tenant info:', error);
-            this.settingsOneWayModel.setProperty('/canEditWorkflowEnabled', false);
         }
     }
 
