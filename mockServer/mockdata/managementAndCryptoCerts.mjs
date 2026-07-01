@@ -4,8 +4,15 @@ export default (keyConfigurationID) => {
     const generateManagementCerts = (count, keyConfigurationID) => {
         const response = Array.from({ length: count }, (_, index) => (
             {
+                name: `hyok-default-${index + 1}`,
                 rootCA: `http://aia.pki.co.example.com/aia/EXAMPLE%20Cloud%20Root%20CA.crt ${index + 1}`,
-                subject: `C=DE,O=EXAMPLE,OU=EXAMPLE,OU=Canary,OU=xxyyzz,L=abcd,CN=01234 ${index + 1}`
+                subject: {
+                    C: 'DE',
+                    CN: `kms-management-${index + 1}`,
+                    L: 'abcd',
+                    O: 'EXAMPLE',
+                    OU: ['EXAMPLE', 'Canary', 'xxyyzz']
+                }
             }
         ));
         return {
@@ -18,7 +25,13 @@ export default (keyConfigurationID) => {
             {
                 name: `Crypto UNIQUE NAME ${index + 1}`,
                 rootCA: `http://aia.pki.co.example.com/aia/EXAMPLE%20Cloud%20Root%20CACrypto.crt ${index + 1}`,
-                subject: `C=DE,O=EXAMPLE,OU=EXAMPLE,OU=Canary,OU=xxyyzz,L=abcd,CN=01234 ${index + 1}`
+                subject: {
+                    C: 'DE',
+                    CN: `kms-crypto-${index + 1}`,
+                    L: 'abcd',
+                    O: 'EXAMPLE',
+                    OU: ['EXAMPLE', 'Canary', 'xxyyzz']
+                }
             }
         ));
         return {

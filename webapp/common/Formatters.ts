@@ -13,7 +13,7 @@ import {
     HYOKProviders
 } from './Enums';
 import { getText } from 'kms/common/Helpers';
-import { AWSAccessDetails } from './Types';
+import { AWSAccessDetails, SubjectDN } from './Types';
 
 export function setTaskStatus(state: TaskStates): string {
     switch (state) {
@@ -93,8 +93,64 @@ export function setSystemStatusColor(status: SystemStatus | undefined): string |
             return null;
     }
 }
-export function formatCert(rootCA: string, subject: string): string {
-    return `Root CA:\n ${rootCA}\nSubject:\n${subject}`;
+function joinDNValue(value: string | string[] | undefined | null): string {
+    if (value === null || value === undefined) {
+        return '';
+    }
+    if (Array.isArray(value)) {
+        return value.filter(v => v !== undefined && v !== null && v !== '').join('/');
+    }
+    return value;
+}
+
+export function formatSubjectDN(subject: SubjectDN | string | null | undefined): string {
+    if (subject === null || subject === undefined) {
+        return '';
+    }
+    if (typeof subject === 'string') {
+        return subject;
+    }
+    if (typeof subject !== 'object') {
+        return String(subject);
+    }
+    const orderedKeys = ['CN', 'OU', 'O', 'L', 'ST', 'C'];
+    const seen = new Set<string>();
+    const parts: string[] = [];
+
+    const appendPart = (key: string) => {
+        const joined = joinDNValue(subject[key]);
+        if (joined !== '') {
+            parts.push(`${key}=${joined}`);
+        }
+    };
+
+    orderedKeys.forEach((key) => {
+        if (key in subject) {
+            appendPart(key);
+            seen.add(key);
+        }
+    });
+    Object.keys(subject).forEach((key) => {
+        if (!seen.has(key)) {
+            appendPart(key);
+        }
+    });
+
+    return parts.join(',');
+}
+
+export function formatSubjectDNField(value: string | string[] | undefined | null): string {
+    if (value === null || value === undefined) {
+        return '';
+    }
+    if (Array.isArray(value)) {
+        return value.filter(v => v !== undefined && v !== null && v !== '').join('\n');
+    }
+    return value;
+}
+
+export function formatCert(rootCA: string, subject: SubjectDN | string): string {
+    return `Root CA:\n ${rootCA}\nSubject:\n${formatSubjectDN(subject)}`;
 }
 
 export function setGroupRole(role: GroupRoles): string {

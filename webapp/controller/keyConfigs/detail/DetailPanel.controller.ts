@@ -470,6 +470,15 @@ export default class DetailPanel extends BaseController {
         this.validateAddCryptoCertsSaveButton();
     }
 
+    public onDownloadRootCA(event: Button$PressEvent): void {
+        const rootCA = event.getSource().getBindingContext('addCryptoCertsModel')?.getProperty('rootCA') as string | undefined;
+        if (!rootCA) {
+            console.error('No Root CA URL available to download');
+            return;
+        }
+        window.open(rootCA, '_blank', 'noopener,noreferrer');
+    }
+
     public onRemoveNewCryptoCertEntry(event: Button$PressEvent): void {
         const path = event.getSource().getBindingContext('addCryptoCertsModel')?.getPath();
         if (!path) return;
