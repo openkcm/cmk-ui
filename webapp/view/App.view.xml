@@ -39,8 +39,7 @@
                             writeToDom="true" />
                     </customData>
                 </ObjectStatus>
-                <!-- KMS20-2751 TEMPORARY -->
-                <!-- <MenuButton
+                <MenuButton
                     text="{= ${twoWay>/selectedTenantName} ? ${twoWay>/selectedTenantName} : ${i18n>invalidTenant}}"
                     type="{= ${twoWay>/selectedTenantName} ? 'Transparent' : 'Reject'}"
                     icon="{= ${twoWay>/selectedTenantName} ? '' : 'sap-icon://warning'}"
@@ -57,7 +56,7 @@
                             value="shellBar-tenantMenuButton"
                             writeToDom="true" />
                     </customData>
-                </MenuButton> -->
+                </MenuButton>
                 <Avatar initials="{twoWay>/userInitials}" displaySize="XS" press="onUserNamePress">
                     <layoutData>
                         <OverflowToolbarLayoutData priority="NeverOverflow" />
