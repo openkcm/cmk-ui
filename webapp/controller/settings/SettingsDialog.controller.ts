@@ -167,7 +167,7 @@ export default class SettingsDialogHandler {
     private async getTenantInfo(): Promise<void> {
         try {
             const api = Api.getInstance();
-            const tenantInfo = await api.get<TenantInfo>('tenantInfo');
+            const tenantInfo = await api.get<TenantInfo>('tenants');
             const canEditWorkflowEnabled = tenantInfo?.role === 'TEST';
             this.settingsOneWayModel.setProperty('/canEditWorkflowEnabled', canEditWorkflowEnabled);
         }
