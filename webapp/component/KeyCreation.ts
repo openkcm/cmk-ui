@@ -1,5 +1,5 @@
-import { BYOKProviders, CloudProviders, HYOKProviders, KeyCreationTypes } from 'kms/common/Enums';
-import { MangedKeyPayload } from 'kms/common/Types';
+import { BYOKProviders, HYOKProviders, KeyCreationTypes } from 'kms/common/Enums';
+import { MangedKeyPayload, KeystoreResponse, SupportedRegion } from 'kms/common/Types';
 import { showErrorMessage } from 'kms/common/Helpers';
 import { AxiosError } from 'axios';
 import BaseController from 'kms/controller/BaseController';
@@ -16,6 +16,7 @@ interface KeyCreationParams {
     keyConfigId: string
     keyType: KeyCreationTypes
     keySubtype: BYOKProviders | HYOKProviders
+    keystoreSettings?: KeystoreResponse
 }
 type KeyCreateCallBackFn = (payload: MangedKeyPayload) => Promise<void>;
 
@@ -33,17 +34,21 @@ export default class KeyCreation extends BaseController {
     private type: KeyCreationTypes;
     private keyConfigId: string;
     private onKeyCreateCallBackfnc: KeyCreateCallBackFn;
+    private supportedRegions: SupportedRegion[] = [];
 
     public openKeyCreationWizard(keyCreationParams: KeyCreationParams, parentController: KeyConfigDetail, onKeyCreateCallBackfnc: KeyCreateCallBackFn): void {
         this.type = keyCreationParams.keyType;
         this.keyConfigId = keyCreationParams.keyConfigId;
         this.onKeyCreateCallBackfnc = onKeyCreateCallBackfnc;
         this.parentController = parentController;
+        this.supportedRegions = keyCreationParams.keystoreSettings?.byok?.supportedRegions ?? [];
         this.setKeyCreationWizard();
     }
 
     private setKeyCreationWizard(): void {
-        const wizardView = 'kms.resources.fragments.common.KeyCreationWizard';
+        const wizardView = this.type === KeyCreationTypes.BYOK
+            ? 'kms.resources.fragments.common.BYOKKeyCreationWizard'
+            : 'kms.resources.fragments.common.KeyCreationWizard';
         const loadFragment = async (): Promise<void> => {
             this.keyCreatePopover = await Fragment.load({
                 // DO NOT change this id else Fragment.byId("keyCreatePopoverDialog",.... would stop working.
@@ -88,18 +93,19 @@ export default class KeyCreation extends BaseController {
     }
 
     private resetKeyCreationModel() {
+        const regionList = [
+            { key: '', text: 'Select Region' },
+            ...this.supportedRegions.map((region: SupportedRegion) => ({
+                key: region.name,
+                text: region.technicalName ?? region.name
+            }))
+        ];
         this.keyCreationModel.setData({
             name: '' as string,
             description: '' as string,
             algorithm: 'AES256' as string,
             region: '' as string,
-            regionList: [
-                { key: '', text: 'Select Region', provider: CloudProviders.AWS },
-                { key: 'us-east-1', text: 'US East (N. Virginia)', provider: CloudProviders.AWS },
-                { key: 'us-east-2', text: 'US East (Ohio)', provider: CloudProviders.AWS },
-                { key: 'us-west-1', text: 'US West (N. California)', provider: CloudProviders.AWS },
-                { key: 'us-west-2', text: 'US West (Oregon)', provider: CloudProviders.AWS }
-            ] as object[],
+            regionList: regionList as object[],
             detailsStepValid: false as boolean,
             keyRegionStepValid: false as boolean,
             keyNameValueState: 'None' as string,

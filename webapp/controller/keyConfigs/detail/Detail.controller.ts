@@ -56,6 +56,7 @@ interface KeyCreationParams {
     keyConfigId: string
     keyType: KeyCreationTypes
     keySubtype: HYOKProviders | BYOKProviders
+    keystoreSettings?: KeystoreResponse
 }
 /**
  * @namespace kms
@@ -226,10 +227,13 @@ export default class KeyConfigDetail extends BaseController {
             return;
         }
 
+        const keystoreSettings = this.oneWayModel.getProperty('/keystoreSettings') as KeystoreResponse;
+
         const keyParams = {
             keyConfigId: this.keyConfigId,
             keyType,
-            keySubtype
+            keySubtype,
+            keystoreSettings
         } as KeyCreationParams;
         const createKey = async (payload: MangedKeyPayload | HyokKeyPayload) => {
             await this.api.post('keys', payload);
