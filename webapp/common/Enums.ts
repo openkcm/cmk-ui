@@ -54,7 +54,7 @@ export enum TaskStates {
 
 export enum ActionTypes {
     UPDATE_STATE = 'UPDATE_STATE',
-    UPDATE_PRIMARY_KEY = 'UPDATE_PRIMARY_KEY',
+    UPDATE_PRIMARY = 'UPDATE_PRIMARY',
     LINK = 'LINK',
     UNLINK = 'UNLINK',
     SWITCH = 'SWITCH',

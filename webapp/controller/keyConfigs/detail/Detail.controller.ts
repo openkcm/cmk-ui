@@ -654,7 +654,6 @@ export default class KeyConfigDetail extends BaseController {
         });
     }
 
-    // eslint-disable-next-line @typescript-eslint/require-await
     public async onKeyTableMakePrimaryPress(event: Button$PressEvent): Promise<void> {
         const path = event.getSource().getBindingContext('oneWay')?.getPath();
         if (!path) {
@@ -662,15 +661,54 @@ export default class KeyConfigDetail extends BaseController {
             return;
         }
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
-        MessageBox.confirm(this.getText('confirmMakePrimaryConfirmation'), {
-            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-            // eslint-disable-next-line @typescript-eslint/no-misused-promises
-            onClose: async (action: unknown) => {
-                if (action === MessageBox.Action.YES) {
-                    await this.makeKeyPrimary(selectedKey);
-                }
+        const workflowParams = {
+            artifactType: ArtifactTypes.KEY_CONFIGURATION,
+            actionType: ActionTypes.UPDATE_PRIMARY,
+            parameters: selectedKey.id
+        } as WorkflowParams;
+
+        const makePrimaryWorkflow = new Workflow('makePrimaryWorkflowComponent');
+        makePrimaryWorkflow.init();
+
+        await makePrimaryWorkflow.checkWorkflowStatus(workflowParams, {
+            onWorkflowNotRequired: () => {
+                MessageBox.confirm(this.getText('confirmMakePrimaryConfirmation'), {
+                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onClose: async (action: unknown) => {
+                        if (action === MessageBox.Action.YES) {
+                            await this.makeKeyPrimary(selectedKey);
+                        }
+                    }
+                });
+            },
+            onWorkflowRequired: () => {
+                MessageBox.confirm(this.getText('confirmMakePrimaryWorkflowCreation'), {
+                    actions: [this.getText('sendForApproval'), MessageBox.Action.NO],
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onClose: async (action: unknown) => {
+                        if (action === this.getText('sendForApproval')) {
+                            await this.createWorkflowForMakePrimary(workflowParams);
+                        }
+                    }
+                });
+            },
+            onError: () => {
+                void this.getKeyConfigData();
             }
         });
+    }
+
+    private async createWorkflowForMakePrimary(workflowParams: WorkflowParams): Promise<void> {
+        const makePrimaryWorkflow = new Workflow('makePrimaryWorkflowComponent');
+        makePrimaryWorkflow.init();
+        try {
+            await makePrimaryWorkflow.createWorkflow(workflowParams);
+        }
+        finally {
+            await this.getKeyConfigData();
+            this.getView()?.setBusy(false);
+        }
     }
 
     public async onBYOKDownloadPress(event: Button$PressEvent) {
@@ -1039,13 +1077,10 @@ export default class KeyConfigDetail extends BaseController {
     private async makeKeyPrimary(key: Key): Promise<void> {
         this.getView()?.setBusy(true);
         const payload = {
-            name: key.name,
-            description: key.description,
-            enabled: key.enabled,
-            isPrimary: true
+            primaryKeyID: key.id
         };
         try {
-            await this.api.patch(`keys/${key.id}`, payload);
+            await this.api.patch(`keyConfigurations/${this.keyConfigId}`, payload);
             MessageToast.show(this.getText('keyMadePrimarySuccessfully'));
             await this.getKeyConfigData();
         }
