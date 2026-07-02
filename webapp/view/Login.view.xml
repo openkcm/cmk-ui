@@ -1,5 +1,5 @@
 <mvc:View
-    controllerName="kms.controller.Forbidden"
+    controllerName="kms.controller.Login"
     xmlns="sap.m"
     xmlns:f="sap.f"
     xmlns:mvc="sap.ui.core.mvc">
@@ -9,12 +9,17 @@
         <f:content>
             <VBox alignItems="Center" justifyContent="Center">
                 <IllustratedMessage enableVerticalResponsiveness="false"
-                    title="{forbidden>/errorTitle}"
-                    description="{forbidden>/errorMessage}"
+                    title="{login>/errorTitle}"
+                    description="{login>/errorMessage}"
                     enableDefaultTitleAndDescription="false"
                     illustrationType="sapIllus-UnableToLoad"
                     illustrationSize="Scene">
                 </IllustratedMessage>
+                <Button
+                    text="{i18n>retryLogin}"
+                    type="Emphasized"
+                    press=".onRetryLogin"
+                    class="sapUiSmallMarginTop" />
             </VBox>
         </f:content>
     </f:DynamicPage>

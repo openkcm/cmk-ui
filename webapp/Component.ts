@@ -26,6 +26,7 @@ export default class Component extends UIComponent {
 
     private initialSetupPromise: Promise<void>;
     private forbiddenService: ForbiddenStateService;
+    private isAuthPage = false;
 
     public init(): void {
         this.forbiddenService = ForbiddenStateService.getInstance();
@@ -48,7 +49,6 @@ export default class Component extends UIComponent {
             const config = await loadConfig();
             Auth.init(config.apiBaseUrl);
             Api.init(config.apiBaseUrl);
-            const api = Api.getInstance();
 
             const yamlText = await loadYAMLConfig();
             const doc = yaml.load(yamlText);
@@ -63,7 +63,24 @@ export default class Component extends UIComponent {
                 this.showSplashScreenError('errorNoTenantSelected');
                 return;
             }
+
+            // Early detection: If we're on the login or logout page (SM redirect),
+            // skip all API calls to prevent login loops.
+            // These pages don't need backend data — they just display a message and a retry button.
+            const isLoginRoute = currentUrl.includes('/login');
+            const isLogoutRoute = currentUrl.includes('/logout');
+
+            if (isLoginRoute || isLogoutRoute) {
+                this.isAuthPage = true;
+                Api.updateTenantId(tenantId);
+                SplashScreen.hide();
+                this.setInitialTheme();
+                this.registerIllustrationSet();
+                return;
+            }
+
             Api.updateTenantId(tenantId);
+            const api = Api.getInstance();
 
             let tenantsResponse, userInfo;
             try {
@@ -115,6 +132,14 @@ export default class Component extends UIComponent {
 
     public getInitialSetupFinishedPromise(): Promise<void> {
         return this.initialSetupPromise;
+    }
+
+    /**
+     * Returns true if the current page is an auth page (login/logout)
+     * that doesn't require full app initialization.
+     */
+    public getIsAuthPage(): boolean {
+        return this.isAuthPage;
     }
 
     private setGlobalModel(tenants: TenantsList[], selectedTenantId: string, userInfo: UserData) {
