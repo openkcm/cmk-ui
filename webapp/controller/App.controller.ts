@@ -10,7 +10,7 @@ import Api from 'kms/services/Api.service';
 import MessageBox from 'sap/m/MessageBox';
 import Component from 'kms/Component';
 import MenuItem from 'sap/m/MenuItem';
-import { RoleBasedAccessData, UserData } from 'kms/common/Types';
+import { UserData } from 'kms/common/Types';
 import { GroupRoles, UserRoles } from 'kms/common/Enums';
 import { setGroupRole } from 'kms/common/Formatters';
 import ForbiddenStateService from '../utils/ForbiddenState';
@@ -184,9 +184,9 @@ export default class App extends BaseController {
         const selectedTenant = tenants.find(tenant => tenant.id === routeArgs?.tenantId);
         this.twoWayModel.setProperty('/selectedTenantName', selectedTenant ? selectedTenant.name : '');
         this.twoWayModel.setProperty('/selectedTenantRole', selectedTenant?.role ? setGroupRole(selectedTenant.role as GroupRoles) : '');
-        const defaultHomePage = this.twoWayModel.getProperty('/defaulHomePage') as string;
 
-        if (this.isForbidden() && routeName !== 'forbidden') {
+        // If in a "hard" forbidden state (auth issues, no tenant access), block all navigation except to forbidden page
+        if (this.isHardForbidden() && routeName !== 'forbidden') {
             this.getRouter().navTo('forbidden', {
                 tenantId: routeArgs?.tenantId
             });
@@ -199,60 +199,31 @@ export default class App extends BaseController {
         }
         else {
             this.setForbiddenState(false);
-        }
-        const navigateToDefaultHomePage = (): void => {
-            this.twoWayModel.setProperty('/selectedKey', defaultHomePage);
-            this.navigateToSelectedPage();
-        };
-        const component = this.getOwnerComponent() as Component;
-        const roleBasedAccessModel = component.getModel('roleBasedAccess') as JSONModel;
-
-        // Safety check: ensure model exists before accessing data
-        if (!roleBasedAccessModel) {
-            this.getView()?.setBusy(false);
-            return;
+            // Clear soft forbidden state when navigating to a valid page
+            if (ForbiddenStateService.getInstance().isSoftForbidden()) {
+                ForbiddenStateService.getInstance().clearForbiddenState();
+            }
         }
 
-        const roleBasedAccessData = roleBasedAccessModel.getData() as RoleBasedAccessData;
+        const defaultHomePage = this.twoWayModel.getProperty('/defaulHomePage') as string;
+
         switch (routeName) {
             case 'keyConfigs':
             case 'keyConfigDetail':
             case 'keyConfigDetailPanel':
-
-                if (!roleBasedAccessData?.keyConfig.canView) {
-                    navigateToDefaultHomePage();
-                }
-                else {
-                    this.twoWayModel.setProperty('/selectedKey', 'keyConfigs');
-                }
+                this.twoWayModel.setProperty('/selectedKey', 'keyConfigs');
                 break;
             case 'systems':
             case 'systemsDetail':
-                if (!roleBasedAccessData?.systems.canView) {
-                    navigateToDefaultHomePage();
-                }
-                else {
-                    this.twoWayModel.setProperty('/selectedKey', 'systems');
-                }
+                this.twoWayModel.setProperty('/selectedKey', 'systems');
                 break;
             case 'tasks':
             case 'tasksDetail':
-                if (!roleBasedAccessData?.tasks.canView) {
-                    navigateToDefaultHomePage();
-                }
-                else {
-                    this.twoWayModel.setProperty('/selectedKey', 'tasks');
-                }
+                this.twoWayModel.setProperty('/selectedKey', 'tasks');
                 break;
             case 'groups':
             case 'groupDetail':
-                if (!roleBasedAccessData?.userGroups.canView) {
-                    navigateToDefaultHomePage();
-                }
-                else {
-                    this.twoWayModel.setProperty('/selectedKey', 'groups');
-                }
-
+                this.twoWayModel.setProperty('/selectedKey', 'groups');
                 break;
             case 'forbidden':
                 this.twoWayModel.setProperty('/selectedKey', 'forbidden');
@@ -264,7 +235,9 @@ export default class App extends BaseController {
     }
 
     public onNavigationClick(): void {
-        if (this.isForbidden()) {
+        // Only block navigation for "hard" forbidden states (auth issues)
+        // Allow navigation when in "soft" forbidden state (no page access)
+        if (this.isHardForbidden()) {
             return;
         }
         this.navigateToSelectedPage();
@@ -297,7 +270,7 @@ export default class App extends BaseController {
     }
 
     public onTenantChanged(event: Menu$ItemSelectedEvent): void {
-        if (this.isForbidden()) {
+        if (this.isHardForbidden()) {
             return;
         }
         const item = event.getParameter('item');
@@ -325,8 +298,8 @@ export default class App extends BaseController {
         Auth.secureLogout(tenantId);
     }
 
-    private isForbidden(): boolean {
-        return ForbiddenStateService.getInstance().isForbidden();
+    private isHardForbidden(): boolean {
+        return ForbiddenStateService.getInstance().isHardForbidden();
     }
 
     private setForbiddenState(isForbidden: boolean): void {
