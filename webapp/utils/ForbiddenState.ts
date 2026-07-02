@@ -18,7 +18,8 @@ export default class ForbiddenStateService {
             errorCode: '',
             errorMessage: '',
             loginButtonVisible: false,
-            isForbidden: false
+            isForbidden: false,
+            isSoftForbidden: false
         });
     }
 
@@ -37,18 +38,23 @@ export default class ForbiddenStateService {
      * Sets the forbidden state with the given error code.
      * The error message and login button visibility are resolved from the error code.
      * Publishes an event so App.controller can navigate to the forbidden page.
+     * @param errorCode - The error code from the API response
+     * @param isSoft - If true, sidebar navigation remains available (soft forbidden).
+     *                 If false (default), all navigation is blocked (hard forbidden).
      */
-    public setForbiddenState(errorCode: string): void {
-        const errorMessage = this.getErrorMessage(errorCode);
-        const errorTitle = this.getErrorTitle(errorCode);
+    public setForbiddenState(errorCode: string, isSoft = false): void {
+        const resolvedErrorCode = isSoft ? Constants.FORBIDDEN_ERROR_CODES.NO_PAGE_ACCESS : errorCode;
+        const errorMessage = this.getErrorMessage(resolvedErrorCode);
+        const errorTitle = this.getErrorTitle(resolvedErrorCode);
         const loginSupportedErrorCodes = [Constants.FORBIDDEN_ERROR_CODES.AUTHENTICATION_FAILED, Constants.FORBIDDEN_ERROR_CODES.MULTIPLE_UNSUCCESSFUL_LOGIN_ATTEMPTS, Constants.FORBIDDEN_ERROR_CODES.LOGGED_OUT];
-        const showLoginButton = loginSupportedErrorCodes.includes(errorCode);
+        const showLoginButton = !isSoft && loginSupportedErrorCodes.includes(errorCode);
 
         this.model.setProperty('/errorTitle', errorTitle);
-        this.model.setProperty('/errorCode', errorCode);
+        this.model.setProperty('/errorCode', resolvedErrorCode);
         this.model.setProperty('/errorMessage', errorMessage);
         this.model.setProperty('/loginButtonVisible', showLoginButton);
         this.model.setProperty('/isForbidden', true);
+        this.model.setProperty('/isSoftForbidden', isSoft);
 
         // Notify listeners (e.g. App.controller) so they can navigate to the forbidden page
         EventBus.getInstance().publish(
@@ -63,10 +69,27 @@ export default class ForbiddenStateService {
         this.model.setProperty('/errorMessage', '');
         this.model.setProperty('/loginButtonVisible', false);
         this.model.setProperty('/isForbidden', false);
+        this.model.setProperty('/isSoftForbidden', false);
     }
 
     public isForbidden(): boolean {
         return this.model.getProperty('/isForbidden') as boolean || false;
+    }
+
+    /**
+     * Returns true only for "hard" forbidden states (auth failures, no tenant access, etc.)
+     * Returns false for "soft" forbidden (no page access) where sidebar navigation should still work.
+     */
+    public isHardForbidden(): boolean {
+        return this.isForbidden() && !(this.model.getProperty('/isSoftForbidden') as boolean);
+    }
+
+    /**
+     * Returns true when user just doesn't have access to the specific page they navigated to.
+     * Sidebar navigation should remain functional in this state.
+     */
+    public isSoftForbidden(): boolean {
+        return this.model.getProperty('/isSoftForbidden') as boolean || false;
     }
 
     public getForbiddenErrorMessage(): string {
@@ -88,6 +111,8 @@ export default class ForbiddenStateService {
                 return resourceBundle?.getText('authenticationFailTitle') || 'Unable to Authenticate';
             case Constants.FORBIDDEN_ERROR_CODES.LOGGED_OUT:
                 return resourceBundle?.getText('loggedOutTitle') || 'Logged Out';
+            case Constants.FORBIDDEN_ERROR_CODES.NO_PAGE_ACCESS:
+                return resourceBundle?.getText('notAuthorised') || 'Not Authorised';
             default:
                 return resourceBundle?.getText('notAuthorised') || 'Not Authorised';
         }
@@ -111,6 +136,8 @@ export default class ForbiddenStateService {
                 return resourceBundle?.getText('multipleUnsuccessfulLoginAttempts') || 'Multiple unsuccessful login attempts';
             case Constants.FORBIDDEN_ERROR_CODES.LOGGED_OUT:
                 return resourceBundle?.getText('loggedOutMessage') || 'You have been logged out';
+            case Constants.FORBIDDEN_ERROR_CODES.NO_PAGE_ACCESS:
+                return resourceBundle?.getText('noPageAccessDescription') || 'You do not have permission to access this page. Please use the navigation menu to access an available page.';
             default:
                 return resourceBundle?.getText('forbiddenDescription') || 'Access forbidden';
         }

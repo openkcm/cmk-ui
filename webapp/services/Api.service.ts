@@ -101,7 +101,12 @@ export default class Api {
     private handleForbiddenError(error: AxiosError): void {
         const errorCode = getErrorCode(error);
         const forbiddenService = ForbiddenStateService.getInstance();
-        forbiddenService.setForbiddenState(errorCode);
+
+        // Generic FORBIDDEN means user doesn't have access to this specific resource/page
+        // Show soft forbidden with sidebar navigation still available
+        // All other 403 codes (MULTIPLE_ROLES_NOT_ALLOWED, NO_TENANT_ACCESS, etc.) are hard forbidden
+        const isSoftForbidden = errorCode === Constants.FORBIDDEN_ERROR_CODES.FORBIDDEN;
+        forbiddenService.setForbiddenState(errorCode, isSoftForbidden);
 
         throw new ApiAccessError(
             forbiddenService.getForbiddenErrorMessage(),

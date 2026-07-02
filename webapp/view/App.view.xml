@@ -11,7 +11,8 @@
                     id="sideNavigationToggleButton"
                     icon="sap-icon://menu2"
                     type="Transparent"
-                    press=".onSideNavButtonPress">
+                    press=".onSideNavButtonPress"
+                    visible="{= !${forbidden>/isForbidden} || ${forbidden>/isSoftForbidden} }">
                     <layoutData>
                         <OverflowToolbarLayoutData priority="NeverOverflow" />
                     </layoutData>
@@ -73,7 +74,8 @@
         <tnt:sideContent>
             <tnt:SideNavigation
                 selectedKey="{twoWay>/selectedKey}"
-                itemSelect="onNavigationClick">
+                itemSelect="onNavigationClick"
+                visible="{= !${forbidden>/isForbidden} || ${forbidden>/isSoftForbidden} }">
                 <tnt:NavigationList>
                     <tnt:NavigationListItem
                         text="{i18n>sideContentKeyConfiguration}"

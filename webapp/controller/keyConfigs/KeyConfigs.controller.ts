@@ -14,6 +14,7 @@ import MessageToast from 'sap/m/MessageToast';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import { BYOKProviders, HYOKProviders } from 'kms/common/Enums';
 import { AxiosError } from 'axios';
+
 interface KeyConfigsResponse {
     value: KeyConfig[]
     count: number
@@ -354,7 +355,7 @@ export default class Keys extends BaseController {
             name: '' as string,
             description: '' as string,
             adminGroup: '' as string,
-            adminGroupList: [{ id: '', name: this.getText('selectAdminGroup') }] as Groups[], // Add default group
+            adminGroupList: [{ id: '', name: this.getText('selectAdminGroup') }] as Groups[],
             createButtonEnabled: false as boolean,
             nameValueState: 'None' as string,
             nameValueStateText: '' as string,
