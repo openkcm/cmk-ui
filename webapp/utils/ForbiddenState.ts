@@ -111,6 +111,10 @@ export default class ForbiddenStateService {
                 return resourceBundle?.getText('authenticationFailTitle') || 'Unable to Authenticate';
             case Constants.FORBIDDEN_ERROR_CODES.LOGGED_OUT:
                 return resourceBundle?.getText('loggedOutTitle') || 'Logged Out';
+            case Constants.FORBIDDEN_ERROR_CODES.NO_TENANT_ACCESS:
+                return resourceBundle?.getText('noTenantAccess') || 'Tenant Access Denied';
+            case Constants.FORBIDDEN_ERROR_CODES.TENANT_BLOCKED:
+                return resourceBundle?.getText('tenantBlocked') || 'Tenant Blocked';
             case Constants.FORBIDDEN_ERROR_CODES.NO_PAGE_ACCESS:
                 return resourceBundle?.getText('notAuthorised') || 'Not Authorised';
             default:
@@ -136,6 +140,8 @@ export default class ForbiddenStateService {
                 return resourceBundle?.getText('multipleUnsuccessfulLoginAttempts') || 'Multiple unsuccessful login attempts';
             case Constants.FORBIDDEN_ERROR_CODES.LOGGED_OUT:
                 return resourceBundle?.getText('loggedOutMessage') || 'You have been logged out';
+            case Constants.FORBIDDEN_ERROR_CODES.TENANT_BLOCKED:
+                return resourceBundle?.getText('permissionDeniedTenantBlocked') || 'This tenant has been blocked and is no longer accessible. Please contact your system administrator for assistance.';
             case Constants.FORBIDDEN_ERROR_CODES.NO_PAGE_ACCESS:
                 return resourceBundle?.getText('noPageAccessDescription') || 'You do not have permission to access this page. Please use the navigation menu to access an available page.';
             default:
