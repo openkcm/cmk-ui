@@ -4,7 +4,7 @@ import BindingMode from 'sap/ui/model/BindingMode';
 import Api from 'kms/services/Api.service';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import EventBus from 'sap/ui/core/EventBus';
-import { AWSAccessDetails, FortanixAccessDetails, Key, KeyVersion, SystemRecoveryActions, WorkflowParams } from 'kms/common/Types';
+import { AWSAccessDetails, FortanixAccessDetails, HyokCertificates, Key, KeyVersion, SystemRecoveryActions, WorkflowParams } from 'kms/common/Types';
 import { isUUIDValid, copyToClipboard, showErrorMessage } from 'kms/common/Helpers';
 import { Button$PressEvent } from 'sap/m/Button';
 import * as Formatter from 'kms/common/Formatters';
@@ -13,6 +13,9 @@ import { ActionTypes, ArtifactTypes, EventChannelIds, EventIDs } from 'kms/commo
 import { AxiosError } from 'axios';
 import MessageBox from 'sap/m/MessageBox';
 import Workflow from 'kms/component/Workflow';
+import Dialog from 'sap/m/Dialog';
+import Fragment from 'sap/ui/core/Fragment';
+
 interface KeyVersionResponse {
     value: KeyVersion[] | undefined
     count: number | undefined
@@ -51,6 +54,11 @@ export default class DetailPanel extends BaseController {
         this.setModel(this.oneWayModel, 'oneWay');
         this.setModel(this.twoWayModel, 'twoWay');
     };
+
+    public onExit(): void {
+        this.addCryptoCertsDialog?.destroy();
+        this.addCryptoCertsDialog = undefined;
+    }
 
     public onKeyConfigDetailPanelRouteMatched(event: Route$PatternMatchedEvent): void {
         this.getView()?.setBusy(true);
@@ -127,6 +135,7 @@ export default class DetailPanel extends BaseController {
             });
             this.twoWayModel.setProperty('/selectedKey/accessDetails/cryptoARNsArray', cryptoARNsArray);
         }
+        this.updateAddCryptoCertButtonState();
     }
 
     private async getSystemRecoveryActions(systemsID: string): Promise<void> {
@@ -372,5 +381,254 @@ export default class DetailPanel extends BaseController {
         else {
             await this.getSystemDetails();
         }
+    }
+
+    // ========================
+    // Add Crypto Certificates
+    // ========================
+
+    private addCryptoCertsDialog: Dialog | undefined;
+    private addCryptoCertsModel = new JSONModel({});
+
+    public async onAddCryptoCertPress(): Promise<void> {
+        this.getView()?.setBusy(true);
+        try {
+            const { allCryptoCerts, availableCerts } = await this.getAvailableCryptoCerts();
+            const allCertsAssigned = availableCerts.length === 0;
+
+            this.addCryptoCertsModel.setData({
+                allCertsAssigned: allCertsAssigned,
+                availableCerts: availableCerts,
+                allCryptoCerts: allCryptoCerts,
+                newCryptoCertEntries: [] as { selectedCertKeys: string[], selectedCerts: HyokCertificates[], trustAnchorArn: string, roleArn: string, profileArn: string }[],
+                selectedCertKeys: [] as string[],
+                canAddMore: !allCertsAssigned,
+                saveEnabled: false
+            });
+
+            await this.openAddCryptoCertsDialog();
+        }
+        catch (error) {
+            console.error('Error loading add crypto certs dialog', error);
+            showErrorMessage(error as AxiosError, this.getText('errorLoadingAddCryptoCertsDialog'));
+        }
+        finally {
+            this.getView()?.setBusy(false);
+        }
+    }
+
+    private async openAddCryptoCertsDialog(): Promise<void> {
+        if (this.addCryptoCertsDialog) {
+            this.addCryptoCertsDialog.destroy();
+            this.addCryptoCertsDialog = undefined;
+        }
+
+        this.addCryptoCertsDialog = await Fragment.load({
+            id: 'addCryptoCertsDialog',
+            name: 'kms.resources.fragments.keys.AddCryptoCertsDialog',
+            controller: this
+        }) as Dialog;
+        this.getView()?.addDependent(this.addCryptoCertsDialog);
+
+        this.addCryptoCertsDialog.setModel(this.addCryptoCertsModel, 'addCryptoCertsModel');
+        this.addCryptoCertsDialog.open();
+    }
+
+    public onAddCryptoCertSelectionFinish(): void {
+        const selectedCertKeys = this.addCryptoCertsModel.getProperty('/selectedCertKeys') as string[];
+        if (!selectedCertKeys || selectedCertKeys.length === 0) {
+            return;
+        }
+
+        const allCryptoCerts = this.addCryptoCertsModel.getProperty('/allCryptoCerts') as HyokCertificates[];
+        const selectedCerts = allCryptoCerts.filter((cert: HyokCertificates) => selectedCertKeys.includes(cert.name));
+
+        // Create a new entry with the selected certs
+        const newEntry = {
+            selectedCertKeys: [...selectedCertKeys],
+            selectedCerts: selectedCerts,
+            trustAnchorArn: '',
+            roleArn: '',
+            profileArn: ''
+        };
+
+        const entries = this.addCryptoCertsModel.getProperty('/newCryptoCertEntries') as typeof newEntry[];
+        entries.push(newEntry);
+        this.addCryptoCertsModel.setProperty('/newCryptoCertEntries', entries);
+
+        let availableCerts = this.addCryptoCertsModel.getProperty('/availableCerts') as HyokCertificates[];
+        availableCerts = availableCerts.filter(cert => !selectedCertKeys.includes(cert.name));
+        this.addCryptoCertsModel.setProperty('/availableCerts', availableCerts);
+
+        this.addCryptoCertsModel.setProperty('/selectedCertKeys', []);
+        this.addCryptoCertsModel.setProperty('/canAddMore', availableCerts.length > 0);
+
+        this.validateAddCryptoCertsSaveButton();
+    }
+
+    public onRemoveNewCryptoCertEntry(event: Button$PressEvent): void {
+        const path = event.getSource().getBindingContext('addCryptoCertsModel')?.getPath();
+        if (!path) return;
+
+        const segments = path.split('/');
+        const index = parseInt(segments[segments.length - 1], 10);
+
+        const entries = this.addCryptoCertsModel.getProperty('/newCryptoCertEntries') as { selectedCertKeys: string[], selectedCerts: HyokCertificates[], trustAnchorArn: string, roleArn: string, profileArn: string }[];
+        const removedEntry = entries[index];
+        const updatedEntries = entries.filter((_entry, i) => i !== index);
+        this.addCryptoCertsModel.setProperty('/newCryptoCertEntries', updatedEntries);
+
+        // Add removed certs back to available list
+        let availableCerts = this.addCryptoCertsModel.getProperty('/availableCerts') as HyokCertificates[];
+        availableCerts = [...availableCerts, ...removedEntry.selectedCerts];
+        this.addCryptoCertsModel.setProperty('/availableCerts', availableCerts);
+        this.addCryptoCertsModel.setProperty('/canAddMore', availableCerts.length > 0);
+
+        this.validateAddCryptoCertsSaveButton();
+    }
+
+    public onAddCryptoCertLiveChange(): void {
+        this.validateAddCryptoCertsSaveButton();
+    }
+
+    private validateAddCryptoCertsSaveButton(): void {
+        const entries = this.addCryptoCertsModel.getProperty('/newCryptoCertEntries') as { selectedCertKeys: string[], selectedCerts: HyokCertificates[], trustAnchorArn: string, roleArn: string, profileArn: string }[];
+
+        if (!entries || entries.length === 0) {
+            this.addCryptoCertsModel.setProperty('/saveEnabled', false);
+            return;
+        }
+
+        // All entries must have all ARN fields filled
+        const allValid = entries.every(entry =>
+            entry.trustAnchorArn?.trim().length > 0
+            && entry.roleArn?.trim().length > 0
+            && entry.profileArn?.trim().length > 0
+            && entry.selectedCertKeys?.length > 0
+        );
+
+        this.addCryptoCertsModel.setProperty('/saveEnabled', allValid);
+    }
+
+    public async onSaveAddCryptoCerts(): Promise<void> {
+        this.addCryptoCertsDialog?.setBusy(true);
+        const entries = this.addCryptoCertsModel.getProperty('/newCryptoCertEntries') as { selectedCertKeys: string[], selectedCerts: HyokCertificates[], trustAnchorArn: string, roleArn: string, profileArn: string }[];
+
+        // Build crypto payload from new entries
+        let newCryptoPayload: Record<string, AWSAccessDetails> = {};
+        entries.forEach((entry) => {
+            entry.selectedCertKeys.forEach((certKey: string) => {
+                newCryptoPayload = {
+                    ...newCryptoPayload,
+                    [certKey]: {
+                        roleArn: entry.roleArn,
+                        trustAnchorArn: entry.trustAnchorArn,
+                        profileArn: entry.profileArn
+                    }
+                };
+            });
+        });
+
+        // Merge with existing crypto ARNs
+        const existingCryptoARNsArray = this.twoWayModel.getProperty('/selectedKey/accessDetails/cryptoARNsArray') as { key: string, value: AWSAccessDetails }[] | undefined;
+        let existingCryptoPayload: Record<string, AWSAccessDetails> = {};
+        existingCryptoARNsArray?.forEach((cryptoItem) => {
+            existingCryptoPayload = {
+                ...existingCryptoPayload,
+                [cryptoItem.key]: {
+                    roleArn: cryptoItem.value.roleArn,
+                    trustAnchorArn: cryptoItem.value.trustAnchorArn,
+                    profileArn: cryptoItem.value.profileArn
+                }
+            };
+        });
+
+        const mergedCryptoPayload = { ...existingCryptoPayload, ...newCryptoPayload };
+
+        const payload = {
+            accessDetails: {
+                crypto: mergedCryptoPayload
+            }
+        };
+
+        try {
+            await this.api.patch<Key>(`keys/${this.id}`, payload);
+            MessageToast.show(this.getText('keyConfigSaved'));
+            this.closeAddCryptoCertsDialog();
+            await this.getKeyDetails();
+            this.updateAddCryptoCertButtonState();
+        }
+        catch (error) {
+            console.error('Error saving new crypto certificates', error);
+            showErrorMessage(error as AxiosError, this.getText('errorSavingCryptoDetails'));
+        }
+        finally {
+            this.addCryptoCertsDialog?.setBusy(false);
+        }
+    }
+
+    public onCancelAddCryptoCerts(): void {
+        const entries = this.addCryptoCertsModel.getProperty('/newCryptoCertEntries') as unknown[];
+        if (entries && entries.length > 0) {
+            MessageBox.warning(this.getText('confirmCancelAddCryptoCerts'), {
+                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                onClose: (action: unknown) => {
+                    if (action === MessageBox.Action.YES) {
+                        this.closeAddCryptoCertsDialog();
+                    }
+                }
+            });
+        }
+        else {
+            this.closeAddCryptoCertsDialog();
+        }
+    }
+
+    private closeAddCryptoCertsDialog(): void {
+        this.addCryptoCertsDialog?.close();
+        this.addCryptoCertsDialog?.destroy();
+        this.addCryptoCertsDialog = undefined;
+    }
+
+    private getExistingCryptoKeys(): string[] {
+        const cryptoARNsArray = this.twoWayModel.getProperty('/selectedKey/accessDetails/cryptoARNsArray') as { key: string, value: AWSAccessDetails }[] | undefined;
+        if (!cryptoARNsArray) return [];
+        return cryptoARNsArray.map(item => item.key);
+    }
+
+    private async fetchCryptoCertificates(): Promise<HyokCertificates[]> {
+        interface HYOKAWScertificates {
+            tenantDefault: { count: number, value: HyokCertificates[] }
+            crypto: { count: number, value: HyokCertificates[] }
+        }
+        const keyConfigId = this.keyConfigId ?? '';
+        const certs = await this.api.get<HYOKAWScertificates>(`keyConfigurations/${keyConfigId}/certificates`);
+        return certs?.crypto?.value ?? [];
+    }
+
+    private async getAvailableCryptoCerts(): Promise<{ allCryptoCerts: HyokCertificates[], availableCerts: HyokCertificates[] }> {
+        const allCryptoCerts = await this.fetchCryptoCertificates();
+        const existingCryptoKeys = this.getExistingCryptoKeys();
+        const availableCerts = allCryptoCerts.filter(
+            (cert: HyokCertificates) => !existingCryptoKeys.includes(cert.name)
+        );
+        return { allCryptoCerts, availableCerts };
+    }
+
+    private updateAddCryptoCertButtonState(): void {
+        const selectedKey = this.oneWayModel.getProperty('/selectedKey') as Key;
+        const keyType = selectedKey?.type;
+        if (keyType !== this.Enums.KeyCreationTypes.HYOK) {
+            this.oneWayModel.setProperty('/addCryptoCertEnabled', false);
+            return;
+        }
+
+        this.getAvailableCryptoCerts().then(({ availableCerts }) => {
+            this.oneWayModel.setProperty('/addCryptoCertEnabled', availableCerts.length > 0);
+        }).catch((error: unknown) => {
+            console.error('Error checking crypto cert availability', error);
+            // Default to enabled so user can still try to add
+            this.oneWayModel.setProperty('/addCryptoCertEnabled', true);
+        });
     }
 }
