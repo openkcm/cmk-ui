@@ -15,3 +15,6 @@
 node_modules/
 /test-results/
 /blob-report/
+
+# Local development HTTPS certificates
+/.certs/
