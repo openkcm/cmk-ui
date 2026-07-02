@@ -41,7 +41,8 @@ export default class App extends BaseController {
             userInitials: '',
             userName: '',
             userEmail: '',
-            isForbidden: false
+            isForbidden: false,
+            isAuthPage: false
         }
     );
 
@@ -58,6 +59,19 @@ export default class App extends BaseController {
         const component = this.getOwnerComponent() as Component;
 
         component.getInitialSetupFinishedPromise().then(() => {
+            // If this is an auth page (login/logout), do minimal setup — just initialize the router
+            // Hide the app shell (header + side nav) since the user is not authenticated
+            if (component.getIsAuthPage()) {
+                this.twoWayModel.setProperty('/isAuthPage', true);
+                this.setModel(this.twoWayModel, 'twoWay');
+                this.getRouter().attachRouteMatched(this.onRouteChange.bind(this));
+                this.getRouter().initialize();
+                if (view) {
+                    view.setBusy(false);
+                }
+                return;
+            }
+
             this.toolPage = this.byId('kmsApp') as ToolPage;
 
             this.setModel(this.oneWayModel, 'oneWay');
@@ -173,6 +187,16 @@ export default class App extends BaseController {
         }
         const routeArgs = event.getParameter('arguments') as { tenantId: string };
         this.twoWayModel.setProperty('/selectedTenant', routeArgs?.tenantId);
+
+        // For auth pages (login/logout), skip all the normal route handling and hide the app shell
+        if (routeName === 'login' || routeName === 'logout') {
+            this.twoWayModel.setProperty('/isAuthPage', true);
+            this.twoWayModel.setProperty('/selectedKey', routeName);
+            this.getView()?.setBusy(false);
+            return;
+        }
+        this.twoWayModel.setProperty('/isAuthPage', false);
+
         try {
             Api.updateTenantId(routeArgs?.tenantId);
         }

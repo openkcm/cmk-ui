@@ -126,6 +126,16 @@
                     "target": "forbidden"
                 },
                 {
+                    "pattern": "{tenantId}/login:?query:",
+                    "name": "login",
+                    "target": "login"
+                },
+                {
+                    "pattern": "{tenantId}/logout",
+                    "name": "logout",
+                    "target": "logout"
+                },
+                {
                     "pattern": "{tenantId}/systems",
                     "name": "systems",
                     "target": "systems"
@@ -143,6 +153,18 @@
                 "forbidden": {
                     "viewId": "forbidden",
                     "viewName": "Forbidden",
+                    "viewLevel": 1,
+                    "controlAggregation": "pages"
+                },
+                "login": {
+                    "viewId": "login",
+                    "viewName": "Login",
+                    "viewLevel": 1,
+                    "controlAggregation": "pages"
+                },
+                "logout": {
+                    "viewId": "logout",
+                    "viewName": "Logout",
                     "viewLevel": 1,
                     "controlAggregation": "pages"
                 },

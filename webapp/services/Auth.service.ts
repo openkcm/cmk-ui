@@ -4,7 +4,6 @@
 
 import Constants from 'kms/common/Constants';
 import { ILoginTracker } from 'kms/common/Types';
-import ForbiddenStateService from '../utils/ForbiddenState';
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export default class Auth {
@@ -22,7 +21,8 @@ export default class Auth {
 
     static setAuthEndpoint(tenantId: string): void {
         const returnToPath = window.location.href;
-        Auth.authEndpoint = `${this.baseAuthUrl}/sm/auth?tenant_id=${encodeURIComponent(tenantId)}&request_uri=${encodeURIComponent(returnToPath)}`;
+        const errorUri = this.buildLoginErrorUri(tenantId);
+        Auth.authEndpoint = `${this.baseAuthUrl}/sm/auth?tenant_id=${encodeURIComponent(tenantId)}&request_uri=${encodeURIComponent(returnToPath)}&error_uri=${encodeURIComponent(errorUri)}`;
     }
 
     static initiateLogin(tenantId: string): void {
@@ -52,8 +52,9 @@ export default class Auth {
     }
 
     static secureLogout(tenantId: string): void {
-        const logoutUrl = `${this.baseAuthUrl}/sm/logout?tenant_id=${tenantId}`;
         this.postLogoutClearance();
+        const logoutRedirectUri = this.buildLogoutRedirectUri(tenantId);
+        const logoutUrl = `${this.baseAuthUrl}/sm/logout?tenant_id=${encodeURIComponent(tenantId)}&post_logout_redirect_uri=${encodeURIComponent(logoutRedirectUri)}`;
         window.location.href = logoutUrl;
     }
 
@@ -74,7 +75,11 @@ export default class Auth {
         }
 
         if (tracker.count >= Auth.maxLoginAttempts) {
-            ForbiddenStateService.getInstance().setForbiddenState(Constants.FORBIDDEN_ERROR_CODES.MULTIPLE_UNSUCCESSFUL_LOGIN_ATTEMPTS);
+            // Redirect to the login error page instead of setting forbidden state in the SPA
+            // This prevents the login loop since the login page doesn't make API calls
+            const origin = window.location.origin;
+            const errorCode = Constants.FORBIDDEN_ERROR_CODES.MULTIPLE_UNSUCCESSFUL_LOGIN_ATTEMPTS;
+            window.location.href = `${origin}/#/${encodeURIComponent(tenantId)}/login?errorCode=${encodeURIComponent(errorCode)}`;
         }
         else {
             tracker.count++;
@@ -83,5 +88,38 @@ export default class Auth {
 
             this.initiateLogin(tenantId);
         }
+    }
+
+    /**
+     * Builds the error_uri for the SM auth endpoint.
+     *
+     * The error_uri intentionally does NOT include a hash fragment (#) because
+     * SM treats `#` as a standard URL fragment separator (per RFC 3986) and
+     * appends query parameters before it, producing broken URLs.
+     *
+     * Instead, we pass the tenantId as a query parameter:
+     *   https://host/index.html?tenant=chbu-5-st
+     *
+     * When SM encounters an error, it appends errorCode/errorDescription as
+     * additional query parameters, producing a clean URL:
+     *   https://host/index.html?tenant=chbu-5-st&errorCode=invalid_request&errorDescription=...
+     *
+     * The splash-helpers.js script (which runs before UI5 bootstraps) detects
+     * errorCode in window.location.search, reads the tenant param, and redirects
+     * to the correct hash-based login route:
+     *   https://host/index.html#/chbu-5-st/login?errorCode=invalid_request
+     */
+    private static buildLoginErrorUri(tenantId: string): string {
+        const base = window.location.origin + window.location.pathname;
+        return `${base}?tenant=${encodeURIComponent(tenantId)}`;
+    }
+
+    /**
+     * Builds the post-logout redirect URI.
+     * SM will redirect here after successfully logging the user out.
+     */
+    private static buildLogoutRedirectUri(tenantId: string): string {
+        const base = window.location.origin + window.location.pathname;
+        return `${base}#/${encodeURIComponent(tenantId)}/logout`;
     }
 }

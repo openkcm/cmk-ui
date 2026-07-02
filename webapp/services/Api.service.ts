@@ -30,8 +30,6 @@ export default class Api {
     private tenantName: string | undefined;
     private userInfo: UserData | undefined;
     private static setAxiosHeaderCSRFCookie: (tenantID: string) => void;
-    private hasHandledFirstAuthError = false;
-    private isLoginInProgress = false;
 
     constructor(baseUrl: string) {
         this.baseURL = baseUrl;
@@ -63,22 +61,13 @@ export default class Api {
         const isForbiddenError = apiError?.status === 403;
         if (isAuthenticationError) {
             console.warn('Authentication error detected. Initiating login process.');
-            try {
-                Auth.handle401Error(this.tenantId || '');
-            }
-            catch (e: unknown) {
-                console.error('Login initiation failed:', e);
-                ForbiddenStateService.getInstance().setForbiddenState(Constants.FORBIDDEN_ERROR_CODES.AUTHENTICATION_FAILED);
-            }
-            // If forbidden state was set (e.g. max login attempts or the catch block for handle401Error), throw so callers can handle it
-            if (ForbiddenStateService.getInstance().isForbidden()) {
-                const forbiddenService = ForbiddenStateService.getInstance();
-                throw new ApiAccessError(
-                    forbiddenService.getForbiddenErrorMessage(),
-                    forbiddenService.getForbiddenErrorCode()
-                );
-            }
-            // Otherwise, a login redirect was initiated — just return
+            // Auth.handle401Error will either:
+            // 1. Redirect to SM login (if under max attempts) — page navigates away
+            // 2. Redirect to login error page (if max attempts exceeded) — page navigates away
+            // In both cases, the current execution context ends after the redirect.
+            Auth.handle401Error(this.tenantId || '');
+            // If we get here, it means the redirect hasn't happened yet (unlikely in normal flow)
+            // Just return to prevent further error handling
             return;
         }
         else if (isForbiddenError) {

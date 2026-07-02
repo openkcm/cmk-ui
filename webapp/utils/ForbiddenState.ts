@@ -17,7 +17,6 @@ export default class ForbiddenStateService {
             errorTitle: '',
             errorCode: '',
             errorMessage: '',
-            loginButtonVisible: false,
             isForbidden: false,
             isSoftForbidden: false
         });
@@ -36,7 +35,7 @@ export default class ForbiddenStateService {
 
     /**
      * Sets the forbidden state with the given error code.
-     * The error message and login button visibility are resolved from the error code.
+     * The error message is resolved from the error code.
      * Publishes an event so App.controller can navigate to the forbidden page.
      * @param errorCode - The error code from the API response
      * @param isSoft - If true, sidebar navigation remains available (soft forbidden).
@@ -46,13 +45,10 @@ export default class ForbiddenStateService {
         const resolvedErrorCode = isSoft ? Constants.FORBIDDEN_ERROR_CODES.NO_PAGE_ACCESS : errorCode;
         const errorMessage = this.getErrorMessage(resolvedErrorCode);
         const errorTitle = this.getErrorTitle(resolvedErrorCode);
-        const loginSupportedErrorCodes = [Constants.FORBIDDEN_ERROR_CODES.AUTHENTICATION_FAILED, Constants.FORBIDDEN_ERROR_CODES.MULTIPLE_UNSUCCESSFUL_LOGIN_ATTEMPTS, Constants.FORBIDDEN_ERROR_CODES.LOGGED_OUT];
-        const showLoginButton = !isSoft && loginSupportedErrorCodes.includes(errorCode);
 
         this.model.setProperty('/errorTitle', errorTitle);
         this.model.setProperty('/errorCode', resolvedErrorCode);
         this.model.setProperty('/errorMessage', errorMessage);
-        this.model.setProperty('/loginButtonVisible', showLoginButton);
         this.model.setProperty('/isForbidden', true);
         this.model.setProperty('/isSoftForbidden', isSoft);
 
@@ -67,7 +63,6 @@ export default class ForbiddenStateService {
         this.model.setProperty('/errorTitle', '');
         this.model.setProperty('/errorCode', '');
         this.model.setProperty('/errorMessage', '');
-        this.model.setProperty('/loginButtonVisible', false);
         this.model.setProperty('/isForbidden', false);
         this.model.setProperty('/isSoftForbidden', false);
     }
@@ -77,7 +72,7 @@ export default class ForbiddenStateService {
     }
 
     /**
-     * Returns true only for "hard" forbidden states (auth failures, no tenant access, etc.)
+     * Returns true only for "hard" forbidden states (no tenant access, multiple roles, etc.)
      * Returns false for "soft" forbidden (no page access) where sidebar navigation should still work.
      */
     public isHardForbidden(): boolean {
@@ -132,8 +127,6 @@ export default class ForbiddenStateService {
                 return resourceBundle?.getText('permissionDeniedMultipleRoles') || 'Multiple roles not allowed';
             case Constants.FORBIDDEN_ERROR_CODES.NO_TENANT_ACCESS:
                 return resourceBundle?.getText('permissionDeniedNoRole') || 'No tenant access';
-            case Constants.FORBIDDEN_ERROR_CODES.AUTHENTICATION_FAILED:
-                return resourceBundle?.getText('permissionDeniedAuthenticationFailed') || 'Authentication failed';
             case Constants.FORBIDDEN_ERROR_CODES.ZERO_ROLES_NOT_ALLOWED:
                 return resourceBundle?.getText('permissionDeniedZeroRoles') || 'Zero roles not allowed';
             case Constants.FORBIDDEN_ERROR_CODES.MULTIPLE_UNSUCCESSFUL_LOGIN_ATTEMPTS:
