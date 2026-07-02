@@ -30,6 +30,7 @@ export default tseslint.config(
     ignores: [
       "eslint.config.mjs",
       "environment.d.ts",
+      "dev-server.mjs",
       "mockServer/**/*",
       "mock.mjs",
       "dist/**/*",
