@@ -858,8 +858,7 @@ export default class KeyConfigDetail extends BaseController {
         const workflowParams = {
             artifactType: ArtifactTypes.KEY,
             artifactID: selectedKey.id,
-            actionType: ActionTypes.UPDATE_PRIMARY,
-            parameters: 'DELETE'
+            actionType: ActionTypes.DELETE
         } as WorkflowParams;
 
         const deleteKeyWorkflow = new Workflow('deleteKeyWorkflowComponent');

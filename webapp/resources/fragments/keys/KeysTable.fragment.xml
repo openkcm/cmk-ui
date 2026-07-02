@@ -114,11 +114,11 @@
                 <Text text="{i18n>name}" />
             </Column>
             <Column
-                    vAlign="Middle"
-                    hAlign="Begin"
-                    minScreenWidth="Large"
-                    demandPopin="false"
-                    visible="{= ${oneWay>/keys}.length > 0 }">
+                vAlign="Middle"
+                hAlign="Begin"
+                minScreenWidth="Large"
+                demandPopin="false"
+                visible="{= ${oneWay>/keys}.length > 0 }">
                 <Text text="{i18n>type}" />
             </Column>
             <Column
@@ -171,9 +171,9 @@
                         <Text text="{oneWay>type}" wrapping="false">
                             <customData>
                                 <core:CustomData
-                                        key="testId"
-                                        value="keysTable-keyTypeText"
-                                        writeToDom="true" />
+                                    key="testId"
+                                    value="keysTable-keyTypeText"
+                                    writeToDom="true" />
                             </customData>
                         </Text>
                     </VBox>
