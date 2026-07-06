@@ -205,6 +205,19 @@ export function setEnableMenuItemVisible(keyType: KeyCreationTypes, keyState: Ke
     return keyType !== KeyCreationTypes.HYOK && keyState === KeyStates.DISABLED;
 }
 
+export function setMakePrimaryMenuItemVisible(isPrimary: boolean, keyState: KeyStates, primaryKeyState: KeyStates | undefined): boolean {
+    if (isPrimary) {
+        return false;
+    }
+    if (keyState === KeyStates.PENDING_IMPORT || keyState === KeyStates.DISABLED) {
+        return false;
+    }
+    if (primaryKeyState === KeyStates.DISABLED) {
+        return false;
+    }
+    return true;
+}
+
 export function setDisableMenuItemVisible(keyType: KeyCreationTypes, keyState: KeyStates): boolean {
     return keyType !== KeyCreationTypes.HYOK && keyState === KeyStates.ENABLED;
 }
