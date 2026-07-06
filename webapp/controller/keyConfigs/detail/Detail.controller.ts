@@ -434,6 +434,8 @@ export default class KeyConfigDetail extends BaseController {
         this.keysPaginationModel.setProperty('/totalPages', Math.ceil((keys?.count ?? 0) / this.top));
         this.keysPaginationModel.setProperty('/currentPage', this.keysCurrentPage);
         this.oneWayModel.setProperty('/keysCount', keys?.count || 0);
+        const primaryKey = await this.getPrimaryKey();
+        this.oneWayModel.setProperty('/primaryKey', primaryKey);
         this.oneWayModel.setProperty('/keysTableUpdating', false);
     }
 
@@ -457,6 +459,20 @@ export default class KeyConfigDetail extends BaseController {
         catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorFetchingKeyDetails'));
+        }
+    }
+
+    private async getPrimaryKey(): Promise<Key | undefined> {
+        const keyConfig = this.oneWayModel.getProperty('/keyConfig') as KeyConfig | undefined;
+        const primaryKeyID = keyConfig?.primaryKeyID;
+        if (!primaryKeyID) {
+            return undefined;
+        }
+        try {
+            return await this.api.get<Key>(`keys/${primaryKeyID}`);
+        }
+        catch (error) {
+            console.error(error);
         }
     }
 

@@ -199,7 +199,7 @@
                                 <Menu class="sapUiSizeCompact">
                                     <MenuItem press="onKeyTableMakePrimaryPress"
                                         text="{i18n>makePrimary}"
-                                        visible="{= !${oneWay>isPrimary}}"
+                                        visible="{parts: ['oneWay>isPrimary', 'oneWay>state', 'oneWay>/primaryKey/state'], formatter: 'commonFormatter.setMakePrimaryMenuItemVisible'}"
                                         icon="sap-icon://favorite">
                                         <customData>
                                             <core:CustomData
