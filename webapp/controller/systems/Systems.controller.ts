@@ -133,13 +133,13 @@ export default class Systems extends BaseController {
             const selectedKeyConfig = this.filterModel.getProperty('/selectedKeyConfig') as string;
 
             const filters: string[] = [];
-            if (selectedRegion !== 'all') {
+            if (selectedRegion && selectedRegion !== 'all') {
                 filters.push(`region eq '${selectedRegion}'`);
             }
-            if (selectedType !== 'all') {
+            if (selectedType && selectedType !== 'all') {
                 filters.push(`type eq '${selectedType}'`);
             }
-            if (selectedKeyConfig !== 'all') {
+            if (selectedKeyConfig && selectedKeyConfig !== 'all') {
                 filters.push(`keyConfigurationID eq '${selectedKeyConfig}'`);
             }
 
