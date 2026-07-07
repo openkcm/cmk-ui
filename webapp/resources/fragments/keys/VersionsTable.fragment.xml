@@ -116,6 +116,10 @@
                             visible="{= ${oneWay>state} === 'DISABLED'}"
                             text="{i18n>disabled}"
                             colorScheme="2" />
+                        <tnt:InfoLabel
+                            visible="{= ${oneWay>state} === 'UNKNOWN'}"
+                            text="{i18n>unknown}"
+                            colorScheme="10" />
                     </VBox>
                     <Text
                         text="{path:'oneWay>metadata/rotatedAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-dd\'T\'HH:mm:ss.SSSSSSX'}}} UTC"
