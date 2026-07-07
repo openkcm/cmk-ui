@@ -108,7 +108,7 @@
                                                             <Text text="{path: 'model>subject/CN', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
                                                         </VBox>
                                                         <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
-                                                            <Label text="{i18n>subjectOU}:" />
+                                                            <Label text="{path: 'model>subject/OU', formatter: 'commonFormatter.formatSubjectOULabel'}" />
                                                             <Text text="{path: 'model>subject/OU', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" renderWhitespace="true" />
                                                         </VBox>
                                                         <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
@@ -192,7 +192,7 @@
                                                                             <Text text="{path: 'model>subject/CN', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
                                                                         </VBox>
                                                                         <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
-                                                                            <Label text="{i18n>subjectOU}:" />
+                                                                            <Label text="{path: 'model>subject/OU', formatter: 'commonFormatter.formatSubjectOULabel'}" />
                                                                             <Text text="{path: 'model>subject/OU', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" renderWhitespace="true" />
                                                                         </VBox>
                                                                         <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
@@ -360,7 +360,7 @@
                                                                 <Text text="{path: 'model>subject/CN', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
                                                             </VBox>
                                                             <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
-                                                                <Label text="{i18n>subjectOU}:" />
+                                                                <Label text="{path: 'model>subject/OU', formatter: 'commonFormatter.formatSubjectOULabel'}" />
                                                                 <Text text="{path: 'model>subject/OU', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" renderWhitespace="true" />
                                                             </VBox>
                                                             <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
