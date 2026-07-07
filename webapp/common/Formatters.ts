@@ -93,14 +93,17 @@ export function setSystemStatusColor(status: SystemStatus | undefined): string |
             return null;
     }
 }
-function joinDNValue(value: string | string[] | undefined | null): string {
+function normalizeDNValues(value: string | string[] | undefined | null): string[] {
     if (value === null || value === undefined) {
-        return '';
+        return [];
     }
     if (Array.isArray(value)) {
-        return value.filter(v => v !== undefined && v !== null && v !== '').join('/');
+        return value.filter((v): v is string => v !== undefined && v !== null && v !== '');
     }
-    return value;
+    if (value === '') {
+        return [];
+    }
+    return [value];
 }
 
 export function formatSubjectDN(subject: SubjectDN | string | null | undefined): string {
@@ -118,10 +121,10 @@ export function formatSubjectDN(subject: SubjectDN | string | null | undefined):
     const parts: string[] = [];
 
     const appendPart = (key: string) => {
-        const joined = joinDNValue(subject[key]);
-        if (joined !== '') {
-            parts.push(`${key}=${joined}`);
-        }
+        const values = normalizeDNValues(subject[key]);
+        values.forEach((v) => {
+            parts.push(`${key}=${v}`);
+        });
     };
 
     orderedKeys.forEach((key) => {
@@ -136,7 +139,7 @@ export function formatSubjectDN(subject: SubjectDN | string | null | undefined):
         }
     });
 
-    return parts.join(',');
+    return parts.join(', ');
 }
 
 export function formatSubjectDNField(value: string | string[] | undefined | null): string {
@@ -147,6 +150,14 @@ export function formatSubjectDNField(value: string | string[] | undefined | null
         return value.filter(v => v !== undefined && v !== null && v !== '').join('\n');
     }
     return value;
+}
+
+export function formatSubjectOULabel(value: string | string[] | undefined | null): string {
+    const values = normalizeDNValues(value);
+    if (values.length > 1) {
+        return `${getText('subjectOUs')}:`;
+    }
+    return `${getText('subjectOU')}:`;
 }
 
 export function formatCert(rootCA: string, subject: SubjectDN | string): string {
