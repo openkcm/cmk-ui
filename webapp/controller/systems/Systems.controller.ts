@@ -140,7 +140,7 @@ export default class Systems extends BaseController {
                 filters.push(`type eq '${selectedType}'`);
             }
             if (selectedKeyConfig && selectedKeyConfig !== 'all') {
-                filters.push(`keyConfigurationID eq '${selectedKeyConfig}'`);
+                filters.push(`keyConfigurationName eq '${selectedKeyConfig}'`);
             }
 
             if (filters.length > 0) {
