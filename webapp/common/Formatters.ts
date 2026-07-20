@@ -220,7 +220,7 @@ export function setMakePrimaryMenuItemVisible(isPrimary: boolean, keyState: KeyS
     if (isPrimary) {
         return false;
     }
-    if (keyState === KeyStates.PENDING_IMPORT || keyState === KeyStates.DISABLED) {
+    if (keyState !== KeyStates.ENABLED) {
         return false;
     }
     if (primaryKeyState === KeyStates.DISABLED) {
