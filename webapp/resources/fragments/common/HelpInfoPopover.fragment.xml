@@ -1,16 +1,8 @@
 <core:FragmentDefinition xmlns="sap.m"
     xmlns:core="sap.ui.core">
-    <Popover title="{= ${helpInfoModel>title}}"
+    <Popover title="{= ${helpModel>/title} ? ${helpModel>/title} : ${i18n>help}}"
         placement="Auto"
         class="sapUiContentPadding">
-        <Text text="{helpInfoModel>displayMessage}" />
-        <footer visible="{helpInfoModel>showCloseButton}">
-            <OverflowToolbar>
-                <ToolbarSpacer />
-                <Button
-                    icon="sap-icon://decline"
-                    press="onHelpClosePressed" />
-            </OverflowToolbar>
-        </footer>
+        <Text text="{helpModel>/text}" />
     </Popover>
 </core:FragmentDefinition>
