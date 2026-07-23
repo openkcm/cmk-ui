@@ -69,7 +69,10 @@ export function setSystemRole(role?: string, roleID?: string): string {
     }
     return role || '';
 }
-export function setSystemStatusIcon(status: SystemStatus | undefined): string | null {
+export function setSystemStatusIcon(status: SystemStatus | undefined, underWorkflow?: boolean): string | null {
+    if (underWorkflow) {
+        return 'sap-icon://workflow-tasks';
+    }
     switch (status) {
         case SystemStatus.CONNECTED:
             return 'sap-icon://sys-enter-2';
@@ -81,7 +84,10 @@ export function setSystemStatusIcon(status: SystemStatus | undefined): string | 
             return null;
     }
 }
-export function setSystemStatusColor(status: SystemStatus | undefined): string | null {
+export function setSystemStatusColor(status: SystemStatus | undefined, underWorkflow?: boolean): string | null {
+    if (underWorkflow) {
+        return 'Indication15';
+    }
     switch (status) {
         case SystemStatus.CONNECTED:
             return 'Indication14';
@@ -92,6 +98,15 @@ export function setSystemStatusColor(status: SystemStatus | undefined): string |
         default:
             return null;
     }
+}
+export function setSystemStatusText(status: SystemStatus | undefined, underWorkflow?: boolean): string {
+    if (underWorkflow) {
+        return getText('UNDER_WORKFLOW');
+    }
+    if (!status) {
+        return '';
+    }
+    return getText(status);
 }
 function normalizeDNValues(value: string | string[] | undefined | null): string[] {
     if (value === null || value === undefined) {

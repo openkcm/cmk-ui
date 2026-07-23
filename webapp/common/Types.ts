@@ -14,6 +14,7 @@ export interface System {
     type: string
     properties?: object
     status: SystemStatus
+    underWorkflow?: boolean
     keyConfigurationName: string
     keyConfigurationID: string
     metadata?: SystemMetadata

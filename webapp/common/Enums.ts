@@ -101,7 +101,8 @@ export enum SystemStatus {
     CONNECTED = 'CONNECTED',
     DISCONNECTED = 'DISCONNECTED',
     PROCESSING = 'PROCESSING',
-    FAILED = 'FAILED'
+    FAILED = 'FAILED',
+    UNDER_WORKFLOW = 'UNDER_WORKFLOW'
 }
 
 export enum SystemType {
