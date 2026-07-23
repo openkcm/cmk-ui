@@ -19,6 +19,14 @@ QUnit.test('The setSystemStatusIcon method with an unknown state', function (ass
     const result = Formatters.setSystemStatusIcon('UNKNOWN' as SystemStatus);
     assert.strictEqual(result, null, 'The icon for an unknown state is empty');
 });
+QUnit.test('The setSystemStatusIcon method returns workflow icon when underWorkflow is true', function (assert) {
+    const result = Formatters.setSystemStatusIcon(SystemStatus.CONNECTED, true);
+    assert.strictEqual(result, 'sap-icon://workflow-tasks', 'The icon should be workflow-tasks when underWorkflow is true');
+});
+QUnit.test('The setSystemStatusIcon method ignores underWorkflow when false', function (assert) {
+    const result = Formatters.setSystemStatusIcon(SystemStatus.CONNECTED, false);
+    assert.strictEqual(result, 'sap-icon://sys-enter-2', 'The icon should reflect status when underWorkflow is false');
+});
 
 QUnit.test('The setSystemStatusColor method with a CONNECTED state', function (assert) {
     const result = Formatters.setSystemStatusColor(SystemStatus.CONNECTED);

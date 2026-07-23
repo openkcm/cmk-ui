@@ -15,6 +15,7 @@ export default (systemId, keyConfigurationID, operation) => {
             externalName: `System One`
         },
         status: 'FAILED',
+        underWorkflow: false,
         type: "SYSTEM"
     },{
         id: '345237-45744-34534-3375890',
@@ -31,6 +32,7 @@ export default (systemId, keyConfigurationID, operation) => {
             externalName: `System Two`
         },
         status: 'PROCESSING',
+        underWorkflow: false,
         type: "SYSTEM"
     },{
         id: '98765-45744-34534-3375890',
@@ -46,7 +48,8 @@ export default (systemId, keyConfigurationID, operation) => {
             roleID: 'QTI',
             externalName: `System Nine`
         },
-        status: 'PROCESSING',
+        status: 'CONNECTED',
+        underWorkflow: true,
         type: "SYSTEM"
     },{
         id: '745565-565744-34534-3375890',
@@ -61,6 +64,7 @@ export default (systemId, keyConfigurationID, operation) => {
             externalName: `System Cobra`
         },
         status: 'DISCONNECTED',
+        underWorkflow: true,
         type: "SYSTEM"
     },{
         id: '43567-56744-34534-3375890',

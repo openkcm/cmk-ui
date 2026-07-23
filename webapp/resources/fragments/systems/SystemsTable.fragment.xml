@@ -149,13 +149,13 @@
                     </Text>
                     <VBox>
                         <ObjectStatus
-                            icon="{parts: ['oneWay>status'], formatter: 'commonFormatter.setSystemStatusIcon'}"
-                            text="{parts: ['oneWay>status'], formatter: '.getText'}"
+                            icon="{parts: ['oneWay>status', 'oneWay>underWorkflow'], formatter: 'commonFormatter.setSystemStatusIcon'}"
+                            text="{parts: ['oneWay>status', 'oneWay>underWorkflow'], formatter: 'commonFormatter.setSystemStatusText'}"
                             active="true"
                             press="handleStatusPressed"
-                            visible="{= ${oneWay>status} !== 'DISCONNECTED'}"
+                            visible="{= ${oneWay>status} !== 'DISCONNECTED' || ${oneWay>underWorkflow} === true}"
                             inverted="true"
-                            state="{parts: ['oneWay>status'], formatter: 'commonFormatter.setSystemStatusColor'}">
+                            state="{parts: ['oneWay>status', 'oneWay>underWorkflow'], formatter: 'commonFormatter.setSystemStatusColor'}">
                             <customData>
                                 <core:CustomData
                                     key="testId"
@@ -166,7 +166,7 @@
                         <Button text="{i18n>connect}"
                             press="onTargetConnectSystemPress"
                             enabled="{= ${roleBasedAccess>/systems/canManage} }"
-                            visible="{= ${oneWay>status} === 'DISCONNECTED'}"
+                            visible="{= ${oneWay>status} === 'DISCONNECTED' &amp;&amp; ${oneWay>underWorkflow} !== true}"
                             icon="sap-icon://add">
                             <customData>
                                 <core:CustomData
