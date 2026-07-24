@@ -176,8 +176,14 @@ export interface FortanixAccessDetails {
     applicationId: string
     isEditable?: boolean
 }
+export interface GCPAccessDetails {
+    projectNumber: string
+    poolId: string
+    providerId: string
+    serviceAccount: string
+}
 export interface AccessDetails {
-    management: AWSAccessDetails | FortanixAccessDetails
+    management: AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails
     crypto: Record<string, AWSAccessDetails | FortanixAccessDetails>
 }
 export interface HyokKeyPayload {
@@ -216,6 +222,10 @@ export interface HyokCryptoCertInput {
     roleCryptoARN: string | null
     rootCryptoCA: string | null
     cryptoApplicationId: string | null
+    cryptoProjectNumber: string | null
+    cryptoPoolId: string | null
+    cryptoProviderId: string | null
+    cryptoServiceAccount: string | null
 }
 export interface SupportedRegion {
     name: string
