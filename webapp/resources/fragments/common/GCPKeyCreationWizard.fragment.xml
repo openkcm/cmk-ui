@@ -1,0 +1,546 @@
+<core:FragmentDefinition
+        xmlns="sap.m"
+        xmlns:core="sap.ui.core"
+        xmlns:f="sap.f"
+        xmlns:form="sap.ui.layout.form"
+        xmlns:dataHelp="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+    core:require="{commonFormatter: 'kms/common/Formatters' }">
+    <Dialog
+        escapeHandler=".onKeyCreationWizardCancelPress"
+        showHeader="false"
+        verticalScrolling="false"
+        contentHeight="80%"
+        contentWidth="40%">
+        <f:DynamicPage
+            stickySubheaderProvider="keyCreationWizard"
+            toggleHeaderOnTitleClick="false"
+            class="sapUiNoContentPadding"
+            showFooter="true">
+            <f:title>
+                <f:DynamicPageTitle>
+                    <f:heading>
+                        <Title text="{i18n>GCPKeyCreationWizard}" />
+                    </f:heading>
+                </f:DynamicPageTitle>
+            </f:title>
+            <f:content>
+                <NavContainer id="HYOKKeyCreationNavContainer">
+                    <pages>
+                        <Page id="HYOKKeyCreationWizardPage" showHeader="false">
+                            <content>
+                                <Wizard id="HYOKKeyCreationWizard"
+                                    class="sapUiResponsivePadding--header sapUiResponsivePadding--content"
+                                    complete="finishAndReviewHYOKKeyCreation">
+                                    <WizardStep id="GCPKeyStep"
+                                        title="{i18n>keyDetails}"
+                                        validated="{= (${model>/nativeId}.length > 0) }"
+                                        activate="">
+                                        <VBox width="100%">
+                                            <Label text="{i18n>keyName}:" required="true" />
+                                            <Input value="{model>/keyName}"
+                                                   valueLiveUpdate="true">
+                                                <customData>
+                                                    <core:CustomData
+                                                            key="testId"
+                                                            value="hyokName-Input"
+                                                            writeToDom="true" />
+                                                </customData>
+                                            </Input>
+                                            <HBox>
+                                                <Label text="{i18n>keyID}:" required="true"
+                                                       class="sapUiSmallMarginTop" />
+                                                <core:Icon src="sap-icon://message-information"
+                                                           alt="{i18n>help}"
+                                                           press="onHelpIconPressed"
+                                                           color="#0A6ED1"
+                                                           dataHelp:helpPopoverKey="keyIDPattern"
+                                                           class="sapUiSmallMarginTop sapUiTinyMarginBegin" />
+                                            </HBox>
+                                            <Input value="{model>/nativeId}"
+                                                   valueLiveUpdate="true">
+                                                <customData>
+                                                    <core:CustomData
+                                                            key="testId"
+                                                            value="GCPKeyId-Input"
+                                                            writeToDom="true" />
+                                                </customData>
+                                            </Input>
+                                            <Label text="{i18n>keyDescription}:"
+                                                class="sapUiTinyMarginTop" />
+                                            <TextArea value="{model>/description}" rows="4"
+                                                width="100%">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="hyok-keyCreationWizard-descriptionInput"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </TextArea>
+                                        </VBox>
+                                    </WizardStep>
+                                    <WizardStep id="GCPManagementRoleStep"
+                                                validated="{= (${model>/projectNumber}.length > 0  &amp;&amp; ${model>/poolId}.length > 0  &amp;&amp; ${model>/providerId}.length > 0) }"
+                                        activate=""
+                                        title="{i18n>managementRole}">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="GCPHyokWizard-managementRoleStep"
+                                                writeToDom="true" />
+                                        </customData>
+                                        <VBox width="100%">
+                                            <VBox width="100%" items="{model>/managementRolesCerts}">
+                                                <VBox width="100%" class="sapUiSmallMarginBottom">
+                                                    <Label text='{i18n>name}:' />
+                                                    <Text
+                                                        text="{model>name}"
+                                                        wrapping="true" />
+                                                    <Label text='{i18n>rootCALabel}:'
+                                                        class="sapUiTinyMarginTop" />
+                                                    <HBox alignItems="Center">
+                                                        <Text
+                                                            text="{model>rootCA}"
+                                                            wrapping="true"
+                                                            class="sapUiSmallMarginEnd" />
+                                                        <Button text="{i18n>downloadRootCACert}"
+                                                            press="onDownloadRootCA"
+                                                            enabled="{= !!${model>rootCA}}" />
+                                                    </HBox>
+                                                    <Label text='{i18n>subject}:'
+                                                        class="sapUiTinyMarginTop" />
+                                                    <Text
+                                                        text="{path: 'model>subject', formatter: 'commonFormatter.formatSubjectDN'}"
+                                                        wrapping="true" />
+                                                    <HBox class="sapUiSmallMarginTop" wrap="Wrap">
+                                                        <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                            <Label text="{i18n>subjectCN}:" />
+                                                            <Text text="{path: 'model>subject/CN', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                        </VBox>
+                                                        <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                            <Label text="{i18n>subjectOU}:" />
+                                                            <Text text="{path: 'model>subject/OU', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" renderWhitespace="true" />
+                                                        </VBox>
+                                                        <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                            <Label text="{i18n>subjectO}:" />
+                                                            <Text text="{path: 'model>subject/O', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                        </VBox>
+                                                        <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                            <Label text="{i18n>subjectL}:" />
+                                                            <Text text="{path: 'model>subject/L', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                        </VBox>
+                                                        <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                            <Label text="{i18n>subjectC}:" />
+                                                            <Text text="{path: 'model>subject/C', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                        </VBox>
+                                                    </HBox>
+                                                </VBox>
+                                            </VBox>
+                                            <Label text="{i18n>projectNumber}:" required="true"
+                                                   class="sapUiSmallMarginTop" />
+                                            <Input value="{model>/projectNumber}"
+                                                   valueLiveUpdate="true">
+                                                <customData>
+                                                    <core:CustomData
+                                                            key="testId"
+                                                            value="projectNumber-Input"
+                                                            writeToDom="true" />
+                                                </customData>
+                                            </Input>
+                                            <Label text="{i18n>poolId}:" required="true"
+                                                   class="sapUiSmallMarginTop" />
+                                            <Input value="{model>/poolId}"
+                                                   valueLiveUpdate="true">
+                                                <customData>
+                                                    <core:CustomData
+                                                            key="testId"
+                                                            value="poolId-Input"
+                                                            writeToDom="true" />
+                                                </customData>
+                                            </Input>
+                                            <Label text="{i18n>providerId}:" required="true"
+                                                   class="sapUiSmallMarginTop" />
+                                            <Input value="{model>/providerId}"
+                                                   valueLiveUpdate="true">
+                                                <customData>
+                                                    <core:CustomData
+                                                            key="testId"
+                                                            value="providerId-Input"
+                                                            writeToDom="true" />
+                                                </customData>
+                                            </Input>
+                                            <Label text="{i18n>serviceAccount}:" required="true"
+                                                   class="sapUiSmallMarginTop" />
+                                            <Input value="{model>/serviceAccount}"
+                                                   placeholder="{i18n>emailPlaceholder}"
+                                                   valueLiveUpdate="true">
+                                                <customData>
+                                                    <core:CustomData
+                                                            key="testId"
+                                                            value="serviceAccount-Input"
+                                                            writeToDom="true" />
+                                                </customData>
+                                            </Input>
+                                        </VBox>
+                                    </WizardStep>
+                                    <WizardStep id="GCPCryptoRoleStep"
+                                        validated="{model>/hyokCryptoRoleStepValid}"
+                                        activate="onhyokCryptoRoleStepActivated"
+                                        title="{i18n>cryptoRole}">
+                                        <VBox items="{model>/hyokCryptoCertObj}"
+                                            class="sapUiMarginBottom">
+                                            <items>
+                                                <HBox>
+                                                    <VBox width="100%">
+                                                        <VBox width="100%"
+                                                            items="{model>selectedCryptoCerts}"
+                                                            class="sapUiSmallMarginTop">
+                                                            <items>
+                                                                <VBox width="100%"
+                                                                    class="sapUiSmallMarginBottom">
+                                                                    <Label text='{i18n>name}:' />
+                                                                    <Text
+                                                                        text="{model>name}"
+                                                                        wrapping="true" />
+                                                                    <Label
+                                                                        text='{i18n>rootCALabel}:'
+                                                                        class="sapUiTinyMarginTop" />
+                                                                    <HBox alignItems="Center">
+                                                                        <Text
+                                                                            text="{model>rootCA}"
+                                                                            wrapping="true"
+                                                                            class="sapUiSmallMarginEnd" />
+                                                                        <Button text="{i18n>downloadRootCACert}"
+                                                                            press="onDownloadRootCA"
+                                                                            enabled="{= !!${model>rootCA}}" />
+                                                                    </HBox>
+                                                                    <Label text='{i18n>subject}:'
+                                                                        class="sapUiTinyMarginTop" />
+                                                                    <Text
+                                                                        text="{path: 'model>subject', formatter: 'commonFormatter.formatSubjectDN'}"
+                                                                        wrapping="true" />
+                                                                    <HBox class="sapUiSmallMarginTop" wrap="Wrap">
+                                                                        <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                                            <Label text="{i18n>subjectCN}:" />
+                                                                            <Text text="{path: 'model>subject/CN', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                                        </VBox>
+                                                                        <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                                            <Label text="{i18n>subjectOU}:" />
+                                                                            <Text text="{path: 'model>subject/OU', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" renderWhitespace="true" />
+                                                                        </VBox>
+                                                                        <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                                            <Label text="{i18n>subjectO}:" />
+                                                                            <Text text="{path: 'model>subject/O', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                                        </VBox>
+                                                                        <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                                            <Label text="{i18n>subjectL}:" />
+                                                                            <Text text="{path: 'model>subject/L', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                                        </VBox>
+                                                                        <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                                            <Label text="{i18n>subjectC}:" />
+                                                                            <Text text="{path: 'model>subject/C', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                                        </VBox>
+                                                                    </HBox>
+                                                                </VBox>
+                                                            </items>
+                                                        </VBox>
+                                                        <VBox class="sapUiLargeMarginBottom">
+                                                            <Label class="sapUiTinyMarginTop"
+                                                                   text="{i18n>projectNumber}:" />
+                                                            <Input value="{model>cryptoProjectNumber}">
+                                                                <customData>
+                                                                    <core:CustomData
+                                                                            key="testId"
+                                                                            value="{= ${rootCryptoCA}-${rootCryptoProjectNumber-Input}}"
+                                                                            writeToDom="true" />
+                                                                </customData>
+                                                            </Input>
+                                                            <Label class="sapUiTinyMarginTop"
+                                                                   text="{i18n>poolId}:" />
+                                                            <Input value="{model>cryptoPoolId}">
+                                                                <customData>
+                                                                    <core:CustomData
+                                                                            key="testId"
+                                                                            value="{= ${rootCryptoCA}-${rootCryptoPoolId-Input}}"
+                                                                            writeToDom="true" />
+                                                                </customData>
+                                                            </Input>
+                                                            <Label class="sapUiTinyMarginTop"
+                                                                   text="{i18n>providerId}:" />
+                                                            <Input value="{model>cryptoProviderId}">
+                                                                <customData>
+                                                                    <core:CustomData
+                                                                            key="testId"
+                                                                            value="{= ${rootCryptoCA}-${rootCryptoProviderId-Input}}"
+                                                                            writeToDom="true" />
+                                                                </customData>
+                                                            </Input>
+                                                            <Label class="sapUiTinyMarginTop"
+                                                                   text="{i18n>serviceAccount}:" />
+                                                            <Input value="{model>cryptoServiceAccount}">
+                                                                <customData>
+                                                                    <core:CustomData
+                                                                            key="testId"
+                                                                            value="{= ${rootCryptoCA}-${rootCryptoServiceAccount-Input}}"
+                                                                            writeToDom="true" />
+                                                                </customData>
+                                                            </Input>
+                                                        </VBox>
+                                                    </VBox>
+                                                    <Button
+                                                        icon="sap-icon://decline"
+                                                        press="onRemoveCryptoCert">
+                                                        <customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="cryptoSelectedcerts-removeButton"
+                                                                writeToDom="true" />
+                                                        </customData>
+                                                    </Button>
+                                                </HBox>
+                                            </items>
+                                        </VBox>
+                                        <VBox visible="{= !!${model>/allowAddMoreCryptoCert}}">
+                                            <Text text="{i18n>addCertApplications}" />
+                                            <HBox width="100%"
+                                                class="sapUiMarginTop"
+                                                alighnItems="Center"
+                                                justifyContent="SpaceBetween">
+                                                <MultiComboBox
+                                                    items="{ path: 'model>/availableCryptoCertsSelectionList' }"
+                                                    selectedKeys="{model>/selectedCryptoRolesCertKeys}"
+                                                    showSelectAll="false"
+                                                    selectionFinish="addARNs"
+                                                    width="25rem">
+                                                    <core:Item
+                                                        key="{model>name}"
+                                                        text="{model>name}">
+                                                    </core:Item>
+                                                    <customData>
+                                                        <core:CustomData
+                                                            key="testId"
+                                                            value="hyokAddCryptoCert-certsComboBox"
+                                                            writeToDom="true" />
+                                                    </customData>
+                                                </MultiComboBox>
+                                            </HBox>
+                                        </VBox>
+                                    </WizardStep>
+                                </Wizard>
+                            </content>
+                        </Page>
+                        <Page id="HYOKKeyCreationReviewPage" showHeader="false">
+                            <content>
+                                <VBox class="sapUiSmallMargin">
+                                    <form:SimpleForm
+                                        class="sapUiSmallMarginBottom"
+                                        editable="false"
+                                        layout="ResponsiveGridLayout">
+                                        <form:toolbar>
+                                            <Toolbar>
+                                                <Title text="1. {i18n>keyDetails}" />
+                                                <ToolbarSpacer />
+                                                <Button press=".onNavBackToStepPress(0)"
+                                                    text="{i18n>edit}">
+                                                    <customData>
+                                                        <core:CustomData
+                                                            key="testId"
+                                                            value="hyokKeyCreationWizard-editDetailsButton"
+                                                            writeToDom="true" />
+                                                    </customData>
+                                                </Button>
+                                            </Toolbar>
+                                        </form:toolbar>
+                                        <form:content>
+                                            <Label text="{i18n>keyName}" />
+                                            <Input value="{model>/keyName}"
+                                                   editable="false" />
+                                            <Label text="{i18n>keyId}" />
+                                            <Input value="{model>/nativeId}"
+                                                editable="false" />
+                                            <Label text="{i18n>keyDescription}:" class="sapUiTinyMarginTop" />
+                                            <TextArea editable="false" value="{model>/description}"
+                                                rows="4"
+                                                width="100%">
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="hyok-keyCreationWizard-descriptionText"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </TextArea>
+                                        </form:content>
+                                    </form:SimpleForm>
+
+                                    <form:SimpleForm
+                                        class="sapUiSmallMarginBottom"
+                                        editable="false"
+                                        layout="ResponsiveGridLayout">
+                                        <form:toolbar>
+                                            <Toolbar>
+                                                <Title text="2. {i18n>managementRole}" />
+                                                <ToolbarSpacer />
+                                                <Button press=".onNavBackToStepPress(1)"
+                                                    text="{i18n>edit}">
+                                                    <customData>
+                                                        <core:CustomData
+                                                            key="testId"
+                                                            value="hyokKeyCreationWizard-editKeySourceButton"
+                                                            writeToDom="true" />
+                                                    </customData>
+                                                </Button>
+                                            </Toolbar>
+                                        </form:toolbar>
+                                        <form:content>
+                                            <VBox width="100%">
+                                                <Label text="{i18n>hyokManagementCertTitle}:" />
+                                                <VBox width="100%"
+                                                    items="{model>/managementRolesCerts}">
+                                                    <VBox width="100%"
+                                                        class="sapUiSmallMarginBottom">
+                                                        <Label text='{i18n>name}:' />
+                                                        <Text
+                                                            text="{model>name}"
+                                                            wrapping="true" />
+                                                        <Label text='{i18n>rootCALabel}:'
+                                                            class="sapUiTinyMarginTop" />
+                                                        <HBox alignItems="Center">
+                                                            <Text
+                                                                text="{model>rootCA}"
+                                                                wrapping="true"
+                                                                class="sapUiSmallMarginEnd" />
+                                                            <Button text="{i18n>downloadRootCACert}"
+                                                                press="onDownloadRootCA"
+                                                                enabled="{= !!${model>rootCA}}" />
+                                                        </HBox>
+                                                        <Label text='{i18n>subject}:'
+                                                            class="sapUiTinyMarginTop" />
+                                                        <Text
+                                                            text="{path: 'model>subject', formatter: 'commonFormatter.formatSubjectDN'}"
+                                                            wrapping="true" />
+                                                        <HBox class="sapUiSmallMarginTop" wrap="Wrap">
+                                                            <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                                <Label text="{i18n>subjectCN}:" />
+                                                                <Text text="{path: 'model>subject/CN', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                            </VBox>
+                                                            <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                                <Label text="{i18n>subjectOU}:" />
+                                                                <Text text="{path: 'model>subject/OU', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" renderWhitespace="true" />
+                                                            </VBox>
+                                                            <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                                <Label text="{i18n>subjectO}:" />
+                                                                <Text text="{path: 'model>subject/O', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                            </VBox>
+                                                            <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                                <Label text="{i18n>subjectL}:" />
+                                                                <Text text="{path: 'model>subject/L', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                            </VBox>
+                                                            <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                                                                <Label text="{i18n>subjectC}:" />
+                                                                <Text text="{path: 'model>subject/C', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+                                                            </VBox>
+                                                        </HBox>
+                                                    </VBox>
+                                                </VBox>
+                                                <Label class="sapUiTinyMarginTop"
+                                                    text="{i18n>projectNumber}:" />
+                                                <Input value="{model>/projectNumber}"
+                                                    editable='false'/>
+                                                <Label class="sapUiTinyMarginTop"
+                                                    text="{i18n>poolId}:" />
+                                                <Input value="{model>/poolId}"
+                                                       editable='false'/>
+                                                <Label class="sapUiTinyMarginTop"
+                                                       text="{i18n>providerId}:" />
+                                                <Input value="{model>/providerId}"
+                                                       editable='false'/>
+                                                <Label class="sapUiTinyMarginTop"
+                                                       text="{i18n>serviceAccount}:" />
+                                                <Input value="{model>/serviceAccount}"
+                                                       editable='false'/>
+                                            </VBox>
+                                        </form:content>
+                                    </form:SimpleForm>
+                                    <form:SimpleForm
+                                        class="sapUiSmallMarginBottom"
+                                        editable="false"
+                                        layout="ResponsiveGridLayout">
+                                        <form:toolbar>
+                                            <Toolbar>
+                                                <Title text="3. {i18n>cryptoRole}" />
+                                                <ToolbarSpacer />
+                                                <Button press=".onNavBackToStepPress(2)"
+                                                    text="{i18n>edit}">
+                                                    <customData>
+                                                        <core:CustomData
+                                                            key="testId"
+                                                            value="hyokKeyCreationWizard-backButton"
+                                                            writeToDom="true" />
+                                                    </customData>
+                                                </Button>
+                                            </Toolbar>
+                                        </form:toolbar>
+                                        <form:content>
+                                            <VBox items="{model>/hyokCryptoCertObj}">
+                                                <VBox width="100%" class="sapUiSmallMarginBottom">
+                                                    <Label text="{i18n>cryptoCerts}:" />
+                                                    <List items="{model>selectedCryptoRolesCertKeys}">
+                                                        <StandardListItem
+                                                            title="{model>}" />
+                                                    </List>
+                                                    <Label class="sapUiTinyMarginTop"
+                                                        text="{i18n>projectNumber}:" />
+                                                    <Input value="{model>cryptoProjectNumber}"
+                                                        editable='false'>
+                                                    </Input>
+                                                    <Label class="sapUiTinyMarginTop"
+                                                           text="{i18n>poolId}:" />
+                                                    <Input value="{model>cryptoPoolId}"
+                                                           editable='false'>
+                                                    </Input>
+                                                    <Label class="sapUiTinyMarginTop"
+                                                           text="{i18n>providerId}:" />
+                                                    <Input value="{model>cryptoProviderId}"
+                                                           editable='false'>
+                                                    </Input>
+                                                    <Label class="sapUiTinyMarginTop"
+                                                           text="{i18n>serviceAccount}:" />
+                                                    <Input value="{model>cryptoServiceAccount}"
+                                                           editable='false'>
+                                                    </Input>
+                                                </VBox>
+                                            </VBox>
+                                        </form:content>
+                                    </form:SimpleForm>
+                                </VBox>
+                            </content>
+                        </Page>
+                    </pages>
+                </NavContainer>
+            </f:content>
+            <f:footer>
+                <OverflowToolbar>
+                    <ToolbarSpacer />
+                    <Button text="{i18n>addKey}" type="Emphasized"
+                        visible="{= !!${model>/reviewMode}}"
+                        press="onKeyCreationWizardSubmitPress">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="hyokKeyCreationWizard-reviewButton"
+                                writeToDom="true" />
+                        </customData>
+                        </Button>
+                    <Button text="{i18n>cancel}" type="Transparent"
+                        press="onKeyCreationWizardCancelPress">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="hyokKeyCreationWizard-cancelButton"
+                                writeToDom="true" />
+                        </customData>
+                    </Button>
+                </OverflowToolbar>
+            </f:footer>
+        </f:DynamicPage>
+    </Dialog>
+</core:FragmentDefinition>

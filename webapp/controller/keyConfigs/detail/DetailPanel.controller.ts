@@ -4,7 +4,16 @@ import BindingMode from 'sap/ui/model/BindingMode';
 import Api from 'kms/services/Api.service';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import EventBus from 'sap/ui/core/EventBus';
-import { AWSAccessDetails, FortanixAccessDetails, HyokCertificates, Key, KeyVersion, SystemRecoveryActions, WorkflowParams } from 'kms/common/Types';
+import {
+    AWSAccessDetails,
+    FortanixAccessDetails,
+    GCPAccessDetails,
+    HyokCertificates,
+    Key,
+    KeyVersion,
+    SystemRecoveryActions,
+    WorkflowParams
+} from 'kms/common/Types';
 import { isUUIDValid, copyToClipboard, showErrorMessage } from 'kms/common/Helpers';
 import { Button$PressEvent } from 'sap/m/Button';
 import * as Formatter from 'kms/common/Formatters';
@@ -128,7 +137,7 @@ export default class DetailPanel extends BaseController {
         const managementDetails = key?.accessDetails?.management;
         const cryptoDetails = key?.accessDetails?.crypto;
         if (managementDetails) {
-            const managementARNsArray: { key: string, value: AWSAccessDetails | FortanixAccessDetails }[] = [{ key: 'management', value: managementDetails }];
+            const managementARNsArray: { key: string, value: AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails }[] = [{ key: 'management', value: managementDetails }];
             this.twoWayModel.setProperty('/selectedKey/accessDetails/managementARNsArray', managementARNsArray);
         }
         if (cryptoDetails) {

@@ -5,7 +5,7 @@ import {
     HyokCertificates,
     HyokCryptoCertInput,
     HyokAWSManagementCertInput,
-    AWSAccessDetails, FortanixAccessDetails
+    AWSAccessDetails, FortanixAccessDetails, GCPAccessDetails
 } from 'kms/common/Types';
 import { getErrorContext, getErrorDataMessage, showErrorMessage } from 'kms/common/Helpers';
 import { AxiosError } from 'axios';
@@ -18,8 +18,10 @@ import NavContainer from 'sap/m/NavContainer';
 import Page from 'sap/m/Page';
 import Wizard from 'sap/m/Wizard';
 import Fragment from 'sap/ui/core/Fragment';
+import { Icon$PressEvent } from 'sap/ui/core/Icon';
 import JSONModel from 'sap/ui/model/json/JSONModel';
 import { Button$PressEvent } from 'sap/m/Button';
+import * as HelpPopover from 'kms/common/HelpInfoPopover';
 
 interface KeyCreationParams {
     keyConfigId: string
@@ -52,7 +54,7 @@ export default class HyokKeyRegistration extends BaseController {
     private keyConfigId: string;
     private onKeyCreateCallBackfnc: KeyCreateCallBackFn;
     private managementDefaultModel: HyokAWSManagementCertInput = { trustAnchorARN: null, roleARN: null, rootCA: null };
-    private cryptoDefaultModel: HyokCryptoCertInput = { trustAnchorCryptoARN: null, roleCryptoARN: null, rootCryptoCA: null, cryptoApplicationId: null, selectedCryptoRolesCertKeys: [], selectedCryptoCerts: [] };
+    private cryptoDefaultModel: HyokCryptoCertInput = { trustAnchorCryptoARN: null, roleCryptoARN: null, rootCryptoCA: null, cryptoApplicationId: null, cryptoProjectNumber: null, cryptoPoolId: null, cryptoProviderId: null, cryptoServiceAccount: null, selectedCryptoRolesCertKeys: [], selectedCryptoCerts: [] };
 
     public openHyokKeyCreationWizard(keyCreationParams: KeyCreationParams, parentController: KeyConfigDetail, api: Api, onKeyCreateCallBackfnc: KeyCreateCallBackFn): void {
         this.type = keyCreationParams.keyType;
@@ -71,6 +73,9 @@ export default class HyokKeyRegistration extends BaseController {
         }
         else if (this.subtype === HYOKProviders.FORTANIX) {
             wizardView = 'kms.resources.fragments.common.FortanixKeyCreationWizard';
+        }
+        else if (this.subtype === HYOKProviders.GCP) {
+            wizardView = 'kms.resources.fragments.common.GCPKeyCreationWizard';
         }
         const loadFragment = async (): Promise<void> => {
             this.keyCreatePopover = await Fragment.load({
@@ -122,6 +127,10 @@ export default class HyokKeyRegistration extends BaseController {
                 keyName: '' as string,
                 nativeId: '' as string,
                 description: '' as string,
+                projectNumber: '' as string,
+                poolId: '' as string,
+                providerId: '' as string,
+                serviceAccount: '' as string,
                 host: '' as string,
                 applicationId: '' as string,
                 keySubType: this.subtype as string,
@@ -142,6 +151,17 @@ export default class HyokKeyRegistration extends BaseController {
         }).finally(() => {
             this.keyCreatePopover?.setBusy(false);
         });
+    }
+
+    public onHelpIconPressed(event: Icon$PressEvent): void {
+        const view = this.parentController?.getView();
+        const key = event.getSource().data('helpPopoverKey') as string;
+        const text = this.getText(key);
+
+        if (!view) {
+            return;
+        }
+        void HelpPopover.open(view, this, event.getSource(), text);
     }
 
     public onKeyCreationWizardCancelPress(): void {
@@ -190,7 +210,7 @@ export default class HyokKeyRegistration extends BaseController {
     }
 
     public getKeyCreationPayload(): HyokKeyPayload {
-        let management = {} as AWSAccessDetails | FortanixAccessDetails;
+        let management = {} as AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails;
         if (this.subtype === HYOKProviders.AWS) {
             management = {
                 roleArn: this.keyCreationModel.getProperty('/hyokAWSManagementCertObj/roleARN') as string,
@@ -202,6 +222,14 @@ export default class HyokKeyRegistration extends BaseController {
             management = {
                 host: this.keyCreationModel.getProperty('/host') as string,
                 applicationId: this.keyCreationModel.getProperty('/applicationId') as string
+            };
+        }
+        else if (this.subtype === HYOKProviders.GCP) {
+            management = {
+                projectNumber: this.keyCreationModel.getProperty('/projectNumber') as string,
+                poolId: this.keyCreationModel.getProperty('/poolId') as string,
+                providerId: this.keyCreationModel.getProperty('/providerId') as string,
+                serviceAccount: this.keyCreationModel.getProperty('/serviceAccount') as string
             };
         }
         return {
@@ -328,6 +356,9 @@ export default class HyokKeyRegistration extends BaseController {
             else if (this.subtype === HYOKProviders.FORTANIX && (cryptoCert.cryptoApplicationId === null || cryptoCert?.selectedCryptoRolesCertKeys?.length === 0)) {
                 return;
             }
+            else if (this.subtype === HYOKProviders.GCP && (cryptoCert.cryptoProjectNumber === null || cryptoCert.cryptoProviderId === null || cryptoCert.cryptoPoolId === null || cryptoCert.cryptoServiceAccount === null || cryptoCert?.selectedCryptoRolesCertKeys?.length === 0)) {
+                return;
+            }
             (cryptoCert?.selectedCryptoRolesCertKeys ?? []).forEach((certKey: string) => {
                 if (this.subtype === HYOKProviders.AWS) {
                     cryptoPayload = {
@@ -337,6 +368,11 @@ export default class HyokKeyRegistration extends BaseController {
                 else if (this.subtype === HYOKProviders.FORTANIX) {
                     cryptoPayload = {
                         ...cryptoPayload, [certKey]: { applicationId: cryptoCert.cryptoApplicationId, host: this.keyCreationModel.getProperty('/host') as string }
+                    };
+                }
+                else if (this.subtype === HYOKProviders.GCP) {
+                    cryptoPayload = {
+                        ...cryptoPayload, [certKey]: { projectNumber: cryptoCert.cryptoProjectNumber, poolId: cryptoCert.cryptoPoolId, providerId: cryptoCert.cryptoProviderId, serviceAccount: cryptoCert.cryptoServiceAccount }
                     };
                 }
             });
