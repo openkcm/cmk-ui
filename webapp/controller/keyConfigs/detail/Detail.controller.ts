@@ -844,6 +844,11 @@ export default class KeyConfigDetail extends BaseController {
         return key?.type === KeyCreationTypes.BYOK && key?.isPrimary;
     }
 
+    private shouldUseWorkflowForKeyDeletion(key: Key): boolean {
+        return key?.isPrimary
+          && (key?.type === KeyCreationTypes.BYOK || key?.type === KeyCreationTypes.HYOK);
+    }
+
     public async onKeyTableDeletePress(event: Button$PressEvent): Promise<void> {
         const path = event.getSource().getBindingContext('oneWay')?.getPath();
         if (!path) {
@@ -858,7 +863,7 @@ export default class KeyConfigDetail extends BaseController {
             }
         }
 
-        if (!this.shouldUseWorkflowForKeyAction(selectedKey)) {
+        if (!this.shouldUseWorkflowForKeyDeletion(selectedKey)) {
             MessageBox.confirm(this.getText('confirmKeyDeletion'), {
                 actions: [MessageBox.Action.YES, MessageBox.Action.NO],
                 // eslint-disable-next-line @typescript-eslint/no-misused-promises
