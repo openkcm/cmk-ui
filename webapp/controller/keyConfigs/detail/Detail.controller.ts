@@ -18,7 +18,7 @@ import FilterOperator from 'sap/ui/model/FilterOperator';
 import ListBinding from 'sap/ui/model/ListBinding';
 import MultiInput, { MultiInput$TokenUpdateEvent } from 'sap/m/MultiInput';
 import Token from 'sap/m/Token';
-import { ActionTypes, ArtifactTypes, BYOKProviders, EventChannelIds, EventIDs, HYOKProviders, KeyCreationTypes, KeyStates, SystemStatus } from 'kms/common/Enums';
+import { ActionTypes, ArtifactTypes, BYOKProviders, EventChannelIds, EventIDs, HYOKProviders, KeyCreationTypes, KeyStates, SystemStatus, WorkflowStatus } from 'kms/common/Enums';
 import KeyCreation from 'kms/component/KeyCreation';
 import HyokKeyRegistration from 'kms/component/HyokKeyCreation';
 import { AxiosError } from 'axios';
@@ -1317,12 +1317,17 @@ export default class KeyConfigDetail extends BaseController {
                 name: 'kms.resources.fragments.systems.SwitchSystemKeyConfig',
                 controller: this
             }) as Dialog;
-            this.switchKeyConfigDialog.addStyleClass('sapUiSizeCompact');
+            //  this.switchKeyConfigDialog.addStyleClass('sapUiSizeCompact');
             this.switchKeyConfigDialog.setModel(component.getModel('i18n'), 'i18n');
             this.switchKeyConfigModel.setData(selectedSystem);
             this.switchKeyConfigDialog.setModel(this.switchKeyConfigModel, 'switchKeyConfigModel');
             this.switchKeyConfigModel.setProperty('/KeyConfigList', filteredKeyConfigs);
             this.switchKeyConfigModel.setProperty('/connectedKeyConfig', connectedKeyConfig);
+            this.switchKeyConfigModel.setProperty('/workflowStatus', undefined);
+            this.switchKeyConfigModel.setProperty('workflowStatusDetails', undefined);
+            this.resetSwitchActionButtons();
+            this.workflowComponent = new Workflow('workflowComponent');
+            this.workflowComponent.init();
             this.switchKeyConfigDialog.open();
             this.getView()?.setBusy(false);
         }
@@ -1330,6 +1335,52 @@ export default class KeyConfigDetail extends BaseController {
             this.switchKeyConfigDialog.open();
             this.getView()?.setBusy(false);
         }
+    }
+
+    public async onSwitchKeyConfigSelectionChange(): Promise<void> {
+        this.resetSwitchActionButtons();
+        const selectedKeyConfigId: string = this.switchKeyConfigModel.getProperty('/selectedKeyConfig') as string;
+        const systemId: string = this.switchKeyConfigModel.getProperty('/id') as string;
+
+        if (!selectedKeyConfigId) {
+            this.switchKeyConfigModel.setProperty('/workflowStatus', undefined);
+            return;
+        }
+
+        const workflowParams = {
+            artifactType: ArtifactTypes.SYSTEM,
+            artifactID: systemId,
+            actionType: ActionTypes.SWITCH,
+            parameters: selectedKeyConfigId
+        } as WorkflowParams;
+
+        await this.workflowComponent?.checkWorkflowStatus(workflowParams, {
+
+            onWorkflowExists: () => {
+                this.resetSwitchActionButtons();
+                this.switchKeyConfigModel.setProperty('/workflowStatus', WorkflowStatus.WORKFLOW_ALREADY_EXISTS);
+            },
+            onWorkflowNotRequired: () => {
+                this.switchKeyConfigModel.setProperty('/showApprovalButton', false);
+                this.switchKeyConfigModel.setProperty('/showSwitchButton', true);
+                this.switchKeyConfigModel.setProperty('/workflowStatus', WorkflowStatus.WORKFLOW_NOT_REQUIRED);
+            },
+            onWorkflowRequired: () => {
+                this.switchKeyConfigModel.setProperty('/showApprovalButton', true);
+                this.switchKeyConfigModel.setProperty('/showSwitchButton', false);
+                this.switchKeyConfigModel.setProperty('/workflowStatus', WorkflowStatus.WORKFLOW_REQUIRED);
+            },
+            onWorkflowCanNotBeCreated: (workflowStatusDetails?: string) => {
+                this.switchKeyConfigModel.setProperty('/showApprovalButton', false);
+                this.switchKeyConfigModel.setProperty('/showSwitchButton', false);
+                this.switchKeyConfigModel.setProperty('/workflowStatus', WorkflowStatus.WORKFLOW_CREATION_BLOCKED);
+                this.switchKeyConfigModel.setProperty('/workflowStatusDetails', workflowStatusDetails);
+            },
+            onError: () => {
+                this.switchKeyConfigModel.setProperty('/workflowStatus', WorkflowStatus.ERROR);
+                this.resetSwitchActionButtons();
+            }
+        });
     }
 
     public onSwitchKeyConfigCancelPress(): void {
@@ -1347,7 +1398,7 @@ export default class KeyConfigDetail extends BaseController {
         }
         catch (error) {
             showErrorMessage(error as AxiosError, this.getText('keyConfigConnectSystemError'));
-            console.error('Error creating key', error);
+            console.error('Error switching key configuration', error);
         }
         finally {
             await this.getKeyConfigData();
@@ -1372,5 +1423,24 @@ export default class KeyConfigDetail extends BaseController {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorFetchingKeystoreDetails'));
         }
+    }
+
+    public async onSwitchKeyConfigSendForApprovalPress(): Promise<void> {
+        const systemId: string = this.switchKeyConfigModel.getProperty('/id') as string;
+        const selectedKeyConfigId: string = this.switchKeyConfigModel.getProperty('/selectedKeyConfig') as string;
+        const workflowParams = {
+            artifactType: ArtifactTypes.SYSTEM,
+            artifactID: systemId,
+            actionType: ActionTypes.SWITCH,
+            parameters: selectedKeyConfigId
+        } as WorkflowParams;
+        await this.workflowComponent?.createWorkflow(workflowParams);
+        this.onSwitchKeyConfigCancelPress();
+        await this.getKeyConfigData();
+    }
+
+    private resetSwitchActionButtons(): void {
+        this.switchKeyConfigModel.setProperty('/showApprovalButton', false);
+        this.switchKeyConfigModel.setProperty('/showSwitchButton', false);
     }
 }

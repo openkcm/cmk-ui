@@ -1,7 +1,8 @@
 <core:FragmentDefinition
     xmlns="sap.m"
     xmlns:f="sap.f"
-    xmlns:core="sap.ui.core">
+    xmlns:core="sap.ui.core"
+    core:require="{ commonFormatter: 'kms/common/Formatters' }">
     <Dialog
         id="switchSystemDialog"
         contentHeight="35rem"
@@ -64,6 +65,7 @@
                             width="100%"
                             enabled="{= ${switchKeyConfigModel>/KeyConfigList}.length > 0 }"
                             selectedKey="{switchKeyConfigModel>/selectedKeyConfig}"
+                            selectionChange="onSwitchKeyConfigSelectionChange"
                             items="{switchKeyConfigModel>/KeyConfigList}">
                             <core:Item key="{switchKeyConfigModel>id}"
                                 text="{switchKeyConfigModel>name}" />
@@ -76,19 +78,39 @@
                         </ComboBox>
                     </VBox>
                 </VBox>
+                <MessageStrip
+                    visible="{parts: ['switchKeyConfigModel>/workflowStatus'], formatter: 'commonFormatter.setConnectSystemInfoMessageStripVisible'}"
+                    text="{parts: ['switchKeyConfigModel>/workflowStatus', 'switchKeyConfigModel>/workflowStatusDetails'], formatter: 'commonFormatter.setConnectSystemInfoMessageStripText'}"
+                    showIcon="true"
+                    showCloseButton="false"
+                    class="sapUiMediumMarginTop">
+                </MessageStrip>
             </VBox>
         </content>
         <footer>
             <OverflowToolbar>
                 <ToolbarSpacer />
-                <Button text="{i18n>sendForApproval}" icon="sap-icon://paper-plane"
+                <Button text="{i18n>switchKeyConfiguration}" icon="sap-icon://switch-views"
                     type="Emphasized"
                     enabled="{= !!${switchKeyConfigModel>/selectedKeyConfig}}"
+                    visible="{switchKeyConfigModel>/showSwitchButton}"
                     press="onSwitchKeyConfigSubmitPress">
                     <customData>
                         <core:CustomData
                             key="testId"
                             value="switchKeyConfig-submitButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
+                <Button text="{i18n>sendForApproval}" icon="sap-icon://paper-plane"
+                    type="Emphasized"
+                    enabled="{= !!${switchKeyConfigModel>/selectedKeyConfig}}"
+                    visible="{switchKeyConfigModel>/showApprovalButton}"
+                    press="onSwitchKeyConfigSendForApprovalPress">
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="switchKeyConfig-approvalButton"
                             writeToDom="true" />
                     </customData>
                 </Button>
