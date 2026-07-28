@@ -127,13 +127,23 @@ export function getErrorDataMessage(error: AxiosError): string | undefined {
         return errorMessage?.error?.data?.error?.message;
     }
 }
+export function getAdditionalErrorDetails(error: AxiosError): string | undefined {
+    let additonalErrorDetails = undefined;
+    const errorContext = getErrorContext(error);
+    const errorMessage = getErrorDataMessage(error);
+    if (errorContext?.reason || errorMessage) {
+        const errorContextCode = errorContext?.reason ? ` (Error code: ${errorContext?.reason})` : '';
+        const detailedErrorMessage = errorMessage ? ` ${errorMessage}` : '';
+        additonalErrorDetails = detailedErrorMessage + errorContextCode;
+    }
+    return additonalErrorDetails;
+}
 
 export function showErrorMessage(error: AxiosError, userMessage: string | undefined, i18nKey?: string, additionalInfo?: string): void {
     // Don't show error dialogs when navigating to the forbidden page
     if (ForbiddenStateService.getInstance().isForbidden()) {
         return;
     }
-
     const requestID: string = getRequestId(error);
     const statusCode = getErrorStatus(error);
     const datetime = convertDateToUTC(new Date());
@@ -142,7 +152,7 @@ export function showErrorMessage(error: AxiosError, userMessage: string | undefi
     if (statusCode === 500) {
         errorMessage = getText('genericError');
     }
-
+    additionalInfo = additionalInfo || getAdditionalErrorDetails(error);
     const additionalInfoHtml = additionalInfo
         ? '<li><strong>' + getText('errorAdditionalInfo') + '</strong>' + ' ' + additionalInfo + '</li>'
         : '';

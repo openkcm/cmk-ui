@@ -8,6 +8,9 @@ import MessageBox from 'sap/m/MessageBox';
 interface WorkflowCheckResponse {
     required: boolean
     exists: boolean
+    canCreate: boolean
+    valid: boolean
+    details: string
 }
 
 export default class Workflow extends BaseController {
@@ -34,6 +37,7 @@ export default class Workflow extends BaseController {
         onWorkflowNotRequired?: () => void
         onWorkflowRequired?: () => void
         onError?: () => void
+        onWorkflowCanNotBeCreated?: (details?: string) => void
     }): Promise<void> {
         try {
             const response = await this.api.post<WorkflowCheckResponse>('workflows/check', workflowParams);
@@ -50,7 +54,13 @@ export default class Workflow extends BaseController {
             }
             else {
                 if (response.required) {
-                    options?.onWorkflowRequired?.();
+                    if (response.canCreate) {
+                        options?.onWorkflowRequired?.();
+                    }
+                    else {
+                        MessageBox.error(this.getText('workflowCanNotBeCreated', response.details));
+                        options?.onWorkflowCanNotBeCreated?.(response.details);
+                    }
                 }
                 else {
                     options?.onWorkflowNotRequired?.();

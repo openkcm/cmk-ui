@@ -265,18 +265,21 @@ export function setConnectSystemInfoMessageStripVisible(workflowStatus: string):
         case WorkflowStatus.WORKFLOW_ALREADY_EXISTS:
         case WorkflowStatus.WORKFLOW_REQUIRED:
         case WorkflowStatus.ERROR:
+        case WorkflowStatus.WORKFLOW_CREATION_BLOCKED:
             return true;
         default:
             return false;
     }
 }
 
-export function setConnectSystemInfoMessageStripText(workflowStatus: string): string {
+export function setConnectSystemInfoMessageStripText(workflowStatus: string, workflowStatusDetails?: string): string {
     switch (workflowStatus) {
         case WorkflowStatus.WORKFLOW_ALREADY_EXISTS:
             return getText('workflowAlreadyExistsMessage');
         case WorkflowStatus.WORKFLOW_REQUIRED:
             return getText('connnectSystemNeedsApprovalMessage');
+        case WorkflowStatus.WORKFLOW_CREATION_BLOCKED:
+            return getText('systemSwitchToKeyConfigBlocked', workflowStatusDetails);
         case WorkflowStatus.ERROR:
             return getText('errorGeneric');
         default:
