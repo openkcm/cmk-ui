@@ -2,6 +2,9 @@ import Fragment from 'sap/ui/core/Fragment';
 import JSONModel from 'sap/ui/model/json/JSONModel';
 import Dialog from 'sap/m/Dialog';
 import NavContainer from 'sap/m/NavContainer';
+import Popover from 'sap/m/Popover';
+import Text from 'sap/m/Text';
+import Control from 'sap/ui/core/Control';
 import Storage from 'sap/ui/util/Storage';
 import { ListBase$SelectionChangeEvent } from 'sap/m/ListBase';
 import { RadioButtonGroup$SelectEvent } from 'sap/m/RadioButtonGroup';
@@ -11,6 +14,8 @@ import Api from 'kms/services/Api.service';
 import { AxiosError } from 'axios';
 import { getText, showErrorMessage } from 'kms/common/Helpers';
 import View from 'sap/ui/core/mvc/View';
+import { ValueState } from 'sap/ui/core/library';
+import BaseEvent from 'sap/ui/base/Event';
 
 const localStorage = new Storage(Storage.Type.local);
 
@@ -27,6 +32,9 @@ const languageNames: Record<string, string> = {
     PT: 'Portuguese',
     ES: 'Spanish'
 };
+
+const MIN_APPROVALS = 2;
+const MIN_RETENTION_PERIOD_DAYS = 30;
 
 interface WorkflowSettings {
     enabled: boolean
@@ -110,9 +118,83 @@ export default class SettingsDialogHandler {
         setLanguage(selectedLanguage[0], false);
     }
 
+    public onMinimumApprovalsChange(): void {
+        this.validateAllFields();
+    }
+
+    public onExpiryPeriodChange(): void {
+        this.validateAllFields();
+    }
+
+    public onRetentionPeriodChange(): void {
+        this.validateAllFields();
+    }
+
     private onWorkflowSettingsChange(): void {
         const hasChanges = this.checkForWorkflowSettingsChanges();
         this.settingsOneWayModel.setProperty('/hasWorkflowSettingsChanges', hasChanges);
+        this.validateAllFields();
+    }
+
+    private validateAllFields(): void {
+        const hasMinApprovalsError = this.validateMinimumApprovals();
+        const hasExpiryError = this.validateExpiryPeriods();
+        const hasRetentionError = this.validateRetentionPeriod();
+
+        this.settingsOneWayModel.setProperty('/hasValidationError', hasMinApprovalsError || hasExpiryError || hasRetentionError);
+    }
+
+    private validateMinimumApprovals(): boolean {
+        const currentSettings = this.settingsWorkflowModel.getData() as WorkflowSettings;
+        const minimumApprovals = currentSettings.minimumApprovals;
+
+        if (minimumApprovals < MIN_APPROVALS) {
+            this.settingsOneWayModel.setProperty('/minimumApprovalsValueState', ValueState.Error);
+            this.settingsOneWayModel.setProperty('/minimumApprovalsValueStateText', getText('minimumApprovalsMinError'));
+            return true;
+        }
+        else {
+            this.settingsOneWayModel.setProperty('/minimumApprovalsValueState', ValueState.None);
+            this.settingsOneWayModel.setProperty('/minimumApprovalsValueStateText', '');
+            return false;
+        }
+    }
+
+    private validateExpiryPeriods(): boolean {
+        const currentSettings = this.settingsWorkflowModel.getData() as WorkflowSettings;
+        const defaultExpiry = currentSettings.defaultExpiryPeriodDays;
+        const maxExpiry = currentSettings.maxExpiryPeriodDays;
+
+        if (defaultExpiry > maxExpiry) {
+            this.settingsOneWayModel.setProperty('/defaultExpiryValueState', ValueState.Error);
+            this.settingsOneWayModel.setProperty('/defaultExpiryValueStateText', getText('defaultExpiryExceedsMaxError'));
+            this.settingsOneWayModel.setProperty('/maxExpiryValueState', ValueState.Error);
+            this.settingsOneWayModel.setProperty('/maxExpiryValueStateText', getText('maxExpiryBelowDefaultError'));
+            return true;
+        }
+        else {
+            this.settingsOneWayModel.setProperty('/defaultExpiryValueState', ValueState.None);
+            this.settingsOneWayModel.setProperty('/defaultExpiryValueStateText', '');
+            this.settingsOneWayModel.setProperty('/maxExpiryValueState', ValueState.None);
+            this.settingsOneWayModel.setProperty('/maxExpiryValueStateText', '');
+            return false;
+        }
+    }
+
+    private validateRetentionPeriod(): boolean {
+        const currentSettings = this.settingsWorkflowModel.getData() as WorkflowSettings;
+        const retentionPeriod = currentSettings.retentionPeriodDays;
+
+        if (retentionPeriod < MIN_RETENTION_PERIOD_DAYS) {
+            this.settingsOneWayModel.setProperty('/retentionPeriodValueState', ValueState.Error);
+            this.settingsOneWayModel.setProperty('/retentionPeriodValueStateText', getText('retentionPeriodMinError'));
+            return true;
+        }
+        else {
+            this.settingsOneWayModel.setProperty('/retentionPeriodValueState', ValueState.None);
+            this.settingsOneWayModel.setProperty('/retentionPeriodValueStateText', '');
+            return false;
+        }
     }
 
     private checkForWorkflowSettingsChanges(): boolean {
@@ -158,12 +240,25 @@ export default class SettingsDialogHandler {
                 this.settingsWorkflowModel.setProperty('/', workflowSettings);
                 this.settingsOneWayModel.setProperty('/hasWorkflowSettingsChanges', false);
                 this.settingsOneWayModel.setProperty('/workflowEnabled', workflowSettings.enabled);
+                this.resetValidationStates();
             }
         }
         catch (error) {
             console.error('Error fetching workflow settings:', error);
             showErrorMessage(error as AxiosError, getText('errorFetchingWorkflowSettings'));
         }
+    }
+
+    private resetValidationStates(): void {
+        this.settingsOneWayModel.setProperty('/hasValidationError', false);
+        this.settingsOneWayModel.setProperty('/minimumApprovalsValueState', ValueState.None);
+        this.settingsOneWayModel.setProperty('/minimumApprovalsValueStateText', '');
+        this.settingsOneWayModel.setProperty('/defaultExpiryValueState', ValueState.None);
+        this.settingsOneWayModel.setProperty('/defaultExpiryValueStateText', '');
+        this.settingsOneWayModel.setProperty('/maxExpiryValueState', ValueState.None);
+        this.settingsOneWayModel.setProperty('/maxExpiryValueStateText', '');
+        this.settingsOneWayModel.setProperty('/retentionPeriodValueState', ValueState.None);
+        this.settingsOneWayModel.setProperty('/retentionPeriodValueStateText', '');
     }
 
     public async onSaveWorkflowSettings(): Promise<void> {
@@ -180,5 +275,27 @@ export default class SettingsDialogHandler {
             console.error('Error saving workflow settings:', error);
             showErrorMessage(error as AxiosError, getText('workflowSettingsSaveError'));
         }
+    }
+
+    public onMinimumApprovalsInfoPress(event: BaseEvent): void {
+        this.showInfoPopover(event.getSource() as unknown as Control, getText('minimumApprovalsInfoText'));
+    }
+
+    public onRetentionPeriodInfoPress(event: BaseEvent): void {
+        this.showInfoPopover(event.getSource() as unknown as Control, getText('retentionPeriodInfoText'));
+    }
+
+    private showInfoPopover(source: Control, text: string): void {
+        const popover = new Popover({
+            placement: 'Auto',
+            showHeader: false,
+            contentWidth: '15rem',
+            content: [new Text({ text }).addStyleClass('sapUiSmallMargin')]
+        });
+        this.settingsDialog?.addDependent(popover);
+        popover.attachAfterClose(() => {
+            popover.destroy();
+        });
+        popover.openBy(source);
     }
 }
