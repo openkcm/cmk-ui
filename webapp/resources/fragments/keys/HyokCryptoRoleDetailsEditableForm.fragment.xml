@@ -43,6 +43,30 @@
                         </forms:FormElement>
                     </forms:formElements>
                 </forms:FormContainer>
+                <forms:FormContainer visible="{= ${oneWay>/selectedKey/provider} === 'GCP'}">
+                    <forms:formElements>
+                        <forms:FormElement label="{i18n>projectNumber}">
+                            <forms:fields>
+                                <Input value="{twoWay>value/projectNumber}" />
+                            </forms:fields>
+                        </forms:FormElement>
+                        <forms:FormElement label="{i18n>poolId}">
+                            <forms:fields>
+                                <Input value="{twoWay>value/poolId}" />
+                            </forms:fields>
+                        </forms:FormElement>
+                        <forms:FormElement label="{i18n>providerId}">
+                            <forms:fields>
+                                <Input value="{twoWay>value/providerId}" />
+                            </forms:fields>
+                        </forms:FormElement>
+                        <forms:FormElement label="{i18n>serviceAccount}">
+                            <forms:fields>
+                                <Input value="{twoWay>value/serviceAccount}" />
+                            </forms:fields>
+                        </forms:FormElement>
+                    </forms:formElements>
+                </forms:FormContainer>
             </forms:formContainers>
         </forms:Form>
         <forms:Form width="100%" visible="{= !${twoWay>value/isEditable} }">
@@ -82,6 +106,30 @@
                         <forms:FormElement label="{i18n>applicationId}">
                             <forms:fields>
                                 <Text text="{twoWay>value/applicationId}" wrapping="true" />
+                            </forms:fields>
+                        </forms:FormElement>
+                    </forms:formElements>
+                </forms:FormContainer>
+                <forms:FormContainer visible="{= ${oneWay>/selectedKey/provider} === 'GCP'}">
+                    <forms:formElements>
+                        <forms:FormElement label="{i18n>projectNumber}">
+                            <forms:fields>
+                                <Text text="{twoWay>value/projectNumber}" wrapping="true" />
+                            </forms:fields>
+                        </forms:FormElement>
+                        <forms:FormElement label="{i18n>poolId}">
+                            <forms:fields>
+                                <Text text="{twoWay>value/poolId}" wrapping="true" />
+                            </forms:fields>
+                        </forms:FormElement>
+                        <forms:FormElement label="{i18n>providerId}">
+                            <forms:fields>
+                                <Text text="{twoWay>value/providerId}" wrapping="true" />
+                            </forms:fields>
+                        </forms:FormElement>
+                        <forms:FormElement label="{i18n>serviceAccount}">
+                            <forms:fields>
+                                <Text text="{twoWay>value/serviceAccount}" wrapping="true" />
                             </forms:fields>
                         </forms:FormElement>
                     </forms:formElements>

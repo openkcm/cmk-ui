@@ -182,6 +182,7 @@ export interface GCPAccessDetails {
     poolId: string
     providerId: string
     serviceAccount: string
+    isEditable?: boolean
 }
 export interface AccessDetails {
     management: AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails

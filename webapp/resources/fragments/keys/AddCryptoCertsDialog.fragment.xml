@@ -89,6 +89,28 @@
                                                valueLiveUpdate="true"
                                                liveChange=".onAddCryptoCertLiveChange"/>
                                     </VBox>
+                                    <VBox visible="{= ${addCryptoCertsModel>/provider} === 'GCP'}">
+                                        <Label text="{i18n>projectNumber}:" class="sapUiTinyMarginTop"
+                                               required="true" />
+                                        <Input value="{addCryptoCertsModel>projectNumber}"
+                                               valueLiveUpdate="true"
+                                               liveChange=".onAddCryptoCertLiveChange"/>
+                                        <Label text="{i18n>poolId}:" class="sapUiTinyMarginTop"
+                                               required="true" />
+                                        <Input value="{addCryptoCertsModel>poolId}"
+                                               valueLiveUpdate="true"
+                                               liveChange=".onAddCryptoCertLiveChange"/>
+                                        <Label text="{i18n>providerId}:" class="sapUiTinyMarginTop"
+                                               required="true" />
+                                        <Input value="{addCryptoCertsModel>providerId}"
+                                               valueLiveUpdate="true"
+                                               liveChange=".onAddCryptoCertLiveChange"/>
+                                        <Label text="{i18n>serviceAccount}:" class="sapUiTinyMarginTop"
+                                               required="true" />
+                                        <Input value="{addCryptoCertsModel>serviceAccount}"
+                                               valueLiveUpdate="true"
+                                               liveChange=".onAddCryptoCertLiveChange"/>
+                                    </VBox>
                                 </VBox>
                                 <Button icon="sap-icon://decline"
                                         type="Transparent"

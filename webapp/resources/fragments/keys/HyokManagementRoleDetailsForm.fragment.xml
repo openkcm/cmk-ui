@@ -15,31 +15,59 @@
             </OverflowToolbar>
         </forms:toolbar>
         <forms:formContainers>
-            <forms:FormContainer>
+            <forms:FormContainer visible="{parts: ['oneWay>/selectedKey/provider'], formatter: 'commonFormatter.displayAWSField'}">
                 <forms:formElements>
-                    <forms:FormElement label="{i18n>trustAnchorARN}" visible="{parts: ['oneWay>/selectedKey/provider'], formatter: 'commonFormatter.displayAWSField'}">
+                    <forms:FormElement label="{i18n>trustAnchorARN}">
                         <forms:fields>
                             <Text text="{twoWay>value/trustAnchorArn}" wrapping="true"/>
                         </forms:fields>
                     </forms:FormElement>
-                    <forms:FormElement label="{i18n>roleARN}" visible="{parts: ['oneWay>/selectedKey/provider'], formatter: 'commonFormatter.displayAWSField'}">
+                    <forms:FormElement label="{i18n>roleARN}">
                         <forms:fields>
                             <Text text="{twoWay>value/roleArn}" wrapping="true"/>
                         </forms:fields>
                     </forms:FormElement>
-                    <forms:FormElement label="{i18n>profileARN}" visible="{parts: ['oneWay>/selectedKey/provider'], formatter: 'commonFormatter.displayAWSField'}">
+                    <forms:FormElement label="{i18n>profileARN}">
                         <forms:fields>
                             <Text text="{twoWay>value/profileArn}" wrapping="true"/>
                         </forms:fields>
                     </forms:FormElement>
-                    <forms:FormElement label="{i18n>applicationId}" visible="{parts: ['oneWay>/selectedKey/provider'], formatter: 'commonFormatter.displayFortanixField'}">
+                </forms:formElements>
+            </forms:FormContainer>
+            <forms:FormContainer visible="{parts: ['oneWay>/selectedKey/provider'], formatter: 'commonFormatter.displayFortanixField'}">
+                <forms:formElements>
+                    <forms:FormElement label="{i18n>applicationId}">
                         <forms:fields>
                             <Text text="{twoWay>value/applicationId}" wrapping="true"/>
                         </forms:fields>
                     </forms:FormElement>
-                    <forms:FormElement label="{i18n>host}" visible="{parts: ['oneWay>/selectedKey/provider'], formatter: 'commonFormatter.displayFortanixField'}">
+                    <forms:FormElement label="{i18n>host}">
                         <forms:fields>
                             <Text text="{twoWay>value/host}" wrapping="true"/>
+                        </forms:fields>
+                    </forms:FormElement>
+                </forms:formElements>
+            </forms:FormContainer>
+            <forms:FormContainer visible="{parts: ['oneWay>/selectedKey/provider'], formatter: 'commonFormatter.displayGCPField'}">
+                <forms:formElements>
+                    <forms:FormElement label="{i18n>projectNumber}">
+                        <forms:fields>
+                            <Text text="{twoWay>value/projectNumber}" wrapping="true"/>
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>poolId}">
+                        <forms:fields>
+                            <Text text="{twoWay>value/poolId}" wrapping="true"/>
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>providerId}">
+                        <forms:fields>
+                            <Text text="{twoWay>value/providerId}" wrapping="true"/>
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>serviceAccount}">
+                        <forms:fields>
+                            <Text text="{twoWay>value/serviceAccount}" wrapping="true"/>
                         </forms:fields>
                     </forms:FormElement>
                 </forms:formElements>

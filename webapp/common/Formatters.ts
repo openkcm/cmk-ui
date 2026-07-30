@@ -256,6 +256,10 @@ export function displayAWSField(keyProvider: string): boolean {
     return (keyProvider as HYOKProviders === HYOKProviders.AWS);
 }
 
+export function displayGCPField(keyProvider: string): boolean {
+    return (keyProvider as HYOKProviders === HYOKProviders.GCP);
+}
+
 export function setConnectSystemInfoMessageStripVisible(workflowStatus: string): boolean {
     switch (workflowStatus) {
         case WorkflowStatus.WORKFLOW_ALREADY_EXISTS:
