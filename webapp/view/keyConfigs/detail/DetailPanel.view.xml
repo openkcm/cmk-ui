@@ -173,7 +173,7 @@
                 showTitle="false">
                 <subSections>
                     <ObjectPageSubSection>
-                        <m:VBox items="{twoWay>/selectedKey/accessDetails/managementARNsArray}">
+                        <m:VBox items="{twoWay>/selectedKey/accessDetails/managementDetailsArray}">
                             <core:Fragment
                                 fragmentName="kms.resources.fragments.keys.HyokManagementRoleDetailsForm"
                                 type="XML" />

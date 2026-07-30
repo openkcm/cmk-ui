@@ -137,11 +137,11 @@ export default class DetailPanel extends BaseController {
         const managementDetails = key?.accessDetails?.management;
         const cryptoDetails = key?.accessDetails?.crypto;
         if (managementDetails) {
-            const managementARNsArray: { key: string, value: AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails }[] = [{ key: 'management', value: managementDetails }];
-            this.twoWayModel.setProperty('/selectedKey/accessDetails/managementARNsArray', managementARNsArray);
+            const managementDetailsArray: { key: string, value: AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails }[] = [{ key: 'management', value: managementDetails }];
+            this.twoWayModel.setProperty('/selectedKey/accessDetails/managementDetailsArray', managementDetailsArray);
         }
         if (cryptoDetails) {
-            const cryptoArray: { key: string, value: AWSAccessDetails | FortanixAccessDetails }[] = [];
+            const cryptoArray: { key: string, value: AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails }[] = [];
             Object.entries(cryptoDetails).forEach(([key, value]) => {
                 cryptoArray.push({ key: key, value: value });
             });
@@ -514,102 +514,139 @@ export default class DetailPanel extends BaseController {
     }
 
     private validateAddCryptoCertsSaveButton(): void {
-        const entries = this.addCryptoCertsModel.getProperty('/newCryptoCertEntries') as { selectedCertKeys: string[], selectedCerts: HyokCertificates[], trustAnchorArn: string, roleArn: string, profileArn: string, applicationId: string }[];
-        let allValid: boolean;
-        if (!entries || entries.length === 0) {
+        const entries = this.addCryptoCertsModel.getProperty('/newCryptoCertEntries') as {
+            selectedCertKeys: string[]
+            selectedCerts: HyokCertificates[]
+            trustAnchorArn: string
+            roleArn: string
+            profileArn: string
+            applicationId: string
+            projectNumber: string
+            poolId: string
+            providerId: string
+            serviceAccount: string
+            isEditable: boolean
+        }[];
+
+        if (!entries?.length) {
             this.addCryptoCertsModel.setProperty('/saveEnabled', false);
             return;
         }
-        if (this.keyProvider === Enums.HYOKProviders.AWS) {
-            // For AWS, all entries must have all ARN fields filled
-            allValid = entries.every(entry =>
-                entry.trustAnchorArn?.trim().length > 0
-                && entry.roleArn?.trim().length > 0
-                && entry.profileArn?.trim().length > 0
-                && entry.selectedCertKeys?.length > 0
-            );
-            this.addCryptoCertsModel.setProperty('/saveEnabled', allValid);
+
+        let fields: string[] = [];
+
+        switch (this.keyProvider) {
+            case Enums.HYOKProviders.AWS:
+                fields = ['trustAnchorArn', 'roleArn', 'profileArn'];
+                break;
+
+            case Enums.HYOKProviders.FORTANIX:
+                fields = ['applicationId'];
+                break;
+
+            case Enums.HYOKProviders.GCP:
+                fields = ['projectNumber', 'poolId', 'providerId', 'serviceAccount'];
+                break;
         }
-        else if (this.keyProvider === Enums.HYOKProviders.FORTANIX) {
-            allValid = entries.every(entry =>
-                entry.applicationId?.trim().length > 0
-                && entry.selectedCertKeys?.length > 0
-            );
-            this.addCryptoCertsModel.setProperty('/saveEnabled', allValid);
-        }
+
+        const allValid = entries.every(entry =>
+            fields.every((field) => {
+                const value = entry[field as keyof typeof entry];
+                return typeof value === 'string' && value.trim().length > 0;
+            })
+            && entry.selectedCertKeys.length > 0
+        );
+
+        this.addCryptoCertsModel.setProperty('/saveEnabled', allValid);
     }
 
     public async onSaveAddCryptoCerts(): Promise<void> {
         this.addCryptoCertsDialog?.setBusy(true);
-        let existingCryptoArray;
-        const entries = this.addCryptoCertsModel.getProperty('/newCryptoCertEntries') as { selectedCertKeys: string[], selectedCerts: HyokCertificates[], trustAnchorArn: string, roleArn: string, profileArn: string, applicationId: string }[];
+        const entries = this.addCryptoCertsModel.getProperty('/newCryptoCertEntries') as { selectedCertKeys: string[], selectedCerts: HyokCertificates[], trustAnchorArn: string, roleArn: string, profileArn: string, applicationId: string, projectNumber: string, poolId: string, providerId: string, serviceAccount: string }[];
 
         // Build crypto payload from new entries
-        let newCryptoPayload: Record<string, AWSAccessDetails | FortanixAccessDetails> = {};
+        const newCryptoPayload: Record<string, AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails> = {};
+
         entries.forEach((entry) => {
-            if (this.keyProvider === Enums.HYOKProviders.AWS) {
-                entry.selectedCertKeys.forEach((certKey: string) => {
-                    newCryptoPayload = {
-                        ...newCryptoPayload,
-                        [certKey]: {
-                            roleArn: entry.roleArn,
-                            trustAnchorArn: entry.trustAnchorArn,
-                            profileArn: entry.profileArn
-                        }
+            let accessDetails: AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails;
+
+            switch (this.keyProvider) {
+                case Enums.HYOKProviders.AWS:
+                    accessDetails = {
+                        roleArn: entry.roleArn,
+                        trustAnchorArn: entry.trustAnchorArn,
+                        profileArn: entry.profileArn
                     };
-                });
-            }
-            else if (this.keyProvider === Enums.HYOKProviders.FORTANIX) {
-                entry.selectedCertKeys.forEach((certKey: string) => {
-                    newCryptoPayload = {
-                        ...newCryptoPayload,
-                        [certKey]: {
-                            applicationId: entry.applicationId,
-                            host: this.twoWayModel.getProperty('/selectedKey/accessDetails/management/host') as string
-                        }
+                    break;
+
+                case Enums.HYOKProviders.FORTANIX:
+                    accessDetails = {
+                        applicationId: entry.applicationId,
+                        host: this.twoWayModel.getProperty('/selectedKey/accessDetails/management/host') as string
                     };
-                });
+                    break;
+
+                case Enums.HYOKProviders.GCP:
+                    accessDetails = {
+                        projectNumber: entry.projectNumber,
+                        poolId: entry.poolId,
+                        providerId: entry.providerId,
+                        serviceAccount: entry.serviceAccount
+                    };
+                    break;
+                default:
+                    return;
             }
+
+            entry.selectedCertKeys.forEach((certKey) => {
+                newCryptoPayload[certKey] = accessDetails;
+            });
         });
 
         // Merge with existing cryptos
-        let mergedCryptoPayload;
-        if (this.keyProvider === Enums.HYOKProviders.AWS) {
-            existingCryptoArray = this.twoWayModel.getProperty('/selectedKey/accessDetails/cryptoARNsArray') as { key: string, value: AWSAccessDetails }[] | undefined;
-            let existingCryptoPayload: Record<string, AWSAccessDetails> = {};
-            existingCryptoArray?.forEach((cryptoItem) => {
-                existingCryptoPayload = {
-                    ...existingCryptoPayload,
-                    [cryptoItem.key]: {
-                        roleArn: cryptoItem.value.roleArn,
-                        trustAnchorArn: cryptoItem.value.trustAnchorArn,
-                        profileArn: cryptoItem.value.profileArn
-                    }
-                };
-            });
-            mergedCryptoPayload = { ...existingCryptoPayload, ...newCryptoPayload };
-        }
-        else if (this.keyProvider === Enums.HYOKProviders.FORTANIX) {
-            existingCryptoArray = this.twoWayModel.getProperty('/selectedKey/accessDetails/cryptoARNsArray') as { key: string, value: FortanixAccessDetails }[] | undefined;
-            let existingCryptoPayload: Record<string, FortanixAccessDetails> = {};
-            existingCryptoArray?.forEach((cryptoItem) => {
-                existingCryptoPayload = {
-                    ...existingCryptoPayload,
-                    [cryptoItem.key]: {
-                        applicationId: cryptoItem.value.applicationId,
-                        host: this.twoWayModel.getProperty('/selectedKey/accessDetails/management/host') as string
-                    }
-                };
-            });
-            mergedCryptoPayload = { ...existingCryptoPayload, ...newCryptoPayload };
-        }
+
+        const existingCryptoPayload: Record<string, AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails> = {};
+
+        const existingCryptoArray = this.twoWayModel.getProperty('/selectedKey/accessDetails/cryptoARNsArray') as | { key: string, value: AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails }[] | undefined;
+
+        existingCryptoArray?.forEach((cryptoItem) => {
+            switch (this.keyProvider) {
+                case Enums.HYOKProviders.AWS:
+                    existingCryptoPayload[cryptoItem.key] = {
+                        roleArn: (cryptoItem.value as AWSAccessDetails).roleArn,
+                        trustAnchorArn: (cryptoItem.value as AWSAccessDetails).trustAnchorArn,
+                        profileArn: (cryptoItem.value as AWSAccessDetails).profileArn
+                    };
+                    break;
+
+                case Enums.HYOKProviders.FORTANIX:
+                    existingCryptoPayload[cryptoItem.key] = {
+                        applicationId: (cryptoItem.value as FortanixAccessDetails).applicationId,
+                        host: this.twoWayModel.getProperty(
+                            '/selectedKey/accessDetails/management/host'
+                        ) as string
+                    };
+                    break;
+
+                case Enums.HYOKProviders.GCP:
+                    existingCryptoPayload[cryptoItem.key] = {
+                        projectNumber: (cryptoItem.value as GCPAccessDetails).projectNumber,
+                        poolId: (cryptoItem.value as GCPAccessDetails).poolId,
+                        providerId: (cryptoItem.value as GCPAccessDetails).providerId,
+                        serviceAccount: (cryptoItem.value as GCPAccessDetails).serviceAccount
+                    };
+                    break;
+            }
+        });
 
         const payload = {
             accessDetails: {
-                crypto: mergedCryptoPayload
+                crypto: {
+                    ...existingCryptoPayload,
+                    ...newCryptoPayload
+                }
             }
         };
-
         try {
             await this.api.patch<Key>(`keys/${this.id}`, payload);
             MessageToast.show(this.getText('keyConfigSaved'));

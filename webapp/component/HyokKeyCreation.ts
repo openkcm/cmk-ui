@@ -63,19 +63,28 @@ export default class HyokKeyRegistration extends BaseController {
         this.keyConfigId = keyCreationParams.keyConfigId;
         this.onKeyCreateCallBackfnc = onKeyCreateCallBackfnc;
         this.parentController = parentController;
-        this.setHYOKRegistraionWizard();
+        this.setHYOKRegistrationWizard();
     }
 
-    private setHYOKRegistraionWizard(): void {
+    private setHYOKRegistrationWizard(): void {
         let wizardView: string;
-        if (this.subtype === HYOKProviders.AWS) {
-            wizardView = 'kms.resources.fragments.common.AWSKeyCreationWizard';
-        }
-        else if (this.subtype === HYOKProviders.FORTANIX) {
-            wizardView = 'kms.resources.fragments.common.FortanixKeyCreationWizard';
-        }
-        else if (this.subtype === HYOKProviders.GCP) {
-            wizardView = 'kms.resources.fragments.common.GCPKeyCreationWizard';
+
+        switch (this.subtype) {
+            case HYOKProviders.AWS:
+                wizardView = 'kms.resources.fragments.common.AWSKeyCreationWizard';
+                break;
+
+            case HYOKProviders.FORTANIX:
+                wizardView = 'kms.resources.fragments.common.FortanixKeyCreationWizard';
+                break;
+
+            case HYOKProviders.GCP:
+                wizardView = 'kms.resources.fragments.common.GCPKeyCreationWizard';
+                break;
+
+            default:
+                MessageBox.information(this.getText('unsupportedKeyProvider', [this.subtype]), { title: this.getText('featureNotAvailable') });
+                return;
         }
         const loadFragment = async (): Promise<void> => {
             this.keyCreatePopover = await Fragment.load({
@@ -123,26 +132,50 @@ export default class HyokKeyRegistration extends BaseController {
     private resetModel() {
         this.keyCreatePopover?.setBusy(true);
         this.getHYOKAWSCertificates().then((certs: { hyokAWSManagementCerts: HyokCertificates[], cryptoRolesCerts: HyokCertificates[] }) => {
-            this.keyCreationModel.setData({
+            const commonData = {
                 keyName: '' as string,
                 nativeId: '' as string,
                 description: '' as string,
-                projectNumber: '' as string,
-                poolId: '' as string,
-                providerId: '' as string,
-                serviceAccount: '' as string,
-                host: '' as string,
-                applicationId: '' as string,
-                keySubType: this.subtype as string,
-                hyokManagementRoleStepValid: false as boolean,
-                managementRolesCerts: certs?.hyokAWSManagementCerts,
+                keySubType: this.subtype,
+                hyokManagementRoleStepValid: false,
                 cryptoRolesCerts: certs?.cryptoRolesCerts,
                 availableCryptoCertsSelectionList: certs?.cryptoRolesCerts,
-                hyokAWSManagementCertObj: this.managementDefaultModel,
                 hyokCryptoCertObj: null as HyokCryptoCertInput[] | null,
                 selectedCryptoRolesCertKeys: [] as string[],
                 selectedCryptoCertItems: [] as HyokCertificates[],
-                allowAddMoreCryptoCert: true as boolean
+                allowAddMoreCryptoCert: true
+            };
+            let providerData = {};
+            switch (this.subtype) {
+                case HYOKProviders.AWS:
+                    providerData = {
+                        managementRolesCerts: certs?.hyokAWSManagementCerts,
+                        hyokAWSManagementCertObj: this.managementDefaultModel
+                    };
+                    break;
+
+                case HYOKProviders.GCP:
+                    providerData = {
+                        projectNumber: '',
+                        poolId: '',
+                        providerId: '',
+                        serviceAccount: ''
+                    };
+                    break;
+
+                case HYOKProviders.FORTANIX:
+                    providerData = {
+                        host: '',
+                        applicationId: ''
+                    };
+                    break;
+
+                default:
+                    MessageBox.information(this.getText('unsupportedKeyProvider', [this.subtype]), { title: this.getText('featureNotAvailable') });
+            }
+            this.keyCreationModel.setData({
+                ...commonData,
+                ...providerData
             }, true);
         }).catch((err: unknown) => {
             showErrorMessage(err as AxiosError, this.parentController.getText('errorFetchingHYOKCertificates'));
