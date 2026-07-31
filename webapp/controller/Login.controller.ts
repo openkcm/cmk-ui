@@ -60,7 +60,7 @@ export default class Login extends BaseController {
         return tenantIdMatch ? decodeURIComponent(tenantIdMatch[1]) : null;
     }
 
-    private resolveErrorMessages(errorCode: string): { title: string; message: string } {
+    private resolveErrorMessages(errorCode: string): { title: string, message: string } {
         switch (errorCode) {
             case Constants.LOGIN_ERRORS.NO_TRUST_CONFIGURED:
                 return {
