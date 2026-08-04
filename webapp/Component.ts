@@ -153,7 +153,12 @@ export default class Component extends UIComponent {
             selectedTenantName: selectedTenant?.name || '',
             selectedTenantRole: selectedTenant?.role || ''
         }), 'selectedTenant');
-        const roleBasedAccessModelData: RoleBasedAccessData = {
+        const roleBasedAccessModel = new JSONModel(this.buildRoleBasedAccessData(userInfo));
+        this.setModel(roleBasedAccessModel, 'roleBasedAccess');
+    }
+
+    private buildRoleBasedAccessData(userInfo: UserData): RoleBasedAccessData {
+        return {
             keyConfig: {
                 canView: this.hasRole(userInfo, UserRoles.TENANT_AUDITOR) || this.hasRole(userInfo, UserRoles.KEY_ADMINISTRATOR),
                 canManage: this.hasRole(userInfo, UserRoles.KEY_ADMINISTRATOR)
@@ -175,8 +180,24 @@ export default class Component extends UIComponent {
                 canManage: this.hasRole(userInfo, UserRoles.TENANT_ADMINISTRATOR)
             }
         };
-        const roleBasedAccessModel = new JSONModel(roleBasedAccessModelData);
-        this.setModel(roleBasedAccessModel, 'roleBasedAccess');
+    }
+
+    public updateUserInfo(userInfo: UserData): void {
+        const userInfoModel = this.getModel('userInfo');
+        if (userInfoModel instanceof JSONModel) {
+            userInfoModel.setData(userInfo);
+        }
+        else {
+            this.setModel(new JSONModel(userInfo), 'userInfo');
+        }
+
+        const roleBasedAccessModel = this.getModel('roleBasedAccess');
+        if (roleBasedAccessModel instanceof JSONModel) {
+            roleBasedAccessModel.setData(this.buildRoleBasedAccessData(userInfo));
+        }
+        else {
+            this.setModel(new JSONModel(this.buildRoleBasedAccessData(userInfo)), 'roleBasedAccess');
+        }
     }
 
     private hasRole(userInfo: UserData, role: string): boolean {
