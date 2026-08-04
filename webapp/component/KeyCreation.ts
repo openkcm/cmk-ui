@@ -96,8 +96,8 @@ export default class KeyCreation extends BaseController {
         const regionList = [
             { key: '', text: 'Select Region' },
             ...this.supportedRegions.map((region: SupportedRegion) => ({
-                key: region.name,
-                text: region.technicalName ?? region.name
+                key: region.technicalName ?? region.name,
+                text: region.name
             }))
         ];
         this.keyCreationModel.setData({
