@@ -22,6 +22,8 @@ import Auth from 'kms/services/Auth.service';
 export default class App extends BaseController {
     private api: Api;
     private userPopover: ResponsivePopover | undefined;
+    private static readonly TENANTS_SIZE_LIMIT = 1024;
+
     private readonly oneWayModel = new JSONModel(
         {
             tenants: [
@@ -73,6 +75,8 @@ export default class App extends BaseController {
             }
 
             this.toolPage = this.byId('kmsApp') as ToolPage;
+
+            this.oneWayModel.setSizeLimit(App.TENANTS_SIZE_LIMIT);
 
             this.setModel(this.oneWayModel, 'oneWay');
             this.setModel(this.twoWayModel, 'twoWay');
@@ -305,6 +309,37 @@ export default class App extends BaseController {
             this.twoWayModel.setProperty('/selectedTenantName', selectedTenantName);
             this.api = Api.getInstance();
             Api.updateTenantId(selectedTenant || '');
+            void this.refreshTenantsAndNavigate();
+        }
+    }
+
+    private async refreshTenantsAndNavigate(): Promise<void> {
+        try {
+            const [tenantsResponse, userInfo] = await Promise.all([
+                this.api.getTenantsForTenant(),
+                this.api.get<UserData>('userInfo')
+            ]);
+
+            const tenants = tenantsResponse?.value ?? [];
+            this.oneWayModel.setProperty('/tenants', tenants);
+
+            const component = this.getOwnerComponent() as Component;
+            const tenantsModel = component?.getModel('tenants');
+            if (tenantsModel instanceof JSONModel) {
+                tenantsModel.setProperty('/tenants', tenants);
+            }
+
+            if (userInfo) {
+                component.updateUserInfo(userInfo);
+                this.setUserInitials(userInfo);
+                this.setUserData(userInfo);
+                this.twoWayModel.setProperty('/defaulHomePage', this.getDefaulHomePage(userInfo));
+            }
+        }
+        catch (error) {
+            console.error('Failed to refresh tenant context after tenant switch:', error);
+        }
+        finally {
             this.navigateToSelectedPage();
         }
     }
