@@ -41,11 +41,6 @@
                             <Text text="{twoWay>value/applicationId}" wrapping="true"/>
                         </forms:fields>
                     </forms:FormElement>
-                    <forms:FormElement label="{i18n>host}">
-                        <forms:fields>
-                            <Text text="{twoWay>value/host}" wrapping="true"/>
-                        </forms:fields>
-                    </forms:FormElement>
                 </forms:formElements>
             </forms:FormContainer>
             <forms:FormContainer visible="{parts: ['oneWay>/selectedKey/provider'], formatter: 'commonFormatter.displayGCPField'}">
