@@ -99,8 +99,10 @@ export default class KeyConfigDetail extends BaseController {
     private top: number;
     private keysSkip: number;
     private systemsSkip: number;
+    private connectSystemSkip: number;
     private keysCurrentPage: number;
     private systemsCurrentPage: number;
+    private connectSystemCurrentPage: number;
     private readonly keysPaginationModel = new JSONModel({});
     private readonly systemsPaginationModel = new JSONModel({});
     private readonly keyCreatePopoverComp = new KeyCreation('keyCreatePopover');
@@ -111,8 +113,10 @@ export default class KeyConfigDetail extends BaseController {
         this.top = 10;
         this.keysSkip = 0;
         this.systemsSkip = 0;
+        this.connectSystemSkip = 0;
         this.keysCurrentPage = 1;
         this.systemsCurrentPage = 1;
+        this.connectSystemCurrentPage = 1;
 
         this.eventBus.subscribe(EventChannelIds.KEYCONFIG, EventIDs.LOAD_KEY_CONFIG_DETAILS, (channelId, eventId, data) => {
             this.onDetailPanelRouteEventTriggered(channelId as EventChannelIds, eventId as EventIDs, data as { keyConfigId: string, tenantId: string });
@@ -404,6 +408,18 @@ export default class KeyConfigDetail extends BaseController {
         await this.updateKeysTable();
     }
 
+    private async onConnectSystemNextPage() {
+        this.connectSystemCurrentPage++;
+        this.connectSystemSkip += 10;
+        await this.resetConnectSystemModel();
+    }
+
+    private async onConnectSystemPreviousPage() {
+        this.connectSystemCurrentPage--;
+        this.connectSystemSkip -= 10;
+        await this.resetConnectSystemModel();
+    }
+
     private async onSystemsNextPage() {
         this.systemsCurrentPage++;
         this.systemsSkip += 10;
@@ -483,7 +499,7 @@ export default class KeyConfigDetail extends BaseController {
                 $top: this.top,
                 $skip: this.systemsSkip
             };
-            return await this.api.get<KeyResponse>('systems', payload);
+            return await this.api.get<SystemsResponse>('systems', payload);
         }
         catch (error) {
             console.error(error);
@@ -506,7 +522,7 @@ export default class KeyConfigDetail extends BaseController {
             const payload = {
                 $filter: `status eq '${SystemStatus.DISCONNECTED}'`,
                 $top: this.top,
-                $skip: this.systemsSkip
+                $skip: this.connectSystemSkip
             };
             return await this.api.get<SystemsResponse>('systems', payload);
         }
@@ -846,7 +862,7 @@ export default class KeyConfigDetail extends BaseController {
 
     private shouldUseWorkflowForKeyDeletion(key: Key): boolean {
         return key?.isPrimary
-            && (key?.type === KeyCreationTypes.BYOK || key?.type === KeyCreationTypes.HYOK);
+          && (key?.type === KeyCreationTypes.BYOK || key?.type === KeyCreationTypes.HYOK);
     }
 
     public async onKeyTableDeletePress(event: Button$PressEvent): Promise<void> {
@@ -1230,8 +1246,7 @@ export default class KeyConfigDetail extends BaseController {
     }
 
     private async getWrappingParams(key: Key): Promise<{ publicKey: string, wrappingAlgorithm: object } | undefined> {
-        const importParams = await this.api.get<{ publicKey: string, wrappingAlgorithm: object }>(`keys/${key.id}/importParams`);
-        return importParams;
+        return await this.api.get<{ publicKey: string, wrappingAlgorithm: object }>(`keys/${key.id}/importParams`);
     }
 
     private async makeKeyPrimary(key: Key): Promise<void> {
@@ -1287,6 +1302,7 @@ export default class KeyConfigDetail extends BaseController {
     private async resetConnectSystemModel() {
         const availbleSystemsForConnectionResponse = await this.getAllSystemAvailableForConnection();
         const connectedSystems = this.oneWayModel.getProperty('/systems') as System[] || [];
+        const totalCount = availbleSystemsForConnectionResponse?.count ?? 0;
 
         const availbleSystemsForConnection = availbleSystemsForConnectionResponse?.value ?? [];
         // As only DISCONNECTED sytems are listed, the systems connected to this
@@ -1296,6 +1312,8 @@ export default class KeyConfigDetail extends BaseController {
             !connectedSystems.some(connectedSystem => connectedSystem.id === system.id)
         );
         this.connectSystemModel.setProperty('/systemsList', filteredSystems);
+        this.connectSystemModel.setProperty('/totalPages', Math.ceil(totalCount / this.top));
+        this.connectSystemModel.setProperty('/currentPage', this.connectSystemCurrentPage);
     }
 
     public async onSwitchKeyConfigPress(event: Button$PressEvent): Promise<void> {
