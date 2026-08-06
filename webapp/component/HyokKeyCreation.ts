@@ -131,7 +131,7 @@ export default class HyokKeyRegistration extends BaseController {
 
     private resetModel() {
         this.keyCreatePopover?.setBusy(true);
-        this.getHYOKAWSCertificates().then((certs: { hyokAWSManagementCerts: HyokCertificates[], cryptoRolesCerts: HyokCertificates[] }) => {
+        this.getHYOKCertificates().then((certs: { hyokManagementCerts: HyokCertificates[], cryptoRolesCerts: HyokCertificates[] }) => {
             const commonData = {
                 keyName: '' as string,
                 nativeId: '' as string,
@@ -139,6 +139,7 @@ export default class HyokKeyRegistration extends BaseController {
                 keySubType: this.subtype,
                 hyokManagementRoleStepValid: false,
                 cryptoRolesCerts: certs?.cryptoRolesCerts,
+                managementRolesCerts: certs?.hyokManagementCerts,
                 availableCryptoCertsSelectionList: certs?.cryptoRolesCerts,
                 hyokCryptoCertObj: null as HyokCryptoCertInput[] | null,
                 selectedCryptoRolesCertKeys: [] as string[],
@@ -149,7 +150,6 @@ export default class HyokKeyRegistration extends BaseController {
             switch (this.subtype) {
                 case HYOKProviders.AWS:
                     providerData = {
-                        managementRolesCerts: certs?.hyokAWSManagementCerts,
                         hyokAWSManagementCertObj: this.managementDefaultModel
                     };
                     break;
@@ -361,10 +361,10 @@ export default class HyokKeyRegistration extends BaseController {
         }
     }
 
-    private async getHYOKAWSCertificates(): Promise<{ hyokAWSManagementCerts: HyokCertificates[], cryptoRolesCerts: HyokCertificates[] }> {
+    private async getHYOKCertificates(): Promise<{ hyokManagementCerts: HyokCertificates[], cryptoRolesCerts: HyokCertificates[] }> {
         const hyokAWScertificates = await this.api.get<HYOKAWScertificates>(`keyConfigurations/${this.keyConfigId}/certificates`);
         return {
-            hyokAWSManagementCerts: hyokAWScertificates?.tenantDefault?.value ?? [],
+            hyokManagementCerts: hyokAWScertificates?.tenantDefault?.value ?? [],
             cryptoRolesCerts: hyokAWScertificates?.crypto?.value ?? []
         };
     }
