@@ -107,5 +107,10 @@ export default (systemId, keyConfigurationID, operation) => {
             },
             type: "SYSTEM"
         };
+    } else if(systemId && !keyConfigurationID && operation === 'recoveryActions') {
+        return {
+            canCancel: true,
+            canRetry: false
+        };
     }
 }
