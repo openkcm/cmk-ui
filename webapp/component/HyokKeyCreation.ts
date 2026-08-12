@@ -7,7 +7,7 @@ import {
     HyokAWSManagementCertInput,
     AWSAccessDetails, FortanixAccessDetails, GCPAccessDetails
 } from 'kms/common/Types';
-import { getErrorContext, getErrorDataMessage, showErrorMessage } from 'kms/common/Helpers';
+import { getErrorCode, getErrorContext, getErrorDataMessage, showErrorMessage } from 'kms/common/Helpers';
 import { AxiosError } from 'axios';
 import BaseController from 'kms/controller/BaseController';
 import KeyConfigDetail from 'kms/controller/keyConfigs/detail/Detail.controller';
@@ -22,6 +22,7 @@ import { Icon$PressEvent } from 'sap/ui/core/Icon';
 import JSONModel from 'sap/ui/model/json/JSONModel';
 import { Button$PressEvent } from 'sap/m/Button';
 import * as HelpPopover from 'kms/common/HelpInfoPopover';
+import Constants from 'kms/common/Constants';
 
 interface KeyCreationParams {
     keyConfigId: string
@@ -416,13 +417,31 @@ export default class HyokKeyRegistration extends BaseController {
     private _handleHYOKKeyRegistrationError(error: AxiosError): void {
         const errorContext = getErrorContext(error);
         const errorMessage = getErrorDataMessage(error);
-        if (errorContext?.reason || errorMessage) {
+        const errorCode = getErrorCode(error);
+        let detailedErrorMessage;
+        if (errorCode) {
+            switch (errorCode) {
+                case Constants.API_ERROR_CODES.MISSING_PROPERTY:
+                    detailedErrorMessage = this.getText('errorKeyMissingProperty');
+                    break;
+                case Constants.API_ERROR_CODES.INVALID_ACCESS_DATA:
+                    detailedErrorMessage = this.getText('errorInvalidKeyAccessData');
+                    break;
+                case Constants.API_ERROR_CODES.NOT_SUPPORTED:
+                    detailedErrorMessage = this.getText('errorKeyNotSupported');
+                    break;
+                case Constants.API_ERROR_CODES.TRANSFORM_KEY_FROM_API:
+                case Constants.API_ERROR_CODES.INVALID_KEY_ATTRIBUTE:
+                    detailedErrorMessage = this.getText('errorInvalidKeyAttribute');
+                    break;
+                default:
+                    detailedErrorMessage = errorMessage ? ` ${errorMessage}` : '';
+            }
             const errorContextCode = errorContext?.reason ? ` (Error code: ${errorContext?.reason})` : '';
-            const detailedErrorMessage = errorMessage ? ` ${errorMessage}` : '';
-            showErrorMessage(error, this.parentController.getText('errorHYOKKeyRegistrationAuthenticationFailed', [detailedErrorMessage + errorContextCode]));
+            showErrorMessage(error, this.getText('errorHYOKKeyRegistrationFailed', [detailedErrorMessage + errorContextCode]));
         }
         else {
-            showErrorMessage(error, this.parentController.getText('errorAddingKey'));
+            showErrorMessage(error, this.getText('errorAddingKey'));
         }
     }
 }
