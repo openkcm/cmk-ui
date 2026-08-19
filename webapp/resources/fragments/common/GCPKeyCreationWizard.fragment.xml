@@ -47,13 +47,13 @@
                                                 </customData>
                                             </Input>
                                             <HBox>
-                                                <Label text="{i18n>keyID}:" required="true"
+                                                <Label text="{i18n>keyResourceName}:" required="true"
                                                        class="sapUiSmallMarginTop" />
                                                 <core:Icon src="sap-icon://message-information"
                                                            alt="{i18n>help}"
                                                            press="onHelpIconPressed"
                                                            color="#0A6ED1"
-                                                           dataHelp:helpPopoverKey="keyIDPattern"
+                                                           dataHelp:helpPopoverKey="keyResourceNamePattern"
                                                            class="sapUiSmallMarginTop sapUiTinyMarginBegin" />
                                             </HBox>
                                             <Input value="{model>/nativeId}"
@@ -61,7 +61,7 @@
                                                 <customData>
                                                     <core:CustomData
                                                             key="testId"
-                                                            value="GCPKeyId-Input"
+                                                            value="GCPkeyResourceName-Input"
                                                             writeToDom="true" />
                                                 </customData>
                                             </Input>
@@ -354,7 +354,7 @@
                                             <Label text="{i18n>keyName}" />
                                             <Input value="{model>/keyName}"
                                                    editable="false" />
-                                            <Label text="{i18n>keyId}" />
+                                            <Label text="{i18n>keyResourceName}" />
                                             <Input value="{model>/nativeId}"
                                                 editable="false" />
                                             <Label text="{i18n>keyDescription}:" class="sapUiTinyMarginTop" />
