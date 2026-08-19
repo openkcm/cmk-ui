@@ -14,6 +14,7 @@ import {
 } from './Enums';
 import { getText } from 'kms/common/Helpers';
 import { AWSAccessDetails, SubjectDN } from './Types';
+import Enums from 'kms/common/Enums';
 
 export function setTaskStatus(state: TaskStates): string {
     switch (state) {
@@ -189,6 +190,18 @@ export function setGroupRole(role: GroupRoles): string {
             return getText('tenantAuditor');
         default:
             return role;
+    }
+}
+export function setNativeIdLabel(provider: string): string {
+    switch (provider as HYOKProviders) {
+        case Enums.HYOKProviders.AWS:
+            return getText('keyARN');
+        case Enums.HYOKProviders.FORTANIX:
+            return getText('fortanixKeyName');
+        case Enums.HYOKProviders.GCP:
+            return getText('keyResourceName');
+        default:
+            return '';
     }
 }
 export function setKeyStateText(state: string): string {

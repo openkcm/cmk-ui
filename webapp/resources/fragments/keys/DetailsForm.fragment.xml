@@ -1,8 +1,8 @@
 <core:FragmentDefinition xmlns="sap.m"
-    xmlns:core="sap.ui.core"
-    xmlns:layout="sap.ui.layout"
-    xmlns:forms="sap.ui.layout.form"
-    core:require="{ commonFormatter: 'kms/common/Formatters' }">
+                         xmlns:core="sap.ui.core"
+                         xmlns:layout="sap.ui.layout"
+                         xmlns:forms="sap.ui.layout.form"
+                         core:require="{ commonFormatter: 'kms/common/Formatters' }">
     <forms:Form width="100%">
         <forms:layout>
             <forms:ColumnLayout
@@ -45,7 +45,12 @@
                     <forms:FormElement label="{i18n>name}">
                         <forms:fields>
                             <Text text="{oneWay>/selectedKey/name}">
-
+                                <customData>
+                                    <core:CustomData
+                                            key="testId"
+                                            value="keyDetail-keyName"
+                                            writeToDom="true" />
+                                </customData>
                             </Text>
                         </forms:fields>
                     </forms:FormElement>
@@ -63,8 +68,7 @@
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>enabled}">
                         <forms:fields>
-                            <Text
-                                text="{= !!${oneWay>/selectedKey/enabled} ? ${i18n>yes} : ${i18n>no}}">
+                            <Text text="{= !!${oneWay>/selectedKey/enabled} ? ${i18n>yes} : ${i18n>no}}">
                                 <customData>
                                     <core:CustomData
                                         key="testId"
@@ -74,7 +78,7 @@
                             </Text>
                         </forms:fields>
                     </forms:FormElement>
-                    <forms:FormElement label="{i18n>keystore}">
+                    <forms:FormElement label="{i18n>keystore}"  visible="{= !!${twoWay>/selectedKey/customerHeld}}">
                         <forms:fields>
                             <Text text="{oneWay>/selectedKey/provider}">
                                 <customData>
@@ -111,7 +115,7 @@
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>host}"
-                        visible="{parts: ['oneWay>/selectedKey/provider'], formatter: 'commonFormatter.displayFortanixField'}">
+                                       visible="{parts: ['oneWay>/selectedKey/provider'], formatter: 'commonFormatter.displayFortanixField'}">
                         <forms:fields>
                             <Text text="{oneWay>/selectedKey/accessDetails/management/host}" wrapping="true">
                                 <customData>
@@ -123,8 +127,8 @@
                             </Text>
                         </forms:fields>
                     </forms:FormElement>
-                    <forms:FormElement label="{i18n>keyARN}"
-                        visible="{= !!${twoWay>/selectedKey/customerHeld}}">
+                    <forms:FormElement label="{ path: 'twoWay>/selectedKey/provider', formatter: 'commonFormatter.setNativeIdLabel' }"
+                                       visible="{= !!${twoWay>/selectedKey/customerHeld}}">
                         <forms:fields>
                             <Text text="{oneWay>/selectedKey/nativeID}">
                                 <customData>
@@ -138,8 +142,7 @@
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>customerHeld}">
                         <forms:fields>
-                            <Text
-                                text="{= !!${twoWay>/selectedKey/customerHeld} ? ${i18n>yes} : ${i18n>no}}">
+                            <Text text="{= !!${twoWay>/selectedKey/customerHeld} ? ${i18n>yes} : ${i18n>no}}">
                                 <customData>
                                     <core:CustomData
                                         key="testId"
@@ -149,8 +152,7 @@
                             </Text>
                         </forms:fields>
                     </forms:FormElement>
-                    <forms:FormElement label="{i18n>createdBy}"
-                        visible="{= !!${oneWay>/selectedKey/metadata/createdBy}}">
+                    <forms:FormElement label="{i18n>createdBy}" visible="{= !!${oneWay>/selectedKey/metadata/createdBy}}">
                         <forms:fields>
                             <Text text="{oneWay>/selectedKey/metadata/createdBy}">
                                 <customData>
@@ -164,8 +166,7 @@
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>createdOn}">
                         <forms:fields>
-                            <Text
-                                text="{path:'oneWay>/selectedKey/metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-dd\'T\'HH:mm:ss.SSSSSSX'}}} UTC">
+                            <Text text="{path:'oneWay>/selectedKey/metadata/createdAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-dd\'T\'HH:mm:ss.SSSSSSX'}}} UTC">
                                 <customData>
                                     <core:CustomData
                                         key="testId"
@@ -177,8 +178,7 @@
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>updatedOn}">
                         <forms:fields>
-                            <Text
-                                text="{path:'oneWay>/selectedKey/metadata/updatedAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-dd\'T\'HH:mm:ss.SSSSSSX'}}} UTC">
+                            <Text text="{path:'oneWay>/selectedKey/metadata/updatedAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-dd\'T\'HH:mm:ss.SSSSSSX'}}} UTC">
                                 <customData>
                                     <core:CustomData
                                         key="testId"
