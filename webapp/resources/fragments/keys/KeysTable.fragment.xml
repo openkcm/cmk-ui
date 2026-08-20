@@ -245,7 +245,7 @@
                                                 writeToDom="true" />
                                         </customData>
                                     </MenuItem>
-                                    <MenuItem press="onBYOKDownloadPress" text="{i18n>download}"
+                                    <MenuItem press="onBYOKDownloadPress" text="{i18n>downloadWrappingKey}"
                                         visible="{= ${oneWay>state} === 'PENDING_IMPORT' }"
                                         icon="sap-icon://download" />
                                     <customData>

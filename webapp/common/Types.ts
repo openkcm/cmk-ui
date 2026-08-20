@@ -99,6 +99,7 @@ export interface Key {
     region: string
     type: KeyCreationTypes
     accessDetails?: AccessDetails
+    importParameters?: BYOKImportParameters
     metadata: {
         createdBy: string
         createdAt: string
@@ -107,6 +108,13 @@ export interface Key {
         imported: boolean
         totalVersions: number
         primaryVersion: number
+    }
+}
+export interface BYOKImportParameters {
+    publicKey?: string
+    wrappingAlgorithm: {
+        name: string
+        hashFunction: string
     }
 }
 export interface KeyVersion {

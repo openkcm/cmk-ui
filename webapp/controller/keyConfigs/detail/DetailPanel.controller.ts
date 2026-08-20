@@ -24,6 +24,8 @@ import MessageBox from 'sap/m/MessageBox';
 import Workflow from 'kms/component/Workflow';
 import Dialog from 'sap/m/Dialog';
 import Fragment from 'sap/ui/core/Fragment';
+import { BYOKImportParameters } from 'kms/common/Types';
+import { downloadWrappingKey, fetchImportParameters, isBYOKAwaitingImport } from 'kms/common/Byok';
 
 interface KeyVersionResponse {
     value: KeyVersion[] | undefined
@@ -104,21 +106,29 @@ export default class DetailPanel extends BaseController {
     private async getKeyDetails(): Promise<void> {
         try {
             const selectedKey = await this.api.get<Key>(`keys/${this.id}`);
-            const keyVersions = await this.api.get<KeyVersionResponse>(`keys/${this.id}/versions`);
-            if (selectedKey) {
-                this.oneWayModel.setProperty('/selectedKey', selectedKey);
-                this.twoWayModel.setProperty('/selectedKey', selectedKey);
-                this.setKeyDetailsToModel(selectedKey);
-                this.oneWayModel.setProperty('/keyVersions', keyVersions?.value);
-                this.oneWayModel.setProperty('/keyVersionsCount', keyVersions?.count);
-            }
-            else {
+            if (!selectedKey) {
                 console.error('Key not found');
                 this.getRouter().navTo('keyConfigDetail', {
                     tenantId: this.tenantId,
                     keyConfigId: this.keyConfigId
                 });
+                return;
             }
+            const [keyVersions, importParams] = await Promise.all([
+                this.api.get<KeyVersionResponse>(`keys/${this.id}/versions`),
+                isBYOKAwaitingImport(selectedKey)
+                    ? fetchImportParameters(this.api, selectedKey.id).catch((error: unknown) => {
+                        console.error('Error fetching BYOK import parameters', error);
+                        return undefined;
+                    })
+                    : Promise.resolve(undefined)
+            ]);
+            this.oneWayModel.setProperty('/selectedKey', selectedKey);
+            this.twoWayModel.setProperty('/selectedKey', selectedKey);
+            this.setKeyDetailsToModel(selectedKey);
+            this.oneWayModel.setProperty('/keyVersions', keyVersions?.value);
+            this.oneWayModel.setProperty('/keyVersionsCount', keyVersions?.count);
+            this.oneWayModel.setProperty('/byokImportParameters', importParams ?? null);
         }
         catch (error) {
             console.error('Error fetching key details', error);
@@ -392,6 +402,34 @@ export default class DetailPanel extends BaseController {
         }
         else {
             await this.getSystemDetails();
+        }
+    }
+
+    public async onBYOKDownloadPress(): Promise<void> {
+        const selectedKey = this.oneWayModel.getProperty('/selectedKey') as Key;
+        if (!selectedKey?.id) {
+            console.error('No selected key for BYOK wrapping key download');
+            return;
+        }
+        this.getView()?.setBusy(true);
+        try {
+            let importParams = this.oneWayModel.getProperty('/byokImportParameters') as BYOKImportParameters | null;
+            if (!importParams) {
+                importParams = await fetchImportParameters(this.api, selectedKey.id) ?? null;
+            }
+            if (!importParams) {
+                MessageBox.error(this.getText('errorDownloadingKey'));
+                return;
+            }
+            downloadWrappingKey(importParams, selectedKey);
+            MessageToast.show(this.getText('keyDownloadedSuccessfully'));
+        }
+        catch (error) {
+            console.error('Error downloading wrapping key', error);
+            showErrorMessage(error as AxiosError, this.getText('errorDownloadingKey'));
+        }
+        finally {
+            this.getView()?.setBusy(false);
         }
     }
 
