@@ -364,6 +364,10 @@ export function isCryptoDetailEditable(cryptoARNsArray: { key: string, value: AW
     return cryptoARNsArray?.some(cryptoARN => cryptoARN.value.isEditable);
 }
 
+export function isBYOKPendingImport(type: string, state: string): boolean {
+    return (type as KeyCreationTypes) === KeyCreationTypes.BYOK && (state as KeyStates) === KeyStates.PENDING_IMPORT;
+}
+
 export function formatErrorDetails(status: string, errorMessage: string): string {
     switch (status as SystemStatus) {
         case SystemStatus.FAILED:

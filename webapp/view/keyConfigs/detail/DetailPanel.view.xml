@@ -167,6 +167,104 @@
                     </ObjectPageSubSection>
                 </subSections>
             </ObjectPageSection>
+            <ObjectPageSection titleUppercase="false" id="byokImportParametersSection"
+                visible="{parts: ['oneWay>/selectedKey/type', 'oneWay>/selectedKey/state'], formatter: 'commonFormatter.isBYOKPendingImport'}"
+                title="{i18n>importParameters}"
+                showTitle="true">
+                <subSections>
+                    <ObjectPageSubSection title="{i18n>importParameters}">
+                        <m:VBox>
+                            <m:MessageStrip
+                                text="{i18n>byokImportParametersGuidance}"
+                                type="Information"
+                                showIcon="true"
+                                showCloseButton="false"
+                                class="sapUiSmallMarginBottom">
+                                <m:link>
+                                    <m:Link
+                                        text="{i18n>byokDocumentationLink}"
+                                        href="{i18n>byokDocumentationUrl}"
+                                        target="_blank" />
+                                </m:link>
+                            </m:MessageStrip>
+                            <forms:Form width="100%">
+                                <forms:layout>
+                                    <forms:ColumnLayout
+                                        columnsM="1"
+                                        columnsL="1"
+                                        columnsXL="1" />
+                                </forms:layout>
+                                <forms:toolbar>
+                                    <m:OverflowToolbar>
+                                        <m:Title text="{i18n>importParameters}" />
+                                        <m:ToolbarSpacer />
+                                        <m:Button
+                                            id="byokDownloadWrappingKeyButton"
+                                            icon="sap-icon://download"
+                                            text="{i18n>downloadWrappingKey}"
+                                            type="Emphasized"
+                                            tooltip="{i18n>tooltipDownloadWrappingKey}"
+                                            press="onBYOKDownloadPress">
+                                            <m:customData>
+                                                <core:CustomData
+                                                    key="testId"
+                                                    value="keyDetail-byokDownloadWrappingKeyButton"
+                                                    writeToDom="true" />
+                                            </m:customData>
+                                        </m:Button>
+                                    </m:OverflowToolbar>
+                                </forms:toolbar>
+                                <forms:formContainers>
+                                    <forms:FormContainer>
+                                        <forms:formElements>
+                                            <forms:FormElement
+                                                label="{i18n>wrappingKeySpec}">
+                                                <forms:fields>
+                                                    <m:Text text="RSA-4096"
+                                                        tooltip="{i18n>tooltipWrappingKeySpec}">
+                                                        <m:customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="keyDetail-wrappingKeySpecText"
+                                                                writeToDom="true" />
+                                                        </m:customData>
+                                                    </m:Text>
+                                                </forms:fields>
+                                            </forms:FormElement>
+                                            <forms:FormElement label="{i18n>wrappingAlgorithm}">
+                                                <forms:fields>
+                                                    <m:Text text="{oneWay>/byokImportParameters/wrappingAlgorithm/name}"
+                                                        tooltip="{i18n>tooltipWrappingAlgorithm}">
+                                                        <m:customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="keyDetail-wrappingAlgorithmText"
+                                                                writeToDom="true" />
+                                                        </m:customData>
+                                                    </m:Text>
+                                                </forms:fields>
+                                            </forms:FormElement>
+                                            <forms:FormElement label="{i18n>hashFunction}">
+                                                <forms:fields>
+                                                    <m:Text text="{oneWay>/byokImportParameters/wrappingAlgorithm/hashFunction}"
+                                                        tooltip="{i18n>tooltipHashFunction}">
+                                                        <m:customData>
+                                                            <core:CustomData
+                                                                key="testId"
+                                                                value="keyDetail-hashFunctionText"
+                                                                writeToDom="true" />
+                                                        </m:customData>
+                                                    </m:Text>
+                                                </forms:fields>
+                                            </forms:FormElement>
+                                        </forms:formElements>
+                                    </forms:FormContainer>
+                                </forms:formContainers>
+                            </forms:Form>
+                        </m:VBox>
+                    </ObjectPageSubSection>
+                </subSections>
+            </ObjectPageSection>
             <ObjectPageSection titleUppercase="false" id="hyokManagementDetailsSection"
                 visible="{= ${oneWay>/type} === 'key' &amp;&amp; ${oneWay>/selectedKey/type} === 'HYOK' }"
                 title="{i18n>managementRole}"

@@ -28,6 +28,21 @@
                     <pages>
                         <Page id="keyCreationWizardPage" showHeader="false">
                             <content>
+                                <VBox class="sapUiSmallMarginBegin sapUiSmallMarginEnd sapUiSmallMarginTop">
+                                    <MessageStrip
+                                        text="{i18n>byokWorkflowGuidance}"
+                                        type="Information"
+                                        showIcon="true"
+                                        showCloseButton="false"
+                                        class="sapUiSmallMarginBottom">
+                                        <link>
+                                            <Link
+                                                text="{i18n>byokDocumentationLink}"
+                                                href="{i18n>byokDocumentationUrl}"
+                                                target="_blank" />
+                                        </link>
+                                    </MessageStrip>
+                                </VBox>
                                 <Wizard id="keyCreationWizard"
                                     class="sapUiResponsivePadding--header sapUiResponsivePadding--content"
                                     complete="onKeyCreationWizardComplete">
@@ -36,10 +51,12 @@
                                         validated="{model>/detailsStepValid}"
                                         activate="">
                                         <VBox width="100%">
-                                            <Label text="{i18n>keyName}:" required="true" />
+                                            <Label text="{i18n>keyName}:" required="true"
+                                                tooltip="{i18n>tooltipBYOKName}" />
                                             <Input value="{model>/name}"
                                                 liveChange="onKeyCreateNameChanged"
                                                 valueLiveUpdate="true"
+                                                tooltip="{i18n>tooltipBYOKName}"
                                                 valueState="{model>/keyNameValueState}"
                                                 valueStateText="{model>/keyNameValueStateText}">
                                                 <customData>
@@ -50,8 +67,10 @@
                                                 </customData>
                                             </Input>
                                             <Label text="{i18n>keyDescription}:"
+                                                tooltip="{i18n>tooltipBYOKDescription}"
                                                 class="sapUiTinyMarginTop" />
                                             <TextArea value="{model>/description}" rows="4"
+                                                tooltip="{i18n>tooltipBYOKDescription}"
                                                 width="100%">
                                                 <customData>
                                                     <core:CustomData
@@ -66,20 +85,25 @@
                                         validated="{model>/keyRegionStepValid}"
                                         activate=""
                                         title="{i18n>region}">
-                                        <Select
-                                            width="100%"
-                                            change="onKeyCreateRegionChanged"
-                                            forceSelection="true"
-                                            selectedKey="{model>/region}"
-                                            items="{model>/regionList}">
-                                            <core:Item key="{model>key}" text="{model>text}" />
-                                            <customData>
-                                                <core:CustomData
-                                                    key="testId"
-                                                    value="byokKeyCreationWizard-regionSelect"
-                                                    writeToDom="true" />
-                                            </customData>
-                                        </Select>
+                                        <VBox width="100%">
+                                            <Label text="{i18n>region}:" required="true"
+                                                tooltip="{i18n>tooltipBYOKRegion}" />
+                                            <Select
+                                                width="100%"
+                                                change="onKeyCreateRegionChanged"
+                                                forceSelection="true"
+                                                tooltip="{i18n>tooltipBYOKRegion}"
+                                                selectedKey="{model>/region}"
+                                                items="{model>/regionList}">
+                                                <core:Item key="{model>key}" text="{model>text}" />
+                                                <customData>
+                                                    <core:CustomData
+                                                        key="testId"
+                                                        value="byokKeyCreationWizard-regionSelect"
+                                                        writeToDom="true" />
+                                                </customData>
+                                            </Select>
+                                        </VBox>
                                     </WizardStep>
                                 </Wizard>
                             </content>

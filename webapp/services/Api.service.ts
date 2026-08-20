@@ -214,4 +214,15 @@ export default class Api {
             this.handleError(error);
         }
     }
+
+    public async downloadWrappingKey<T>(keyId: string): Promise<T | undefined> {
+        this.setAxiosHeaderContentType(this.defaultContentType);
+        try {
+            const response: AxiosResponse<T> = await this.axiosInstance.get(`keys/${keyId}/importParams`);
+            return response.data;
+        }
+        catch (error) {
+            this.handleError(error);
+        }
+    }
 }

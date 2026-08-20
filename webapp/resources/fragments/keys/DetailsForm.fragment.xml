@@ -83,7 +83,9 @@
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>enabled}">
                         <forms:fields>
-                            <Text text="{= !!${oneWay>/selectedKey/enabled} ? ${i18n>yes} : ${i18n>no}}">
+                            <Text
+                                tooltip="{i18n>tooltipKeyState}"
+                                text="{= !!${oneWay>/selectedKey/enabled} ? ${i18n>yes} : ${i18n>no}}">
                                 <customData>
                                     <core:CustomData
                                         key="testId"

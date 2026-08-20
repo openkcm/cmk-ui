@@ -8,28 +8,51 @@
         id="ImportKeySelectDialog"
         title="{i18n>importKey}"
         contentWidth="30rem"
+        busy="{= !!${importKeyModel>/importing} }"
+        busyIndicatorDelay="0"
         >
         <form:SimpleForm editable="true" layout="ResponsiveGridLayout" columnsM="1" columnsL="2"
             columnsXL="2" breakpointL="1270">
+                <MessageStrip
+                    text="{i18n>byokImportFileFormatGuidance}"
+                    type="Information"
+                    showIcon="true"
+                    showCloseButton="false"
+                    class="sapUiSmallMarginBottom">
+                    <link>
+                        <Link
+                            text="{i18n>byokDocumentationLink}"
+                            href="{i18n>byokDocumentationUrl}"
+                            target="_blank" />
+                    </link>
+                </MessageStrip>
                 <VBox justifyContent="SpaceBetween" class="sapUiSmallMarginBottom">
                     <Text text="{i18n>wrappingAlgorithm}" class="sapUiTinyMarginBottom"/>
                     <HBox class="sapUiSmallMarginBegin">
-                        <Label text="{i18n>name}:" class="sapUiTinyMarginTop" />
-                        <Text text="{importKeyModel>/wrappingAlgorithm/name}" class="sapUiTinyMarginBegin"/>
+                        <Label text="{i18n>name}:" class="sapUiTinyMarginTop"
+                            tooltip="{i18n>tooltipWrappingAlgorithm}" />
+                        <Text text="{importKeyModel>/wrappingAlgorithm/name}"
+                            tooltip="{i18n>tooltipWrappingAlgorithm}"
+                            class="sapUiTinyMarginBegin"/>
                     </HBox>
                     <HBox class="sapUiSmallMarginBegin">
-                        <Label text="{i18n>hashFunction}:" class="sapUiTinyMarginTop"/>
-                        <Text text="{importKeyModel>/wrappingAlgorithm/hashFunction}" class="sapUiTinyMarginBegin"/>
+                        <Label text="{i18n>hashFunction}:" class="sapUiTinyMarginTop"
+                            tooltip="{i18n>tooltipHashFunction}"/>
+                        <Text text="{importKeyModel>/wrappingAlgorithm/hashFunction}"
+                            tooltip="{i18n>tooltipHashFunction}"
+                            class="sapUiTinyMarginBegin"/>
                     </HBox>
                 </VBox>
             <VBox justifyContent="SpaceBetween" width="100%">
                 <u:FileUploader buttonText="{i18n>browse}" width="100%"
                             sameFilenameAllowed='true'
                             maximumFileSize="1" uploadUrl="" 
+                            tooltip="{i18n>tooltipKeyMaterialUpload}"
                             placeholder="{i18n>uploadMaterial}"
                             change="onMaterialUpload"/>
                 <TextArea value="{importKeyModel>/keyMaterial}" valueLiveUpdate="true"  width="100%"
                         placeholder="{i18n>pasteMaterial}"
+                        tooltip="{i18n>tooltipKeyMaterialUpload}"
                         rows="7">
                         <customData>
                             <core:CustomData
@@ -38,6 +61,24 @@
                                 writeToDom="true" />
                         </customData>
                 </TextArea>
+                <VBox visible="{= !!${importKeyModel>/importing} }"
+                    alignItems="Center"
+                    class="sapUiSmallMarginTop">
+                    <ProgressIndicator
+                        width="100%"
+                        percentValue="100"
+                        displayValue="{i18n>importingKey}"
+                        showValue="true"
+                        state="Information"
+                        displayAnimation="true">
+                        <customData>
+                            <core:CustomData
+                                key="testId"
+                                value="importKey-progressIndicator"
+                                writeToDom="true" />
+                        </customData>
+                    </ProgressIndicator>
+                </VBox>
             </VBox>
         </form:SimpleForm>
         <footer>
@@ -45,7 +86,7 @@
                 <ToolbarSpacer />
                 <Button text="{i18n>import}"
                     type="Emphasized"
-                    enabled="{= ${importKeyModel>/keyMaterial} ? true : false }"
+                    enabled="{= !!${importKeyModel>/keyMaterial} &amp;&amp; !${importKeyModel>/importing} }"
                     press="onImportKeySubmitPress">
                     <customData>
                         <core:CustomData
@@ -55,6 +96,7 @@
                     </customData>
                 </Button>
                 <Button text="{i18n>cancel}" type="Transparent"
+                    enabled="{= !${importKeyModel>/importing} }"
                     press="onImportKeyCancelPress">
                     <customData>
                         <core:CustomData

@@ -19,10 +19,10 @@ import ListBinding from 'sap/ui/model/ListBinding';
 import MultiInput, { MultiInput$TokenUpdateEvent } from 'sap/m/MultiInput';
 import Token from 'sap/m/Token';
 import { ActionTypes, ArtifactTypes, BYOKProviders, EventChannelIds, EventIDs, HYOKProviders, KeyCreationTypes, KeyStates, SystemStatus, WorkflowStatus } from 'kms/common/Enums';
+import { downloadWrappingKey, fetchImportParameters, isBase64KeyMaterial, canDeleteWithoutWorkflow, canMakePrimary, isKeyStateEditable } from 'kms/common/Byok';
 import KeyCreation from 'kms/component/KeyCreation';
 import HyokKeyRegistration from 'kms/component/HyokKeyCreation';
 import { AxiosError } from 'axios';
-import { zipSync, strToU8 } from 'fflate';
 import Workflow from 'kms/component/Workflow';
 import List from 'sap/m/List';
 import { SearchField$LiveChangeEvent } from 'sap/m/SearchField';
@@ -693,6 +693,10 @@ export default class KeyConfigDetail extends BaseController {
             return;
         }
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
+        if (!canMakePrimary(selectedKey.isPrimary, selectedKey.state)) {
+            MessageToast.show(this.getText('actionNotAllowedForKeyState'));
+            return;
+        }
         const workflowParams = {
             artifactType: ArtifactTypes.KEY_CONFIGURATION,
             actionType: ActionTypes.UPDATE_PRIMARY,
@@ -833,20 +837,30 @@ export default class KeyConfigDetail extends BaseController {
     public async onImportKeySubmitPress(): Promise<void> {
         const selectedKey = this.oneWayModel.getProperty('/selectedKey') as Key;
         const keyMaterial = this.importKeyModel.getProperty('/keyMaterial') as string;
+        if (!isBase64KeyMaterial(keyMaterial)) {
+            MessageBox.error(this.getText('errorInvalidBase64KeyMaterial'));
+            return;
+        }
         const payload = {
             wrappedKeyMaterial: keyMaterial
         };
+        this.importKeyModel.setProperty('/importing', true);
+        let success = false;
         try {
             await this.api.post(`keys/${selectedKey.id}/importKeyMaterial`, payload);
+            success = true;
             MessageToast.show(this.getText('keyImportedSuccessfully'));
         }
         catch (error) {
             console.error(error);
-            MessageBox.error(this.getText('errorImportingKey'));
+            showErrorMessage(error as AxiosError, this.getText('errorImportingKey'));
         }
         finally {
-            this.onImportKeyCancelPress();
-            await this.getKeyConfigData();
+            this.importKeyModel.setProperty('/importing', false);
+            if (success) {
+                this.onImportKeyCancelPress();
+                await this.getKeyConfigData();
+            }
         }
     }
 
@@ -872,6 +886,18 @@ export default class KeyConfigDetail extends BaseController {
             return;
         }
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
+        if (canDeleteWithoutWorkflow(selectedKey.type, selectedKey.state)) {
+            MessageBox.confirm(this.getText('confirmKeyDeletion'), {
+                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                onClose: async (action: unknown) => {
+                    if (action === MessageBox.Action.YES) {
+                        await this.deleteKey(selectedKey.id);
+                    }
+                }
+            });
+            return;
+        }
         if (selectedKey?.isPrimary) {
             if (this.oneWayModel.getProperty('/systemsCount') > 0) {
                 MessageBox.error(this.getText('errorDeletingPrimaryKeyWithSystems'));
@@ -937,6 +963,10 @@ export default class KeyConfigDetail extends BaseController {
             return;
         }
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
+        if (!isKeyStateEditable(selectedKey.type, selectedKey.state)) {
+            MessageToast.show(this.getText('actionNotAllowedForKeyState'));
+            return;
+        }
 
         if (!this.shouldUseWorkflowForKeyAction(selectedKey)) {
             MessageBox.confirm(this.getText('confirmKeyDisable'), {
@@ -997,6 +1027,10 @@ export default class KeyConfigDetail extends BaseController {
             return;
         }
         const selectedKey = this.oneWayModel.getProperty(path) as Key;
+        if (!isKeyStateEditable(selectedKey.type, selectedKey.state)) {
+            MessageToast.show(this.getText('actionNotAllowedForKeyState'));
+            return;
+        }
 
         if (!this.shouldUseWorkflowForKeyAction(selectedKey)) {
             MessageBox.confirm(this.getText('confirmKeyEnable'), {
@@ -1199,11 +1233,12 @@ export default class KeyConfigDetail extends BaseController {
     private async downloadBYOKkey(key: Key): Promise<void> {
         this.getView()?.setBusy(true);
         try {
-            const importParams = await this.getWrappingParams(key);
-            this._downloadPublicKeyFile({
-                publicKey: importParams?.publicKey || '',
-                wrappingAlgorithm: importParams?.wrappingAlgorithm as { name: string, hashFunction: string }
-            }, key);
+            const importParams = await fetchImportParameters(this.api, key.id);
+            if (!importParams) {
+                MessageBox.error(this.getText('errorDownloadingKey'));
+                return;
+            }
+            downloadWrappingKey(importParams, key);
             MessageToast.show(this.getText('keyDownloadedSuccessfully'));
         }
         catch (error) {
@@ -1215,38 +1250,9 @@ export default class KeyConfigDetail extends BaseController {
         }
     }
 
-    private _downloadPublicKeyFile(content: { publicKey: string, wrappingAlgorithm: { name: string, hashFunction: string } }, key: Key): void {
-        const keyId = key.id || 'unknown';
-        const keyType = key.algorithm || 'unknown';
-
-        const wrappingAlgorithmText
-            = `KeyID: ${keyId}
-            Wrapping Key Size: ${keyType}
-            Wrapping Algorithm: ${content.wrappingAlgorithm.name}
-            Hash Algorithm: ${content.wrappingAlgorithm.hashFunction}`;
-
-        const files: Record<string, Uint8Array> = {
-            'publickey.pem': strToU8(content.publicKey),
-            'README.txt': strToU8(wrappingAlgorithmText)
-        };
-
-        try {
-            const zipData = zipSync(files);
-            const blob = new Blob([new Uint8Array(zipData)], { type: 'application/zip' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `WrappingPublicKeyFor-${keyId}.zip`;
-            link.click();
-            URL.revokeObjectURL(link.href);
-        }
-        catch (error) {
-            console.error('Error generating ZIP file:', error);
-            MessageBox.error(this.getText('errorGeneratingZipFile'));
-        }
-    }
-
     private async getWrappingParams(key: Key): Promise<{ publicKey: string, wrappingAlgorithm: object } | undefined> {
-        return await this.api.get<{ publicKey: string, wrappingAlgorithm: object }>(`keys/${key.id}/importParams`);
+        const importParams = await fetchImportParameters(this.api, key.id);
+        return importParams as { publicKey: string, wrappingAlgorithm: object } | undefined;
     }
 
     private async makeKeyPrimary(key: Key): Promise<void> {
