@@ -7,6 +7,7 @@ import { Router$RouteMatchedEvent } from 'sap/ui/core/routing/Router';
 import ToolPage from 'sap/tnt/ToolPage';
 import { Menu$ItemSelectedEvent } from 'sap/m/Menu';
 import Api from 'kms/services/Api.service';
+import BuiltInSupportService from 'kms/services/BuiltInSupport.service';
 import MessageBox from 'sap/m/MessageBox';
 import Component from 'kms/Component';
 import MenuItem from 'sap/m/MenuItem';
@@ -259,6 +260,10 @@ export default class App extends BaseController {
             default:
                 this.twoWayModel.setProperty('/selectedKey', defaultHomePage);
         }
+
+        // Update Built-in Support with current page context
+        BuiltInSupportService.getInstance().updateApplicationContext(routeName);
+
         this.getView()?.setBusy(false);
     }
 
@@ -309,6 +314,13 @@ export default class App extends BaseController {
             this.twoWayModel.setProperty('/selectedTenantName', selectedTenantName);
             this.api = Api.getInstance();
             Api.updateTenantId(selectedTenant || '');
+
+            // Update Built-in Support with new tenant context
+            BuiltInSupportService.getInstance().updateSystemContext(
+                selectedTenant || '',
+                selectedTenantName || ''
+            );
+
             void this.refreshTenantsAndNavigate();
         }
     }
@@ -353,6 +365,9 @@ export default class App extends BaseController {
 
     public onSignOutPress(): void {
         const tenantId = (this.twoWayModel.getProperty('/selectedTenant') as string) || this.tenantId || /#\/([^/]+)/.exec(window.location.hash)?.[1] || '';
+
+        // Clean up Built-in Support SDK before logout
+        BuiltInSupportService.getInstance().teardown();
 
         Auth.secureLogout(tenantId);
     }

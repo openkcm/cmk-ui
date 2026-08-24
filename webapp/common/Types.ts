@@ -2,6 +2,7 @@ import { ActionTypes, ArtifactTypes, KeyCreationTypes, KeyStates, TaskStates, Ta
 
 export interface Config {
     apiBaseUrl: string
+    bisEnvironment?: 'test' | 'live'
 }
 export interface SystemMetadata {
     errorCode: string

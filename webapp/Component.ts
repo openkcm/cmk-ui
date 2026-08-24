@@ -6,6 +6,7 @@ import { loadConfig, loadYAMLConfig } from './utils/Config';
 import * as yaml from 'js-yaml';
 import Api, { ApiAccessError } from './services/Api.service';
 import Ora from './services/Ora.service';
+import BuiltInSupportService from './services/BuiltInSupport.service';
 import ResourceModel from 'sap/ui/model/resource/ResourceModel';
 import Core from 'sap/ui/core/Core';
 import Auth from './services/Auth.service';
@@ -109,6 +110,15 @@ export default class Component extends UIComponent {
 
             this.setInitialTheme();
             this.registerIllustrationSet();
+
+            // Initialize Built-in Support SDK (non-blocking — loads asynchronously)
+            const selectedTenant = tenants?.find(t => t.id === tenantId);
+            void BuiltInSupportService.getInstance().initialize({
+                tenantId: tenantId,
+                tenantName: selectedTenant?.name || '',
+                targetEnvironment: config.bisEnvironment || 'test'
+            });
+
             SplashScreen.hide();
         }
         catch (error) {
@@ -209,9 +219,11 @@ export default class Component extends UIComponent {
             const newColorScheme = event.matches ? 'dark' : 'light';
             if (newColorScheme === 'dark') {
                 Theming.setTheme('sap_horizon_dark');
+                BuiltInSupportService.getInstance().updateTheme('sap_horizon_dark');
             }
             else if (newColorScheme === 'light') {
                 Theming.setTheme('sap_horizon');
+                BuiltInSupportService.getInstance().updateTheme('sap_horizon');
             }
         });
     }
