@@ -200,6 +200,8 @@
                                     <MenuItem press="onKeyTableMakePrimaryPress"
                                         text="{i18n>makePrimary}"
                                         visible="{parts: ['oneWay>isPrimary', 'oneWay>state', 'oneWay>/primaryKey/state'], formatter: 'commonFormatter.setMakePrimaryMenuItemVisible'}"
+                                        enabled="{parts: ['oneWay>state'], formatter: 'commonFormatter.setKeyLifecycleActionEnabled'}"
+                                        tooltip="{parts: ['oneWay>state'], formatter: 'commonFormatter.setKeyLifecycleActionTooltip'}"
                                         icon="sap-icon://favorite">
                                         <customData>
                                             <core:CustomData
@@ -211,6 +213,8 @@
                                     <MenuItem press="onKeyTableEnablePress"
                                         text="{i18n>enable}"
                                         visible="{parts: ['oneWay>type', 'oneWay>state'], formatter: 'commonFormatter.setEnableMenuItemVisible'}"
+                                        enabled="{parts: ['oneWay>state'], formatter: 'commonFormatter.setKeyLifecycleActionEnabled'}"
+                                        tooltip="{parts: ['oneWay>state'], formatter: 'commonFormatter.setKeyLifecycleActionTooltip'}"
                                         icon="sap-icon://log">
                                         <customData>
                                             <core:CustomData
@@ -222,6 +226,8 @@
                                     <MenuItem press="onKeyTableDisablePress"
                                         text="{i18n>disable}"
                                         visible="{parts: ['oneWay>type', 'oneWay>state'], formatter: 'commonFormatter.setDisableMenuItemVisible'}"
+                                        enabled="{parts: ['oneWay>state'], formatter: 'commonFormatter.setKeyLifecycleActionEnabled'}"
+                                        tooltip="{parts: ['oneWay>state'], formatter: 'commonFormatter.setKeyLifecycleActionTooltip'}"
                                         icon="sap-icon://log">
                                         <customData>
                                             <core:CustomData

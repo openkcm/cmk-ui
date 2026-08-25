@@ -1,6 +1,7 @@
 <core:FragmentDefinition xmlns="sap.m"
                          xmlns:core="sap.ui.core"
                          xmlns:layout="sap.ui.layout"
+                         xmlns:tnt="sap.tnt"
                          xmlns:forms="sap.ui.layout.form"
                          core:require="{ commonFormatter: 'kms/common/Formatters' }">
     <forms:Form width="100%">
@@ -64,6 +65,20 @@
                                         writeToDom="true" />
                                 </customData>
                             </Text>
+                        </forms:fields>
+                    </forms:FormElement>
+                    <forms:FormElement label="{i18n>state}">
+                        <forms:fields>
+                            <tnt:InfoLabel
+                                text="{parts: ['oneWay>/selectedKey/state'], formatter: 'commonFormatter.setKeyStateText'}"
+                                colorScheme="{parts: ['oneWay>/selectedKey/state'], formatter: 'commonFormatter.setKeyStateColor'}">
+                                <tnt:customData>
+                                    <core:CustomData
+                                        key="testId"
+                                        value="keyDetail-stateInfoLabel"
+                                        writeToDom="true" />
+                                </tnt:customData>
+                            </tnt:InfoLabel>
                         </forms:fields>
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>enabled}">

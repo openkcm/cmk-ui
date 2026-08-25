@@ -214,6 +214,10 @@ export function setKeyStateText(state: string): string {
             return getText('pendingDeletion');
         case KeyStates.PENDING_IMPORT:
             return getText('pendingImport');
+        case KeyStates.PENDING_CREATION:
+            return getText('pendingCreation');
+        case KeyStates.PENDING_REGISTRATION:
+            return getText('pendingRegistration');
         case KeyStates.DELETED:
             return getText('deleted');
         case KeyStates.UNKNOWN:
@@ -233,6 +237,9 @@ export function setKeyStateColor(state: string): int {
             return 5;
         case KeyStates.PENDING_IMPORT:
             return 6;
+        case KeyStates.PENDING_CREATION:
+        case KeyStates.PENDING_REGISTRATION:
+            return 1;
         case KeyStates.UNKNOWN:
             return 10;
         default:
@@ -240,13 +247,31 @@ export function setKeyStateColor(state: string): int {
     }
 }
 
+export function isKeyLifecyclePending(keyState: KeyStates | string): boolean {
+    switch (keyState as KeyStates) {
+        case KeyStates.PENDING_CREATION:
+        case KeyStates.PENDING_REGISTRATION:
+        case KeyStates.PENDING_DELETION:
+        case KeyStates.PENDING_IMPORT:
+            return true;
+        default:
+            return false;
+    }
+}
+
 export function setEnableMenuItemVisible(keyType: KeyCreationTypes, keyState: KeyStates): boolean {
-    return keyType !== KeyCreationTypes.HYOK && keyState === KeyStates.DISABLED;
+    if (keyType === KeyCreationTypes.HYOK) {
+        return false;
+    }
+    return keyState === KeyStates.DISABLED || isKeyLifecyclePending(keyState);
 }
 
 export function setMakePrimaryMenuItemVisible(isPrimary: boolean, keyState: KeyStates, primaryKeyState: KeyStates | undefined): boolean {
     if (isPrimary) {
         return false;
+    }
+    if (isKeyLifecyclePending(keyState)) {
+        return true;
     }
     if (keyState !== KeyStates.ENABLED) {
         return false;
@@ -258,7 +283,21 @@ export function setMakePrimaryMenuItemVisible(isPrimary: boolean, keyState: KeyS
 }
 
 export function setDisableMenuItemVisible(keyType: KeyCreationTypes, keyState: KeyStates): boolean {
-    return keyType !== KeyCreationTypes.HYOK && keyState === KeyStates.ENABLED;
+    if (keyType === KeyCreationTypes.HYOK) {
+        return false;
+    }
+    return keyState === KeyStates.ENABLED || isKeyLifecyclePending(keyState);
+}
+
+export function setKeyLifecycleActionEnabled(keyState: KeyStates | string): boolean {
+    return !isKeyLifecyclePending(keyState);
+}
+
+export function setKeyLifecycleActionTooltip(keyState: KeyStates | string): string {
+    if (isKeyLifecyclePending(keyState)) {
+        return getText('keyLifecycleActionPendingTooltip');
+    }
+    return '';
 }
 
 export function displayFortanixField(keyProvider: string): boolean {
