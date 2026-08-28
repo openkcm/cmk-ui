@@ -1,14 +1,23 @@
 import Theming from 'sap/ui/core/Theming';
 
 /**
- * Minimal interface for the BIS SDK methods used by this service.
- * The actual SDK is loaded dynamically to avoid breaking the test runner.
+ * Minimal interface for the BIS SDK methods exposed globally by the pure CDN script.
  */
 interface BisSDKInstance {
     create: (configs: Record<string, unknown>) => void
     destroy: () => void
     isInitialized: () => boolean
     refreshContext: (getOverrideContext: () => Promise<Record<string, unknown>>) => Promise<void>
+}
+
+/**
+ * Extend Window to include the BIS SDK globals loaded by the CDN script.
+ */
+interface BisWindow extends Window {
+    create?: BisSDKInstance['create']
+    destroy?: BisSDKInstance['destroy']
+    isInitialized?: BisSDKInstance['isInitialized']
+    refreshContext?: BisSDKInstance['refreshContext']
 }
 
 /**
@@ -20,6 +29,11 @@ export interface BISInitConfig {
     targetEnvironment: 'test' | 'live'
 }
 
+const BIS_CDN_BASE: Record<string, string> = {
+    test: 'https://main.test.built-in-support.example/built-in-support-sdk/pure',
+    live: 'https://main.live.built-in-support.example/built-in-support-sdk/pure'
+};
+
 /**
  * Built-in Support Service
  *
@@ -27,14 +41,15 @@ export interface BISInitConfig {
  * Provides a floating support icon that gives users access to contextual help,
  * expert chat, and incident creation directly within the application.
  *
- * The SDK is loaded asynchronously via getSDK() which returns the SDK module.
+ * The SDK is loaded dynamically from the BIS CDN (Pure CSS distribution)
+ * to avoid CSP inline script/style issues. The environment (test vs live)
+ * is determined by the bisEnvironment value in config.json.
  *
  * @see https://docs.example/built-in-support
  * @namespace kms.services
  */
 export default class BuiltInSupportService {
     private static instance: BuiltInSupportService;
-    private sdk: BisSDKInstance | null = null;
     private initialized = false;
     private currentTenantId = '';
     private currentTenantName = '';
@@ -52,7 +67,7 @@ export default class BuiltInSupportService {
 
     /**
      * Initialize the Built-in Support SDK.
-     * Should be called once after successful app initialization (user authenticated, tenant resolved).
+     * Dynamically loads the BIS SDK CSS and JS from the CDN, then calls create().
      *
      * IMPORTANT: Built-In Support is NOT supported in China data centers, SAP NS2, or Sovereign Cloud.
      */
@@ -71,14 +86,22 @@ export default class BuiltInSupportService {
         this.currentTenantId = config.tenantId;
         this.currentTenantName = config.tenantName;
 
-        try {
-            // Dynamic import to avoid breaking the test runner (which can't resolve npm packages statically)
-            const bisModule = await import('built-in-support-sdk') as unknown as { getSDK: () => Promise<BisSDKInstance> };
-            this.sdk = await bisModule.getSDK();
+        const env = config.targetEnvironment || 'test';
+        const cdnBase = BIS_CDN_BASE[env] || BIS_CDN_BASE.test;
 
-            this.sdk.create({
+        try {
+            // Load the BIS SDK CSS and JS from CDN (Pure CSS distribution — no inline styles/scripts)
+            await this.loadBisResources(cdnBase);
+
+            const bisWindow = window as unknown as BisWindow;
+            if (typeof bisWindow.create !== 'function') {
+                console.error('BIS: SDK script loaded but create() not found on window.');
+                return;
+            }
+
+            bisWindow.create({
                 // Environment configuration
-                targetEnvironment: config.targetEnvironment,
+                targetEnvironment: env,
 
                 // UI configuration — floating support icon
                 useIcon: true,
@@ -134,14 +157,17 @@ export default class BuiltInSupportService {
      * Call this on every route change.
      */
     public updateApplicationContext(routeName: string): void {
-        if (!this.initialized || !this.sdk) {
+        if (!this.initialized) {
             return;
         }
 
-        void this.sdk.refreshContext(() => Promise.resolve({
-            appUrl: window.location.hash,
-            applicationName: this.getPageName(routeName)
-        }));
+        const bisWindow = window as unknown as BisWindow;
+        if (typeof bisWindow.refreshContext === 'function') {
+            void bisWindow.refreshContext(() => Promise.resolve({
+                appUrl: window.location.hash,
+                applicationName: this.getPageName(routeName)
+            }));
+        }
     }
 
     /**
@@ -149,31 +175,37 @@ export default class BuiltInSupportService {
      * Call this when the tenant selection changes.
      */
     public updateSystemContext(tenantId: string, tenantName: string): void {
-        if (!this.initialized || !this.sdk) {
+        if (!this.initialized) {
             return;
         }
 
         this.currentTenantId = tenantId;
         this.currentTenantName = tenantName;
 
-        void this.sdk.refreshContext(() => Promise.resolve({
-            tenantID: tenantId,
-            tenantName: tenantName,
-            systemURL: window.location.host
-        }));
+        const bisWindow = window as unknown as BisWindow;
+        if (typeof bisWindow.refreshContext === 'function') {
+            void bisWindow.refreshContext(() => Promise.resolve({
+                tenantID: tenantId,
+                tenantName: tenantName,
+                systemURL: window.location.host
+            }));
+        }
     }
 
     /**
      * Update the theme in BIS when the user changes the application theme.
      */
     public updateTheme(theme: string): void {
-        if (!this.initialized || !this.sdk) {
+        if (!this.initialized) {
             return;
         }
 
-        void this.sdk.refreshContext(() => Promise.resolve({
-            theme
-        }));
+        const bisWindow = window as unknown as BisWindow;
+        if (typeof bisWindow.refreshContext === 'function') {
+            void bisWindow.refreshContext(() => Promise.resolve({
+                theme
+            }));
+        }
     }
 
     /**
@@ -181,11 +213,15 @@ export default class BuiltInSupportService {
      * Call this on user logout to clean up resources.
      */
     public teardown(): void {
-        if (this.initialized && this.sdk) {
+        if (!this.initialized) {
+            return;
+        }
+
+        const bisWindow = window as unknown as BisWindow;
+        if (typeof bisWindow.destroy === 'function') {
             try {
-                this.sdk.destroy();
+                bisWindow.destroy();
                 this.initialized = false;
-                this.sdk = null;
                 console.log('BIS: Built-in Support SDK destroyed.');
             }
             catch (error) {
@@ -198,7 +234,37 @@ export default class BuiltInSupportService {
      * Check if the SDK is currently initialized.
      */
     public isReady(): boolean {
-        return this.initialized && this.sdk?.isInitialized() === true;
+        if (!this.initialized) {
+            return false;
+        }
+        const bisWindow = window as unknown as BisWindow;
+        return typeof bisWindow.isInitialized === 'function' && bisWindow.isInitialized();
+    }
+
+    /**
+     * Dynamically load the BIS SDK CSS and JS from the CDN.
+     * Uses the Pure CSS distribution to avoid CSP inline style/script issues.
+     */
+    private loadBisResources(cdnBase: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            // Load CSS
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = `${cdnBase}/built-in-support-sdk.css`;
+            document.head.appendChild(link);
+
+            // Load JS
+            const script = document.createElement('script');
+            script.src = `${cdnBase}/built-in-support-sdk.js`;
+            script.defer = true;
+            script.onload = () => {
+                resolve();
+            };
+            script.onerror = () => {
+                reject(new Error(`BIS: Failed to load SDK script from ${script.src}`));
+            };
+            document.head.appendChild(script);
+        });
     }
 
     /**
