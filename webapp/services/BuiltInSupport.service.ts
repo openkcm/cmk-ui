@@ -2,6 +2,7 @@ import Theming from 'sap/ui/core/Theming';
 
 /**
  * Minimal interface for the BIS SDK methods exposed globally by the pure CDN script.
+ * The Pure CSS SDK exposes its API on window['built-in-support-sdk'].
  */
 interface BisSDKInstance {
     create: (configs: Record<string, unknown>) => void
@@ -10,15 +11,7 @@ interface BisSDKInstance {
     refreshContext: (getOverrideContext: () => Promise<Record<string, unknown>>) => Promise<void>
 }
 
-/**
- * Extend Window to include the BIS SDK globals loaded by the CDN script.
- */
-interface BisWindow extends Window {
-    create?: BisSDKInstance['create']
-    destroy?: BisSDKInstance['destroy']
-    isInitialized?: BisSDKInstance['isInitialized']
-    refreshContext?: BisSDKInstance['refreshContext']
-}
+const BIS_SDK_GLOBAL_KEY = 'built-in-support-sdk';
 
 /**
  * Configuration for initializing Built-in Support
@@ -66,6 +59,18 @@ export default class BuiltInSupportService {
     }
 
     /**
+     * Get the BIS SDK instance from the global window object.
+     * The Pure CSS CDN script exposes the SDK on window['built-in-support-sdk'].
+     */
+    private getSdk(): BisSDKInstance | null {
+        const sdk = (window as unknown as Record<string, unknown>)[BIS_SDK_GLOBAL_KEY];
+        if (sdk && typeof (sdk as BisSDKInstance).create === 'function') {
+            return sdk as BisSDKInstance;
+        }
+        return null;
+    }
+
+    /**
      * Initialize the Built-in Support SDK.
      * Dynamically loads the BIS SDK CSS and JS from the CDN, then calls create().
      *
@@ -93,13 +98,13 @@ export default class BuiltInSupportService {
             // Load the BIS SDK CSS and JS from CDN (Pure CSS distribution — no inline styles/scripts)
             await this.loadBisResources(cdnBase);
 
-            const bisWindow = window as unknown as BisWindow;
-            if (typeof bisWindow.create !== 'function') {
-                console.error('BIS: SDK script loaded but create() not found on window.');
+            const sdk = this.getSdk();
+            if (!sdk) {
+                console.error('BIS: SDK script loaded but create() not found on window["built-in-support-sdk"].');
                 return;
             }
 
-            bisWindow.create({
+            sdk.create({
                 // Environment configuration
                 targetEnvironment: env,
 
@@ -161,9 +166,9 @@ export default class BuiltInSupportService {
             return;
         }
 
-        const bisWindow = window as unknown as BisWindow;
-        if (typeof bisWindow.refreshContext === 'function') {
-            void bisWindow.refreshContext(() => Promise.resolve({
+        const sdk = this.getSdk();
+        if (sdk) {
+            void sdk.refreshContext(() => Promise.resolve({
                 appUrl: window.location.hash,
                 applicationName: this.getPageName(routeName)
             }));
@@ -182,9 +187,9 @@ export default class BuiltInSupportService {
         this.currentTenantId = tenantId;
         this.currentTenantName = tenantName;
 
-        const bisWindow = window as unknown as BisWindow;
-        if (typeof bisWindow.refreshContext === 'function') {
-            void bisWindow.refreshContext(() => Promise.resolve({
+        const sdk = this.getSdk();
+        if (sdk) {
+            void sdk.refreshContext(() => Promise.resolve({
                 tenantID: tenantId,
                 tenantName: tenantName,
                 systemURL: window.location.host
@@ -200,9 +205,9 @@ export default class BuiltInSupportService {
             return;
         }
 
-        const bisWindow = window as unknown as BisWindow;
-        if (typeof bisWindow.refreshContext === 'function') {
-            void bisWindow.refreshContext(() => Promise.resolve({
+        const sdk = this.getSdk();
+        if (sdk) {
+            void sdk.refreshContext(() => Promise.resolve({
                 theme
             }));
         }
@@ -217,10 +222,10 @@ export default class BuiltInSupportService {
             return;
         }
 
-        const bisWindow = window as unknown as BisWindow;
-        if (typeof bisWindow.destroy === 'function') {
+        const sdk = this.getSdk();
+        if (sdk) {
             try {
-                bisWindow.destroy();
+                sdk.destroy();
                 this.initialized = false;
                 console.log('BIS: Built-in Support SDK destroyed.');
             }
@@ -237,8 +242,7 @@ export default class BuiltInSupportService {
         if (!this.initialized) {
             return false;
         }
-        const bisWindow = window as unknown as BisWindow;
-        return typeof bisWindow.isInitialized === 'function' && bisWindow.isInitialized();
+        return this.getSdk()?.isInitialized() === true;
     }
 
     /**
