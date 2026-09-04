@@ -7,6 +7,7 @@ import { ListBase$SelectionChangeEvent } from 'sap/m/ListBase';
 import { RadioButtonGroup$SelectEvent } from 'sap/m/RadioButtonGroup';
 import { setLanguage } from 'kms/common/Language.Helpers';
 import MessageToast from 'sap/m/MessageToast';
+import MessageBox from 'sap/m/MessageBox';
 import Api from 'kms/services/Api.service';
 import { AxiosError } from 'axios';
 import { getText, showErrorMessage } from 'kms/common/Helpers';
@@ -31,9 +32,12 @@ const languageNames: Record<string, string> = {
 interface WorkflowSettings {
     enabled: boolean
     minimumApprovals: number
+    maxApprovals: number
     defaultExpiryPeriodDays: number
     maxExpiryPeriodDays: number
     retentionPeriodDays: number
+    minRetentionPeriodDays: number
+    maxRetentionPeriodDays: number
 }
 
 interface RoleBasedAccessSettings {
@@ -124,7 +128,6 @@ export default class SettingsDialogHandler {
             currentSettings.enabled !== this.originalWorkflowSettings.enabled
             || currentSettings.minimumApprovals !== this.originalWorkflowSettings.minimumApprovals
             || currentSettings.defaultExpiryPeriodDays !== this.originalWorkflowSettings.defaultExpiryPeriodDays
-            || currentSettings.maxExpiryPeriodDays !== this.originalWorkflowSettings.maxExpiryPeriodDays
             || currentSettings.retentionPeriodDays !== this.originalWorkflowSettings.retentionPeriodDays
         );
     }
@@ -167,10 +170,35 @@ export default class SettingsDialogHandler {
     }
 
     public async onSaveWorkflowSettings(): Promise<void> {
+        const workflowSettings = this.settingsWorkflowModel.getData() as WorkflowSettings;
+
+        if (workflowSettings.minimumApprovals < 2 || workflowSettings.minimumApprovals > workflowSettings.maxApprovals) {
+            MessageBox.error(getText('workflowSettingsOutOfBounds', [
+                getText('minimumApprovals'), String(2), String(workflowSettings.maxApprovals)
+            ]));
+            return;
+        }
+        if (workflowSettings.defaultExpiryPeriodDays < 1 || workflowSettings.defaultExpiryPeriodDays > workflowSettings.maxExpiryPeriodDays) {
+            MessageBox.error(getText('workflowSettingsOutOfBounds', [
+                getText('defaultExpiryPeriodDays'), String(1), String(workflowSettings.maxExpiryPeriodDays)
+            ]));
+            return;
+        }
+        if (workflowSettings.retentionPeriodDays < workflowSettings.minRetentionPeriodDays || workflowSettings.retentionPeriodDays > workflowSettings.maxRetentionPeriodDays) {
+            MessageBox.error(getText('workflowSettingsOutOfBounds', [
+                getText('retentionPeriodDays'), String(workflowSettings.minRetentionPeriodDays), String(workflowSettings.maxRetentionPeriodDays)
+            ]));
+            return;
+        }
+
         try {
             const api = Api.getInstance();
-            const workflowSettings = this.settingsWorkflowModel.getData() as WorkflowSettings;
-            await api.patch<WorkflowSettings>('tenantConfigurations/workflow', workflowSettings);
+            await api.patch<WorkflowSettings>('tenantConfigurations/workflow', {
+                enabled: workflowSettings.enabled,
+                minimumApprovals: workflowSettings.minimumApprovals,
+                defaultExpiryPeriodDays: workflowSettings.defaultExpiryPeriodDays,
+                retentionPeriodDays: workflowSettings.retentionPeriodDays
+            });
             this.originalWorkflowSettings = { ...workflowSettings };
             this.settingsOneWayModel.setProperty('/hasWorkflowSettingsChanges', false);
             this.settingsOneWayModel.setProperty('/workflowEnabled', workflowSettings.enabled);

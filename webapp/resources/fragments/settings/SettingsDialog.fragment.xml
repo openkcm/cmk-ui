@@ -96,25 +96,25 @@
                                                     </customData>
                                                 </Switch>
                                                 <Label text="{i18n>minimumApprovals}" />
-                                                <StepInput value="{workflow>/minimumApprovals}" min="1" step="1" width="10rem" enabled="{oneWay>/canEditWorkflowSettings}">
+                                                <StepInput value="{workflow>/minimumApprovals}" min="2" max="{workflow>/maxApprovals}" step="1" width="10rem" enabled="{oneWay>/canEditWorkflowSettings}">
                                                     <customData>
                                                         <core:CustomData key="help-id" value="settings-input-minimumApprovals" writeToDom="true" />
                                                     </customData>
                                                 </StepInput>
                                                 <Label text="{i18n>defaultExpiryPeriodDays}" />
-                                                <StepInput value="{workflow>/defaultExpiryPeriodDays}" min="1" step="1" width="10rem" enabled="{oneWay>/canEditWorkflowSettings}">
+                                                <StepInput value="{workflow>/defaultExpiryPeriodDays}" min="1" max="{workflow>/maxExpiryPeriodDays}" step="1" width="10rem" enabled="{oneWay>/canEditWorkflowSettings}">
                                                     <customData>
                                                         <core:CustomData key="help-id" value="settings-input-defaultExpiryPeriodDays" writeToDom="true" />
                                                     </customData>
                                                 </StepInput>
                                                 <Label text="{i18n>maxExpiryPeriodDays}" />
-                                                <StepInput value="{workflow>/maxExpiryPeriodDays}" min="1" step="1" width="10rem" enabled="{oneWay>/canEditWorkflowSettings}">
+                                                <Text text="{workflow>/maxExpiryPeriodDays}">
                                                     <customData>
-                                                        <core:CustomData key="help-id" value="settings-input-maxExpiryPeriodDays" writeToDom="true" />
+                                                        <core:CustomData key="help-id" value="settings-text-maxExpiryPeriodDays" writeToDom="true" />
                                                     </customData>
-                                                </StepInput>
+                                                </Text>
                                                 <Label text="{i18n>retentionPeriodDays}" />
-                                                <StepInput value="{workflow>/retentionPeriodDays}" min="1" step="1" width="10rem" enabled="{oneWay>/canEditWorkflowSettings}">
+                                                <StepInput value="{workflow>/retentionPeriodDays}" min="{workflow>/minRetentionPeriodDays}" max="{workflow>/maxRetentionPeriodDays}" step="1" width="10rem" enabled="{oneWay>/canEditWorkflowSettings}">
                                                     <customData>
                                                         <core:CustomData key="help-id" value="settings-input-retentionPeriodDays" writeToDom="true" />
                                                     </customData>
