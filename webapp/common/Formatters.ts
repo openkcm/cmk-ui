@@ -222,6 +222,8 @@ export function setKeyStateText(state: string): string {
             return getText('deleted');
         case KeyStates.UNKNOWN:
             return getText('unknown');
+        case KeyStates.FORBIDDEN:
+            return getText('forbidden');
         default:
             return state;
     }
