@@ -21,12 +21,17 @@ app.get("/cmk/v1/tenant1-id/tenants", (req, res) => {
     res.json(genereateTenants());
 });
 
+app.get("/cmk/v1/tenant1-id/keyConfigurations/", (req, res) => {
+    const { id } = req.params;
+    res.json(keyConfig());
+});
+
 app.post("/cmk/v1/tenant1-id/keyConfigurations", (req, res) => {
     const newKeyConfig = { ...req.body, id: "config-" + Math.floor(Math.random() * 10000) };
     res.status(201).json(newKeyConfig);
 });
 
-app.get("/cmk/v1/tenant1-id/keyConfigurations/:id?", (req, res) => {
+app.get("/cmk/v1/tenant1-id/keyConfigurations/:id", (req, res) => {
     const { id } = req.params;
     res.json(keyConfig(id));
 });
@@ -55,7 +60,12 @@ app.post("/cmk/v1/tenant1-id/keys", (req, res) => {
     res.status(201).json(newKey);
 });
 
-app.get("/cmk/v1/tenant1-id/keys/:id?", (req, res) => {
+app.get("/cmk/v1/tenant1-id/keys", (req, res) => {
+    const { id } = req.params;
+    res.json(keys(id));
+});
+
+app.get("/cmk/v1/tenant1-id/keys/:id", (req, res) => {
     const { id } = req.params;
     res.json(keys(id));
 });
@@ -82,31 +92,35 @@ app.patch("/cmk/v1/tenant1-id/keys/:id/versions/:id", (req, res) => {
     res.status(200).json({});
 });
 
+app.get("/cmk/v1/tenant1-id/systems", (req, res) => {
+    res.json(systems(null, null, 'getSystems'));
+});
+
 app.get("/cmk/v1/tenant1-id/systems/filterOptions", (req, res) => {
     res.json(systems(null, null, 'filterOptions'));
 });
 
-app.get("/cmk/v1/tenant1-id/systems/:systemId?/recoveryActions", (req, res) => {
+app.get("/cmk/v1/tenant1-id/systems/:systemId/recoveryActions", (req, res) => {
     const { systemId, keyConfigurationID } = req.params;
     res.json(systems(systemId, keyConfigurationID, 'recoveryActions', 'get'));
 });
 
-app.get("/cmk/v1/tenant1-id/systems/:systemId?/:keyConfigurationID?", (req, res) => {
+app.get("/cmk/v1/tenant1-id/systems/:systemId", (req, res) => {
     const { systemId, keyConfigurationID } = req.params;
     res.json(systems(systemId, keyConfigurationID, 'getSystems'));
 });
 
-app.patch("/cmk/v1/tenant1-id/systems/:systemId?/link/", (req, res) => {
+app.patch("/cmk/v1/tenant1-id/systems/:systemId/link/", (req, res) => {
     const { systemId, keyConfigurationID } = req.query;
     res.json(systems(systemId, keyConfigurationID, ''));
 });
 
-app.delete("/cmk/v1/tenant1-id/systems/:systemId?/link/", (req, res) => {
+app.delete("/cmk/v1/tenant1-id/systems/:systemId/link/", (req, res) => {
     const { systemId, keyConfigurationID } = req.query;
     res.json(systems(systemId, keyConfigurationID, ''));
 });
 
-app.post("/cmk/v1/tenant1-id/systems/:systemId?/recoveryActions/", (req, res) => {
+app.post("/cmk/v1/tenant1-id/systems/:systemId/recoveryActions/", (req, res) => {
     const { systemId, keyConfigurationID } = req.params;
     res.json(systems(systemId, keyConfigurationID, 'recoveryActions', 'post'));
 });
@@ -115,12 +129,12 @@ app.get("/cmk/v1/tenant1-id/groups", (req, res) => {
     res.json(groups());
 });
 
-app.get("/cmk/v1/tenant1-id/user/:id?", (req, res) => {
+app.get("/cmk/v1/tenant1-id/userInfo/", (req, res) => {
     const { id } = req.params;
-    res.json(user(id));
+    res.json(user());
 });
 
-app.get("/cmk/v1/tenant1-id/workflows/:taskId?", (req, res) => {
+app.get("/cmk/v1/tenant1-id/workflows/:taskId", (req, res) => {
     const { taskId } = req.params;
     res.json(workflows(taskId));
 });

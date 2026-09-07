@@ -62,7 +62,7 @@ export default (configID) => {
             id: configID,
             description: chance.sentence(),
             adminGroupID: chance.guid(),
-            canConnectSystems: false,
+            canConnectSystems: true,
             metadata: {
                 creatorID: chance.guid(),
                 creatorName: chance.name(),
