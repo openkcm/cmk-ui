@@ -846,7 +846,7 @@ export default class KeyConfigDetail extends BaseController {
 
     private shouldUseWorkflowForKeyDeletion(key: Key): boolean {
         return key?.isPrimary
-          && (key?.type === KeyCreationTypes.BYOK || key?.type === KeyCreationTypes.HYOK);
+            && (key?.type === KeyCreationTypes.BYOK || key?.type === KeyCreationTypes.HYOK);
     }
 
     public async onKeyTableDeletePress(event: Button$PressEvent): Promise<void> {
