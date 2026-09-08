@@ -281,9 +281,9 @@ export default class BuiltInSupportService {
     private isRestrictedRegion(): boolean {
         const hostname = window.location.hostname.toLowerCase();
         return hostname.includes('.cn.')
-            || hostname.includes('.china.')
-            || hostname.includes('ns2.')
-            || hostname.includes('sovereign');
+          || hostname.includes('.china.')
+          || hostname.includes('ns2.')
+          || hostname.includes('sovereign');
     }
 
     /**

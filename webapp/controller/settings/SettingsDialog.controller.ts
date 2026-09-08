@@ -34,7 +34,10 @@ const languageNames: Record<string, string> = {
 };
 
 const MIN_APPROVALS = 2;
-const MIN_RETENTION_PERIOD_DAYS = 30;
+const MAX_APPROVALS = 5;
+const MIN_RETENTION_PERIOD_DAYS = 7;
+const MAX_RETENTION_PERIOD_DAYS = 30;
+const MAX_EXPIRY_PERIOD_DAYS = 7;
 
 interface WorkflowSettings {
     enabled: boolean
@@ -148,9 +151,9 @@ export default class SettingsDialogHandler {
         const currentSettings = this.settingsWorkflowModel.getData() as WorkflowSettings;
         const minimumApprovals = currentSettings.minimumApprovals;
 
-        if (minimumApprovals < MIN_APPROVALS) {
+        if (minimumApprovals < MIN_APPROVALS || minimumApprovals > MAX_APPROVALS) {
             this.settingsOneWayModel.setProperty('/minimumApprovalsValueState', ValueState.Error);
-            this.settingsOneWayModel.setProperty('/minimumApprovalsValueStateText', getText('minimumApprovalsMinError'));
+            this.settingsOneWayModel.setProperty('/minimumApprovalsValueStateText', getText('minimumApprovalsRangeError'));
             return true;
         }
         else {
@@ -164,30 +167,36 @@ export default class SettingsDialogHandler {
         const currentSettings = this.settingsWorkflowModel.getData() as WorkflowSettings;
         const defaultExpiry = currentSettings.defaultExpiryPeriodDays;
         const maxExpiry = currentSettings.maxExpiryPeriodDays;
+        let hasError = false;
 
-        if (defaultExpiry > maxExpiry) {
+        if (maxExpiry > MAX_EXPIRY_PERIOD_DAYS) {
+            this.settingsOneWayModel.setProperty('/maxExpiryValueState', ValueState.Error);
+            this.settingsOneWayModel.setProperty('/maxExpiryValueStateText', getText('maxExpiryExceedsLimitError'));
+            hasError = true;
+        }
+        else if (defaultExpiry > maxExpiry) {
             this.settingsOneWayModel.setProperty('/defaultExpiryValueState', ValueState.Error);
             this.settingsOneWayModel.setProperty('/defaultExpiryValueStateText', getText('defaultExpiryExceedsMaxError'));
             this.settingsOneWayModel.setProperty('/maxExpiryValueState', ValueState.Error);
             this.settingsOneWayModel.setProperty('/maxExpiryValueStateText', getText('maxExpiryBelowDefaultError'));
-            return true;
+            hasError = true;
         }
         else {
             this.settingsOneWayModel.setProperty('/defaultExpiryValueState', ValueState.None);
             this.settingsOneWayModel.setProperty('/defaultExpiryValueStateText', '');
             this.settingsOneWayModel.setProperty('/maxExpiryValueState', ValueState.None);
             this.settingsOneWayModel.setProperty('/maxExpiryValueStateText', '');
-            return false;
         }
+        return hasError;
     }
 
     private validateRetentionPeriod(): boolean {
         const currentSettings = this.settingsWorkflowModel.getData() as WorkflowSettings;
         const retentionPeriod = currentSettings.retentionPeriodDays;
 
-        if (retentionPeriod < MIN_RETENTION_PERIOD_DAYS) {
+        if (retentionPeriod < MIN_RETENTION_PERIOD_DAYS || retentionPeriod > MAX_RETENTION_PERIOD_DAYS) {
             this.settingsOneWayModel.setProperty('/retentionPeriodValueState', ValueState.Error);
-            this.settingsOneWayModel.setProperty('/retentionPeriodValueStateText', getText('retentionPeriodMinError'));
+            this.settingsOneWayModel.setProperty('/retentionPeriodValueStateText', getText('retentionPeriodRangeError'));
             return true;
         }
         else {
