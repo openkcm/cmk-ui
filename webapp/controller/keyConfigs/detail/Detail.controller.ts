@@ -518,6 +518,7 @@ export default class KeyConfigDetail extends BaseController {
     }
 
     private async getAllSystemAvailableForConnection() {
+        this.connectSystemPopover?.setBusy(true);
         try {
             const payload = {
                 $filter: `status eq '${SystemStatus.DISCONNECTED}'`,
@@ -529,6 +530,9 @@ export default class KeyConfigDetail extends BaseController {
         catch (error) {
             console.error(error);
             showErrorMessage(error as AxiosError, this.getText('errorFetchingSystems'));
+        }
+        finally {
+            this.connectSystemPopover?.setBusy(false);
         }
     }
 
