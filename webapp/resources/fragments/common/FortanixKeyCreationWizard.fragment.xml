@@ -3,7 +3,7 @@
         xmlns:core="sap.ui.core"
         xmlns:f="sap.f"
         xmlns:form="sap.ui.layout.form"
-    core:require="{commonFormatter: 'kms/common/Formatters' }">
+        core:require="{commonFormatter: 'kms/common/Formatters' }">
     <Dialog
         escapeHandler=".onKeyCreationWizardCancelPress"
         showHeader="false"
@@ -94,24 +94,21 @@
                                             <VBox width="100%" items="{model>/managementRolesCerts}">
                                                 <VBox width="100%" class="sapUiSmallMarginBottom">
                                                     <Label text='{i18n>name}:' />
-                                                    <Text
-                                                        text="{model>name}"
-                                                        wrapping="true" />
+                                                    <Text text="{model>name}"
+                                                          wrapping="true" />
                                                     <Label text='{i18n>rootCALabel}:'
                                                         class="sapUiTinyMarginTop" />
                                                     <HBox alignItems="Center">
-                                                        <Text
-                                                            text="{model>rootCA}"
-                                                            wrapping="true"
-                                                            class="sapUiSmallMarginEnd" />
+                                                        <Text text="{model>rootCA}"
+                                                              wrapping="true"
+                                                              class="sapUiSmallMarginEnd" />
                                                         <Button text="{i18n>downloadRootCACert}"
                                                             press="onDownloadRootCA"
                                                             enabled="{= !!${model>rootCA}}" />
                                                     </HBox>
                                                     <Label text='{i18n>subject}:'
                                                         class="sapUiTinyMarginTop" />
-                                                    <Text
-                                                        text="{path: 'model>subject', formatter: 'commonFormatter.formatSubjectDN'}"
+                                                    <Text text="{path: 'model>subject', formatter: 'commonFormatter.formatSubjectDN'}"
                                                         wrapping="true" />
                                                     <HBox class="sapUiSmallMarginTop" wrap="Wrap">
                                                         <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
@@ -166,15 +163,12 @@
                                                                 <VBox width="100%"
                                                                     class="sapUiSmallMarginBottom">
                                                                     <Label text='{i18n>name}:' />
-                                                                    <Text
-                                                                        text="{model>name}"
+                                                                    <Text text="{model>name}"
                                                                         wrapping="true" />
-                                                                    <Label
-                                                                        text='{i18n>rootCALabel}:'
+                                                                    <Label text='{i18n>rootCALabel}:'
                                                                         class="sapUiTinyMarginTop" />
                                                                     <HBox alignItems="Center">
-                                                                        <Text
-                                                                            text="{model>rootCA}"
+                                                                        <Text text="{model>rootCA}"
                                                                             wrapping="true"
                                                                             class="sapUiSmallMarginEnd" />
                                                                         <Button text="{i18n>downloadRootCACert}"
@@ -182,10 +176,9 @@
                                                                             enabled="{= !!${model>rootCA}}" />
                                                                     </HBox>
                                                                     <Label text='{i18n>subject}:'
-                                                                        class="sapUiTinyMarginTop" />
-                                                                    <Text
-                                                                        text="{path: 'model>subject', formatter: 'commonFormatter.formatSubjectDN'}"
-                                                                        wrapping="true" />
+                                                                           class="sapUiTinyMarginTop" />
+                                                                    <Text text="{path: 'model>subject', formatter: 'commonFormatter.formatSubjectDN'}"
+                                                                          wrapping="true" />
                                                                     <HBox class="sapUiSmallMarginTop" wrap="Wrap">
                                                                         <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
                                                                             <Label text="{i18n>subjectCN}:" />
@@ -238,7 +231,14 @@
                                             </items>
                                         </VBox>
                                         <VBox visible="{= !!${model>/allowAddMoreCryptoCert}}">
-                                            <Text text="{i18n>addCertApplications}" />
+                                            <Text text="{i18n>addCertApplications}" >
+                                                <customData>
+                                                    <core:CustomData
+                                                            key="testId"
+                                                            value="keyCreatePopoverDialog--FortanixCryptoRoleStep-Input"
+                                                            writeToDom="true" />
+                                                </customData>
+                                            </Text>
                                             <HBox width="100%"
                                                 class="sapUiMarginTop"
                                                 alighnItems="Center"

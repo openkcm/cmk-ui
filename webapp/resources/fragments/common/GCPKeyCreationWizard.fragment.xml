@@ -80,8 +80,7 @@
                                     </WizardStep>
                                     <WizardStep id="GCPManagementRoleStep"
                                                 validated="{= (${model>/projectNumber}.length > 0  &amp;&amp; ${model>/poolId}.length > 0  &amp;&amp; ${model>/providerId}.length > 0  &amp;&amp; ${model>/serviceAccount}.length > 0) }"
-                                        activate=""
-                                        title="{i18n>managementRole}">
+                                                activate="" title="{i18n>managementRole}">
                                         <customData>
                                             <core:CustomData
                                                 key="testId"
@@ -92,14 +91,12 @@
                                             <VBox width="100%" items="{model>/managementRolesCerts}">
                                                 <VBox width="100%" class="sapUiSmallMarginBottom">
                                                     <Label text='{i18n>name}:' />
-                                                    <Text
-                                                        text="{model>name}"
+                                                    <Text text="{model>name}"
                                                         wrapping="true" />
                                                     <Label text='{i18n>rootCALabel}:'
                                                         class="sapUiTinyMarginTop" />
                                                     <HBox alignItems="Center">
-                                                        <Text
-                                                            text="{model>rootCA}"
+                                                        <Text text="{model>rootCA}"
                                                             wrapping="true"
                                                             class="sapUiSmallMarginEnd" />
                                                         <Button text="{i18n>downloadRootCACert}"
@@ -108,8 +105,7 @@
                                                     </HBox>
                                                     <Label text='{i18n>subject}:'
                                                         class="sapUiTinyMarginTop" />
-                                                    <Text
-                                                        text="{path: 'model>subject', formatter: 'commonFormatter.formatSubjectDN'}"
+                                                    <Text text="{path: 'model>subject', formatter: 'commonFormatter.formatSubjectDN'}"
                                                         wrapping="true" />
                                                     <HBox class="sapUiSmallMarginTop" wrap="Wrap">
                                                         <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
@@ -300,7 +296,14 @@
                                             </items>
                                         </VBox>
                                         <VBox visible="{= !!${model>/allowAddMoreCryptoCert}}">
-                                            <Text text="{i18n>addCertApplications}" />
+                                            <Text text="{i18n>addCertApplications}" >
+                                                <customData>
+                                                    <core:CustomData
+                                                            key="testId"
+                                                            value="keyCreatePopoverDialog--GCPCryptoRoleStep-Input"
+                                                            writeToDom="true" />
+                                                </customData>
+                                            </Text>
                                             <HBox width="100%"
                                                 class="sapUiMarginTop"
                                                 alighnItems="Center"
@@ -370,7 +373,6 @@
                                             </TextArea>
                                         </form:content>
                                     </form:SimpleForm>
-
                                     <form:SimpleForm
                                         class="sapUiSmallMarginBottom"
                                         editable="false"
@@ -398,14 +400,12 @@
                                                     <VBox width="100%"
                                                         class="sapUiSmallMarginBottom">
                                                         <Label text='{i18n>name}:' />
-                                                        <Text
-                                                            text="{model>name}"
+                                                        <Text text="{model>name}"
                                                             wrapping="true" />
                                                         <Label text='{i18n>rootCALabel}:'
                                                             class="sapUiTinyMarginTop" />
                                                         <HBox alignItems="Center">
-                                                            <Text
-                                                                text="{model>rootCA}"
+                                                            <Text text="{model>rootCA}"
                                                                 wrapping="true"
                                                                 class="sapUiSmallMarginEnd" />
                                                             <Button text="{i18n>downloadRootCACert}"
@@ -414,8 +414,7 @@
                                                         </HBox>
                                                         <Label text='{i18n>subject}:'
                                                             class="sapUiTinyMarginTop" />
-                                                        <Text
-                                                            text="{path: 'model>subject', formatter: 'commonFormatter.formatSubjectDN'}"
+                                                        <Text text="{path: 'model>subject', formatter: 'commonFormatter.formatSubjectDN'}"
                                                             wrapping="true" />
                                                         <HBox class="sapUiSmallMarginTop" wrap="Wrap">
                                                             <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
