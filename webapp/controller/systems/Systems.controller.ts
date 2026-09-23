@@ -8,6 +8,7 @@ import { AxiosError } from 'axios';
 import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
 import { Button$PressEvent } from 'sap/m/Button';
 import Dialog from 'sap/m/Dialog';
+import { ComboBox$SelectionChangeEvent } from 'sap/m/ComboBox';
 import Fragment from 'sap/ui/core/Fragment';
 import EventBus from 'sap/ui/core/EventBus';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
@@ -58,6 +59,7 @@ export default class Systems extends BaseController {
     private skip: number;
     private top: number;
     private currentPage: number;
+    private keyConfigCheckTimer?: ReturnType<typeof setTimeout>;
     private readonly paginationModel = new JSONModel({});
 
     public onInit(): void {
@@ -264,6 +266,10 @@ export default class Systems extends BaseController {
     }
 
     public onConnectSystemCancelPress(): void {
+        if (this.keyConfigCheckTimer) {
+            clearTimeout(this.keyConfigCheckTimer);
+            this.keyConfigCheckTimer = undefined;
+        }
         this.connectTargetSystem?.close();
         this.connectTargetSystem?.destroy();
         this.connectTargetSystem = undefined;
@@ -299,8 +305,29 @@ export default class Systems extends BaseController {
         this.updateSystemsTable();
     }
 
-    public async onSelectedKeyConfigChange(): Promise<void> {
+    public onSelectedKeyConfigChange(event: ComboBox$SelectionChangeEvent): void {
         this.resetActionButtons();
+        this.connectSystemModel.setProperty('/workflowStatus', undefined);
+
+        // The workflow check must only run for a genuine, existing key config.
+        // While the user is typing/editing an invalid or partial value, the
+        // ComboBox reports no selected item, so we stop here and skip the check.
+        const selectedItem = event.getParameter('selectedItem');
+        if (!selectedItem) {
+            return;
+        }
+
+        // Debounce the (async) workflow check so it only runs once the user has
+        // settled on a value rather than firing on every intermediate change.
+        if (this.keyConfigCheckTimer) {
+            clearTimeout(this.keyConfigCheckTimer);
+        }
+        this.keyConfigCheckTimer = setTimeout(() => {
+            void this.runWorkflowCheck();
+        }, 350);
+    }
+
+    private async runWorkflowCheck(): Promise<void> {
         const selectedKeyConfigId: string = this.connectSystemModel.getProperty('/selectedKeyConfig') as string;
 
         const workflowParams = {
