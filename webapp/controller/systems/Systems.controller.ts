@@ -8,7 +8,7 @@ import { AxiosError } from 'axios';
 import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
 import { Button$PressEvent } from 'sap/m/Button';
 import Dialog from 'sap/m/Dialog';
-import { ComboBox$SelectionChangeEvent } from 'sap/m/ComboBox';
+import { ComboBox$ChangeEvent } from 'sap/m/ComboBox';
 import Fragment from 'sap/ui/core/Fragment';
 import EventBus from 'sap/ui/core/EventBus';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
@@ -59,7 +59,6 @@ export default class Systems extends BaseController {
     private skip: number;
     private top: number;
     private currentPage: number;
-    private keyConfigCheckTimer?: ReturnType<typeof setTimeout>;
     private readonly paginationModel = new JSONModel({});
 
     public onInit(): void {
@@ -266,10 +265,6 @@ export default class Systems extends BaseController {
     }
 
     public onConnectSystemCancelPress(): void {
-        if (this.keyConfigCheckTimer) {
-            clearTimeout(this.keyConfigCheckTimer);
-            this.keyConfigCheckTimer = undefined;
-        }
         this.connectTargetSystem?.close();
         this.connectTargetSystem?.destroy();
         this.connectTargetSystem = undefined;
@@ -305,31 +300,23 @@ export default class Systems extends BaseController {
         this.updateSystemsTable();
     }
 
-    public onSelectedKeyConfigChange(event: ComboBox$SelectionChangeEvent): void {
+    public onSelectedKeyConfigChange(event: ComboBox$ChangeEvent): void {
+        this.connectTargetSystem?.setBusy(true);
         this.resetActionButtons();
         this.connectSystemModel.setProperty('/workflowStatus', undefined);
 
-        // The workflow check must only run for a genuine, existing key config.
-        // While the user is typing/editing an invalid or partial value, the
-        // ComboBox reports no selected item, so we stop here and skip the check.
-        const selectedItem = event.getParameter('selectedItem');
+        // `change` fires only when editing is done (blur / Enter / selection),
+        // not while typing. Skip the check if the value isn't a real key config.
+        const selectedItem = event.getSource().getSelectedItem();
         if (!selectedItem) {
+            this.connectTargetSystem?.setBusy(false);
             return;
         }
 
-        // Debounce the (async) workflow check so it only runs once the user has
-        // settled on a value rather than firing on every intermediate change.
-        if (this.keyConfigCheckTimer) {
-            clearTimeout(this.keyConfigCheckTimer);
-        }
-        this.keyConfigCheckTimer = setTimeout(() => {
-            void this.runWorkflowCheck();
-        }, 350);
+        void this.runWorkflowCheck(selectedItem.getKey());
     }
 
-    private async runWorkflowCheck(): Promise<void> {
-        const selectedKeyConfigId: string = this.connectSystemModel.getProperty('/selectedKeyConfig') as string;
-
+    private async runWorkflowCheck(selectedKeyConfigId: string): Promise<void> {
         const workflowParams = {
             artifactType: ArtifactTypes.SYSTEM,
             artifactID: this.connectSystemModel.getProperty('/id') as string,
@@ -337,26 +324,71 @@ export default class Systems extends BaseController {
             parameters: selectedKeyConfigId
         };
 
-        await this.workflowComponent?.checkWorkflowStatus(workflowParams, {
-            onWorkflowExists: () => {
-                this.resetActionButtons();
-                this.connectSystemModel.setProperty('/workflowStatus', WorkflowStatus.WORKFLOW_ALREADY_EXISTS);
-            },
-            onWorkflowNotRequired: () => {
-                this.connectSystemModel.setProperty('/showApprovalButton', false);
-                this.connectSystemModel.setProperty('/showConnectButton', true);
-                this.connectSystemModel.setProperty('/workflowStatus', WorkflowStatus.WORKFLOW_NOT_REQUIRED);
-            },
-            onWorkflowRequired: () => {
-                this.connectSystemModel.setProperty('/showApprovalButton', true);
-                this.connectSystemModel.setProperty('/showConnectButton', false);
-                this.connectSystemModel.setProperty('/workflowStatus', WorkflowStatus.WORKFLOW_REQUIRED);
-            },
-            onError: () => {
-                this.connectSystemModel.setProperty('/workflowStatus', WorkflowStatus.ERROR);
-                this.resetActionButtons();
+        // --- Stale-response protection ---------------------------------------
+        // The workflow check is asynchronous. Between starting it and its
+        // response arriving, the user can change the ComboBox selection again,
+        // for example:
+        //   1. Select a VALID config A  -> this check for A starts (busy on).
+        //   2. Immediately type an INVALID value (or pick another config B)
+        //      -> `onSelectedKeyConfigChange` runs again, resets the UI, and for
+        //         an invalid value clears `/selectedKeyConfig` (or sets it to B).
+        //   3. A's response now arrives LAST.
+        //
+        // Without a guard, A's callbacks would write A's workflow status and
+        // action buttons even though the current input is invalid (or is B) -
+        // leaving the dialog showing results that belong to a selection the user
+        // has already replaced. `isCurrentSelection()` returns false in that case
+        // (the model no longer equals the key this check was started for), so we
+        // bail out of each callback and do NOT touch the UI for a stale result.
+        const isCurrentSelection = (): boolean =>
+            this.connectSystemModel.getProperty('/selectedKeyConfig') === selectedKeyConfigId;
+
+        try {
+            await this.workflowComponent?.checkWorkflowStatus(workflowParams, {
+                onWorkflowExists: () => {
+                    // Skip if the selection changed while this request was in flight;
+                    // otherwise we'd overwrite the current state with a stale result.
+                    if (!isCurrentSelection()) {
+                        return;
+                    }
+                    this.resetActionButtons();
+                    this.connectSystemModel.setProperty('/workflowStatus', WorkflowStatus.WORKFLOW_ALREADY_EXISTS);
+                },
+                onWorkflowNotRequired: () => {
+                    // Skip stale responses (see isCurrentSelection() comment above).
+                    if (!isCurrentSelection()) {
+                        return;
+                    }
+                    this.connectSystemModel.setProperty('/showApprovalButton', false);
+                    this.connectSystemModel.setProperty('/showConnectButton', true);
+                    this.connectSystemModel.setProperty('/workflowStatus', WorkflowStatus.WORKFLOW_NOT_REQUIRED);
+                },
+                onWorkflowRequired: () => {
+                    // Skip stale responses (see isCurrentSelection() comment above).
+                    if (!isCurrentSelection()) {
+                        return;
+                    }
+                    this.connectSystemModel.setProperty('/showApprovalButton', true);
+                    this.connectSystemModel.setProperty('/showConnectButton', false);
+                    this.connectSystemModel.setProperty('/workflowStatus', WorkflowStatus.WORKFLOW_REQUIRED);
+                },
+                onError: () => {
+                    // Skip stale responses (see isCurrentSelection() comment above).
+                    if (!isCurrentSelection()) {
+                        return;
+                    }
+                    this.connectSystemModel.setProperty('/workflowStatus', WorkflowStatus.ERROR);
+                    this.resetActionButtons();
+                }
+            });
+        }
+        finally {
+            // Only the current selection's check clears busy; a stale one must
+            // not, as a newer check may still be running.
+            if (isCurrentSelection()) {
+                this.connectTargetSystem?.setBusy(false);
             }
-        });
+        }
     }
 
     private resetActionButtons(): void {

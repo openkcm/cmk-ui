@@ -3,7 +3,7 @@
     xmlns:f="sap.f"
     xmlns:core="sap.ui.core"
     core:require="{ commonFormatter: 'kms/common/Formatters' }"
-    >
+>
     <Dialog
         id="connectTargetSystemDialogs"
         contentHeight="35rem"
@@ -55,8 +55,9 @@
                     <Label text="{i18n>selectedTargetKeyConfiguration}:" />
                     <ComboBox
                         width="100%"
+                        autocomplete="false"
                         selectedKey="{connectSystemModel>/selectedKeyConfig}"
-                        selectionChange="onSelectedKeyConfigChange"
+                        change="onSelectedKeyConfigChange"
                         items="{connectSystemModel>/KeyConfigList}">
                         <core:Item key="{connectSystemModel>id}" text="{connectSystemModel>name}" />
                         <customData>
@@ -98,7 +99,7 @@
                             writeToDom="true" />
                     </customData>
                 </Button>
-                 <Button text="{i18n>sendForApproval}" icon="sap-icon://paper-plane"
+                <Button text="{i18n>sendForApproval}" icon="sap-icon://paper-plane"
                     type="Emphasized"
                     enabled="{= !!${connectSystemModel>/selectedKeyConfig}}"
                     visible="{connectSystemModel>/showApprovalButton}"
