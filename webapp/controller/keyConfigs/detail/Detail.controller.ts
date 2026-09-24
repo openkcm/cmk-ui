@@ -554,7 +554,7 @@ export default class KeyConfigDetail extends BaseController {
         }
     }
 
-    public async onTagsUpdate(event: MultiInput$TokenUpdateEvent): Promise<void> {
+    public onTagsUpdate(event: MultiInput$TokenUpdateEvent): void {
         const tags = this.oneWayModel.getProperty('/tags') as [];
 
         const removedTokens = event.getParameter('removedTokens');
@@ -564,27 +564,11 @@ export default class KeyConfigDetail extends BaseController {
         const updatedTags = tags?.filter(tag => !removedTags.includes(tag)) || [] as [];
         updatedTags?.push(...addedTags);
         this.oneWayModel.setProperty('/tags', updatedTags || tags);
-
-        const payload = {
-            tags: updatedTags
-        };
-        try {
-            await this.api.put(`keyConfigurations/${this.keyConfigId}/tags`, payload);
-            MessageToast.show(this.getText('tagsUpdatedSuccessfully'));
-        }
-        catch (error) {
-            console.error(error);
-            showErrorMessage(error as AxiosError, this.getText('errorUpdatingTags'));
-            const tags = await this.getTags();
-            this.oneWayModel.setProperty('/tags', tags?.value || []);
-        }
     }
 
     private async patchKeyConfigData(keyConfig: KeyConfigPatchPayload) {
         try {
-            const keyConfigs = await this.api.patch<KeyConfig>(`keyConfigurations/${this.keyConfigId}`, keyConfig);
-            MessageToast.show(this.getText('keyConfigSaved'));
-            return keyConfigs;
+            return await this.api.patch<KeyConfig>(`keyConfigurations/${this.keyConfigId}`, keyConfig);
         }
         catch (error) {
             console.error(error);
@@ -604,18 +588,34 @@ export default class KeyConfigDetail extends BaseController {
     public async onSaveKeyConfigPress(): Promise<void> {
         this.getView()?.setBusy(true);
         const keyConfig = this.twoWayModel.getProperty('/keyConfig') as KeyConfig;
+        const tags = this.oneWayModel.getProperty('/tags') as string[];
         const payload = {
             name: keyConfig.name
         };
 
+        const patched = await this.patchKeyConfigData(payload);
+        if (!patched) {
+            this.getView()?.setBusy(false);
+            return;
+        }
+
         try {
-            await this.patchKeyConfigData(payload);
-            await this.getKeyConfigData();
+            if (Array.isArray(tags)) {
+                await this.api.put(`keyConfigurations/${this.keyConfigId}/tags`, { tags });
+            }
+            MessageToast.show(this.getText('keyConfigSaved'));
             await this.onCancelEditPress();
         }
         catch (error) {
-            console.error('Error patching key config', error);
-            showErrorMessage(error as AxiosError, this.getText('errorPatchingKeyConfigDetails'));
+            console.error('Error updating tags', error);
+            showErrorMessage(error as AxiosError, this.getText('errorUpdatingTags'));
+            try {
+                const restoredTags = await this.getTags();
+                this.oneWayModel.setProperty('/tags', restoredTags?.value || []);
+            }
+            catch (restoreError) {
+                console.error('Error restoring tags', restoreError);
+            }
         }
         finally {
             this.getView()?.setBusy(false);
@@ -891,8 +891,7 @@ export default class KeyConfigDetail extends BaseController {
     }
 
     private shouldUseWorkflowForKeyDeletion(key: Key): boolean {
-        return key?.isPrimary
-            && (key?.type === KeyCreationTypes.BYOK || key?.type === KeyCreationTypes.HYOK);
+        return key?.isPrimary && (key?.type === KeyCreationTypes.BYOK || key?.type === KeyCreationTypes.HYOK);
     }
 
     public async onKeyTableDeletePress(event: Button$PressEvent): Promise<void> {
