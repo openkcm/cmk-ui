@@ -280,6 +280,10 @@ export default class App extends BaseController {
         this.toolPage?.setSideExpanded(!this.toolPage.getSideExpanded());
     }
 
+    public onBuiltInSupportPress(): void {
+        BuiltInSupportService.getInstance().openSupport();
+    }
+
     public async onUserNamePress(event: Avatar$PressEvent): Promise<void> {
         const button = event.getSource();
         const view = this.getView();

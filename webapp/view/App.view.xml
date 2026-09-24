@@ -58,6 +58,24 @@
                             writeToDom="true" />
                     </customData>
                 </MenuButton>
+                <Button
+                    id="builtInSupportButton"
+                    icon="sap-icon://headset"
+                    type="Transparent"
+                    tooltip="{i18n>builtInSupportTooltip}"
+                    press=".onBuiltInSupportPress"
+                    visible="{= ${selectedTenant>/isBuiltInSupportEnabled} === true }"
+                    class="sapUiTinyMarginEnd">
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                    <customData>
+                        <core:CustomData
+                            key="testId"
+                            value="shellBar-builtInSupportButton"
+                            writeToDom="true" />
+                    </customData>
+                </Button>
                 <Avatar initials="{twoWay>/userInitials}" displaySize="XS" press="onUserNamePress">
                     <layoutData>
                         <OverflowToolbarLayoutData priority="NeverOverflow" />
