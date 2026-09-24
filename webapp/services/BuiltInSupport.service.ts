@@ -40,6 +40,13 @@ export default class BuiltInSupportService {
     }
 
     /**
+     * Opens the built-in support panel. No-op in this build.
+     */
+    public openSupport(): void {
+        // Intentionally empty
+    }
+
+    /**
      * Updates the support application context. No-op in this build.
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

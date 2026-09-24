@@ -111,12 +111,20 @@ export default class Component extends UIComponent {
             this.setInitialTheme();
             this.registerIllustrationSet();
 
-            // Initialize Built-in Support SDK (non-blocking — loads asynchronously)
+            // Initialize Built-in Support SDK (non-blocking — loads asynchronously).
+            // Once ready, flag it on the selectedTenant model so the shell can show the
+            // support icon.
             const selectedTenant = tenants?.find(t => t.id === tenantId);
-            void BuiltInSupportService.getInstance().initialize({
+            const bis = BuiltInSupportService.getInstance();
+            void bis.initialize({
                 tenantId: tenantId,
                 tenantName: selectedTenant?.name || '',
                 targetEnvironment: config.bisEnvironment || 'test'
+            }).then(() => {
+                const selectedTenantModel = this.getModel('selectedTenant');
+                if (selectedTenantModel instanceof JSONModel) {
+                    selectedTenantModel.setProperty('/isBuiltInSupportEnabled', bis.isReady());
+                }
             });
 
             SplashScreen.hide();
