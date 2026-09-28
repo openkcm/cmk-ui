@@ -35,5 +35,10 @@ server:
       afterMiddleware: compression
     - name: ui5-tooling-transpile-middleware
       afterMiddleware: compression
+      configuration:
+        coverage:
+          exclude:
+            - "webapp/test/**"
+            - "**/*.d.ts"
     - name: ui5-middleware-livereload
       afterMiddleware: compression
