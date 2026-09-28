@@ -701,6 +701,13 @@ export default class KeyConfigDetail extends BaseController {
             MessageToast.show(this.getText('actionNotAllowedForKeyState'));
             return;
         }
+
+        const isInitialPrimary = !this.oneWayModel.getProperty('/primaryKey');
+        if (isInitialPrimary) {
+            this.confirmMakeKeyPrimary(selectedKey, isInitialPrimary);
+            return;
+        }
+
         const workflowParams = {
             artifactType: ArtifactTypes.KEY_CONFIGURATION,
             actionType: ActionTypes.UPDATE_PRIMARY,
@@ -713,15 +720,7 @@ export default class KeyConfigDetail extends BaseController {
 
         await makePrimaryWorkflow.checkWorkflowStatus(workflowParams, {
             onWorkflowNotRequired: () => {
-                MessageBox.confirm(this.getText('confirmMakePrimaryConfirmation'), {
-                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                    onClose: async (action: unknown) => {
-                        if (action === MessageBox.Action.YES) {
-                            await this.makeKeyPrimary(selectedKey);
-                        }
-                    }
-                });
+                this.confirmMakeKeyPrimary(selectedKey, isInitialPrimary);
             },
             onWorkflowRequired: () => {
                 MessageBox.confirm(this.getText('confirmMakePrimaryWorkflowCreation'), {
@@ -736,6 +735,19 @@ export default class KeyConfigDetail extends BaseController {
             },
             onError: () => {
                 void this.getKeyConfigData();
+            }
+        });
+    }
+
+    private confirmMakeKeyPrimary(selectedKey: Key, isInitialPrimary: boolean): void {
+        const confirmationText = isInitialPrimary ? 'confirmSetPrimaryConfirmation' : 'confirmMakePrimaryConfirmation';
+        MessageBox.confirm(this.getText(confirmationText), {
+            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            onClose: async (action: unknown) => {
+                if (action === MessageBox.Action.YES) {
+                    await this.makeKeyPrimary(selectedKey, isInitialPrimary);
+                }
             }
         });
     }
@@ -880,7 +892,7 @@ export default class KeyConfigDetail extends BaseController {
 
     private shouldUseWorkflowForKeyDeletion(key: Key): boolean {
         return key?.isPrimary
-          && (key?.type === KeyCreationTypes.BYOK || key?.type === KeyCreationTypes.HYOK);
+            && (key?.type === KeyCreationTypes.BYOK || key?.type === KeyCreationTypes.HYOK);
     }
 
     public async onKeyTableDeletePress(event: Button$PressEvent): Promise<void> {
@@ -1259,14 +1271,15 @@ export default class KeyConfigDetail extends BaseController {
         return importParams as { publicKey: string, wrappingAlgorithm: object } | undefined;
     }
 
-    private async makeKeyPrimary(key: Key): Promise<void> {
+    private async makeKeyPrimary(key: Key, isInitialPrimary: boolean): Promise<void> {
         this.getView()?.setBusy(true);
         const payload = {
             primaryKeyID: key.id
         };
+        const successText = isInitialPrimary ? 'keySetPrimarySuccessfully' : 'keyMadePrimarySuccessfully';
         try {
             await this.api.patch(`keyConfigurations/${this.keyConfigId}`, payload);
-            MessageToast.show(this.getText('keyMadePrimarySuccessfully'));
+            MessageToast.show(this.getText(successText));
             await this.getKeyConfigData();
         }
         catch (error) {
