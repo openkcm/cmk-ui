@@ -200,8 +200,10 @@ export interface GCPAccessDetails {
     serviceAccount: string
     isEditable?: boolean
 }
+export type ProviderAccessDetails = AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails;
+export type KeyProviderType = HYOKProviders | BYOKProviders;
 export interface AccessDetails {
-    management: AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails
+    management: ProviderAccessDetails
     crypto: Record<string, AWSAccessDetails | FortanixAccessDetails>
 }
 export interface HyokKeyPayload {

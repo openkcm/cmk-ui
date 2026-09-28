@@ -158,6 +158,76 @@ export function formatSubjectDN(subject: SubjectDN | string | null | undefined):
     return parts.join(', ');
 }
 
+/**
+ * Parse a string Distinguished Name (e.g. "CN=foo, OU=bar, O=baz") into a
+ * structured {@link SubjectDN}. Repeated keys (such as multiple OU values) are
+ * collected into an array to mirror the structured representation returned by
+ * the API. Returns an empty object when the string cannot be parsed.
+ */
+export function parseSubjectDN(subject: string | null | undefined): SubjectDN {
+    if (!subject) {
+        return {};
+    }
+    const result: SubjectDN = {};
+    // Split on commas or slashes that are not escaped, which are the common DN separators.
+    const segments = subject.split(/(?<!\\)[,/]/);
+    segments.forEach((segment) => {
+        const trimmed = segment.trim();
+        if (!trimmed) {
+            return;
+        }
+        const separatorIndex = trimmed.indexOf('=');
+        if (separatorIndex <= 0) {
+            return;
+        }
+        const key = trimmed.slice(0, separatorIndex).trim();
+        const value = trimmed.slice(separatorIndex + 1).trim();
+        if (!key || value === '') {
+            return;
+        }
+        const existing = result[key];
+        if (existing === undefined) {
+            result[key] = value;
+        }
+        else if (Array.isArray(existing)) {
+            existing.push(value);
+        }
+        else {
+            result[key] = [existing, value];
+        }
+    });
+    return result;
+}
+
+/**
+ * Normalise a certificate subject into a structured {@link SubjectDN} so that
+ * both the "String" and "Details" views resolve correctly. String subjects are
+ * parsed into their structured form; structured subjects are returned as-is.
+ */
+export function normalizeSubjectDN(subject: SubjectDN | string | null | undefined): SubjectDN {
+    if (subject === null || subject === undefined) {
+        return {};
+    }
+    if (typeof subject === 'string') {
+        return parseSubjectDN(subject);
+    }
+    return subject;
+}
+
+/**
+ * Returns true when a subject exposes at least one structured field, i.e. the
+ * "Details" view can render meaningful content. String subjects are parsed
+ * first; an unparseable string (or empty subject) yields false so callers can
+ * hide the "Details" toggle and avoid a blank panel.
+ */
+export function hasStructuredSubject(subject: SubjectDN | string | null | undefined): boolean {
+    const normalized = normalizeSubjectDN(subject);
+    return Object.keys(normalized).some((key) => {
+        const value = normalized[key];
+        return normalizeDNValues(value).length > 0;
+    });
+}
+
 export function formatSubjectDNField(value: string | string[] | undefined | null): string {
     if (value === null || value === undefined) {
         return '';

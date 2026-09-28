@@ -188,6 +188,36 @@ QUnit.test('formatSubjectDN expands array-valued OU entries', function (assert) 
     assert.strictEqual(Formatters.formatSubjectDN(subject), 'CN=a, OU=One, OU=Two', 'each OU value becomes its own segment');
 });
 
+QUnit.test('parseSubjectDN splits a string DN into structured fields', function (assert) {
+    const result = Formatters.parseSubjectDN('CN=example.com, O=SAP, C=DE');
+    assert.deepEqual(result, { CN: 'example.com', O: 'SAP', C: 'DE' }, 'comma-separated DN is parsed into fields');
+});
+QUnit.test('parseSubjectDN supports slash separators and collects repeated keys', function (assert) {
+    const result = Formatters.parseSubjectDN('/CN=a/OU=One/OU=Two');
+    assert.deepEqual(result, { CN: 'a', OU: ['One', 'Two'] }, 'slash-separated DN with repeated OUs becomes an array');
+});
+QUnit.test('parseSubjectDN returns an empty object for nullish or unparseable input', function (assert) {
+    assert.deepEqual(Formatters.parseSubjectDN(null), {}, 'null yields empty object');
+    assert.deepEqual(Formatters.parseSubjectDN(undefined), {}, 'undefined yields empty object');
+    assert.deepEqual(Formatters.parseSubjectDN('not a dn'), {}, 'unparseable string yields empty object');
+});
+
+QUnit.test('normalizeSubjectDN parses strings and passes through objects', function (assert) {
+    assert.deepEqual(Formatters.normalizeSubjectDN('CN=a, O=SAP'), { CN: 'a', O: 'SAP' }, 'string subject is parsed');
+    const structured: SubjectDN = { CN: 'a', OU: ['x', 'y'] };
+    assert.strictEqual(Formatters.normalizeSubjectDN(structured), structured, 'structured subject is returned as-is');
+    assert.deepEqual(Formatters.normalizeSubjectDN(null), {}, 'nullish subject yields empty object');
+});
+
+QUnit.test('hasStructuredSubject reflects whether the Details view can render', function (assert) {
+    assert.strictEqual(Formatters.hasStructuredSubject('CN=example.com'), true, 'parseable string has structure');
+    assert.strictEqual(Formatters.hasStructuredSubject({ CN: 'a' }), true, 'structured object has structure');
+    assert.strictEqual(Formatters.hasStructuredSubject('not a dn'), false, 'unparseable string has no structure');
+    assert.strictEqual(Formatters.hasStructuredSubject(''), false, 'empty string has no structure');
+    assert.strictEqual(Formatters.hasStructuredSubject(null), false, 'null has no structure');
+    assert.strictEqual(Formatters.hasStructuredSubject({ CN: '' }), false, 'object with only empty values has no structure');
+});
+
 QUnit.test('formatSubjectDNField joins arrays and passes through scalars', function (assert) {
     assert.strictEqual(Formatters.formatSubjectDNField(['a', '', 'b', null as unknown as string]), 'a\nb', 'empty and nullish entries are filtered before joining');
     assert.strictEqual(Formatters.formatSubjectDNField('single'), 'single', 'scalar is returned unchanged');

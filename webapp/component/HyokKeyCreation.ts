@@ -21,6 +21,7 @@ import Fragment from 'sap/ui/core/Fragment';
 import { Icon$PressEvent } from 'sap/ui/core/Icon';
 import JSONModel from 'sap/ui/model/json/JSONModel';
 import { Button$PressEvent } from 'sap/m/Button';
+import { SegmentedButton$SelectionChangeEvent } from 'sap/m/SegmentedButton';
 import * as HelpPopover from 'kms/common/HelpInfoPopover';
 import Constants from 'kms/common/Constants';
 
@@ -133,15 +134,17 @@ export default class HyokKeyRegistration extends BaseController {
     private resetModel() {
         this.keyCreatePopover?.setBusy(true);
         this.getHYOKCertificates().then((certs: { hyokManagementCerts: HyokCertificates[], cryptoRolesCerts: HyokCertificates[] }) => {
+            const managementRolesCerts = (certs?.hyokManagementCerts ?? []).map(cert => ({ ...cert, certViewMode: 'String' }));
+            const cryptoRolesCerts = (certs?.cryptoRolesCerts ?? []).map(cert => ({ ...cert, certViewMode: 'String' }));
             const commonData = {
                 keyName: '' as string,
                 nativeId: '' as string,
                 description: '' as string,
                 keySubType: this.subtype,
                 hyokManagementRoleStepValid: false,
-                cryptoRolesCerts: certs?.cryptoRolesCerts,
-                managementRolesCerts: certs?.hyokManagementCerts,
-                availableCryptoCertsSelectionList: certs?.cryptoRolesCerts,
+                cryptoRolesCerts: cryptoRolesCerts,
+                managementRolesCerts: managementRolesCerts,
+                availableCryptoCertsSelectionList: cryptoRolesCerts,
                 hyokCryptoCertObj: null as HyokCryptoCertInput[] | null,
                 selectedCryptoRolesCertKeys: [] as string[],
                 selectedCryptoCertItems: [] as HyokCertificates[],
@@ -334,6 +337,15 @@ export default class HyokKeyRegistration extends BaseController {
             return;
         }
         window.open(rootCA, '_blank', 'noopener,noreferrer');
+    }
+
+    public onToggleCertViewMode(event: SegmentedButton$SelectionChangeEvent): void {
+        const source = event.getSource();
+        const path = source.getBindingContext('model')?.getPath();
+        if (!path) {
+            return;
+        }
+        this.keyCreationModel.setProperty(`${path}/certViewMode`, source.getSelectedKey());
     }
 
     public onRemoveCryptoCert(event: Button$PressEvent): void {

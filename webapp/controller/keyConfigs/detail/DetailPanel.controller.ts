@@ -6,15 +6,19 @@ import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import EventBus from 'sap/ui/core/EventBus';
 import {
     AWSAccessDetails,
+    BYOKImportParameters,
     FortanixAccessDetails,
     GCPAccessDetails,
     HyokCertificates,
     Key,
     KeyVersion,
+    ProviderAccessDetails,
+    SubjectDN,
     SystemRecoveryActions,
     WorkflowParams
 } from 'kms/common/Types';
 import { isUUIDValid, copyToClipboard, showErrorMessage } from 'kms/common/Helpers';
+import { downloadWrappingKey, fetchImportParameters, isBYOKAwaitingImport } from 'kms/common/Byok';
 import { Button$PressEvent } from 'sap/m/Button';
 import * as Formatter from 'kms/common/Formatters';
 import MessageToast from 'sap/m/MessageToast';
@@ -24,8 +28,7 @@ import MessageBox from 'sap/m/MessageBox';
 import Workflow from 'kms/component/Workflow';
 import Dialog from 'sap/m/Dialog';
 import Fragment from 'sap/ui/core/Fragment';
-import { BYOKImportParameters } from 'kms/common/Types';
-import { downloadWrappingKey, fetchImportParameters, isBYOKAwaitingImport } from 'kms/common/Byok';
+import { SegmentedButton$SelectionChangeEvent } from 'sap/m/SegmentedButton';
 
 interface KeyVersionResponse {
     value: KeyVersion[] | undefined
@@ -114,6 +117,14 @@ export default class DetailPanel extends BaseController {
                 });
                 return;
             }
+            if (selectedKey.type === this.Enums.KeyCreationTypes.HYOK) {
+                try {
+                    await this.loadCertificateDetails();
+                }
+                catch (certError) {
+                    console.error('Error loading certificate details', certError);
+                }
+            }
             const [keyVersions, importParams] = await Promise.all([
                 this.api.get<KeyVersionResponse>(`keys/${this.id}/versions`),
                 isBYOKAwaitingImport(selectedKey)
@@ -139,6 +150,31 @@ export default class DetailPanel extends BaseController {
         }
     };
 
+    private managementCertsCache: HyokCertificates[] = [];
+    private cryptoCertsCache: HyokCertificates[] = [];
+
+    private async loadCertificateDetails(): Promise<void> {
+        try {
+            interface HYOKCertificatesResponse {
+                tenantDefault: { count: number, value: HyokCertificates[] }
+                crypto: { count: number, value: HyokCertificates[] }
+            }
+            const keyConfigId = this.keyConfigId ?? '';
+            const certs = await this.api.get<HYOKCertificatesResponse>(`keyConfigurations/${keyConfigId}/certificates`);
+            this.managementCertsCache = certs?.tenantDefault?.value ?? [];
+            this.cryptoCertsCache = certs?.crypto?.value ?? [];
+        }
+        catch (error) {
+            console.error('Error fetching certificate details', error);
+            this.managementCertsCache = [];
+            this.cryptoCertsCache = [];
+        }
+    }
+
+    private findCertByName(certs: HyokCertificates[], name: string): HyokCertificates | undefined {
+        return certs.find(cert => cert.name === name);
+    }
+
     private setKeyDetailsToModel(key: Key): void {
         this.twoWayModel.setProperty('/selectedKey/customerHeld', key?.type === this.Enums.KeyCreationTypes.HYOK);
         this.twoWayModel.setProperty('/selectedKey/enabled', key?.state === this.Enums.KeyStates.ENABLED);
@@ -147,17 +183,44 @@ export default class DetailPanel extends BaseController {
         const managementDetails = key?.accessDetails?.management;
         const cryptoDetails = key?.accessDetails?.crypto;
         if (managementDetails) {
-            const managementDetailsArray: { key: string, value: AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails }[] = [{ key: 'management', value: managementDetails }];
+            const managementCerts = this.managementCertsCache.length > 0 ? this.managementCertsCache : [undefined];
+            const managementDetailsArray: { key: string, value: ProviderAccessDetails, subject?: SubjectDN, rootCA?: string, certName?: string, certViewMode?: string }[] = managementCerts.map((managementCert, index) => ({
+                key: managementCert?.name ?? `management-${String(index)}`,
+                value: managementDetails,
+                subject: managementCert ? Formatter.normalizeSubjectDN(managementCert.subject) : undefined,
+                rootCA: managementCert?.rootCA,
+                certName: managementCert?.name,
+                certViewMode: 'String'
+            }));
             this.twoWayModel.setProperty('/selectedKey/accessDetails/managementDetailsArray', managementDetailsArray);
         }
         if (cryptoDetails) {
-            const cryptoArray: { key: string, value: AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails }[] = [];
+            const cryptoArray: { key: string, value: ProviderAccessDetails, subject?: SubjectDN, rootCA?: string, certName?: string, certViewMode?: string }[] = [];
             Object.entries(cryptoDetails).forEach(([key, value]) => {
-                cryptoArray.push({ key: key, value: value });
+                const cryptoCert = this.findCertByName(this.cryptoCertsCache, key);
+                cryptoArray.push({
+                    key: key,
+                    value: value,
+                    subject: cryptoCert ? Formatter.normalizeSubjectDN(cryptoCert.subject) : undefined,
+                    rootCA: cryptoCert?.rootCA,
+                    certName: cryptoCert?.name,
+                    certViewMode: 'String'
+                });
             });
             this.twoWayModel.setProperty('/selectedKey/accessDetails/cryptoARNsArray', cryptoArray);
         }
         this.updateAddCryptoCertButtonState();
+    }
+
+    public onToggleCertViewMode(event: SegmentedButton$SelectionChangeEvent): void {
+        const source = event.getSource();
+        const bindingContext = source.getBindingContext('twoWay');
+        const path = bindingContext?.getPath();
+        if (!path) {
+            return;
+        }
+        const selectedKey = source.getSelectedKey();
+        this.twoWayModel.setProperty(`${path}/certViewMode`, selectedKey);
     }
 
     private async getSystemRecoveryActions(systemsID: string): Promise<void> {
@@ -603,10 +666,10 @@ export default class DetailPanel extends BaseController {
         const entries = this.addCryptoCertsModel.getProperty('/newCryptoCertEntries') as { selectedCertKeys: string[], selectedCerts: HyokCertificates[], trustAnchorArn: string, roleArn: string, profileArn: string, applicationId: string, projectNumber: string, poolId: string, providerId: string, serviceAccount: string }[];
 
         // Build crypto payload from new entries
-        const newCryptoPayload: Record<string, AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails> = {};
+        const newCryptoPayload: Record<string, ProviderAccessDetails> = {};
 
         entries.forEach((entry) => {
-            let accessDetails: AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails;
+            let accessDetails: ProviderAccessDetails;
 
             switch (this.keyProvider) {
                 case Enums.HYOKProviders.AWS:
@@ -643,9 +706,9 @@ export default class DetailPanel extends BaseController {
 
         // Merge with existing cryptos
 
-        const existingCryptoPayload: Record<string, AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails> = {};
+        const existingCryptoPayload: Record<string, ProviderAccessDetails> = {};
 
-        const existingCryptoArray = this.twoWayModel.getProperty('/selectedKey/accessDetails/cryptoARNsArray') as | { key: string, value: AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails }[] | undefined;
+        const existingCryptoArray = this.twoWayModel.getProperty('/selectedKey/accessDetails/cryptoARNsArray') as | { key: string, value: ProviderAccessDetails }[] | undefined;
 
         existingCryptoArray?.forEach((cryptoItem) => {
             switch (this.keyProvider) {
