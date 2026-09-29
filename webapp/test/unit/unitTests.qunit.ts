@@ -1,2 +1,11 @@
 import './controller/App.qunit';
 import './formatter/Formatters.qunit';
+import './common/Helpers.qunit';
+import './common/Byok.qunit';
+import './utils/ForbiddenState.qunit';
+import './utils/SplashScreen.qunit';
+import './utils/Config.qunit';
+import './service/BuiltInSupport.qunit';
+import './service/Ora.qunit';
+import './service/Auth.qunit';
+import './service/Api.qunit';
