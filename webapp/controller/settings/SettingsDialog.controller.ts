@@ -47,6 +47,12 @@ interface WorkflowSettings {
     retentionPeriodDays: number
 }
 
+interface WorkflowSettingsResponse extends WorkflowSettings {
+    maxApprovals: number
+    maxRetentionPeriodDays: number
+    minRetentionPeriodDays: number
+}
+
 interface RoleBasedAccessSettings {
     canManage: boolean
 }
@@ -243,8 +249,16 @@ export default class SettingsDialogHandler {
     private async getWorkflowSettings(): Promise<void> {
         try {
             const api = Api.getInstance();
-            const workflowSettings = await api.get<WorkflowSettings>('tenantConfigurations/workflow');
-            if (workflowSettings) {
+            const workflowSettingsResponse = await api.get<WorkflowSettingsResponse>('tenantConfigurations/workflow');
+            if (workflowSettingsResponse) {
+                const workflowSettings: WorkflowSettings = {
+                    enabled: workflowSettingsResponse.enabled,
+                    minimumApprovals: workflowSettingsResponse.minimumApprovals,
+                    defaultExpiryPeriodDays: workflowSettingsResponse.defaultExpiryPeriodDays,
+                    maxExpiryPeriodDays: workflowSettingsResponse.maxExpiryPeriodDays,
+                    retentionPeriodDays: workflowSettingsResponse.retentionPeriodDays
+                };
+
                 this.originalWorkflowSettings = { ...workflowSettings };
                 this.settingsWorkflowModel.setProperty('/', workflowSettings);
                 this.settingsOneWayModel.setProperty('/hasWorkflowSettingsChanges', false);
