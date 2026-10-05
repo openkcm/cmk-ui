@@ -1,6 +1,7 @@
 import { Button$PressEvent } from 'sap/m/Button';
 import MessageToast from 'sap/m/MessageToast';
 import MessageBox from 'sap/m/MessageBox';
+import encodeXML from 'sap/base/security/encodeXML';
 import { AxiosError } from 'axios';
 import Core from 'sap/ui/core/Core';
 import ResourceBundle from 'sap/base/i18n/ResourceBundle';
@@ -154,7 +155,7 @@ export function showErrorMessage(error: AxiosError, userMessage: string | undefi
     }
     additionalInfo = additionalInfo || getAdditionalErrorDetails(error);
     const additionalInfoHtml = additionalInfo
-        ? '<li><strong>' + getText('errorAdditionalInfo') + '</strong>' + ' ' + additionalInfo + '</li>'
+        ? '<li><strong>' + getText('errorAdditionalInfo') + '</strong>' + ' ' + encodeXML(additionalInfo) + '</li>'
         : '';
 
     MessageBox.error(errorMessage, {
@@ -162,7 +163,7 @@ export function showErrorMessage(error: AxiosError, userMessage: string | undefi
         details: '<p><strong>' + getText('errorDetailsHeader') + '</strong></p>'
             // eslint-disable-next-line @stylistic/indent-binary-ops
             + '<ul>'
-            + '<li><strong>' + getText('errorRequestId') + '</strong>' + ' ' + requestID + '</li>'
+            + '<li><strong>' + getText('errorRequestId') + '</strong>' + ' ' + encodeXML(requestID) + '</li>'
             + '<li><strong>' + getText('errorTimestamp') + '</strong>' + datetime + '</li>'
             + additionalInfoHtml
             + '<li><strong>' + getText('errorSupportPage') + '</strong>' + "<a href='https://support.sap.com/'>https://support.sap.com<a/>" + '</li>'
