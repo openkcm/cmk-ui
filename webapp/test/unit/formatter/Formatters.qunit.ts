@@ -1,5 +1,5 @@
 import * as Formatters from 'kms/common/Formatters';
-import { SystemStatus } from 'kms/common/Enums';
+import {KeyStates, SystemStatus} from 'kms/common/Enums';
 
 QUnit.module('Formatters Unit Tests');
 
@@ -81,4 +81,59 @@ QUnit.test('The isErrorStatus method returns false for PROCESSING status', funct
 QUnit.test('The isErrorStatus method returns false for DISCONNECTED status', function (assert) {
     const result = Formatters.isErrorStatus('DISCONNECTED');
     assert.strictEqual(result, false, 'DISCONNECTED should not be an error status');
+});
+
+QUnit.test('The setKeyStateColor method returns the correct color for key states', function (assert) {
+    assert.strictEqual(
+        Formatters.setKeyStateColor(KeyStates.DISABLED),
+        2,
+        'DISABLED should return 2'
+    );
+
+    assert.strictEqual(
+        Formatters.setKeyStateColor(KeyStates.ENABLED),
+        8,
+        'ENABLED should return 8'
+    );
+
+    assert.strictEqual(
+        Formatters.setKeyStateColor(KeyStates.PENDING_DELETION),
+        5,
+        'PENDING_DELETION should return 5'
+    );
+
+    assert.strictEqual(
+        Formatters.setKeyStateColor(KeyStates.DELETED),
+        5,
+        'DELETED should return 5'
+    );
+
+    assert.strictEqual(
+        Formatters.setKeyStateColor(KeyStates.PENDING_IMPORT),
+        6,
+        'PENDING_IMPORT should return 6'
+    );
+
+    assert.strictEqual(
+        Formatters.setKeyStateColor(KeyStates.PENDING_CREATION),
+        1,
+        'PENDING_CREATION should return 1'
+    );
+
+    assert.strictEqual(
+        Formatters.setKeyStateColor(KeyStates.PENDING_REGISTRATION),
+        1,
+        'PENDING_REGISTRATION should return 1'
+    );
+
+    assert.strictEqual(
+        Formatters.setKeyStateColor(KeyStates.UNKNOWN),
+        10,
+        'UNKNOWN should return 10'
+    );
+});
+
+QUnit.test('The setKeyStateColor method returns 10 for an unknown state', function (assert) {
+    const result = Formatters.setKeyStateColor('INVALID_STATE');
+    assert.strictEqual(result, 10, 'An unknown state should return the default color 10');
 });

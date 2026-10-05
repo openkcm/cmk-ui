@@ -1,7 +1,7 @@
 <core:FragmentDefinition xmlns="sap.m"
-    xmlns:core="sap.ui.core"
-    xmlns:tnt="sap.tnt"
-    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+                         xmlns:core="sap.ui.core"
+                         xmlns:tnt="sap.tnt"
+                         core:require="{ formatMessage: 'sap/base/strings/formatMessage', commonFormatter: 'kms/common/Formatters' }">
     <Table
         noDataText=" "
         items="{
@@ -109,17 +109,8 @@
                         xmlns:data="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1" />
                     <VBox justifyContent="Center">
                         <tnt:InfoLabel
-                            visible="{= ${oneWay>state} === 'ENABLED'}"
-                            text="{i18n>enabled}"
-                            colorScheme="8" />
-                        <tnt:InfoLabel
-                            visible="{= ${oneWay>state} === 'DISABLED'}"
-                            text="{i18n>disabled}"
-                            colorScheme="2" />
-                        <tnt:InfoLabel
-                            visible="{= ${oneWay>state} === 'UNKNOWN'}"
-                            text="{i18n>unknown}"
-                            colorScheme="10" />
+                                text="{parts: ['oneWay>state'], formatter: 'commonFormatter.setKeyStateText'}"
+                                colorScheme="{parts: ['oneWay>state'], formatter: 'commonFormatter.setKeyStateColor'}" />
                     </VBox>
                     <Text
                         text="{path:'oneWay>metadata/rotatedAt', type:'sap.ui.model.type.DateTime', formatOptions:{UTC: true, source:{pattern: 'yyyy-MM-dd\'T\'HH:mm:ss.SSSSSSX'}}} UTC"
