@@ -5,6 +5,7 @@ export interface BISInitConfig {
     tenantId: string
     tenantName: string
     targetEnvironment: 'test' | 'live'
+    language?: string
 }
 
 /**
@@ -67,6 +68,14 @@ export default class BuiltInSupportService {
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public updateTheme(theme: string): void {
+        // Intentionally empty
+    }
+
+    /**
+     * Syncs the current language with built-in support. No-op in this build.
+     */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    public updateLanguage(language: string): void {
         // Intentionally empty
     }
 

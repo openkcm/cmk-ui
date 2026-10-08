@@ -1,5 +1,6 @@
 import Localization from 'sap/base/i18n/Localization';
 import Storage from 'sap/ui/util/Storage';
+import BuiltInSupportService from 'kms/services/BuiltInSupport.service';
 const DEFAULT_LOCALE = 'EN';
 const LOCALE_MAPPINGS: Record<string, string> = {
     EN: 'en',
@@ -27,16 +28,16 @@ export function setLanguage(language: string, reload: boolean) {
     }
     // Retrieve current application language
     const currentLanguage = Localization.getLanguage();
-    // Only perform the change if the current language is different from new language
     if (currentLanguage !== parsedLanguage) {
         console.info('Setting new language:', parsedLanguage);
         const localStorage = new Storage(Storage.Type.local);
         localStorage.put('sap-language', language);
+        // Propagate the selected language to Built-in Support so its UI matches
+        // the language chosen in KMS (no-op when BIS is not active).
+        BuiltInSupportService.getInstance().updateLanguage(parsedLanguage);
+        Localization.setLanguage(parsedLanguage);
         if (reload) {
             location.reload();
-        }
-        else {
-            Localization.setLanguage(parsedLanguage);
         }
     }
 }
