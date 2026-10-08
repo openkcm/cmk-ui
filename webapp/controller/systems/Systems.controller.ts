@@ -235,7 +235,7 @@ export default class Systems extends BaseController {
     public async onTargetConnectSystemPress(event: Button$PressEvent): Promise<void> {
         const path = event.getSource().getBindingContext('oneWay')?.getPath();
         const component = this.getOwnerComponent();
-        const keyConfigs = await this.api.get<KeyConfigsResponse>('keyConfigurations', {});
+        const keyConfigs = await this.api.get<KeyConfigsResponse>('keyConfigurations', { $top: 1024, $skip: 0 });
         if (!path || !component) {
             console.error('Path or component is undefined');
             return;
@@ -246,7 +246,6 @@ export default class Systems extends BaseController {
                 name: 'kms.resources.fragments.common.ConnectTargetSystem',
                 controller: this
             }) as Dialog;
-            // TODO:Perhaps it is better to have this filter in the backend.
             const keyConfigsData = keyConfigs?.value.filter((keyConfig: KeyConfig) => keyConfig?.canConnectSystems);
             this.connectTargetSystem.addStyleClass('sapUiSizeCompact');
             this.connectTargetSystem.setModel(component.getModel('i18n'), 'i18n');
