@@ -2,6 +2,7 @@ import UIComponent from 'sap/ui/core/UIComponent';
 import JSONModel from 'sap/ui/model/json/JSONModel';
 import IllustrationPool from 'sap/m/IllustrationPool';
 import Theming from 'sap/ui/core/Theming';
+import Localization from 'sap/base/i18n/Localization';
 import { loadConfig, loadYAMLConfig } from './utils/Config';
 import * as yaml from 'js-yaml';
 import Api, { ApiAccessError } from './services/Api.service';
@@ -119,7 +120,8 @@ export default class Component extends UIComponent {
             void bis.initialize({
                 tenantId: tenantId,
                 tenantName: selectedTenant?.name || '',
-                targetEnvironment: config.bisEnvironment || 'test'
+                targetEnvironment: config.bisEnvironment || 'test',
+                language: Localization.getLanguage()
             }).then(() => {
                 const selectedTenantModel = this.getModel('selectedTenant');
                 if (selectedTenantModel instanceof JSONModel) {

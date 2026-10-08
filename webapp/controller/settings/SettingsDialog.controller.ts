@@ -124,7 +124,7 @@ export default class SettingsDialogHandler {
         if (!selectedLanguage) {
             throw new Error('Invalid language index');
         }
-        setLanguage(selectedLanguage[0], false);
+        setLanguage(selectedLanguage[0], true);
     }
 
     public onMinimumApprovalsChange(): void {
