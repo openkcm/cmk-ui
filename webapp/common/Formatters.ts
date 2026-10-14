@@ -249,6 +249,13 @@ export function setKeyStateColor(state: string): int {
     }
 }
 
+export function setCreatorDetails(creatorName: string | undefined, creatorID: string): string {
+    if (!creatorName || creatorName === 'UNKNOWN') {
+        return creatorID;
+    }
+    return creatorName;
+}
+
 export function isKeyLifecyclePending(keyState: KeyStates | string): boolean {
     switch (keyState as KeyStates) {
         case KeyStates.PENDING_CREATION:

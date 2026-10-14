@@ -1,7 +1,7 @@
 <core:FragmentDefinition xmlns="sap.m"
-    xmlns:core="sap.ui.core"
-    xmlns:layout="sap.ui.layout"
-    xmlns:forms="sap.ui.layout.form">
+                         xmlns:core="sap.ui.core"
+                         xmlns:forms="sap.ui.layout.form"
+                         core:require="{ commonFormatter: 'kms/common/Formatters' }">
     <forms:Form width="100%" editable="true">
         <forms:layout>
             <forms:ColumnLayout
@@ -82,7 +82,7 @@
                     </forms:FormElement>
                     <forms:FormElement label="{i18n>createdBy}">
                         <forms:fields>
-                            <Text text="{oneWay>/keyConfig/metadata/creatorName}">
+                            <Text text="{parts: ['oneWay>/keyConfig/metadata/creatorName','oneWay>/keyConfig/metadata/creatorID'], formatter: 'commonFormatter.setCreatorDetails'}">
                                 <customData>
                                     <core:CustomData
                                         key="testId"
