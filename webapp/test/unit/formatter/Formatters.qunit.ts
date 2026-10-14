@@ -1,5 +1,5 @@
 import * as Formatters from 'kms/common/Formatters';
-import {KeyStates, SystemStatus} from 'kms/common/Enums';
+import { KeyStates, SystemStatus } from 'kms/common/Enums';
 
 QUnit.module('Formatters Unit Tests');
 
@@ -136,4 +136,24 @@ QUnit.test('The setKeyStateColor method returns the correct color for key states
 QUnit.test('The setKeyStateColor method returns 10 for an unknown state', function (assert) {
     const result = Formatters.setKeyStateColor('INVALID_STATE');
     assert.strictEqual(result, 10, 'An unknown state should return the default color 10');
+});
+
+QUnit.test('Returns creatorID when creatorName is undefined', function (assert) {
+    const result = Formatters.setCreatorDetails(undefined, 'user123');
+    assert.strictEqual(result, 'user123', 'Should return creatorID when creatorName is undefined');
+});
+
+QUnit.test('Returns creatorID when creatorName is an empty string', function (assert) {
+    const result = Formatters.setCreatorDetails('', 'user123');
+    assert.strictEqual(result, 'user123', 'Should return creatorID when creatorName is empty');
+});
+
+QUnit.test('Returns creatorID when creatorName is UNKNOWN', function (assert) {
+    const result = Formatters.setCreatorDetails('UNKNOWN', 'user123');
+    assert.strictEqual(result, 'user123', 'Should return creatorID when creatorName is UNKNOWN');
+});
+
+QUnit.test('Returns creatorName when creatorName is valid', function (assert) {
+    const result = Formatters.setCreatorDetails('name@email.com', 'user123');
+    assert.strictEqual(result, 'name@email.com', 'Should return creatorName when it is valid');
 });
