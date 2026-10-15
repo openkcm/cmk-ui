@@ -3,6 +3,13 @@ import { ActionTypes, ArtifactTypes, KeyCreationTypes, KeyStates, TaskStates, Ta
 export interface Config {
     apiBaseUrl: string
     bisEnvironment?: 'test' | 'live'
+    /**
+     * Feature flag for SAP Built-in Support (BIS). Set per environment in config.json:
+     *   - Devel / staging: true  → BIS enabled.
+     *   - Canary / production: false (or omitted) → BIS disabled.
+     * Harmless in open source (the BIS stub ignores it).
+     */
+    bisEnabled?: boolean
 }
 export interface SystemMetadata {
     errorCode: string
