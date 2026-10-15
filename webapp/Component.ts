@@ -121,6 +121,9 @@ export default class Component extends UIComponent {
                 tenantId: tenantId,
                 tenantName: selectedTenant?.name || '',
                 targetEnvironment: config.bisEnvironment || 'test',
+                // Feature flag: enabled only where config.json sets bisEnabled:true
+                // (devel/staging). Defaults to false in canary/production.
+                enabled: config.bisEnabled === true,
                 language: Localization.getLanguage()
             }).then(() => {
                 const selectedTenantModel = this.getModel('selectedTenant');

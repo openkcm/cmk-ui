@@ -6,6 +6,12 @@ export interface BISInitConfig {
     tenantName: string
     targetEnvironment: 'test' | 'live'
     language?: string
+    /**
+     * Feature flag that gates Built-in Support entirely (driven by the
+     * `bisEnabled` field in the per-environment config.json). Ignored by this
+     * no-op stub; honored by the real SAP implementation.
+     */
+    enabled?: boolean
 }
 
 /**
