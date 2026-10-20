@@ -34,7 +34,14 @@ RUN rm -rf /usr/share/nginx/html/*
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Update Nginx to listen on 8080 (standard for non-root/containerized environments)
-RUN sed -i 's/listen\s\+80;/listen 8080;/' /etc/nginx/conf.d/default.conf
+RUN sed -i 's/listen\s\+80;/listen 8080;/' /etc/nginx/conf.d/default.conf \
+    && chown -R nginx:nginx /usr/share/nginx/html \
+    && chown -R nginx:nginx /var/cache/nginx \
+    && chown -R nginx:nginx /var/log/nginx \
+    && touch /var/run/nginx.pid \
+    && chown nginx:nginx /var/run/nginx.pid
+
+USER 101
 
 # Expose the new port
 EXPOSE 8080
