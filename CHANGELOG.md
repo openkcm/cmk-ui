@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.6](https://github.com/openkcm/cmk-ui/compare/v0.1.0...v0.0.6) (2026-10-21)
+
+
+### Miscellaneous Chores
+
+* pin next release ([f9c334c](https://github.com/openkcm/cmk-ui/commit/f9c334c0a0882fa1c8e84b8b79cd7c9dabeb4ac7))
+
 ## [0.1.0](https://github.com/openkcm/cmk-ui/compare/v0.1.0...v0.1.0) (2026-10-21)
 
 
