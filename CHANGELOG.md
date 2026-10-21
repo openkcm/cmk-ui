@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.7](https://github.com/openkcm/cmk-ui/compare/v0.0.6...v0.0.7) (2026-10-21)
+
+
+### Bug Fixes
+
+* add a missed file to i18n_en_US.properties ([2a877fe](https://github.com/openkcm/cmk-ui/commit/2a877fe1e7c663426b1ef7c4cd91e570949517e0))
+* add release please manifest ([90e3e63](https://github.com/openkcm/cmk-ui/commit/90e3e6361c6e2e5dc42a2c08924336fa7a52ca7d))
+
 ## [0.0.6](https://github.com/openkcm/cmk-ui/compare/v0.1.0...v0.0.6) (2026-10-21)
 
 
