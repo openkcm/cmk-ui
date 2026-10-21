@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.2](https://github.com/openkcm/cmk-ui/compare/v0.1.1...v0.1.2) (2026-10-21)
+
+
+### Bug Fixes
+
+* update release type to node for cmk-ui package ([ba630bd](https://github.com/openkcm/cmk-ui/commit/ba630bd2598c69aa4943dec9ea081206f0fbc356))
+
+
+### Miscellaneous Chores
+
+* pin next release ([41b6d95](https://github.com/openkcm/cmk-ui/commit/41b6d95f4d757716c5111aec016e9973fc76d4ba))
+* pin next release ([6fbc91b](https://github.com/openkcm/cmk-ui/commit/6fbc91b62241b7a66355791d2c69a4503dc3cc42))
+
 ## [0.1.1](https://github.com/openkcm/cmk-ui/compare/v0.0.6...v0.1.1) (2026-10-21)
 
 
