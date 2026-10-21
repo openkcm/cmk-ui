@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.1.0](https://github.com/openkcm/cmk-ui/compare/v0.0.5...v0.1.0) (2026-10-21)
+
+
+### Features
+
+* enforce hard limits on workflow configuration UI ([43d5e93](https://github.com/openkcm/cmk-ui/commit/43d5e932926e944337bce0dce4d6b2e60e06e479))
+
+
+### Bug Fixes
+
+* enable coverage instrumentation in ui5-tooling-transpile-middleware ([6152841](https://github.com/openkcm/cmk-ui/commit/6152841161d49317528aaaab2587758087096cf0))
+* encode API-sourced values in error dialog HTML (SEC-100, SEC-281) ([4e1868c](https://github.com/openkcm/cmk-ui/commit/4e1868cbb668ef40e8f20851cb22e1917b257b94))
+* logout API call ([#90](https://github.com/openkcm/cmk-ui/issues/90)) ([d4bbb88](https://github.com/openkcm/cmk-ui/commit/d4bbb8853d354b1b8b1520dfef8a6423b05c73e2))
+* Update dependabot config ([#53](https://github.com/openkcm/cmk-ui/issues/53)) ([8248d2b](https://github.com/openkcm/cmk-ui/commit/8248d2b16644323f0390955988b04e6c045f4572))
+* update security.txt expiry date ([c451c4a](https://github.com/openkcm/cmk-ui/commit/c451c4a4e477bfdbed14ffd3e1409cddb1904ab5))
+
 ## [0.0.5](https://github.com/openkcm/cmk-ui/compare/v0.0.4...v0.0.5) (2026-03-10)
 
 
