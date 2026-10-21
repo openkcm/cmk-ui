@@ -10,3 +10,5 @@ includes:
       CHART_COMPONENTS: 'cmk-ui'
       SINGLE_IMAGE_NAME: 'cmk-ui'
       IMG_COMPONENTS: 'cmk-ui'
+
+      DOCKER_FILE_IDENTIFIER: 'ui'
