@@ -3,6 +3,7 @@
   "draft": false,
   "prerelease": false,
   "release-type": "node",
+  "include-component-in-tag": false,
   "bump-minor-pre-major": true,
   "include-v-in-tag": true,
   "always-update": true,
@@ -48,6 +49,7 @@
   "packages": {
     ".": {
       "release-type": "node",
+      "include-component-in-tag": false,
       "bump-minor-pre-major": true,
       "extra-files": [
         {
