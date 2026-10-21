@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/openkcm/cmk-ui/compare/v0.1.2...v0.1.3) (2026-10-21)
+
+
+### Bug Fixes
+
+* add anew i18n_de_DE.properties file ([876e489](https://github.com/openkcm/cmk-ui/commit/876e4899e519561463dc384dfe0cb59d77d2acdc))
+
 ## [0.1.2](https://github.com/openkcm/cmk-ui/compare/v0.1.1...v0.1.2) (2026-10-21)
 
 
