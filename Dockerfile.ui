@@ -3,16 +3,25 @@ FROM node:${NODE_VERSION}-alpine AS build
 
 ARG NPM_VERSION=11.11.0
 
+# Apply the latest Alpine security patches (musl, zlib, openssl, busybox, ...)
+# so the build stage doesn't carry forward outdated apk package revisions.
+RUN apk update && apk upgrade --no-cache \
+    && rm -rf /var/cache/apk/*
+
 WORKDIR /app
 
 # Install specific NPM version via curl/npm before installing dependencies
-RUN npm install -g npm@${NPM_VERSION}
+# --ignore-scripts: SDOL-025 supply chain safeguard — prevents execution of
+# pre/postinstall lifecycle hooks from potentially compromised dependencies
+RUN npm install -g npm@${NPM_VERSION} --ignore-scripts
 
 # Copy dependency files first to leverage Docker layer caching
 COPY package*.json ./
 
 # Use 'npm ci' for faster, more reliable builds in CI/CD environments
-RUN npm ci
+# --ignore-scripts: SDOL-025 supply chain safeguard — prevents execution of
+# pre/postinstall lifecycle hooks from potentially compromised dependencies
+RUN npm ci --ignore-scripts
 
 # Copy the rest of the source code
 COPY . .
@@ -24,7 +33,12 @@ RUN npm run build
 RUN npm prune --production
 
 # Stage 2: Production environment
-FROM nginx:1.29.3-alpine3.22-slim AS production
+# Base image pulled from the nginx crimson-prod JFrog Artifactory registry
+FROM nginx:1.31.6-alpine3.24-slim AS production
+
+# Apply the latest Alpine security patches in the final image as well.
+RUN apk update && apk upgrade --no-cache \
+    && rm -rf /var/cache/apk/*
 
 # Clean default static files
 RUN rm -rf /usr/share/nginx/html/*
