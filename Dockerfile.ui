@@ -34,7 +34,7 @@ RUN npm prune --production
 
 # Stage 2: Production environment
 # Base image pulled from the nginx crimson-prod JFrog Artifactory registry
-FROM nginx:1.31.6-alpine3.24-slim AS production
+FROM nginx:1.31.7-alpine3.24-slim AS production
 
 # Apply the latest Alpine security patches in the final image as well.
 RUN apk update && apk upgrade --no-cache \
