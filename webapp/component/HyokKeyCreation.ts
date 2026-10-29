@@ -1,13 +1,15 @@
 import { BYOKProviders, HYOKProviders, KeyCreationTypes } from 'kms/common/Enums';
 import {
     MangedKeyPayload,
-    HyokKeyPayload,
+    HyokKeyCreationPayload,
     HyokCertificates,
+    HyokCertificatesResponse,
     HyokCryptoCertInput,
     HyokAWSManagementCertInput,
     AWSAccessDetails, FortanixAccessDetails, GCPAccessDetails
 } from 'kms/common/Types';
 import { getErrorCode, getErrorContext, getErrorDataMessage, showErrorMessage } from 'kms/common/Helpers';
+import { isHyokCertificatesNotRequired } from 'kms/common/Formatters';
 import { AxiosError } from 'axios';
 import BaseController from 'kms/controller/BaseController';
 import KeyConfigDetail from 'kms/controller/keyConfigs/detail/Detail.controller';
@@ -30,17 +32,7 @@ interface KeyCreationParams {
     keyType: KeyCreationTypes
     keySubtype: HYOKProviders | BYOKProviders
 }
-type KeyCreateCallBackFn = (payload: MangedKeyPayload | HyokKeyPayload) => Promise<void>;
-interface HYOKAWScertificates {
-    tenantDefault: {
-        count: number
-        value: HyokCertificates[]
-    }
-    crypto: {
-        count: number
-        value: HyokCertificates[]
-    }
-}
+type KeyCreateCallBackFn = (payload: MangedKeyPayload | HyokKeyCreationPayload) => Promise<void>;
 
 export default class HyokKeyRegistration extends BaseController {
     private readonly keyCreationModel = new JSONModel({}); // This model should be initialized with the correct structure based on the key creation wizard requirements (for managed key, HYOK and BYOK)
@@ -50,6 +42,7 @@ export default class HyokKeyRegistration extends BaseController {
     private HYOKKeyCreationWizard: Wizard | undefined;
     private HYOKKeyCreationWizardPage: Page | undefined;
     private HYOKKeyCreationReviewPage: Page | undefined;
+    private HYOKKeyCreationSimplePage: Page | undefined;
     private parentController: KeyConfigDetail;
     private type: KeyCreationTypes;
     private subtype: HYOKProviders | BYOKProviders;
@@ -99,6 +92,7 @@ export default class HyokKeyRegistration extends BaseController {
             this.parentController?.getView()?.addDependent(this.keyCreatePopover);
             this.keyCreatePopover.addStyleClass('sapUiSizeCompact');
             this.keyCreatePopover.setModel(this.keyCreationModel, 'model');
+            this.keyCreatePopover.setBusy(true);
             this.keyCreatePopover.open();
             this.setWizardPageSections();
             this.resetModel();
@@ -128,19 +122,37 @@ export default class HyokKeyRegistration extends BaseController {
         this.HYOKKeyCreationNavContainer = Fragment.byId('keyCreatePopoverDialog', 'HYOKKeyCreationNavContainer') as NavContainer;
         this.HYOKKeyCreationReviewPage = Fragment.byId('keyCreatePopoverDialog', 'HYOKKeyCreationReviewPage') as Page;
         this.HYOKKeyCreationWizardPage = Fragment.byId('keyCreatePopoverDialog', 'HYOKKeyCreationWizardPage') as Page;
+        this.HYOKKeyCreationSimplePage = Fragment.byId('keyCreatePopoverDialog', 'HYOKKeyCreationSimplePage') as Page;
         this.HYOKKeyCreationNavContainer?.to(this.HYOKKeyCreationWizardPage);
+    }
+
+    /**
+     * When certificates are not required for HYOK (open source deployment), the user only needs to
+     * provide the key name and description. The multi-step wizard cannot be safely reduced below its
+     * minimum of three steps, so instead of mutating the wizard we navigate the NavContainer to a
+     * dedicated single key-details page rendered outside the wizard. The three-step wizard stays
+     * fully intact for the normal flow.
+     */
+    private applyNotRequiredForHYOKWizard(notRequiredForHYOK: boolean): void {
+        if (!notRequiredForHYOK || !this.HYOKKeyCreationNavContainer || !this.HYOKKeyCreationSimplePage) {
+            return;
+        }
+        this.HYOKKeyCreationNavContainer.to(this.HYOKKeyCreationSimplePage, 'show');
     }
 
     private resetModel() {
         this.keyCreatePopover?.setBusy(true);
-        this.getHYOKCertificates().then((certs: { hyokManagementCerts: HyokCertificates[], cryptoRolesCerts: HyokCertificates[] }) => {
+        this.getHYOKCertificates().then((certs: { hyokManagementCerts: HyokCertificates[], cryptoRolesCerts: HyokCertificates[], notRequiredForHYOK: boolean }) => {
             const managementRolesCerts = (certs?.hyokManagementCerts ?? []).map(cert => ({ ...cert, certViewMode: 'String' }));
             const cryptoRolesCerts = (certs?.cryptoRolesCerts ?? []).map(cert => ({ ...cert, certViewMode: 'String' }));
+            const notRequiredForHYOK = certs?.notRequiredForHYOK ?? false;
+
             const commonData = {
                 keyName: '' as string,
                 nativeId: '' as string,
                 description: '' as string,
                 keySubType: this.subtype,
+                notRequiredForHYOK,
                 hyokManagementRoleStepValid: false,
                 cryptoRolesCerts: cryptoRolesCerts,
                 managementRolesCerts: managementRolesCerts,
@@ -181,6 +193,7 @@ export default class HyokKeyRegistration extends BaseController {
                 ...commonData,
                 ...providerData
             }, true);
+            this.applyNotRequiredForHYOKWizard(notRequiredForHYOK);
         }).catch((err: unknown) => {
             showErrorMessage(err as AxiosError, this.parentController.getText('errorFetchingHYOKCertificates'));
             this.closeKeyCreationWizard();
@@ -246,7 +259,17 @@ export default class HyokKeyRegistration extends BaseController {
         }
     }
 
-    public getKeyCreationPayload(): HyokKeyPayload {
+    public getKeyCreationPayload(): HyokKeyCreationPayload {
+        if (this.keyCreationModel.getProperty('/notRequiredForHYOK') === true) {
+            return {
+                name: this.keyCreationModel.getProperty('/keyName') as string,
+                description: this.keyCreationModel.getProperty('/description') as string,
+                type: this.type,
+                keyConfigurationID: this.keyConfigId,
+                provider: this.subtype
+            };
+        }
+
         let management = {} as AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails;
         if (this.subtype === HYOKProviders.AWS) {
             management = {
@@ -325,8 +348,8 @@ export default class HyokKeyRegistration extends BaseController {
         const hyokAWSManagementCertObj = this.keyCreationModel.getProperty('/hyokAWSManagementCertObj') as HyokAWSManagementCertInput;
         const managementRolesComplete
             = (hyokAWSManagementCertObj?.trustAnchorARN ?? '').length > 0
-              && (hyokAWSManagementCertObj?.roleARN ?? '').length > 0
-              && (hyokAWSManagementCertObj?.rootCA ?? '').length > 0;
+            && (hyokAWSManagementCertObj?.roleARN ?? '').length > 0
+            && (hyokAWSManagementCertObj?.rootCA ?? '').length > 0;
         this.keyCreationModel.setProperty('/hyokManagementRoleStepValid', managementRolesComplete);
     }
 
@@ -374,11 +397,12 @@ export default class HyokKeyRegistration extends BaseController {
         }
     }
 
-    private async getHYOKCertificates(): Promise<{ hyokManagementCerts: HyokCertificates[], cryptoRolesCerts: HyokCertificates[] }> {
-        const hyokAWScertificates = await this.api.get<HYOKAWScertificates>(`keyConfigurations/${this.keyConfigId}/certificates`);
+    private async getHYOKCertificates(): Promise<{ hyokManagementCerts: HyokCertificates[], cryptoRolesCerts: HyokCertificates[], notRequiredForHYOK: boolean }> {
+        const hyokAWScertificates = await this.api.get<HyokCertificatesResponse>(`keyConfigurations/${this.keyConfigId}/certificates`);
         return {
             hyokManagementCerts: hyokAWScertificates?.tenantDefault?.value ?? [],
-            cryptoRolesCerts: hyokAWScertificates?.crypto?.value ?? []
+            cryptoRolesCerts: hyokAWScertificates?.crypto?.value ?? [],
+            notRequiredForHYOK: isHyokCertificatesNotRequired(hyokAWScertificates)
         };
     }
 

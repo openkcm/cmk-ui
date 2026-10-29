@@ -206,16 +206,19 @@ export interface AccessDetails {
     management: ProviderAccessDetails
     crypto: Record<string, AWSAccessDetails | FortanixAccessDetails>
 }
-export interface HyokKeyPayload {
+export interface HyokKeyPayloadWithoutCerts {
     name: string
-    nativeId: string
     type: KeyCreationTypes
     keyConfigurationID: string
     description?: string
     enabled?: boolean
     provider: HYOKProviders | BYOKProviders
+}
+export interface HyokKeyPayload extends HyokKeyPayloadWithoutCerts {
+    nativeId: string
     accessDetails: AccessDetails
 }
+export type HyokKeyCreationPayload = HyokKeyPayload | HyokKeyPayloadWithoutCerts;
 export interface SubjectDN {
     C?: string
     CN?: string
@@ -229,6 +232,17 @@ export interface HyokCertificates {
     name: string
     rootCA: string
     subject: SubjectDN | string
+}
+export interface HyokCertificatesResponse {
+    tenantDefault?: {
+        count?: number
+        value?: HyokCertificates[]
+    }
+    crypto?: {
+        count?: number
+        value?: HyokCertificates[]
+    }
+    notRequiredForHYOK?: boolean
 }
 export interface HyokAWSManagementCertInput {
     trustAnchorARN: string | null
