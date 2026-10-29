@@ -532,6 +532,34 @@
                                 </VBox>
                             </content>
                         </Page>
+                        <Page id="HYOKKeyCreationSimplePage" showHeader="false"
+                            class="sapUiResponsivePadding--header sapUiResponsivePadding--content">
+                            <content>
+                                <VBox width="100%" class="sapUiContentPadding sapUiMediumMarginTop">
+                                    <Label text="{i18n>keyName}:" required="true" />
+                                    <Input value="{model>/keyName}"
+                                        valueLiveUpdate="true">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="hyokSimpleName-Input"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </Input>
+                                    <Label text="{i18n>keyDescription}:"
+                                        class="sapUiTinyMarginTop" />
+                                    <TextArea value="{model>/description}" rows="4"
+                                        width="100%">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="hyokSimple-descriptionInput"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </TextArea>
+                                </VBox>
+                            </content>
+                        </Page>
                     </pages>
                 </NavContainer>
             </f:content>
@@ -539,7 +567,8 @@
                 <OverflowToolbar>
                     <ToolbarSpacer />
                     <Button text="{i18n>addKey}" type="Emphasized"
-                        visible="{= !!${model>/reviewMode}}"
+                        visible="{= !!${model>/reviewMode} || !!${model>/notRequiredForHYOK} }"
+                        enabled="{= !${model>/notRequiredForHYOK} || ${model>/keyName}.length > 0 }"
                         press="onKeyCreationWizardSubmitPress">
                         <customData>
                             <core:CustomData
