@@ -13,9 +13,6 @@ import { ListItemBase$PressEvent } from 'sap/m/ListItemBase';
 import { isUUIDValid, copyToClipboard, showErrorMessage } from 'kms/common/Helpers';
 import EventBus from 'sap/ui/core/EventBus';
 import { Button$PressEvent } from 'sap/m/Button';
-import Filter from 'sap/ui/model/Filter';
-import FilterOperator from 'sap/ui/model/FilterOperator';
-import ListBinding from 'sap/ui/model/ListBinding';
 import MultiInput, { MultiInput$TokenUpdateEvent } from 'sap/m/MultiInput';
 import Token from 'sap/m/Token';
 import { ActionTypes, ArtifactTypes, BYOKProviders, EventChannelIds, EventIDs, HYOKProviders, KeyCreationTypes, KeyStates, SystemStatus, WorkflowStatus } from 'kms/common/Enums';
@@ -25,7 +22,7 @@ import HyokKeyRegistration from 'kms/component/HyokKeyCreation';
 import { AxiosError } from 'axios';
 import Workflow from 'kms/component/Workflow';
 import List from 'sap/m/List';
-import { SearchField$LiveChangeEvent } from 'sap/m/SearchField';
+import { SearchField$SearchEvent } from 'sap/m/SearchField';
 
 interface KeyConfigPatchPayload {
     name: string
@@ -266,6 +263,9 @@ export default class KeyConfigDetail extends BaseController {
     public onConnectSystemsCancelPress(): void {
         this.connectSystemPopover?.destroy();
         this.connectSystemPopover = undefined;
+        this.connectSystemCurrentPage = 1;
+        this.connectSystemSkip = 0;
+        this.connectSystemModel.setProperty('/searchQuery', undefined);
     }
 
     public async onConnectSystemsConfirmPress(): Promise<void> {
@@ -341,35 +341,10 @@ export default class KeyConfigDetail extends BaseController {
         }
     }
 
-    public onSearchConnectSystems(event: SearchField$LiveChangeEvent): void {
-        // Get the search query from the event
-        const query = event.getParameter('newValue');
-
-        // Get the list control and its binding with type casting
-        const list = this.byId('connectSystemsList') as List;
-        const binding = list.getBinding('items') as ListBinding;
-
-        if (!binding) {
-            return;
-        }
-
-        const filters: Filter[] = [];
-
-        if (query && query.length > 0) {
-            // Define the individual filters
-            const filterExternalName = new Filter('properties/externalName', FilterOperator.Contains, query);
-            const filterIdentifier = new Filter('identifier', FilterOperator.Contains, query);
-            const filterRegion = new Filter('region', FilterOperator.Contains, query);
-            // Combine with 'and: false' to create an OR logic
-            const combinedFilter = new Filter({
-                filters: [filterExternalName, filterIdentifier, filterRegion],
-                and: false
-            });
-
-            filters.push(combinedFilter);
-        }
-        // Apply the filter array to the binding
-        binding.filter(filters);
+    public async onSearchConnectSystemsSubmit(event: SearchField$SearchEvent): Promise<void> {
+        const query = event.getParameter('query')?.trim();
+        this.connectSystemModel.setProperty('/searchQuery', query || undefined);
+        await this.resetConnectSystemModel();
     }
 
     private async getKeyConfigData(): Promise<void> {
@@ -520,8 +495,10 @@ export default class KeyConfigDetail extends BaseController {
     private async getAllSystemAvailableForConnection() {
         this.connectSystemPopover?.setBusy(true);
         try {
+            const searchQuery: string = this.connectSystemModel.getProperty('/searchQuery') as string;
             const payload = {
                 $filter: `status eq '${SystemStatus.DISCONNECTED}'`,
+                ...(searchQuery ? { $search: searchQuery } : {}),
                 $top: this.top,
                 $skip: this.connectSystemSkip
             };
