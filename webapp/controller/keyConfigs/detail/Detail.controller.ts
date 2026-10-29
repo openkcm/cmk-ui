@@ -1,7 +1,7 @@
 import BaseController from 'kms/controller/BaseController';
 import JSONModel from 'sap/ui/model/json/JSONModel';
 import BindingMode from 'sap/ui/model/BindingMode';
-import { KeyConfig, Key, System, MangedKeyPayload, HyokKeyPayload, KeystoreResponse, WorkflowParams } from 'kms/common/Types';
+import { KeyConfig, Key, System, MangedKeyPayload, HyokKeyCreationPayload, KeystoreResponse, WorkflowParams } from 'kms/common/Types';
 import { Route$PatternMatchedEvent } from 'sap/ui/core/routing/Route';
 import Api from 'kms/services/Api.service';
 import MessageBox from 'sap/m/MessageBox';
@@ -239,7 +239,7 @@ export default class KeyConfigDetail extends BaseController {
             keySubtype,
             keystoreSettings
         } as KeyCreationParams;
-        const createKey = async (payload: MangedKeyPayload | HyokKeyPayload) => {
+        const createKey = async (payload: MangedKeyPayload | HyokKeyCreationPayload) => {
             await this.api.post('keys', payload);
             MessageToast.show(this.getText('keyCreatedSuccessfully'));
             this.getKeyConfigData().catch((error: unknown) => {
