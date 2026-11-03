@@ -348,8 +348,8 @@ export default class HyokKeyRegistration extends BaseController {
         const hyokAWSManagementCertObj = this.keyCreationModel.getProperty('/hyokAWSManagementCertObj') as HyokAWSManagementCertInput;
         const managementRolesComplete
             = (hyokAWSManagementCertObj?.trustAnchorARN ?? '').length > 0
-            && (hyokAWSManagementCertObj?.roleARN ?? '').length > 0
-            && (hyokAWSManagementCertObj?.rootCA ?? '').length > 0;
+              && (hyokAWSManagementCertObj?.roleARN ?? '').length > 0
+              && (hyokAWSManagementCertObj?.rootCA ?? '').length > 0;
         this.keyCreationModel.setProperty('/hyokManagementRoleStepValid', managementRolesComplete);
     }
 
