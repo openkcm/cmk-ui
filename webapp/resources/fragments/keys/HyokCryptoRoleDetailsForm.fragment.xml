@@ -1,6 +1,47 @@
 <core:FragmentDefinition xmlns="sap.m"
     xmlns:core="sap.ui.core"
-    xmlns:forms="sap.ui.layout.form">
+    xmlns:forms="sap.ui.layout.form"
+    core:require="{ commonFormatter: 'kms/common/Formatters' }">
+    <VBox class="sapUiSmallMarginBegin sapUiSmallMarginTop">
+        <Label text="{i18n>certificateSubject}" design="Bold" />
+        <SegmentedButton
+            selectedKey="{twoWay>certViewMode}"
+            selectionChange="onToggleCertViewMode"
+            class="sapUiTinyMarginTop sapUiTinyMarginBottom"
+            width="12rem">
+            <items>
+                <SegmentedButtonItem key="String" text="{i18n>certViewString}" />
+                <SegmentedButtonItem key="Details" text="{i18n>certViewDetails}"
+                    visible="{path: 'twoWay>subject', formatter: 'commonFormatter.hasStructuredSubject'}" />
+            </items>
+        </SegmentedButton>
+        <Text text="{path: 'twoWay>subject', formatter: 'commonFormatter.formatSubjectDN'}"
+            wrapping="true"
+            visible="{= ${twoWay>certViewMode} !== 'Details' }" />
+        <HBox class="sapUiTinyMarginTop" wrap="Wrap"
+            visible="{= ${twoWay>certViewMode} === 'Details' }">
+            <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                <Label text="{i18n>subjectCN}:" />
+                <Text text="{path: 'twoWay>subject/CN', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+            </VBox>
+            <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                <Label text="{path: 'twoWay>subject/OU', formatter: 'commonFormatter.formatSubjectOULabel'}" />
+                <Text text="{path: 'twoWay>subject/OU', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" renderWhitespace="true" />
+            </VBox>
+            <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                <Label text="{i18n>subjectO}:" />
+                <Text text="{path: 'twoWay>subject/O', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+            </VBox>
+            <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                <Label text="{i18n>subjectL}:" />
+                <Text text="{path: 'twoWay>subject/L', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+            </VBox>
+            <VBox class="sapUiMediumMarginEnd sapUiTinyMarginBottom">
+                <Label text="{i18n>subjectC}:" />
+                <Text text="{path: 'twoWay>subject/C', formatter: 'commonFormatter.formatSubjectDNField'}" wrapping="true" />
+            </VBox>
+        </HBox>
+    </VBox>
     <forms:Form width="100%">
         <forms:layout>
             <forms:ColumnLayout

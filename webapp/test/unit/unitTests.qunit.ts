@@ -1,4 +1,6 @@
 import './controller/App.qunit';
+import './controller/DetailPanel.qunit';
+import './component/HyokKeyCreation.qunit';
 import './formatter/Formatters.qunit';
 import './common/Helpers.qunit';
 import './common/Byok.qunit';
