@@ -117,20 +117,28 @@ export default class Component extends UIComponent {
             // support icon.
             const selectedTenant = tenants?.find(t => t.id === tenantId);
             const bis = BuiltInSupportService.getInstance();
+            const isBisEnabled = config.bisEnabled === true;
+
+            // Re-evaluates the Built-in Support state and reflects it on the
+            // selectedTenant model. Called once after initialize() resolves and
+            // again on every subsequent auth/ready state change (e.g. when an
+            // S-user signs in through the support panel) so the signed-in UI
+            // updates immediately without requiring a page refresh.
+            const syncBuiltInSupportState = () => {
+                const selectedTenantModel = this.getModel('selectedTenant');
+                if (selectedTenantModel instanceof JSONModel) {
+                    selectedTenantModel.setProperty('/isBuiltInSupportEnabled', isBisEnabled && bis.isReady());
+                }
+            };
+
             void bis.initialize({
                 tenantId: tenantId,
                 tenantName: selectedTenant?.name || '',
                 targetEnvironment: config.bisEnvironment || 'test',
-                // Feature flag: enabled only where config.json sets bisEnabled:true
-                // (devel/staging). Defaults to false in canary/production.
-                enabled: config.bisEnabled === true,
-                language: Localization.getLanguage()
-            }).then(() => {
-                const selectedTenantModel = this.getModel('selectedTenant');
-                if (selectedTenantModel instanceof JSONModel) {
-                    selectedTenantModel.setProperty('/isBuiltInSupportEnabled', bis.isReady());
-                }
-            });
+                enabled: isBisEnabled,
+                language: Localization.getLanguage(),
+                onReadyStateChange: syncBuiltInSupportState
+            }).then(syncBuiltInSupportState);
 
             SplashScreen.hide();
         }
