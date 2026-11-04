@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/openkcm/cmk-ui/compare/v0.1.5...v0.1.6) (2026-11-04)
+
+
+### Bug Fixes
+
+* correct binary-ops indentation in HyokKeyCreation ([f53ee1e](https://github.com/openkcm/cmk-ui/commit/f53ee1effd6f5dc6ca8a134c292fcf345904d8d8))
+
 ## [0.1.5](https://github.com/openkcm/cmk-ui/compare/v0.1.4...v0.1.5) (2026-10-21)
 
 
