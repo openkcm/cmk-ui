@@ -12,6 +12,14 @@ export interface BISInitConfig {
      * no-op stub; honored by the real SAP implementation.
      */
     enabled?: boolean
+    /**
+     * Optional callback invoked whenever the Built-in Support auth/ready state
+     * changes AFTER initialization — for example when an S-user signs in through
+     * the support panel. Lets the shell update the signed-in UI without requiring
+     * a full page refresh. Ignored by this no-op stub; invoked by the real SAP
+     * implementation on every state transition.
+     */
+    onReadyStateChange?: () => void
 }
 
 /**
