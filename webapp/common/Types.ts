@@ -213,6 +213,7 @@ export interface HyokKeyPayloadWithoutCerts {
     description?: string
     enabled?: boolean
     provider: HYOKProviders | BYOKProviders
+    nativeId?: string
 }
 export interface HyokKeyPayload extends HyokKeyPayloadWithoutCerts {
     nativeId: string
