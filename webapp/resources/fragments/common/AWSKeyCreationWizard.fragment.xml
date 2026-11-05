@@ -546,6 +546,17 @@
                                                 writeToDom="true" />
                                         </customData>
                                     </Input>
+                                    <Label text="{i18n>keyARN}:" required="true"
+                                        class="sapUiSmallMarginTop" />
+                                    <Input value="{model>/nativeId}"
+                                        valueLiveUpdate="true">
+                                        <customData>
+                                            <core:CustomData
+                                                key="testId"
+                                                value="hyokSimpleArn-Input"
+                                                writeToDom="true" />
+                                        </customData>
+                                    </Input>
                                     <Label text="{i18n>keyDescription}:"
                                         class="sapUiTinyMarginTop" />
                                     <TextArea value="{model>/description}" rows="4"
@@ -568,7 +579,7 @@
                     <ToolbarSpacer />
                     <Button text="{i18n>addKey}" type="Emphasized"
                         visible="{= !!${model>/reviewMode} || !!${model>/notRequiredForHYOK} }"
-                        enabled="{= !${model>/notRequiredForHYOK} || ${model>/keyName}.length > 0 }"
+                        enabled="{= !${model>/notRequiredForHYOK} || (${model>/keyName}.length > 0 &amp;&amp; ${model>/nativeId}.length > 0) }"
                         press="onKeyCreationWizardSubmitPress">
                         <customData>
                             <core:CustomData

@@ -263,6 +263,7 @@ export default class HyokKeyRegistration extends BaseController {
         if (this.keyCreationModel.getProperty('/notRequiredForHYOK') === true) {
             return {
                 name: this.keyCreationModel.getProperty('/keyName') as string,
+                nativeId: this.keyCreationModel.getProperty('/nativeId') as string,
                 description: this.keyCreationModel.getProperty('/description') as string,
                 type: this.type,
                 keyConfigurationID: this.keyConfigId,
