@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.7](https://github.com/openkcm/cmk-ui/compare/v0.1.6...v0.1.7) (2026-11-06)
+
+
+### Bug Fixes
+
+* **deps:** bump actions/checkout from 4 to 7 ([7a7679f](https://github.com/openkcm/cmk-ui/commit/7a7679f004f6feb35c13f5a81976e2e7f2dd291d))
+* **deps:** bump actions/setup-node from 4 to 7 ([fc0d797](https://github.com/openkcm/cmk-ui/commit/fc0d797393a52a34bb668e3cb8dd9237b07ca6ea))
+* **deps:** bump follow-redirects from 1.16.1 to 1.16.2 ([c1c9f08](https://github.com/openkcm/cmk-ui/commit/c1c9f0813c81550ee497bac50dc13bbe172fce86))
+* **deps:** bump nginx ([6733861](https://github.com/openkcm/cmk-ui/commit/67338616f1afd7f286a69349379a5a4287df837b))
+* **deps:** bump node from 25-alpine to 26-alpine ([6e25d33](https://github.com/openkcm/cmk-ui/commit/6e25d33ce4d45b5a8c0feb72107d28ab84328171))
+* **workflows:** update release trigger workflow to use release-please action ([174e39e](https://github.com/openkcm/cmk-ui/commit/174e39e903cfbc630d7974005656621ae33954bb))
+
 ## [0.1.6](https://github.com/openkcm/cmk-ui/compare/v0.1.5...v0.1.6) (2026-11-04)
 
 
