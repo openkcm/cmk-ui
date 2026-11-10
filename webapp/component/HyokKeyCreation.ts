@@ -267,7 +267,11 @@ export default class HyokKeyRegistration extends BaseController {
                 description: this.keyCreationModel.getProperty('/description') as string,
                 type: this.type,
                 keyConfigurationID: this.keyConfigId,
-                provider: this.subtype
+                provider: this.subtype,
+                accessDetails: {
+                    management: {} as AWSAccessDetails | FortanixAccessDetails | GCPAccessDetails,
+                    crypto: {}
+                }
             };
         }
 
