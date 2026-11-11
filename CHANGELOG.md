@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.8](https://github.com/openkcm/cmk-ui/compare/v0.1.7...v0.1.8) (2026-11-11)
+
+
+### Bug Fixes
+
+* include the missing accessDetails from the requests ([#180](https://github.com/openkcm/cmk-ui/issues/180)) ([34c467b](https://github.com/openkcm/cmk-ui/commit/34c467b906ff7a8e2b0dbcd07dc09fe23dad285a))
+
 ## [0.1.7](https://github.com/openkcm/cmk-ui/compare/v0.1.6...v0.1.7) (2026-11-06)
 
 

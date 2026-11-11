@@ -1,7 +1,7 @@
 {
   "name": "cmk-ui",
   "private": true,
-  "version": "0.1.7",
+  "version": "0.1.8",
   "author": "SAP SE",
   "description": "CMK UI",
   "dependencies": {
