@@ -9,7 +9,7 @@
         title="{i18n>connectSystem}">
         <subHeader>
             <Toolbar>
-                <SearchField liveChange="onSearchConnectSystems" width="100%" />
+                <SearchField search="onSearchConnectSystemsSubmit" width="100%" />
             </Toolbar>
         </subHeader>
         <content>
